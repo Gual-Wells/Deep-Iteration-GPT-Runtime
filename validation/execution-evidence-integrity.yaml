@@ -1,0 +1,15 @@
+id: execution-evidence-integrity
+checks:
+  - "reported_actions_actually_occurred"
+  - "external_verifiable_evidence_is_identifiable"
+  - "runtime_attestation_is_labeled_as_runtime_attestation"
+  - "unverified_or_degraded_parts_are_disclosed"
+  - "protocol_requirements_are_not_misreported_as_execution_facts"
+  - "evidence_summary_is_brief"
+  - "hidden_reasoning_is_not_exposed"
+  - "evidence_status_is_present"
+repair:
+  - "remove_unsubstantiated_execution_claims"
+  - "downgrade_claim_to_runtime_attestation_when_appropriate"
+  - "mark_missing_independent_evidence"
+  - "state_remote_or_tool_degradation"

@@ -13,6 +13,7 @@ defaults:
     - validation/task-fidelity.yaml
     - validation/defect-regression.yaml
     - validation/native-capability-regression.yaml
+    - validation/execution-evidence-integrity.yaml
 
 routes:
   current_or_external_facts:

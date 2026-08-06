@@ -14,4 +14,4 @@ https://raw.githubusercontent.com/<OWNER>/<REPO>/stable/manifest.json
 
 - `stable`：最新稳定；
 - `main`：开发版本；
-- `v2.0.0`：固定版本。
+- `v2.1.0`：固定版本。

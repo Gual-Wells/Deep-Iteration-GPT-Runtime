@@ -33,6 +33,7 @@
         "executing",
         "auditing",
         "revising",
+        "evidence_reporting",
         "completed"
       ]
     },
@@ -52,6 +53,14 @@
     },
     "stop_reason": {
       "type": "string"
+    },
+    "evidence_status": {
+      "enum": [
+        "complete",
+        "partial",
+        "degraded",
+        "failed"
+      ]
     }
   },
   "additionalProperties": true

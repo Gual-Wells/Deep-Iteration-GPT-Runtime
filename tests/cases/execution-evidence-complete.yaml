@@ -1,0 +1,11 @@
+name: execution-evidence-complete
+observed:
+  - "manifest.json fetched"
+  - "core rules fetched"
+  - "web sources opened"
+  - "result audit recorded"
+expected:
+  evidence_status: "complete"
+  output_order:
+    - "execution_evidence"
+    - "final_result"

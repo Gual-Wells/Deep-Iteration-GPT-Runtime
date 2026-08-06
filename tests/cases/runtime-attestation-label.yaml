@@ -1,0 +1,6 @@
+name: runtime-attestation-label
+claim: "结果回代审计已完成"
+independent_artifact: false
+expected:
+  classification: "runtime_attested"
+  classification_not_allowed: "external_verifiable"
