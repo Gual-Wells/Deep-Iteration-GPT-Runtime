@@ -1,0 +1,10 @@
+id: meta-research
+activate_when:
+  - "best_method_is_unclear"
+  - "task_requires_domain_specific_evaluation"
+  - "workflow_choice_can_materially_change_quality"
+questions:
+  - "what_is_the_current_best_practice"
+  - "which_sources_and_tools_are_authoritative"
+  - "what_failure_modes_are_reported"
+  - "how_should_results_be_verified"

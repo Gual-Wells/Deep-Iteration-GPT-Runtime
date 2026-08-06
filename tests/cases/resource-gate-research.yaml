@@ -1,0 +1,8 @@
+name: resource-gate-research
+input: "深度迭代：核查现行官方政策并对比社区反馈"
+expected:
+  external_research: true
+  modules:
+    - "external-resource-gate"
+    - "source-priority"
+    - "evidence-integrity"

@@ -1,0 +1,5 @@
+name: trigger-negative
+input: "请进行深度迭代分析"
+expected:
+  activated: false
+reason: "未使用显式前缀"

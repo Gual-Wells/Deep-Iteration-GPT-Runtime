@@ -1,0 +1,5 @@
+name: empty-task
+input: "深度迭代："
+expected:
+  activated: false
+  action: "请求非空任务"

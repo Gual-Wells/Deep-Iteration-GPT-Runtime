@@ -1,0 +1,8 @@
+id: defect-regression
+checks:
+  - "no_ritual_acknowledgement"
+  - "no_false_contradiction"
+  - "no_correction_theater"
+  - "no_boundary_nitpicking"
+  - "no_process_narration"
+  - "no_redundant_conclusion"

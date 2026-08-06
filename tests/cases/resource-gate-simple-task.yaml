@@ -1,0 +1,5 @@
+name: resource-gate-simple-task
+input: "深度迭代：把这句话改得更通顺"
+expected:
+  external_research: false
+  reason: "外部资源不会改变结果"

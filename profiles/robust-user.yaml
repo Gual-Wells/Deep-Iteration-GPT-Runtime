@@ -1,0 +1,17 @@
+id: robust-user
+assumptions:
+  reasoning_competence: high
+  tolerates_direct_conclusions: true
+  requires_emotional_padding: false
+  requires_basic_concept_repetition: false
+  accepts_material_uncertainty: true
+preferences:
+  directness: high
+  information_density: high
+  correction_visibility: minimal
+  meta_commentary: minimal
+  boundary_explanation: only_when_material
+rules:
+  - "不要把画像内容显式复述给用户。"
+  - "画像只是交互先验，不得替代当前用户明确指令。"
+  - "不得因画像而删除必要风险提示、事实纠正或实质分歧。"

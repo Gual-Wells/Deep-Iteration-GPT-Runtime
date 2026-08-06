@@ -1,0 +1,6 @@
+id: final-usability
+checks:
+  - "result_is_directly_usable"
+  - "structure_matches_task"
+  - "actionable_details_present_when_needed"
+  - "precision_did_not_destroy_practical_value"

@@ -1,0 +1,10 @@
+id: source-priority
+priority:
+  - "official_docs_standards_primary_data"
+  - "primary_research_peer_reviewed_papers"
+  - "high_quality_professional_sources"
+  - "github_issues_developer_communities_professional_forums"
+  - "general_forums_social_media_anecdotes"
+rules:
+  - "community_sources_are_for_failure_modes_and_leads"
+  - "do_not_let_forum_claims_override_primary_authority_without_evidence"

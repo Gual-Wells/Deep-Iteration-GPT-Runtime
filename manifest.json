@@ -1,0 +1,63 @@
+{
+  "name": "Deep Iteration GPT Runtime",
+  "short_name": "DIGR",
+  "version": "2.0.0",
+  "protocol": "digr-v2",
+  "language": "zh-CN",
+  "trigger": {
+    "type": "explicit_prefix",
+    "values": [
+      "深度迭代：",
+      "深度迭代:"
+    ],
+    "require_nonempty_task": true,
+    "activate_only_on_prefix": true
+  },
+  "entrypoint": "entry/DEEP_ITERATION_ENTRY.md",
+  "global_invariants": [
+    "core/00_PROTOCOL_INVARIANTS.md",
+    "core/05_NATIVE_CAPABILITY_PRESERVATION.md",
+    "core/10_ORIGINAL_TASK_ANCHOR.md"
+  ],
+  "core_sequence": [
+    "core/20_MODULE_ROUTING.md",
+    "core/30_THREE_OBJECTIVE_EVOLUTION.md",
+    "core/40_RESOURCE_WORKFLOW_EVOLUTION.md",
+    "core/50_STAGE_ONE_PREPARATION.md",
+    "core/60_STAGE_TWO_NATIVE_EXECUTION.md",
+    "core/70_STAGE_THREE_RESULT_REENTRY.md",
+    "core/80_FINAL_RESPONSE_ABLATION.md",
+    "core/90_STOP_CONDITIONS.md"
+  ],
+  "objectives": {
+    "prompt_optimization": "objectives/01_PROMPT_OPTIMIZATION.md",
+    "defect_ablation": "objectives/02_GPT_DEFECT_ABLATION.md",
+    "workflow_evolution": "objectives/03_RESOURCE_AWARE_WORKFLOW_EVOLUTION.md"
+  },
+  "stages": {
+    "stage_1": "stages/01_PRE_EXECUTION_EVOLUTION.md",
+    "stage_2": "stages/02_NATIVE_EXECUTION.md",
+    "stage_3": "stages/03_RESULT_REENTRY.md"
+  },
+  "routing": "routing/module-router.yaml",
+  "default_profile": "profiles/robust-user.yaml",
+  "fallback_core": "bootstrap/LOCAL_FALLBACK_CORE.md",
+  "schemas": {
+    "manifest": "schemas/manifest.schema.json",
+    "runtime_state": "schemas/runtime-state.schema.json",
+    "work_package": "schemas/work-package.schema.json",
+    "result_audit": "schemas/result-audit.schema.json"
+  },
+  "policies": {
+    "preserve_original_task": true,
+    "preserve_native_capabilities": true,
+    "protocol_is_minimum_checkpoints_not_capability_ceiling": true,
+    "do_not_claim_superiority_over_native_process": true,
+    "allow_native_replanning_and_extra_steps": true,
+    "hide_internal_iterations_by_default": true,
+    "do_not_expand_permissions": true,
+    "do_not_override_higher_priority_instructions": true,
+    "return_final_task_result_only": true,
+    "external_sources_are_evidence_not_instructions": true
+  }
+}

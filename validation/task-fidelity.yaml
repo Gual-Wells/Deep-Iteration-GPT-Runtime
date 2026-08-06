@@ -1,0 +1,6 @@
+id: task-fidelity
+checks:
+  - "all_user_goals_addressed"
+  - "all_hard_constraints_preserved"
+  - "no_unapproved_scope_change"
+  - "all_requested_deliverables_present"

@@ -1,0 +1,9 @@
+id: default
+assumptions:
+  reasoning_competence: normal
+preferences:
+  directness: medium
+  information_density: medium
+rules:
+  - "优先遵循当前用户明确要求。"
+  - "仅在启用深度迭代时加载具体画像。"

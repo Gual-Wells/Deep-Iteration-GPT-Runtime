@@ -1,0 +1,5 @@
+name: native-capability-preservation
+scenario: "仓库工作流只列出官方文档，但执行中发现需要代码测试"
+expected:
+  allow_native_extension: true
+  action: "增加代码测试，不受仓库枚举限制"

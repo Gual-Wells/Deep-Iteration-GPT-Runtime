@@ -1,0 +1,6 @@
+id: fallback-strategy
+rules:
+  - "if_remote_rules_fail_use_local_fallback_core"
+  - "if_a_tool_fails_continue_with_best_available_method"
+  - "state_material_limitations_in_final_result"
+  - "do_not_abandon_the_task_due_to_noncritical_fetch_failure"

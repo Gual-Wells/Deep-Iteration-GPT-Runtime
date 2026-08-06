@@ -1,0 +1,100 @@
+Deep-Iteration-GPT-Runtime-v2.0.0/
+├── ablation/
+│   ├── anti-boundary-nitpicking.yaml
+│   ├── anti-correction-theater.yaml
+│   ├── anti-false-contradiction.yaml
+│   ├── anti-formalism.yaml
+│   ├── anti-meta-padding.yaml
+│   ├── anti-paternalism.yaml
+│   └── anti-verbosity.yaml
+├── bootstrap/
+│   └── LOCAL_FALLBACK_CORE.md
+├── core/
+│   ├── 00_PROTOCOL_INVARIANTS.md
+│   ├── 05_NATIVE_CAPABILITY_PRESERVATION.md
+│   ├── 10_ORIGINAL_TASK_ANCHOR.md
+│   ├── 20_MODULE_ROUTING.md
+│   ├── 30_THREE_OBJECTIVE_EVOLUTION.md
+│   ├── 40_RESOURCE_WORKFLOW_EVOLUTION.md
+│   ├── 50_STAGE_ONE_PREPARATION.md
+│   ├── 60_STAGE_TWO_NATIVE_EXECUTION.md
+│   ├── 70_STAGE_THREE_RESULT_REENTRY.md
+│   ├── 80_FINAL_RESPONSE_ABLATION.md
+│   └── 90_STOP_CONDITIONS.md
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── EXTENSION_GUIDE.md
+│   ├── GITHUB_DEPLOYMENT.md
+│   ├── MIGRATION_FROM_V1.md
+│   ├── QUALITY_MODEL.md
+│   └── SECURITY_MODEL.md
+├── entry/
+│   └── DEEP_ITERATION_ENTRY.md
+├── examples/
+│   ├── EXAMPLE_NON_TRIGGER.md
+│   ├── EXAMPLE_TRIGGER_ENGINEERING.md
+│   └── EXAMPLE_TRIGGER_RESEARCH.md
+├── local-personalization/
+│   ├── CHATGPT_LOCAL_PERSONALIZATION.txt
+│   └── README.md
+├── objectives/
+│   ├── 01_PROMPT_OPTIMIZATION.md
+│   ├── 02_GPT_DEFECT_ABLATION.md
+│   └── 03_RESOURCE_AWARE_WORKFLOW_EVOLUTION.md
+├── optimization/
+│   ├── constraint-fidelity.yaml
+│   ├── creative-preservation.yaml
+│   ├── evidence-discipline.yaml
+│   ├── execution-completeness.yaml
+│   ├── information-density.yaml
+│   └── prompt-minimality.yaml
+├── profiles/
+│   ├── default.yaml
+│   └── robust-user.yaml
+├── routing/
+│   └── module-router.yaml
+├── schemas/
+│   ├── manifest.schema.json
+│   ├── result-audit.schema.json
+│   ├── runtime-state.schema.json
+│   └── work-package.schema.json
+├── stages/
+│   ├── 01_PRE_EXECUTION_EVOLUTION.md
+│   ├── 02_NATIVE_EXECUTION.md
+│   └── 03_RESULT_REENTRY.md
+├── tests/
+│   ├── cases/
+│   │   ├── anti-false-contradiction.yaml
+│   │   ├── anti-meta-padding.yaml
+│   │   ├── empty-task.yaml
+│   │   ├── external-instruction-is-evidence-only.yaml
+│   │   ├── native-capability-preservation.yaml
+│   │   ├── native-regression-repair.yaml
+│   │   ├── necessary-correction-preserved.yaml
+│   │   ├── no-superiority-claim.yaml
+│   │   ├── no-useless-loop.yaml
+│   │   ├── resource-gate-research.yaml
+│   │   ├── resource-gate-simple-task.yaml
+│   │   ├── result-reentry.yaml
+│   │   ├── trigger-negative.yaml
+│   │   └── trigger-positive.yaml
+│   └── README.md
+├── validation/
+│   ├── defect-regression.yaml
+│   ├── evidence-integrity.yaml
+│   ├── final-usability.yaml
+│   ├── native-capability-regression.yaml
+│   ├── task-fidelity.yaml
+│   └── workflow-completeness.yaml
+├── workflow/
+│   ├── evidence-mapping.yaml
+│   ├── external-resource-gate.yaml
+│   ├── fallback-strategy.yaml
+│   ├── meta-research.yaml
+│   ├── source-priority.yaml
+│   └── tool-strategy.yaml
+├── CHANGELOG.md
+├── LICENSE
+├── manifest.json
+├── README.md
+└── VERSION

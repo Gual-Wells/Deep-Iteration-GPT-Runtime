@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DIGR v2 Runtime State",
+  "type": "object",
+  "required": [
+    "protocol",
+    "original_task",
+    "stage",
+    "status"
+  ],
+  "properties": {
+    "protocol": {
+      "const": "digr-v2"
+    },
+    "original_task": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stage": {
+      "enum": [
+        "pre_execution_evolution",
+        "native_execution",
+        "result_reentry",
+        "completed"
+      ]
+    },
+    "status": {
+      "enum": [
+        "anchored",
+        "routing",
+        "evolving",
+        "researching_method",
+        "executing",
+        "auditing",
+        "revising",
+        "completed"
+      ]
+    },
+    "active_modules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "iteration": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "native_capability_preserved": {
+      "type": "boolean"
+    },
+    "stop_reason": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

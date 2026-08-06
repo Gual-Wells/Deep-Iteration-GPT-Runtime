@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DIGR v2 Internal Work Package",
+  "type": "object",
+  "required": [
+    "original_task",
+    "prompt_strategy",
+    "ablation_strategy",
+    "workflow_strategy",
+    "validation_strategy",
+    "native_capability_policy"
+  ],
+  "properties": {
+    "original_task": {
+      "type": "string"
+    },
+    "prompt_strategy": {
+      "type": "string"
+    },
+    "ablation_strategy": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "workflow_strategy": {
+      "type": "object"
+    },
+    "validation_strategy": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "native_capability_policy": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

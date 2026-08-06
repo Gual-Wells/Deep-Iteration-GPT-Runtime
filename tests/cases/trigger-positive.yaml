@@ -1,0 +1,6 @@
+name: trigger-positive
+input: "深度迭代：分析方案并给出结论"
+expected:
+  activated: true
+  protocol: "digr-v2"
+  original_task: "分析方案并给出结论"

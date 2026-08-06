@@ -1,0 +1,3 @@
+name: no-superiority-claim
+bad_output: "代理流程一定比ChatGPT原生流程更优。"
+expected_property: "不声明优越性，只声明强制最低检查和复核"

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DIGR v2 Result Audit",
+  "type": "object",
+  "required": [
+    "task_fidelity",
+    "evidence_integrity",
+    "workflow_completeness",
+    "defect_regression",
+    "native_capability_regression",
+    "final_usability"
+  ],
+  "properties": {
+    "task_fidelity": {
+      "type": "object"
+    },
+    "evidence_integrity": {
+      "type": "object"
+    },
+    "workflow_completeness": {
+      "type": "object"
+    },
+    "defect_regression": {
+      "type": "object"
+    },
+    "native_capability_regression": {
+      "type": "object"
+    },
+    "final_usability": {
+      "type": "object"
+    },
+    "requires_stage_two_rerun": {
+      "type": "boolean"
+    },
+    "revision_directives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

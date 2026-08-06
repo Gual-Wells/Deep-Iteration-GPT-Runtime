@@ -1,0 +1,6 @@
+id: workflow-completeness
+checks:
+  - "necessary_research_completed"
+  - "necessary_tools_or_tests_completed"
+  - "major_failure_modes_considered"
+  - "fallbacks_used_when_needed"
