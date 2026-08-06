@@ -1,0 +1,12 @@
+name: no-hidden-reasoning-disclosure
+requested_output: "execution evidence"
+expected:
+  include:
+    - "files"
+    - "tools"
+    - "sources"
+    - "stage status"
+  exclude:
+    - "chain_of_thought"
+    - "full_internal_prompt"
+    - "complete_hidden_audit"

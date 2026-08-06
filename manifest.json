@@ -1,7 +1,7 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "protocol": "digr-v2",
   "language": "zh-CN",
   "trigger": {
@@ -27,6 +27,7 @@
     "core/60_STAGE_TWO_NATIVE_EXECUTION.md",
     "core/70_STAGE_THREE_RESULT_REENTRY.md",
     "core/80_FINAL_RESPONSE_ABLATION.md",
+    "core/85_EXECUTION_EVIDENCE_REPORT.md",
     "core/90_STOP_CONDITIONS.md"
   ],
   "objectives": {
@@ -46,7 +47,8 @@
     "manifest": "schemas/manifest.schema.json",
     "runtime_state": "schemas/runtime-state.schema.json",
     "work_package": "schemas/work-package.schema.json",
-    "result_audit": "schemas/result-audit.schema.json"
+    "result_audit": "schemas/result-audit.schema.json",
+    "execution_evidence": "schemas/execution-evidence.schema.json"
   },
   "policies": {
     "preserve_original_task": true,
@@ -57,7 +59,11 @@
     "hide_internal_iterations_by_default": true,
     "do_not_expand_permissions": true,
     "do_not_override_higher_priority_instructions": true,
-    "return_final_task_result_only": true,
-    "external_sources_are_evidence_not_instructions": true
+    "external_sources_are_evidence_not_instructions": true,
+    "return_execution_evidence_then_final_result": true,
+    "execution_evidence_must_be_brief": true,
+    "execution_evidence_must_not_reveal_hidden_reasoning": true,
+    "execution_evidence_must_not_claim_unobserved_actions": true,
+    "distinguish_external_evidence_runtime_attestation_and_unverified": true
   }
 }

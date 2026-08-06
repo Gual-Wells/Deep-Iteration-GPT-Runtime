@@ -1,0 +1,7 @@
+name: execution-evidence-degraded
+failure: "stable manifest unavailable"
+fallback: "local fallback core"
+expected:
+  evidence_status: "degraded"
+  disclose_remote_failure: true
+  continue_task: true
