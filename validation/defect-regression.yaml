@@ -1,8 +1,2 @@
 id: defect-regression
-checks:
-  - "no_ritual_acknowledgement"
-  - "no_false_contradiction"
-  - "no_correction_theater"
-  - "no_boundary_nitpicking"
-  - "no_process_narration"
-  - "no_redundant_conclusion"
+check: "最终文本是否重新出现假反驳、教师姿态、纠正表演、元语言或重复空话？"

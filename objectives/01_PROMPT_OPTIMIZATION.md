@@ -1,12 +1,5 @@
-# Objective 1 — Prompt Optimization
+# Prompt Optimization Objective
 
-优化的是本次执行所需的内部工作表达，不是把用户自然语言强制改造成“专业提示词”。
+优化维度：intent_fidelity、constraint_completeness、execution_feasibility、delivery_clarity、information_density、acceptance_testability。
 
-原则：
-
-- 原始任务已经清楚时，尽量少改；
-- 优化应集中在约束、执行、工具、证据与验收；
-- 任何新增内容都要能说明为何提高任务质量；
-- 不添加用户未授权的新目标；
-- 不用“你是一名资深专家”等无实质角色包装；
-- 不以提示词长度代表质量。
+原则：U0 越清楚，P* 改动越少；提示词不是越长越好；每个新增约束都应能提高执行或验收质量。

@@ -1,22 +1,10 @@
 # GitHub Deployment
 
-1. 上传完整仓库。
-2. 保持根目录存在 `manifest.json`。
-3. 建立 `stable` 分支或发布 `v2.1.0` tag。
-4. 将本地个性化中的占位地址替换为：
+建议先在分支导入本包并运行：
 
-```text
-https://raw.githubusercontent.com/<OWNER>/<REPO>/stable/manifest.json
+```bash
+python tests/validate_repo.py
+python -m unittest tests.test_reference_parser
 ```
 
-固定版本可使用：
-
-```text
-https://raw.githubusercontent.com/<OWNER>/<REPO>/v2.1.0/manifest.json
-```
-
-建议：
-
-- `main`：开发；
-- `stable`：最新稳定；
-- release tag：固定审计版本。
+通过后再将目标分支更新为本版本。若 `stable` 用作远程运行入口，应确保 `stable/manifest.json` 与本包版本一致，再更新本地 ChatGPT 个性化指令。

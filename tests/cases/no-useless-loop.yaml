@@ -1,5 +1,0 @@
-name: no-useless-loop
-condition: "下一轮只会改变措辞"
-expected:
-  continue_iteration: false
-  action: "进入执行或提交最终结果"

@@ -1,6 +1,3 @@
 id: constraint-fidelity
-rules:
-  - "逐项保留用户硬约束。"
-  - "软偏好不得被升级为硬约束。"
-  - "不得自行缩小或扩大任务范围。"
-  - "无法满足的约束应诚实说明，不得静默删除。"
+measure: [intent_fidelity, constraint_completeness]
+rule: "任何优化不得替换 U0；显式硬约束必须可追踪到 P* 与交付。"

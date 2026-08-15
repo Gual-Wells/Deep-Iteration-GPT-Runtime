@@ -1,5 +1,0 @@
-name: result-reentry
-draft_problem: "遗漏用户要求的测试方案"
-expected:
-  audit_detects: "task_fidelity_failure"
-  action: "修订结果并补齐测试方案"

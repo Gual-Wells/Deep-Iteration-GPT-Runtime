@@ -1,5 +1,4 @@
-version: 2
-
+version: 2.2
 defaults:
   ablation:
     - ablation/anti-meta-padding.yaml
@@ -13,50 +12,45 @@ defaults:
     - validation/task-fidelity.yaml
     - validation/defect-regression.yaml
     - validation/native-capability-regression.yaml
-    - validation/execution-evidence-integrity.yaml
-
+    - validation/runtime-report-integrity.yaml
 routes:
   current_or_external_facts:
     signals: ["最新", "当前", "核查", "官方", "规则", "价格", "政策", "论文", "来源"]
     add:
       - workflow/external-resource-gate.yaml
       - workflow/source-priority.yaml
+      - workflow/source-accounting.yaml
       - optimization/evidence-discipline.yaml
-      - validation/evidence-integrity.yaml
-
+      - validation/source-integrity.yaml
   deep_research:
-    signals: ["调研", "研究", "社区反馈", "论坛", "文献", "最佳实践"]
+    signals: ["调研", "研究", "社区反馈", "论坛", "文献", "最佳实践", "深度思考"]
     add:
       - workflow/meta-research.yaml
-      - workflow/evidence-mapping.yaml
+      - workflow/source-accounting.yaml
       - validation/workflow-completeness.yaml
-
   engineering:
-    signals: ["代码", "项目", "文件", "实现", "测试", "修复", "设计", "仓库"]
+    signals: ["代码", "项目", "文件", "实现", "测试", "修复", "设计", "仓库", "工程", "交付"]
     add:
       - workflow/tool-strategy.yaml
       - optimization/execution-completeness.yaml
       - validation/workflow-completeness.yaml
-
   creative:
     signals: ["创作", "故事", "文案", "风格", "改写"]
     add:
       - optimization/creative-preservation.yaml
-
   terminology_risk:
     signals: ["定义", "严格来说", "边界", "术语"]
     add:
       - ablation/anti-boundary-nitpicking.yaml
-
   direct_dense_user:
     signals: ["直接说", "别废话", "不要抬杠", "不用解释常识"]
     add:
       - ablation/anti-paternalism.yaml
       - ablation/anti-verbosity.yaml
       - ablation/anti-formalism.yaml
-
 limits:
   prefer_minimum_modules: true
   recommended_total_modules: 6
   maximum_total_modules: 12
   routing_is_advisory_not_capability_limit: true
+  complexity_budget_changes_depth_not_module_count_mechanically: true

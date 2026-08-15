@@ -1,42 +1,37 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR v2 Result Audit",
+  "title": "DIGR Result Re-entry Audit",
   "type": "object",
   "required": [
     "task_fidelity",
-    "evidence_integrity",
-    "workflow_completeness",
-    "defect_regression",
-    "native_capability_regression",
-    "final_usability"
+    "evidence_complete",
+    "workflow_complete",
+    "defect_regression_free",
+    "native_capability_preserved",
+    "final_usable",
+    "redo_required"
   ],
   "properties": {
     "task_fidelity": {
-      "type": "object"
-    },
-    "evidence_integrity": {
-      "type": "object"
-    },
-    "workflow_completeness": {
-      "type": "object"
-    },
-    "defect_regression": {
-      "type": "object"
-    },
-    "native_capability_regression": {
-      "type": "object"
-    },
-    "final_usability": {
-      "type": "object"
-    },
-    "requires_stage_two_rerun": {
       "type": "boolean"
     },
-    "revision_directives": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+    "evidence_complete": {
+      "type": "boolean"
+    },
+    "workflow_complete": {
+      "type": "boolean"
+    },
+    "defect_regression_free": {
+      "type": "boolean"
+    },
+    "native_capability_preserved": {
+      "type": "boolean"
+    },
+    "final_usable": {
+      "type": "boolean"
+    },
+    "redo_required": {
+      "type": "boolean"
     }
   },
   "additionalProperties": true

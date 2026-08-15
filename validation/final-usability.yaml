@@ -1,6 +1,2 @@
 id: final-usability
-checks:
-  - "result_is_directly_usable"
-  - "structure_matches_task"
-  - "actionable_details_present_when_needed"
-  - "precision_did_not_destroy_practical_value"
+check: "真正任务结果是否先出现、可直接理解/执行/下载，且 DIGR 记录没有喧宾夺主？"

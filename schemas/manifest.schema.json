@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR v2 Manifest",
+  "title": "DIGR Manifest 2.2",
   "type": "object",
   "required": [
     "name",
@@ -10,19 +10,14 @@
     "entrypoint",
     "global_invariants",
     "core_sequence",
-    "objectives",
-    "stages"
+    "policies"
   ],
   "properties": {
-    "name": {
-      "type": "string"
-    },
     "version": {
-      "type": "string",
-      "const": "2.1.0"
+      "const": "2.2.0"
     },
     "protocol": {
-      "const": "digr-v2"
+      "const": "digr-v2.2"
     },
     "trigger": {
       "type": "object"
@@ -42,10 +37,7 @@
         "type": "string"
       }
     },
-    "objectives": {
-      "type": "object"
-    },
-    "stages": {
+    "policies": {
       "type": "object"
     }
   },

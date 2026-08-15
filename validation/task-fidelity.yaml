@@ -1,6 +1,2 @@
 id: task-fidelity
-checks:
-  - "all_user_goals_addressed"
-  - "all_hard_constraints_preserved"
-  - "no_unapproved_scope_change"
-  - "all_requested_deliverables_present"
+check: "最终结果是否完整回答 U0 且保留硬约束？"

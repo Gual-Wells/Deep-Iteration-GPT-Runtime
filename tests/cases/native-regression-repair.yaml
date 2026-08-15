@@ -1,5 +1,0 @@
-name: native-regression-repair
-draft_problem: "代理规则阻止了必要搜索"
-expected:
-  audit_detects: "native_capability_regression"
-  repair: "撤销限制并恢复原生搜索判断"

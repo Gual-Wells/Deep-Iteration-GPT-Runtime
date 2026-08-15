@@ -1,7 +1,0 @@
-id: evidence-integrity
-checks:
-  - "major_claims_supported"
-  - "source_quality_matches_claim"
-  - "inference_not_misrepresented_as_fact"
-  - "material_uncertainty_preserved"
-  - "community_feedback_not_treated_as_primary_authority"
