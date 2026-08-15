@@ -1,10 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR Invocation",
+  "title": "DIGR 2.3 Invocation",
   "type": "object",
   "required": [
     "enabled",
-    "task_raw"
+    "task_raw",
+    "parameterized"
   ],
   "properties": {
     "enabled": {
@@ -20,11 +21,12 @@
       ],
       "minimum": 1
     },
-    "complexity_budget": {
+    "complexity_budget_raw": {
       "type": [
         "string",
         "null"
-      ]
+      ],
+      "description": "Opaque T expression preserved for ChatGPT semantic interpretation; schema does not convert it to minutes, tiers, tokens or workload."
     },
     "parameterized": {
       "type": "boolean"

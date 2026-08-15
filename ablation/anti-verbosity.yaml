@@ -1,3 +1,2 @@
-id: anti-verbosity
-check: "这段是否提供新的决策信息、证据或执行价值？"
-action: "没有则压缩或删除。"
+remove: repetition_and_empty_expansion
+preserve: task_required_detail

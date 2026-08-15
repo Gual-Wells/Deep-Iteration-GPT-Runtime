@@ -1,3 +1,2 @@
-id: anti-paternalism
-check: "是否无依据降低用户理解能力假设或采用训诫语气？"
-action: "改为直接、平等、信息密集。"
+remove: teacher_or_paternalistic_tone
+preserve: clear_risk_information

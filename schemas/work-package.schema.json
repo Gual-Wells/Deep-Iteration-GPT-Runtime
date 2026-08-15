@@ -1,31 +1,43 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR Work Package",
+  "title": "DIGR 2.3 Work Package",
   "type": "object",
-  "required": [
-    "u0",
-    "final_prompt",
-    "acceptance_criteria"
-  ],
   "properties": {
-    "u0": {
+    "U0": {
       "type": "string"
     },
-    "final_prompt": {
+    "P_star": {
       "type": "string"
     },
-    "acceptance_criteria": {
+    "T_raw": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "T_reference": {
+      "const": "GPT-5.6 Sol / High"
+    },
+    "complexity_interpretation": {
+      "type": "string",
+      "description": "High-level execution calibration; not hidden chain-of-thought."
+    },
+    "core_deliverables": {
       "type": "array",
       "items": {
         "type": "string"
       }
     },
-    "resource_plan": {
+    "candidate_high_value_actions": {
       "type": "array",
       "items": {
         "type": "string"
       }
     }
   },
+  "required": [
+    "U0",
+    "P_star"
+  ],
   "additionalProperties": true
 }

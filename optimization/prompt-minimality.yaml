@@ -1,2 +1,2 @@
-id: prompt-minimality
-rule: "P* 只保留能改善执行或验收的信息；U0 已清楚时最小改写。"
+objective: minimal_sufficient_P_star
+rule: "If U0 is already clear, avoid prompt inflation."

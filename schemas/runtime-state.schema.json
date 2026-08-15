@@ -1,82 +1,35 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR v2.2 Runtime State",
+  "title": "DIGR 2.3 Runtime State",
   "type": "object",
-  "required": [
-    "protocol",
-    "original_task",
-    "stage",
-    "status"
-  ],
   "properties": {
-    "protocol": {
-      "const": "digr-v2.2"
+    "U0": {
+      "type": "string"
     },
-    "original_task": {
-      "type": "string",
-      "minLength": 1
-    },
-    "stage": {
-      "enum": [
-        "pre_execution_evolution",
-        "native_execution",
-        "result_reentry",
-        "completed"
-      ]
-    },
-    "status": {
-      "enum": [
-        "anchored",
-        "routing",
-        "prompt_iterating",
-        "researching_method",
-        "executing",
-        "auditing",
-        "redoing",
-        "reporting",
-        "completed"
-      ]
-    },
-    "requested_min_iterations": {
-      "type": [
-        "integer",
-        "null"
-      ],
-      "minimum": 1
-    },
-    "actual_prompt_iterations": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "complexity_budget": {
+    "n_requested": {},
+    "t_raw": {},
+    "resolved_protocol_commit": {
       "type": [
         "string",
         "null"
       ]
     },
-    "complexity_level": {
-      "enum": [
-        "Focused",
-        "Analytical",
-        "Deep",
-        "Research",
-        "Extended Research",
-        "Auto"
-      ]
+    "actual_prompt_iterations": {
+      "type": "integer",
+      "minimum": 0
     },
     "redo_count": {
       "type": "integer",
       "minimum": 0
     },
-    "native_capability_preserved": {
-      "type": "boolean"
-    },
-    "active_modules": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "uniqueItems": true
+    "t_budget_adequacy": {
+      "enum": [
+        "pending",
+        "matched",
+        "early_convergence",
+        "resource_limited",
+        "not_applicable"
+      ]
     }
   },
   "additionalProperties": true

@@ -1,2 +1,2 @@
-id: execution-completeness
-rule: "工程任务优先做到可运行/可验证/可交付；能实际测试时不只给理论方案。"
+objective: complete_core_deliverables
+rule: "Every core deliverable must receive risk-proportionate execution and validation."

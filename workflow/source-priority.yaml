@@ -1,8 +1,7 @@
-id: source-priority
 priority:
   - user_primary_material
   - official_standard_original_data_source_code
-  - peer_reviewed_or_primary_technical
-  - high_quality_professional_community
+  - peer_reviewed_or_primary_research
+  - maintainer_or_high_quality_professional_community
   - general_web_or_forum
-rule: "按任务适配，不机械套层级。"
+rule: "Task context may override ordering when justified."

@@ -1,5 +1,5 @@
-# Auto budget trigger
+# Auto
 
-输入：`深度迭代：核实这条消息并解释可信度`
+`深度迭代：核实这个技术说法并给出结论`
 
-预期：启用 DIGR；N/T 自动；最终先给核实结果，再给 DIGR 记录。
+N/T 由 ChatGPT 自动选择，T 仍以 GPT-5.6 Sol / High 任务规模为参考。

@@ -1,2 +1,1 @@
-id: task-fidelity
-check: "最终结果是否完整回答 U0 且保留硬约束？"
+checks: [facts_preserved, goals_preserved, hard_constraints_preserved, authorization_not_expanded, U0_not_replaced]

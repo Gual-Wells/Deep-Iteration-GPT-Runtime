@@ -1,3 +1,2 @@
-id: anti-formalism
-check: "步骤是否只为显示协议复杂，而无信息增益？"
-action: "删除、合并或跳过无收益步骤。"
+remove: protocol_formalism
+preserve: useful_quality_checkpoints

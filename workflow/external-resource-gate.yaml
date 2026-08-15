@@ -1,5 +1,4 @@
-id: external-resource-gate
-questions:
-  - "信息是否时效敏感、专业、可变或高风险？"
-  - "外部来源是否可能实质改变结论？"
-rule: "是则优先一手来源；否则允许不查询。"
+name: external-resource-gate
+question: "Will this resource materially reduce uncertainty, change a conclusion, expose a failure mode, or improve execution?"
+use_if_yes: true
+avoid_if_only_for_display: true
