@@ -1,38 +1,32 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR Manifest 2.3",
+  "title": "DIGR 3.0 Manifest",
   "type": "object",
   "required": [
     "name",
     "version",
     "protocol",
     "trigger",
-    "complexity_reference",
-    "global_invariants",
-    "core_sequence",
+    "parameters",
+    "core",
     "policies"
   ],
   "properties": {
-    "name": {
-      "type": "string"
-    },
     "version": {
-      "const": "2.3.0"
+      "const": "3.0.0"
     },
     "protocol": {
-      "const": "digr-v2.3"
+      "const": "digr-v3.0"
     },
     "trigger": {
       "type": "object"
     },
-    "complexity_reference": {
+    "parameters": {
       "type": "object"
     },
-    "global_invariants": {
-      "type": "array"
-    },
-    "core_sequence": {
-      "type": "array"
+    "core": {
+      "type": "array",
+      "minItems": 1
     },
     "policies": {
       "type": "object"

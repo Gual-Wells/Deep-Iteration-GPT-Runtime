@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DIGR 3.0 Minimal Proof Data",
+  "type": "object",
+  "required": [
+    "version",
+    "main"
+  ],
+  "properties": {
+    "version": {
+      "const": "3.0"
+    },
+    "main": {
+      "type": "object"
+    },
+    "source": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

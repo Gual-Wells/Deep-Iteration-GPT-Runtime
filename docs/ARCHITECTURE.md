@@ -1,7 +1,39 @@
-# Architecture 2.3
+# Architecture — DIGR 3.0
 
-DIGR 由控制平面与原生执行面组成。控制平面负责：触发解析、U0、N 提示优化、T 语义校准、资源门控、结果回代和运行记录；执行面仍由 ChatGPT 原生规划/推理/工具能力完成。
+DIGR 3.0 是 **light control plane over ChatGPT native execution**。
 
-核心数据流：`Invocation(raw N/T) -> U0 -> P* -> semantic T calibration -> adaptive native execution -> budget adequacy -> result re-entry -> report`。
+## Control plane only guarantees
+- U0 fidelity
+- minimum evolution constraints
+- trusted hard-time verification
+- lightweight EST continuity
+- whole-process R/r breakthrough re-entry
+- per-S source evolution minimums
+- minimal truthful proof
 
-parser 与 schema 只负责结构，不承担智能决策。T 的任务规模解释和停止判断属于模型运行时。
+## Native plane owns
+- language understanding
+- planning
+- reasoning
+- search/research choices
+- tool strategy
+- testing/debugging
+- hypothesis generation
+- branch/depth choice
+- synthesis
+- final expression
+
+## Continuous co-evolution
+不存在固定 Stage 1/2/3。Prompt/行为、研究、S、测试、结果与 R 可以互相重新驱动。
+
+## State
+Runtime state 应保持最小：
+- U0
+- requested/actual minima
+- trusted clock anchor/capability
+- Main EST compact snapshot
+- current result
+- S instances: objective + compact EST + n/r + active source intervals
+- aggregate source time
+
+不维护隐藏思维日志。

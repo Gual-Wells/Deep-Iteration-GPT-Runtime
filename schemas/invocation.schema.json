@@ -1,35 +1,86 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR 2.3 Invocation",
+  "title": "DIGR 3.0 Semantic Invocation State",
+  "description": "Represents ChatGPT's semantic interpretation. It is not a parser grammar.",
   "type": "object",
   "required": [
     "enabled",
     "task_raw",
-    "parameterized"
+    "mode"
   ],
   "properties": {
     "enabled": {
       "type": "boolean"
     },
+    "mode": {
+      "enum": [
+        "off",
+        "auto",
+        "parameterized",
+        "help"
+      ]
+    },
     "task_raw": {
       "type": "string"
     },
-    "min_prompt_iterations": {
+    "N": {
       "type": [
         "integer",
         "null"
       ],
       "minimum": 1
     },
-    "complexity_budget_raw": {
+    "T_raw": {
       "type": [
         "string",
         "null"
-      ],
-      "description": "Opaque T expression preserved for ChatGPT semantic interpretation; schema does not convert it to minutes, tiers, tokens or workload."
+      ]
     },
-    "parameterized": {
-      "type": "boolean"
+    "R": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "B": {
+      "enum": [
+        "soft",
+        "hard",
+        null
+      ]
+    },
+    "S": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "t_raw": {
+          "type": "string"
+        },
+        "r": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "b": {
+          "enum": [
+            "soft",
+            "hard"
+          ]
+        }
+      },
+      "required": [
+        "n",
+        "t_raw",
+        "r",
+        "b"
+      ],
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

@@ -1,5 +1,0 @@
-principles:
-  - use_tools_when_they_materially_improve_quality
-  - parallelize_independent_calls_when_useful
-  - test_verifiable_claims_or_artifacts_when_practical
-  - do_not_call_tools_to_pad_T

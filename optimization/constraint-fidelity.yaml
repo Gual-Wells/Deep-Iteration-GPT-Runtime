@@ -1,2 +1,0 @@
-objective: preserve_user_constraints
-forbid: [dropping_hard_constraints, inventing_user_goals]

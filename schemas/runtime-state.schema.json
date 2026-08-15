@@ -1,35 +1,74 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR 2.3 Runtime State",
+  "title": "DIGR 3.0 Lightweight Runtime State",
   "type": "object",
+  "required": [
+    "U0",
+    "main",
+    "sources"
+  ],
   "properties": {
     "U0": {
       "type": "string"
     },
-    "n_requested": {},
-    "t_raw": {},
-    "resolved_protocol_commit": {
+    "clock": {
       "type": [
-        "string",
+        "object",
         "null"
       ]
     },
-    "actual_prompt_iterations": {
-      "type": "integer",
-      "minimum": 0
+    "main": {
+      "type": "object",
+      "properties": {
+        "N_requested": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "N_actual": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "R_requested": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "R_actual": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "est_snapshot": {
+          "type": [
+            "string",
+            "object",
+            "array",
+            "null"
+          ]
+        },
+        "current_result_state": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "N_actual",
+        "R_actual"
+      ],
+      "additionalProperties": true
     },
-    "redo_count": {
-      "type": "integer",
-      "minimum": 0
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
-    "t_budget_adequacy": {
-      "enum": [
-        "pending",
-        "matched",
-        "early_convergence",
-        "resource_limited",
-        "not_applicable"
-      ]
+    "aggregate_source_intervals": {
+      "type": "array"
     }
   },
   "additionalProperties": true

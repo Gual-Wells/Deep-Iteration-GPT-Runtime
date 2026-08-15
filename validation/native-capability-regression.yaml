@@ -1,1 +1,0 @@
-checks: [native_replanning_allowed, useful_tools_not_blocked, no_fixed_pipeline_quality_loss, T_not_used_to_cap_native_reasoning]

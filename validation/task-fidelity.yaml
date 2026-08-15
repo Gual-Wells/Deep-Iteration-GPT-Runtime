@@ -1,1 +1,0 @@
-checks: [facts_preserved, goals_preserved, hard_constraints_preserved, authorization_not_expanded, U0_not_replaced]
