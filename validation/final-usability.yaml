@@ -1,2 +1,1 @@
-id: final-usability
-check: "真正任务结果是否先出现、可直接理解/执行/下载，且 DIGR 记录没有喧宾夺主？"
+checks: [result_directly_usable, no_core_omission, no_protocol_padding, important_uncertainty_visible]

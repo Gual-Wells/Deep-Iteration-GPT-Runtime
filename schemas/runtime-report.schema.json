@@ -1,486 +1,64 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR Runtime Report",
+  "title": "DIGR 2.3 Runtime Report",
   "type": "object",
   "required": [
     "parameters",
     "prompt_iterations",
     "final_prompt",
     "evolution_metrics",
-    "redo",
+    "redo_count",
     "workflow_chain",
     "sources"
   ],
   "properties": {
     "parameters": {
-      "type": "object"
-    },
-    "prompt_iterations": {
       "type": "object",
-      "required": [
-        "minimum",
-        "actual",
-        "floor_met"
-      ],
       "properties": {
-        "minimum": {
-          "type": [
-            "integer",
-            "string"
+        "n_requested": {},
+        "t_requested_raw": {},
+        "t_reference_model": {
+          "const": "GPT-5.6 Sol"
+        },
+        "t_reference_reasoning": {
+          "const": "high"
+        },
+        "t_budget_adequacy": {
+          "enum": [
+            "matched",
+            "early_convergence",
+            "resource_limited",
+            "not_applicable"
           ]
         },
-        "actual": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "floor_met": {
-          "type": "boolean"
+        "t_adequacy_reason": {
+          "type": "string"
         }
-      }
+      },
+      "required": [
+        "t_reference_model",
+        "t_reference_reasoning",
+        "t_budget_adequacy"
+      ],
+      "additionalProperties": true
+    },
+    "prompt_iterations": {
+      "type": "object"
     },
     "final_prompt": {
       "type": "string"
     },
     "evolution_metrics": {
-      "type": "object",
-      "required": [
-        "intent_fidelity",
-        "constraint_completeness",
-        "execution_feasibility",
-        "delivery_clarity",
-        "information_density",
-        "acceptance_testability",
-        "boundary_correction_control",
-        "meta_teacher_suppression",
-        "repetition_padding_suppression",
-        "necessary_qualification_preservation",
-        "resource_selection",
-        "source_evidence_design",
-        "tool_test_design",
-        "counterexample_failure_coverage",
-        "no_gain_step_suppression",
-        "native_capability_preservation"
-      ],
-      "properties": {
-        "intent_fidelity": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "constraint_completeness": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "execution_feasibility": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "delivery_clarity": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "information_density": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "acceptance_testability": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "boundary_correction_control": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "meta_teacher_suppression": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "repetition_padding_suppression": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "necessary_qualification_preservation": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "resource_selection": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "source_evidence_design": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "tool_test_design": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "counterexample_failure_coverage": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "no_gain_step_suppression": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        },
-        "native_capability_preservation": {
-          "type": "object",
-          "required": [
-            "initial",
-            "final",
-            "delta"
-          ],
-          "properties": {
-            "initial": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "final": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 5
-            },
-            "delta": {
-              "type": "integer",
-              "minimum": -5,
-              "maximum": 5
-            }
-          }
-        }
-      }
+      "type": "object"
     },
-    "redo": {
-      "type": "object",
-      "required": [
-        "count",
-        "reasons"
-      ],
-      "properties": {
-        "count": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "reasons": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
+    "redo_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "redo_reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
     },
     "workflow_chain": {
@@ -490,23 +68,11 @@
       }
     },
     "sources": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "source",
-          "purpose"
-        ],
-        "properties": {
-          "source": {
-            "type": "string"
-          },
-          "purpose": {
-            "type": "string"
-          }
-        }
-      }
+      "type": "array"
+    },
+    "resolved_protocol": {
+      "type": "object"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }

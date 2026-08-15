@@ -1,2 +1,2 @@
-id: evidence-discipline
-rule: "只把实际读取且相关的来源用于事实支撑；推断标为推断；不以来源数量代替质量。"
+objective: evidence_quality
+rule: "Use evidence where it changes reliability; do not decorate answers with irrelevant citations."

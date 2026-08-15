@@ -1,38 +1,32 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR Result Re-entry Audit",
+  "title": "DIGR 2.3 Result Audit",
   "type": "object",
-  "required": [
-    "task_fidelity",
-    "evidence_complete",
-    "workflow_complete",
-    "defect_regression_free",
-    "native_capability_preserved",
-    "final_usable",
-    "redo_required"
-  ],
   "properties": {
     "task_fidelity": {
       "type": "boolean"
     },
-    "evidence_complete": {
+    "core_deliverables_complete": {
       "type": "boolean"
     },
-    "workflow_complete": {
+    "evidence_sufficient": {
       "type": "boolean"
     },
-    "defect_regression_free": {
+    "T_budget_adequate": {
       "type": "boolean"
     },
-    "native_capability_preserved": {
-      "type": "boolean"
-    },
-    "final_usable": {
+    "major_gap": {
       "type": "boolean"
     },
     "redo_required": {
       "type": "boolean"
     }
   },
+  "required": [
+    "task_fidelity",
+    "core_deliverables_complete",
+    "T_budget_adequate",
+    "redo_required"
+  ],
   "additionalProperties": true
 }

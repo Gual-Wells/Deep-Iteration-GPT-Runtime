@@ -1,3 +1,2 @@
-id: anti-false-contradiction
-check: "是否人为制造‘不是A而是B’，其实 A/B 可兼容？"
-action: "改成直接补充或限定。"
+remove: false_contradiction
+preserve: substantive_disagreement

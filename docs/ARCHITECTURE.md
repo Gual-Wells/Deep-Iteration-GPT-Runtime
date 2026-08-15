@@ -1,25 +1,7 @@
-# Architecture
+# Architecture 2.3
 
-DIGR 2.2 的控制面由 GitHub 文本规则组成，执行面仍是当前 ChatGPT 会话本身。
+DIGR 由控制平面与原生执行面组成。控制平面负责：触发解析、U0、N 提示优化、T 语义校准、资源门控、结果回代和运行记录；执行面仍由 ChatGPT 原生规划/推理/工具能力完成。
 
-```text
-Invocation
-  ↓
-U0 anchor
-  ↓
-Budget parser (N/T)
-  ↓
-Prompt loop P0…P*
-  ↓
-Resource gate + workflow design
-  ↓
-Native execution
-  ↓
-Result re-entry ── structural failure ──> redo native execution
-  ↓
-Final response ablation
-  ↓
-Final result + public runtime report
-```
+核心数据流：`Invocation(raw N/T) -> U0 -> P* -> semantic T calibration -> adaptive native execution -> budget adequacy -> result re-entry -> report`。
 
-运行记录只公开可安全观察的元数据，不试图输出隐藏思维链。
+parser 与 schema 只负责结构，不承担智能决策。T 的任务规模解释和停止判断属于模型运行时。

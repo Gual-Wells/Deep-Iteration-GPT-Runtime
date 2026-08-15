@@ -1,8 +1,4 @@
-id: default
-preferences:
-  directness: adaptive
-  information_density: high
-  correction_visibility: only_when_material
-  meta_commentary: minimal
-rules:
-  - "画像不得替代当前用户明确指令。"
+profile: default
+T_reference: GPT-5.6-Sol-high
+resource_strategy: adaptive
+validation: proportional

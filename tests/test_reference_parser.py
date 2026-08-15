@@ -9,10 +9,10 @@ class TestParser(unittest.TestCase):
         self.assertTrue(parse_invocation("深度迭代:task")["enabled"])
     def test_parameter_cn(self):
         x=parse_invocation("深度迭代（4，30m）：任务")
-        self.assertTrue(x["enabled"]); self.assertEqual(x["min_prompt_iterations"],4); self.assertEqual(x["complexity_budget"],"30m")
+        self.assertTrue(x["enabled"]); self.assertEqual(x["min_prompt_iterations"],4); self.assertEqual(x["complexity_budget_raw"],"30m")
     def test_parameter_ascii(self):
         x=parse_invocation("深度迭代(8,2h):task")
-        self.assertEqual((x["min_prompt_iterations"],x["complexity_budget"]),(8,"2h"))
+        self.assertEqual((x["min_prompt_iterations"],x["complexity_budget_raw"]),(8,"2h"))
     def test_empty_task(self):
         self.assertFalse(parse_invocation("深度迭代：   ")["enabled"])
     def test_zero_iteration(self):

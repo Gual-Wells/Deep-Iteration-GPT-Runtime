@@ -1,3 +1,2 @@
-id: meta-research
-trigger: "完成方法本身存在显著不确定性，且先研究方法可能改变质量。"
-action: "先查如何更好完成任务，再优化实际工作流。"
+name: meta-research
+rule: "When method choice materially affects quality, first research how to perform the task better; otherwise skip meta-research."

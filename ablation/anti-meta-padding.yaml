@@ -1,3 +1,2 @@
-id: anti-meta-padding
-check: "是否用‘我将深入分析’等代理自述占据答案？"
-action: "删掉，直接给内容或真实运行元数据。"
+remove: meta_padding
+preserve: concise_runtime_report

@@ -1,2 +1,1 @@
-id: workflow-completeness
-check: "是否遗漏足以改变主要结论的来源、工具、测试、方案或失败模式？"
+checks: [high_value_search_not_omitted, necessary_tools_used, tests_run_when_material, core_deliverables_covered]

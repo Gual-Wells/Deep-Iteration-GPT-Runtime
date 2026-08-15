@@ -1,3 +1,2 @@
-id: constraint-fidelity
-measure: [intent_fidelity, constraint_completeness]
-rule: "任何优化不得替换 U0；显式硬约束必须可追踪到 P* 与交付。"
+objective: preserve_user_constraints
+forbid: [dropping_hard_constraints, inventing_user_goals]

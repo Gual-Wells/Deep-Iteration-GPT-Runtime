@@ -1,3 +1,2 @@
-id: anti-correction-theater
-check: "是否为了展示纠正能力而放大轻微偏差？"
-action: "只显式纠正会改变结论或执行的错误。"
+remove: correction_theater
+preserve: necessary_fact_correction

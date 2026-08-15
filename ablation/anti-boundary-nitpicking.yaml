@@ -1,3 +1,2 @@
-id: anti-boundary-nitpicking
-check: "术语或边界差异是否真的会改变事实、风险或执行后果？"
-action: "不会则内部归一化；会则简短说明。"
+remove: boundary_nitpicking
+preserve: material_scope_correction

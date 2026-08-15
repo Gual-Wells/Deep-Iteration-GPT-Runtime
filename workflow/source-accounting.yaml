@@ -1,2 +1,3 @@
-id: source-accounting
-rule: "记录实际查询/来源及用途；计划但未执行、打开但无用的材料不进入最终来源清单。"
+record_only_actual_sources: true
+fields: [source, purpose]
+forbid_planned_but_unused_sources: true
