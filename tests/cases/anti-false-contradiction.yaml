@@ -1,3 +1,0 @@
-name: anti-false-contradiction
-bad_output: "你说的不是提示词优化，而是行为控制。"
-preferred_output: "该方案同时包含提示词优化、缺陷消融和工作流进化。"

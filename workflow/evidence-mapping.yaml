@@ -1,6 +1,0 @@
-id: evidence-mapping
-rules:
-  - "map_major_claims_to_supporting_sources_or_tool_results"
-  - "mark_inferences_as_inferences"
-  - "surface_material_uncertainty"
-  - "avoid_single_source_dependency_for_contested_claims"

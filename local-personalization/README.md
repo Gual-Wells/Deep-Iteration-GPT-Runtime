@@ -1,17 +1,7 @@
-# Local Personalization
+# ChatGPT Local Personalization
 
-将 `CHATGPT_LOCAL_PERSONALIZATION.txt` 复制到 ChatGPT 本地个性化或自定义指令中。
+将 `CHATGPT_LOCAL_PERSONALIZATION.txt` 内容粘贴到 ChatGPT Custom Instructions / 个性化指令。
 
-上传 GitHub 后，把：
+它只负责：触发、远程 manifest 入口、fallback 核心、2.2 输出契约。详细规则仍由 GitHub stable 分支加载。
 
-```text
-https://raw.githubusercontent.com/<OWNER>/<REPO>/stable/manifest.json
-```
-
-替换为实际地址。
-
-可以使用：
-
-- `stable`：最新稳定；
-- `main`：开发版本；
-- `v2.1.0`：固定版本。
+该文本设计为不超过 Plus 当前 5,000 characters 上限。运行 `tests/validate_repo.py` 会检查字符数。

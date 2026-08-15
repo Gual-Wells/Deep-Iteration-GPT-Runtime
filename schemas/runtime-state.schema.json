@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR v2 Runtime State",
+  "title": "DIGR v2.2 Runtime State",
   "type": "object",
   "required": [
     "protocol",
@@ -10,7 +10,7 @@
   ],
   "properties": {
     "protocol": {
-      "const": "digr-v2"
+      "const": "digr-v2.2"
     },
     "original_task": {
       "type": "string",
@@ -28,14 +28,48 @@
       "enum": [
         "anchored",
         "routing",
-        "evolving",
+        "prompt_iterating",
         "researching_method",
         "executing",
         "auditing",
-        "revising",
-        "evidence_reporting",
+        "redoing",
+        "reporting",
         "completed"
       ]
+    },
+    "requested_min_iterations": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "actual_prompt_iterations": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "complexity_budget": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "complexity_level": {
+      "enum": [
+        "Focused",
+        "Analytical",
+        "Deep",
+        "Research",
+        "Extended Research",
+        "Auto"
+      ]
+    },
+    "redo_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "native_capability_preserved": {
+      "type": "boolean"
     },
     "active_modules": {
       "type": "array",
@@ -43,24 +77,6 @@
         "type": "string"
       },
       "uniqueItems": true
-    },
-    "iteration": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "native_capability_preserved": {
-      "type": "boolean"
-    },
-    "stop_reason": {
-      "type": "string"
-    },
-    "evidence_status": {
-      "enum": [
-        "complete",
-        "partial",
-        "degraded",
-        "failed"
-      ]
     }
   },
   "additionalProperties": true

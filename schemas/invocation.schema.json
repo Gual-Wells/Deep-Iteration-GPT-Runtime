@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DIGR Invocation",
+  "type": "object",
+  "required": [
+    "enabled",
+    "task_raw"
+  ],
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "task_raw": {
+      "type": "string"
+    },
+    "min_prompt_iterations": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "complexity_budget": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "parameterized": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

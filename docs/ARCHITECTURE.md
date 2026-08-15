@@ -1,41 +1,25 @@
 # Architecture
 
-## 控制面
-
-GitHub 保存：
-
-- 触发与入口；
-- 全局不变量；
-- 三目标规则；
-- 三阶段职责；
-- 缺陷消融模块；
-- 提示优化模块；
-- 资源与工作流模块；
-- 验证模块；
-- 用户画像；
-- 路由；
-- Schema、测试和版本历史。
-
-## 执行面
-
-GPT 在同一次工作中：
-
-1. 加载规则；
-2. 建立 `U0`；
-3. 进行三目标前置联合进化；
-4. 继续完整使用原生能力执行任务；
-5. 将结果回代验证；
-6. 定向修订；
-7. 生成分级执行证据摘要；
-8. 按“执行证据 → 最终结果”输出。
-
-## 关键关系
+DIGR 2.2 的控制面由 GitHub 文本规则组成，执行面仍是当前 ChatGPT 会话本身。
 
 ```text
-ChatGPT 原生能力
-+ 仓库强制最低检查点
-+ 结果回代复核
-= 深度迭代工作
+Invocation
+  ↓
+U0 anchor
+  ↓
+Budget parser (N/T)
+  ↓
+Prompt loop P0…P*
+  ↓
+Resource gate + workflow design
+  ↓
+Native execution
+  ↓
+Result re-entry ── structural failure ──> redo native execution
+  ↓
+Final response ablation
+  ↓
+Final result + public runtime report
 ```
 
-仓库不替代模型，不构成外部模型服务。
+运行记录只公开可安全观察的元数据，不试图输出隐藏思维链。

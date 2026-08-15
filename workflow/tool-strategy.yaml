@@ -1,6 +1,2 @@
 id: tool-strategy
-rules:
-  - "choose_tools_by_expected_quality_gain"
-  - "allow_native_tool_replanning"
-  - "do_not_call_tools_for_process_theater"
-  - "record_only_reproducible_tool_results_for_reentry"
+rule: "选择能产生新证据或真实产物的工具；工程任务优先实际读取、执行、测试与验证。"

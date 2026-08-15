@@ -1,9 +1,8 @@
 id: default
-assumptions:
-  reasoning_competence: normal
 preferences:
-  directness: medium
-  information_density: medium
+  directness: adaptive
+  information_density: high
+  correction_visibility: only_when_material
+  meta_commentary: minimal
 rules:
-  - "优先遵循当前用户明确要求。"
-  - "仅在启用深度迭代时加载具体画像。"
+  - "画像不得替代当前用户明确指令。"

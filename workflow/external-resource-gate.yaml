@@ -1,15 +1,5 @@
 id: external-resource-gate
-activate_when:
-  - "information_is_time_sensitive"
-  - "task_is_niche_or_uncertain"
-  - "user_requests_sources_or_verification"
-  - "official_rules_specs_or_docs_are_material"
-  - "referenced_material_is_not_present"
-  - "recommendation_has_material_cost_or_risk"
-  - "community_failure_modes_are_material"
-  - "task_requires_files_code_tools_or_testing"
-skip_when:
-  - "pure_rewriting"
-  - "translation"
-  - "self_contained_reasoning"
-  - "external_information_would_not_change_result"
+questions:
+  - "信息是否时效敏感、专业、可变或高风险？"
+  - "外部来源是否可能实质改变结论？"
+rule: "是则优先一手来源；否则允许不查询。"

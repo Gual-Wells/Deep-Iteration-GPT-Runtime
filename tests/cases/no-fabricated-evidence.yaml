@@ -1,9 +1,0 @@
-name: no-fabricated-evidence
-bad_claims:
-  - "已严格执行全部三阶段"
-  - "已全面核查"
-observed:
-  - "manifest only"
-expected:
-  remove_unsubstantiated_claims: true
-  evidence_status: "partial"

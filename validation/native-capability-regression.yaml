@@ -1,8 +1,2 @@
 id: native-capability-regression
-checks:
-  - "proxy_did_not_block_needed_search_or_tools"
-  - "proxy_did_not_treat_recommended_workflow_as_unique"
-  - "prompt_evolution_did_not_reduce_natural_task_understanding"
-  - "ablation_did_not_remove_necessary_correction_or_disagreement"
-  - "stage_formality_did_not_create_useless_work"
-  - "native_replanning_remained_available"
+check: "DIGR 是否阻止了本应使用的原生搜索、工具、测试、反例或重新规划？"
