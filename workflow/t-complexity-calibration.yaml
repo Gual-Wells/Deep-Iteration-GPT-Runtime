@@ -1,8 +1,0 @@
-reference_model: "GPT-5.6 Sol"
-reasoning_mode: high
-interpretation_owner: ChatGPT
-T_is: semantic_reference_model_task_scale
-T_is_not: [human_time, wall_clock_deadline, token_budget, fixed_tier, fixed_step_count, output_length]
-pre_stop_gate: semantic_budget_adequacy_check
-allow_early_convergence: true
-forbid_padding: true

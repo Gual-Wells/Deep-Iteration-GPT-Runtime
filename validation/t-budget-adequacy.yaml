@@ -1,8 +1,0 @@
-checks:
-  - T_interpreted_as_GPT_5_6_Sol_High_task_scale
-  - no_fixed_time_tier_mapping
-  - no_programmatic_token_or_step_conversion
-  - high_value_remaining_work_checked_before_stop
-  - multi_deliverable_coverage_checked
-  - no_waiting_or_padding_for_T
-status_values: [matched, early_convergence, resource_limited, not_applicable]

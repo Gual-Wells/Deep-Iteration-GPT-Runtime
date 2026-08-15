@@ -1,3 +1,0 @@
-record_only_actual_sources: true
-fields: [source, purpose]
-forbid_planned_but_unused_sources: true

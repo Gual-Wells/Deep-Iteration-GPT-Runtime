@@ -1,12 +1,19 @@
-# 2.3.0 Test Matrix
+# 3.0 Test Matrix
 
-| Risk | Test / validation |
-|---|---|
-| T normalized or discretized by parser | `test_raw_T_is_preserved_not_normalized`, `test_parser_contains_no_time_tier_mapping` |
-| T reference drifts from Sol 5.6 High | `test_manifest_reference_model` |
-| Human-time semantics return | `test_no_legacy_human_time_definition` |
-| Stop before T adequacy check | `test_stop_gate_orders_T_check_before_marginal_stop` |
-| Mutable `stable` reused as immutable ref | `test_protocol_pin.py` |
-| Missing manifest/core/schema files | `tests/validate_repo.py` |
-| Python syntax regressions | `python -m py_compile ...` |
-| Full parser/T/pin suite | `python -m unittest discover -s tests -v` |
+Required contract areas:
+1. Version consistency
+2. No legacy semantic-T wording in active core/manifest/fallback
+3. Result Sovereignty present
+4. Current-turn-only non-sticky activation
+5. Help command defined as non-executing meta-command
+6. N/R and n/r minimum semantics
+7. Multiple S allowed; n/r/b per S; t aggregate
+8. S minimums never close future source research
+9. EST explicitly memory/reference, not algorithm/search controller
+10. R/r whole-process re-entry + default challenge
+11. ABG present and explicitly does not weaken real safety/permissions
+12. Hard T/t require trusted time and fail closed
+13. No waiting/repetition padding
+14. Minimal proof; heavy default report retired
+15. Deterministic helpers do not parse/decide user intent
+16. Runtime helpers pass standard-library unit tests

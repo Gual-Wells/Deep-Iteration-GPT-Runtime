@@ -1,1 +1,0 @@
-checks: [result_directly_usable, no_core_omission, no_protocol_padding, important_uncertainty_visible]

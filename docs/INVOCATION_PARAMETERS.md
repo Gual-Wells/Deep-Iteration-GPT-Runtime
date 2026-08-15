@@ -1,11 +1,27 @@
-# Invocation Parameters
+# Invocation Parameters — 3.0
 
-## N
-N 是提示词优化最小有效循环次数，由 ChatGPT 执行，不是必须生成 N 个不同措辞版本。
+Canonical:
+```text
+深度迭代（N，T，R，B，S（n，t，r，b））：<任务>
+```
 
-## T
-T 原文直接保留，例如 `10m`、`15min`、`30分钟`、`1h`、`2小时`。它的语义由 ChatGPT 结合 U0 解释，参考框架固定为 GPT-5.6 Sol / High 的任务规模。
+ChatGPT 是语义解释器，canonical 语法不是硬 parser 合同。
 
-参考解析器只做语法抽取，不负责：单位标准化、分钟换算、复杂度分档、token 预算、工具次数、来源数或停止决策。
+## Main / S isomorphism
+- `N ↔ n`: minimum effective evolution cycles
+- `R ↔ r`: minimum whole-process result re-entry evolution cycles
+- `B ↔ b`: soft/hard time-policy semantics
+- `T ↔ t`: both are actual time targets, but T belongs to the whole run while t belongs to the union of all S source-active intervals
 
-如果 T 表达本身无法被 ChatGPT 合理理解为时长级任务规模，不得虚构精确含义；应在当前上下文中按用户意图最佳解释或报告参数降级。
+## Example
+```text
+深度迭代（3，15m，2，hard，S（2，6m，1，hard））：分析某技术问题
+```
+
+Meaning:
+- Main N >= 3
+- Main R >= 2
+- Total run hard minimum 15m, verified by trusted clock
+- Every actual S: n>=2, r>=1, b=hard
+- Aggregate source-active time across all S: >=6m
+- all minimums are floors, never ceilings

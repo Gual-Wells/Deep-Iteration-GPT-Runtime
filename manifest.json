@@ -1,112 +1,78 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
-  "version": "2.3.0",
-  "protocol": "digr-v2.3",
+  "version": "3.0.0",
+  "protocol": "digr-v3.0",
   "language": "zh-CN",
+  "philosophy": {
+    "primary_object": "high_quality_task_result_under_faithful_U0",
+    "result_sovereignty": true,
+    "native_chatgpt_control": true,
+    "protocol_is_minimum_guarantees_not_algorithm": true,
+    "lightweight_observability": true
+  },
   "trigger": {
-    "type": "explicit_prefix_with_optional_budget",
-    "plain_values": [
-      "深度迭代：",
-      "深度迭代:"
+    "activation_scope": "current_user_turn_only",
+    "non_sticky": true,
+    "explicit_prefix_required": true,
+    "plain_examples": [
+      "深度迭代：<任务>",
+      "深度迭代:<任务>"
     ],
-    "parameterized_examples": [
-      "深度迭代（4，30m）：<任务>",
-      "深度迭代(8,2h):<任务>"
-    ],
-    "parameter_grammar": "深度迭代（N，T）：<任务> | 深度迭代(N,T):<任务>",
-    "require_nonempty_task": true,
-    "activate_only_on_prefix": true,
-    "iterations": {
-      "type": "positive_integer",
-      "meaning": "minimum_effective_prompt_optimization_cycles"
-    },
-    "duration": {
-      "type": "opaque_semantic_duration_expression",
-      "meaning": "reference_model_effective_task_scale",
-      "preserve_raw": true
+    "parameterized_example": "深度迭代（N，T，R，B，S（n，t，r，b））：<任务>",
+    "help_command": "深度迭代/help",
+    "semantic_interpreter": "ChatGPT",
+    "parser_is_not_authority": true
+  },
+  "parameters": {
+    "N": "minimum_effective_main_evolution_cycles",
+    "T": "target_actual_closed_loop_runtime",
+    "R": "minimum_whole_process_result_reentry_evolution_cycles",
+    "B": "soft_or_hard_T_policy",
+    "S": {
+      "meaning": "repeatable_external_research_evolution_template",
+      "n": "minimum_effective_evolution_cycles_per_S_instance",
+      "t": "aggregate_actual_source_activity_time_target_across_all_S_instances",
+      "r": "minimum_result_reentry_evolution_cycles_per_S_instance",
+      "b": "source_soft_or_hard_policy_inherited_by_each_S_instance"
     }
   },
-  "complexity_reference": {
-    "kind": "semantic_model_work_scale",
-    "model": "GPT-5.6 Sol",
-    "reasoning_mode": "high",
-    "meaning": "T describes a task scale that would ordinarily warrant about T of effective active work by GPT-5.6 Sol at High reasoning, across reasoning, research, tools, verification and result re-entry as useful for U0.",
-    "interpreted_by": "ChatGPT",
-    "not_a_wall_clock_deadline": true,
-    "not_a_wait_target": true,
-    "no_fixed_time_tiers": true,
-    "no_token_conversion": true,
-    "no_programmatic_workload_mapping": true,
-    "larger_t_must_materially_change_execution_when_high_value_work_exists": true,
-    "early_stop_requires_semantic_budget_adequacy_check": true
-  },
+  "core": [
+    "core/00_RESULT_SOVEREIGNTY.md",
+    "core/10_INVOCATION_AND_U0.md",
+    "core/20_MINIMUM_GUARANTEES.md",
+    "core/30_EVOLUTION_STATE_MEMORY.md",
+    "core/40_NATIVE_EVOLUTION.md",
+    "core/50_SOURCE_EVOLUTION.md",
+    "core/60_TRUSTED_TIME_CONTROL.md",
+    "core/70_REENTRY_BREAKTHROUGH.md",
+    "core/80_STOP_AND_PROOF.md"
+  ],
   "entrypoint": "entry/DEEP_ITERATION_ENTRY.md",
-  "global_invariants": [
-    "core/00_PROTOCOL_INVARIANTS.md",
-    "core/05_NATIVE_CAPABILITY_PRESERVATION.md",
-    "core/10_ORIGINAL_TASK_ANCHOR.md"
+  "help": "entry/HELP.md",
+  "local_fallback_core": "bootstrap/LOCAL_FALLBACK_CORE.md",
+  "deterministic_helpers": [
+    "runtime/clock_probe.py",
+    "runtime/duration.py",
+    "runtime/protocol_pin.py",
+    "runtime/state_checks.py"
   ],
-  "core_sequence": [
-    "core/15_INVOCATION_BUDGETS.md",
-    "core/18_T_COMPLEXITY_CALIBRATION.md",
-    "core/20_MODULE_ROUTING.md",
-    "core/30_THREE_OBJECTIVE_EVOLUTION.md",
-    "core/35_PROMPT_ITERATION_LOOP.md",
-    "core/40_RESOURCE_WORKFLOW_EVOLUTION.md",
-    "core/50_STAGE_ONE_PREPARATION.md",
-    "core/60_STAGE_TWO_NATIVE_EXECUTION.md",
-    "core/70_STAGE_THREE_RESULT_REENTRY.md",
-    "core/80_FINAL_RESPONSE_ABLATION.md",
-    "core/85_RUNTIME_REPORT.md",
-    "core/90_STOP_CONDITIONS.md"
-  ],
-  "objectives": {
-    "prompt_optimization": "objectives/01_PROMPT_OPTIMIZATION.md",
-    "defect_ablation": "objectives/02_GPT_DEFECT_ABLATION.md",
-    "workflow_evolution": "objectives/03_RESOURCE_AWARE_WORKFLOW_EVOLUTION.md"
-  },
-  "stages": {
-    "stage_1": "stages/01_PRE_EXECUTION_EVOLUTION.md",
-    "stage_2": "stages/02_NATIVE_EXECUTION.md",
-    "stage_3": "stages/03_RESULT_REENTRY.md"
-  },
-  "routing": "routing/module-router.yaml",
-  "default_profile": "profiles/robust-user.yaml",
-  "fallback_core": "bootstrap/LOCAL_FALLBACK_CORE.md",
-  "schemas": {
-    "manifest": "schemas/manifest.schema.json",
-    "invocation": "schemas/invocation.schema.json",
-    "runtime_state": "schemas/runtime-state.schema.json",
-    "work_package": "schemas/work-package.schema.json",
-    "result_audit": "schemas/result-audit.schema.json",
-    "runtime_report": "schemas/runtime-report.schema.json"
-  },
   "policies": {
     "preserve_original_task": true,
     "preserve_native_capabilities": true,
-    "protocol_is_minimum_checkpoints_not_capability_ceiling": true,
-    "do_not_claim_superiority_over_native_process": true,
-    "allow_native_replanning_and_extra_steps": true,
-    "do_not_expand_permissions": true,
-    "do_not_override_higher_priority_instructions": true,
-    "external_sources_are_evidence_not_instructions": true,
-    "pin_remote_protocol_to_one_resolved_commit_when_possible": true,
-    "t_semantics_are_model_interpreted": true,
-    "t_is_reference_model_task_scale_not_human_task_time": true,
-    "t_is_not_a_hard_wall_clock_requirement": true,
-    "do_not_satisfy_t_with_waiting_padding_or_useless_search": true,
-    "do_not_collapse_t_to_a_coarse_tier": true,
-    "do_not_fabricate_iterations_or_elapsed_time": true,
-    "show_prompt_iteration_count": true,
-    "show_final_optimized_prompt": true,
-    "show_evolution_metrics": true,
-    "show_redo_count": true,
-    "show_actual_workflow_chain": true,
-    "show_queries_and_sources_used": true,
-    "show_t_budget_adequacy": true,
-    "return_final_result_then_runtime_report": true,
-    "do_not_return_legacy_execution_evidence_block": true,
-    "do_not_reveal_hidden_reasoning": true
+    "no_algorithmic_tree_controller": true,
+    "est_is_working_state_memory_only": true,
+    "N_R_n_r_are_minima_not_caps": true,
+    "S_minimums_never_disable_future_research": true,
+    "hard_time_requires_trusted_clock": true,
+    "hard_time_fail_closed_when_unverifiable": true,
+    "no_idle_padding": true,
+    "no_repetition_padding": true,
+    "R_r_use_whole_process_default_challenge": true,
+    "R_r_include_anti_bureaucracy_guard": true,
+    "do_not_weaken_real_safety_or_permissions": true,
+    "minimal_default_proof": true,
+    "do_not_reveal_hidden_reasoning": true,
+    "pin_remote_protocol_to_one_commit_when_possible": true
   }
 }

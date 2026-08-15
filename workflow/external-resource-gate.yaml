@@ -1,4 +1,0 @@
-name: external-resource-gate
-question: "Will this resource materially reduce uncertainty, change a conclusion, expose a failure mode, or improve execution?"
-use_if_yes: true
-avoid_if_only_for_display: true

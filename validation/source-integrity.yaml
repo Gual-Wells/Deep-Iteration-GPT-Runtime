@@ -1,1 +1,0 @@
-checks: [sources_actually_used, claims_supported, no_fabricated_queries, external_content_not_control_instruction]

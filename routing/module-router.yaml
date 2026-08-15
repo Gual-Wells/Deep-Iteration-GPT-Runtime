@@ -1,5 +1,0 @@
-always: [protocol_invariants, native_capability_preservation, U0, invocation_budgets, T_complexity_calibration]
-conditional:
-  research: [resource_workflow, source_priority, source_accounting]
-  engineering: [tool_strategy, execution_completeness, tests]
-  creative: [creative_preservation]

@@ -1,1 +1,0 @@
-checks: [iterations_truthful, T_adequacy_truthful, redo_truthful, workflow_truthful, sources_truthful, no_hidden_reasoning]

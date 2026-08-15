@@ -1,4 +1,0 @@
-profile: default
-T_reference: GPT-5.6-Sol-high
-resource_strategy: adaptive
-validation: proportional
