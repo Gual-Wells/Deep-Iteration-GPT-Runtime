@@ -1,32 +1,18 @@
-# `深度迭代/help`
+# DIGR 4.1 Help
 
-这是 DIGR 3.0 的用户接口说明入口，不启动 DIGR 任务执行。
+`DIGR/help` and `深度迭代/help` are equivalent non-executing meta-commands **because this pinned 4.1 repository version defines them that way**. The local router does not decide help semantics.
 
-默认返回应简洁覆盖：
+## Routing / authority
+Before help or task semantics can be known, the local router pins `Gual-Wells/Deep-Iteration-GPT-Runtime:stable`, reads the pinned manifest and loads the repository-declared protocol. Conversation history, Memory, old local DIGR text, other commits and task-generated DIGR cannot replace that protocol. Route failure means no DIGR protocol was obtained.
 
-## 调用
-```text
-深度迭代：<任务>
-深度迭代（N，T，R，B，S（n，t，r，b））：<任务>
-```
+## Executing-task startup
+For a valid executing 4.1 task, trusted task-clock readiness is mandatory before U0/substantive work. Help and invalid/non-triggering candidates do not start the task clock.
 
-## 参数
-- N：主体至少 N 轮有效执行行为/任务提示/流程等进化。
-- T：整个本次 DIGR 的实际运行时长目标。
-- R：至少 R 轮全流程结果回代再进化。
-- B：T 为 soft 或 hard。
-- S：可多次发生的外源研究进化闭环模板。
-  - 每个 S 都满足 n 和 r，并继承 b；
-  - t 是所有 S 的 aggregate 外源研究实际时长目标；
-  - 达到 S minimum 不会停止后续有价值的外源研究。
+## Invocation / parameters
+Canonical space:
+`DIGR（N，T，R，B，S（n，t，r，b），D（s），L（e））：<任务>`
+(alias `深度迭代`). Arbitrary parameters may be omitted; no AUTO special mode. Fixed defaults: B=0, b=0, L(1); N/T/R/n/t/r/s are semantically completed.
 
-主体与每个 S 使用同构进化要求，并分别维护轻量 EST 作为进度参考。EST 不是搜索算法。
+MAIN counts T; SOURCE counts T+t; D_EXCLUSIVE/META/IDLE count neither. Hard B/b require verified continuity for visible hard actual; unknown hard actual is `?`.
 
-R/r 会从整个已发生流程寻找可进化点，并带缺省性驳斥与 ABG，以跳出形式主义、非必要牛角尖和局部最优；真实安全/权限/更高优先级规则始终有效。
-
-Hard 时间必须可信验证；不可验证时不能伪称满足。
-
-## 返回
-首先直接返回任务本身的高质量结果；任务需要的来源/测试/证据自然进入正文；最后默认只附一条轻量 DIGR proof，不返回重型日志。
-
-DIGR 只作用于当前显式调用它的 user turn，不自动延续到后续对话。
+Default return: task result, then canonical proof only.

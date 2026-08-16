@@ -1,87 +1,172 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR 3.0 Semantic Invocation State",
-  "description": "Represents ChatGPT's semantic interpretation. It is not a parser grammar.",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/invocation.schema.json",
+  "title": "DIGR 4.1 Semantic Invocation State",
+  "description": "Host-LLM semantic interpretation; not a parser grammar. Protocol authority is resolved separately.",
   "type": "object",
   "required": [
     "enabled",
+    "kind",
     "task_raw",
-    "mode"
+    "explicit"
   ],
   "properties": {
     "enabled": {
       "type": "boolean"
     },
-    "mode": {
+    "kind": {
       "enum": [
         "off",
-        "auto",
-        "parameterized",
+        "task",
         "help"
+      ]
+    },
+    "alias": {
+      "enum": [
+        "DIGR",
+        "深度迭代",
+        null
       ]
     },
     "task_raw": {
       "type": "string"
     },
-    "N": {
-      "type": [
-        "integer",
-        "null"
-      ],
-      "minimum": 1
-    },
-    "T_raw": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "R": {
-      "type": [
-        "integer",
-        "null"
-      ],
-      "minimum": 0
-    },
-    "B": {
-      "enum": [
-        "soft",
-        "hard",
-        null
-      ]
-    },
-    "S": {
-      "type": [
-        "object",
-        "null"
-      ],
+    "explicit": {
+      "type": "object",
       "properties": {
-        "n": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "t_raw": {
-          "type": "string"
-        },
-        "r": {
-          "type": "integer",
+        "N": {
+          "type": [
+            "integer",
+            "null"
+          ],
           "minimum": 0
         },
-        "b": {
+        "T_raw": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "R": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "B": {
           "enum": [
-            "soft",
-            "hard"
+            0,
+            1,
+            null
+          ]
+        },
+        "S": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "n": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "t_raw": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "r": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "b": {
+              "enum": [
+                0,
+                1,
+                null
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "D_s": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "L_e": {
+          "enum": [
+            1,
+            2,
+            3,
+            null
           ]
         }
       },
-      "required": [
-        "n",
-        "t_raw",
-        "r",
-        "b"
-      ],
       "additionalProperties": false
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "task"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "enabled": {
+            "const": true
+          },
+          "task_raw": {
+            "minLength": 1
+          },
+          "alias": {
+            "enum": [
+              "DIGR",
+              "深度迭代"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "off",
+              "help"
+            ]
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "task_raw": {
+            "maxLength": 0
+          }
+        }
+      }
+    }
+  ],
   "additionalProperties": false
 }

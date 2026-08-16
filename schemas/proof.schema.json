@@ -1,29 +1,166 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DIGR 3.0 Minimal Proof Data",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/proof.schema.json",
+  "title": "DIGR 4.1 Internal Proof Data",
   "type": "object",
   "required": [
-    "version",
-    "main"
+    "main",
+    "source",
+    "dictator",
+    "isolation"
   ],
   "properties": {
-    "version": {
-      "const": "3.0"
-    },
     "main": {
-      "type": "object"
+      "type": "object",
+      "required": [
+        "N_target",
+        "N_actual",
+        "T_target_seconds",
+        "T_actual_seconds",
+        "T_hard_verified",
+        "R_target",
+        "R_actual",
+        "B"
+      ],
+      "properties": {
+        "N_target": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "N_actual": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "T_target_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "T_actual_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "T_hard_verified": {
+          "type": "boolean"
+        },
+        "R_target": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "R_actual": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "B": {
+          "enum": [
+            0,
+            1
+          ]
+        }
+      },
+      "additionalProperties": false
     },
     "source": {
-      "type": [
-        "object",
-        "null"
-      ]
+      "type": "object",
+      "required": [
+        "count",
+        "n_target",
+        "n_actual",
+        "t_target_seconds",
+        "t_actual_seconds",
+        "t_hard_verified",
+        "r_target",
+        "r_actual",
+        "b"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "n_target": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "n_actual": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "t_target_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "t_actual_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "t_hard_verified": {
+          "type": "boolean"
+        },
+        "r_target": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "r_actual": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "b": {
+          "enum": [
+            0,
+            1
+          ]
+        }
+      },
+      "additionalProperties": false
     },
-    "limitations": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+    "dictator": {
+      "type": "object",
+      "required": [
+        "target",
+        "actual"
+      ],
+      "properties": {
+        "target": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "actual": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "isolation": {
+      "type": "object",
+      "required": [
+        "target",
+        "actual"
+      ],
+      "properties": {
+        "target": {
+          "enum": [
+            1,
+            2,
+            3
+          ]
+        },
+        "actual": {
+          "enum": [
+            1,
+            2,
+            3,
+            null
+          ]
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

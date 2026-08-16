@@ -1,8 +1,4 @@
-"""Canonical duration normalization for DIGR 3.0.
-
-Human command semantics remain ChatGPT-native. This helper only converts an
-already-understood canonical duration expression into seconds.
-"""
+"""Canonical duration normalization for already-understood DIGR values."""
 from __future__ import annotations
 import re
 

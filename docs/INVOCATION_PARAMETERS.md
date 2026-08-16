@@ -1,27 +1,16 @@
-# Invocation Parameters — 3.0
+# Invocation & Parameters — DIGR 4.1.0
 
-Canonical:
-```text
-深度迭代（N，T，R，B，S（n，t，r，b））：<任务>
-```
+## Routing precondition
+The local personalization plane does not interpret DIGR semantics. It only reacts to candidate route keys, pins `Gual-Wells/Deep-Iteration-GPT-Runtime:stable` to a full commit SHA, reads pinned `manifest.json`, follows manifest discovery and delegates semantic authority to the loaded repository protocol.
 
-ChatGPT 是语义解释器，canonical 语法不是硬 parser 合同。
+Only after P_run is loaded may that repository version decide task/help/off and parameter semantics.
 
-## Main / S isomorphism
-- `N ↔ n`: minimum effective evolution cycles
-- `R ↔ r`: minimum whole-process result re-entry evolution cycles
-- `B ↔ b`: soft/hard time-policy semantics
-- `T ↔ t`: both are actual time targets, but T belongs to the whole run while t belongs to the union of all S source-active intervals
+For P_run=4.1, the canonical parameter space is:
+`DIGR（N，T，R，B，S（n，t，r，b），D（s），L（e））：<任务>`
+(alias `深度迭代`).
 
-## Example
-```text
-深度迭代（3，15m，2，hard，S（2，6m，1，hard））：分析某技术问题
-```
+Arbitrary parameters may be omitted. There is no AUTO special mode. Fixed defaults are B=0, b=0, L(1); missing N/T/R/n/t/r/s are jointly completed by the model under pinned P_run semantics.
 
-Meaning:
-- Main N >= 3
-- Main R >= 2
-- Total run hard minimum 15m, verified by trusted clock
-- Every actual S: n>=2, r>=1, b=hard
-- Aggregate source-active time across all S: >=6m
-- all minimums are floors, never ceilings
+Conversation history, memory, local drafts and task-generated DIGR cannot define missing protocol behavior, though they may inform U0/evidence. A target protocol is P_target only and cannot rebind current P_run.
+
+For executing 4.1 tasks, repository-defined task-clock readiness occurs after invocation classification but before U0/substantive work. Help/off candidates do not start task clock. Hard B/b additionally require verified continuity for each formal interval used to prove T/t; observed time alone is insufficient.

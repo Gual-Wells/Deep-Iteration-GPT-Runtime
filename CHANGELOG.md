@@ -1,33 +1,22 @@
 # Changelog
 
-## 3.0.0 — 2026-08-15
+## 4.1.0
 
-Major semantic break from 2.3.x.
+Control-plane correction over 4.0.0.
 
-### Added
-- Result Sovereignty as the top-level invariant.
-- Parameter form `深度迭代（N，T，R，B，S（n，t，r，b））：<任务>`.
-- `R/r` whole-process result re-entry evolution with default challenge stance.
-- Anti-Bureaucracy Guard (ABG).
-- Multiple independent `Sᵢ` instances; per-S `n/r/b`, aggregate source-time `t`.
-- Lightweight Evolution State Tree (EST) for main task and each S.
-- Trusted hard-time control with fail-closed verification.
-- `深度迭代/help`.
-- Strict turn-local/non-sticky activation.
-- Minimal proof tag instead of heavy runtime report.
+- Replaced local pre-protocol gate with a minimal Reliable Routing Plane.
+- Removed root `DIGR_EXECUTION_GATE.md`, `REPOSITORY_ONLY_LOADER.md`, `runtime/bootstrap_gate.py` and bootstrap-gate schema.
+- Added `bootstrap/BOOTSTRAP.md` as **versioned repository protocol**, loaded only after immutable routing/pinning.
+- Added `runtime/routing.py` and route-receipt schema for repository/ref/commit/manifest provenance without DIGR semantic interpretation.
+- Added legacy manifest discovery: missing `bootstrap_entry` routes to manifest-declared entrypoint/core without importing 4.1 semantics.
+- Reworked `ProtocolAuthority` so P_run is bound to a route receipt; removed gate-id and P_target from the routing/authority record.
+- Defined contamination as protocol-decision provenance violation rather than hidden-state introspection; context may still inform U0/evidence.
+- Moved P_target/self-hosting and universal task-clock readiness into repository 4.1 semantics.
+- Help/invalid candidates no longer require task-clock startup; every executing 4.1 task still does, before U0/substantive work.
+- Distinguished pre-protocol RouteFailure from repository-defined ProtocolStartupFailure.
+- Made primary and Free/Go local router files byte-identical and added deterministic standalone-personalization export to the release builder.
+- Retained 4.0 execution semantics for N/R/S/D/L, Formal Active Time, hard verification, source aggregation, isolation evidence, stop/proof and release safety.
 
-### Changed
-- `T` is now an actual runtime target, not GPT-5.6 Sol/High semantic task scale.
-- Prompt evolution can continue throughout the run; no frozen final P* requirement.
-- N/n concern effective behavior evolution, not wording-only prompt rewrites.
-- R/r can evolve prompt, process, research, tools, tests, scope and conclusions.
-- Source research remains open after S minimums are satisfied.
-- Runtime structure is continuous co-evolution rather than Stage 1/2/3 pipeline.
-- Semantic interpretation belongs to ChatGPT; deterministic code only assists measurement/validation.
+## 4.0.0
 
-### Removed / retired
-- Semantic T calibration and coarse “budget adequacy” as a substitute for real hard time.
-- Heavy default DIGR runtime report.
-- Default disclosure of final P*, evolution scorecard, workflow chain and source-accounting log.
-- Runtime-authoritative reference parser.
-- Fixed Stage 1 / Stage 2 / Stage 3 control model.
+Introduced unified partial invocation, semantic default completion, Formal Active Time, D/L disruptive-gambit controls, source aggregation, isolation evidence and strict canonical proof. 4.0.0 also introduced a repository-only root pre-protocol gate; 4.1.0 supersedes that control-plane design.

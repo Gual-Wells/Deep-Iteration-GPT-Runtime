@@ -2,21 +2,20 @@ import json
 import subprocess
 import sys
 import unittest
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
 
 class TestClockCrossProcess(unittest.TestCase):
-    def _snap(self):
-        out = subprocess.check_output([sys.executable, "runtime/clock_probe.py"], cwd=ROOT, text=True)
-        return json.loads(out)
+    def test_probe_json_is_strict_shape(self):
+        out=subprocess.check_output([sys.executable,'-m','runtime.clock_probe'],text=True)
+        data=json.loads(out)
+        self.assertEqual(set(data),{'provider','session_id','boot_id','monotonic_ns','wall_ns'})
+        self.assertGreater(data['monotonic_ns'],0)
+        self.assertTrue(data['session_id'])
+    def test_process_sessions_differ(self):
+        def get():
+            return json.loads(subprocess.check_output([sys.executable,'-m','runtime.clock_probe'],text=True))
+        a,b=get(),get()
+        self.assertNotEqual(a['session_id'],b['session_id'])
+        if a['boot_id'] is not None and b['boot_id'] is not None:
+            self.assertEqual(a['boot_id'],b['boot_id'])
 
-    def test_cross_process_identity_when_strong_provider_available(self):
-        a = self._snap()
-        b = self._snap()
-        self.assertGreaterEqual(b["monotonic_ns"], a["monotonic_ns"])
-        if a["hard_verifiable"] and b["hard_verifiable"]:
-            self.assertEqual(a["clock_id"], b["clock_id"])
-
-if __name__ == "__main__":
-    unittest.main()
+if __name__ == '__main__': unittest.main()

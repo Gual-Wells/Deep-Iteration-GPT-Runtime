@@ -1,96 +1,155 @@
-# Deep Iteration GPT Runtime 3.0.0
+# Deep Iteration GPT Runtime (DIGR) 4.1.0
 
-**版本：`3.0.0`｜协议：`digr-v3.0`**
+DIGR 4.1 is a task-commitment/runtime-control protocol for preventing premature under-allocation of effort while preserving the model's native freedom to reason, research, use tools, test, redesign and synthesize.
 
-DIGR 3.0.0 是一次 major semantic break。它不再把自己设计成“驱动 ChatGPT 的流程引擎”，而是退到幕后，作为 ChatGPT 原生任务执行的**结果导向最低进化约束、可信时间闭环与轻量进化状态记忆层**。
+**4.1's architectural correction:** local personalization is no longer a pre-protocol. It is a minimal **Reliable Routing Plane**. All versioned DIGR semantics live in the pinned repository protocol.
 
-## 最高原则：Result Sovereignty
+## First design axiom
 
-DIGR 服务并负责的主体核心对象只有一个：
+> **本地负责叫醒、找到、钉住、交权；仓库负责定义、启动、执行、停止和证明。**
 
-> **在本次用户保真意图 `U0` 下取得尽可能高质量、正确、完整、可靠、深入、可用的任务结果。**
+Formally:
 
-协议、参数、时钟、计数、EST、S、R、证明标签都只是手段。除真实安全/权限/更高优先级约束、用户硬约束与计时真实性外，任何 DIGR 形式维护不得与原任务争夺注意力和执行资源。
+`Local Config = Candidate Response + Repository Routing + Immutable Pin + Authority Delegation`
 
-## 用户接口
+`Pinned Repository Protocol = All Versioned DIGR Semantics`
 
-```text
-深度迭代：<任务>
-深度迭代（N，T，R，B，S（n，t，r，b））：<任务>
-深度迭代/help
-```
+`Runtime Helpers = Evidence / Verification, not Semantic Authority`
 
-也接受语义清楚的中英文标点、`soft/hard`、`0/1`、`是/否`等自然表达。**参数由 ChatGPT 原生理解，不由字符解析器定义用户意图。**
-
-### 参数
-
-- `N`：主体至少 `N` 轮有效进化。对象不仅是提示词措辞，还可包括任务理解、执行指令、流程、拆解、验证方式、考虑维度与 ChatGPT 原生行为的实质优化。
-- `T`：本次 DIGR 整体闭环的实际运行时长目标。
-- `R`：形成可评估任务结果后，至少 `R` 轮**全流程结果回代再进化**。
-- `B`：`T` 的 soft/hard 控制。hard 时可信计时未达到 `T` 前不得正常退出；达到 `T` 也不代表必须退出。
-- `S(n,t,r,b)`：外源研究进化闭环的最低模板。
-  - 每个实际发生的 `Sᵢ` 都必须满足自己的 `n` 与 `r`，并继承 `b`。
-  - `t` 不属于单个 `Sᵢ`，而由本次任务全部 `S₁...Sₖ` 的有效外源研究活动时间**聚合**满足。
-  - `S` 的任何最低要求都不是研究上限；满足以后仍应继续所有对任务结果有价值的外源调研。
-
-`N/R/n/r/T/t` 均为最低保障或目标，不是能力上限、固定工作量表或停止理由。
-
-## Evolution State Tree（EST）
-
-主体和每个 `Sᵢ` 都自然维护一份轻量 EST。EST **不是搜索算法**，不规定 BFS/DFS/MCTS、评分、剪枝或任何固定动作。它只是 ChatGPT 的进化工作记忆：
-
-- 已经形成了哪些主要进化方向；
-- 各方向已经推进到什么状态；
-- 哪些关键成果已经成立；
-- 当前未解决问题和可继续发展的位置；
-- 当前活跃叶/分支大致在哪里。
-
-其目的，是让长时 DIGR 可以直接从当前进化位置继续，而不是反复返回 U0、重新理解、重复推导到已有进度。EST 不保存隐藏思维链，也不默认返回给用户。
-
-## R/r：全流程突破性回代
-
-`R` 与每个 `Sᵢ` 的 `r` 同构。它不是“再读一遍答案”，也不是只检查事实错误。
-
-每轮 R/r 都把**当前结果 + 已发生流程 + 当前 EST + 当前执行指令/提示框架 + 研究/工具/测试状态**重新置于原目标的高质量结果立场下，采用缺省性驳斥去寻找突破：
-
-- 为什么做到这里就算够？
-- 为什么不再深挖一个关键点？
-- 为什么不换一种流程、提示、验证、分解或研究方式？
-- 为什么不考虑之前遗漏的方面、反例、竞争解释或边界？
-- 为什么当前局部方案值得继续，而不是跳出局部最优？
-- 是否需要新的 S、重新打开旧 S、测试、源码/数据核验、Debug 或独立重推？
-
-这些只是思维方向示例，不是固定 checklist。真正动作由 ChatGPT 原生判断并实际执行。
-
-R/r 内置 **Anti-Bureaucracy Guard（ABG）**：防止协议官僚化、形式主义、日志主义、非必要牛角尖、局部最优锁死、证据数量主义，以及把并非真实要求的过度谨慎/免责声明扩张成主体任务。ABG **绝不削弱**真实安全、权限、用户硬约束或更高优先级规则；它清理的是 ChatGPT 自己额外制造且对结果无实质帮助的程序性负担。
-
-## T 与可信计时
-
-3.0 删除 2.3 的 “GPT-5.6 Sol / High 语义任务规模 T”。`T` 现在是真实运行时长目标。
-
-- `B=soft`：T 是软目标；真实收敛后允许提前退出。
-- `B=hard`：可信实际计时 `< T` 时正常停止权不存在。继续寻找真正有价值的新进化、研究、验证、测试、反证、流程改造或查漏补缺。
-- 不允许等待、sleep、重复搜索、机械改写、伪分支或日志膨胀来填充 T。
-- 达到 T 只表示时间最低要求满足；若结果仍有高价值缺口则继续。
-
-硬时钟优先使用跨调用稳定的单调时钟身份（本包提供 `runtime/clock_probe.py` 作为参考实现）。无法可靠验证 hard 时间时必须 fail closed：不能把“估计够了”报告成 hard 已满足。
-
-## 非粘滞
-
-DIGR 严格 current-user-turn scoped。只有**当前用户消息**显式使用 `深度迭代...` 前缀才启用。上一轮即使使用 DIGR，下一轮没有前缀也必须回到普通 ChatGPT；可以继承普通对话事实，但不得继承 DIGR 控制状态、计数、时钟或证明标签。
-
-`深度迭代/help` 是元指令，不启动任务运行时，只返回当前有效 DIGR 的调用定义、参数定义与返回定义。
-
-## 默认返回
-
-默认输出几乎全部属于任务本身。DIGR 最后只附一条轻量执行证明，例如：
+## Control plane
 
 ```text
-【DIGR 3.0｜N 3→5｜T 15mH→16m08s✓｜R 2→3｜S×4〔n≥2 · S-time 6mH→7m21s · r≥1〕✓】
+user message begins with DIGR / 深度迭代
+        ↓ candidate route only
+local personalization router
+        ↓
+stable → immutable 40-char commit SHA
+        ↓
+pinned manifest.json
+        ↓
+manifest discovery: bootstrap_entry (4.1+) or legacy entrypoint+core
+        ↓
+explicit authority delegation to pinned repository protocol
+──────────── semantic authority boundary ────────────
+repository version classifies task/help/off
+        ↓ executing 4.1 task only
+mandatory trusted task-clock readiness
+        ↓
+U0 → Semantic Completion → Effective Contract
+        ↓
+MAIN / SOURCE / R / D-L / validation
+        ↓
+Stop Gates → Result → Canonical Proof
 ```
 
-不默认返回最终 P*、EST、工作流日志、自评分、查询清单或协议 SHA。任务本身需要的引用、测试和证据应自然进入正文，而不是另建 DIGR 日志。
+### Why this matters
+4.0.0 accidentally let the local loader define root-gate, clock, no-fallback and P_target behavior while also claiming that the local loader was “not protocol”. That created two semantic authorities and allowed the anti-contamination mechanism itself to contaminate an older repository version. 4.1 removes the pre-protocol gate completely.
 
-## 迁移
+The local router may know only discovery facts: candidate route keys, repository/ref, immutable pin requirement, manifest location and manifest-declared protocol paths. It cannot define invocation validity, help behavior, defaults, clock rules, N/R/S/D/L, stop gates or proof.
 
-详见 `docs/MIGRATION_FROM_2.3.md`。
+## Routing and legacy cleanliness
+The router reads `Gual-Wells/Deep-Iteration-GPT-Runtime:stable` on every candidate invocation and pins it to an immutable commit. It then reads **that commit's** `manifest.json`.
+
+- 4.1+ manifest: follow `bootstrap_entry`, then repository entry/core.
+- legacy manifest without `bootstrap_entry`: follow its declared `entrypoint` + `core`.
+
+This compatibility rule only decides **where to read**. It does not import 4.1 semantics into a legacy P_run. Therefore a pinned 3.0 repository can be routed and then run strictly by 3.0's own semantics instead of being rejected by a future 4.1 startup rule.
+
+A route failure happens before P_run exists and is not a DIGR execution. The router reports that no repository protocol was obtained; it does not reconstruct DIGR from conversation memory or a local protocol copy.
+
+## Repository-delegated semantic authority
+Once a pinned repository protocol is loaded, it is the DIGR semantic source for that user turn, subject to higher-priority instructions and current user hard constraints. Protocol decisions must be provenance-clean:
+
+`Context !-> ProtocolSemantics`
+
+but ordinary task continuation remains allowed:
+
+`Context -> U0 / Evidence`
+
+The goal is protocol authority isolation, not conversation amnesia.
+
+If a task modifies DIGR, the generated/edited protocol is `P_target`; it cannot rebind current `P_run`. A later user turn must route and pin again before a new repository version can become P_run.
+
+## 4.1 task startup
+After 4.1 itself classifies a candidate as an executing task, it requires trusted monotonic task-clock readiness **before U0 freeze or substantive work**. Help/invalid candidates do not start a task clock. This rule belongs to repository P_run=4.1; it is deliberately absent from local personalization.
+
+The timer substrate separates:
+- observed monotonic duration;
+- hard continuity verification.
+
+Soft T/t may use honest observed duration. Hard T/t must carry continuity-verification facts for the formal intervals they claim.
+
+## Invocation
+Canonical form:
+
+`DIGR（N，T，R，B，S（n，t，r，b），D（s），L（e））：<任务>`
+
+Alias: `深度迭代`.
+
+4.1 has no special AUTO mode. Any subset may be supplied. Fixed defaults are only `B=0`, `b=0`, `L(1)`; missing N/T/R/n/t/r/s are jointly completed by native semantic calibration.
+
+## Execution semantics retained from 4.0
+- Result Sovereignty and Task Commitment;
+- Effective Contract freeze;
+- EST as lightweight evolution-state memory, not a search algorithm;
+- N and whole-process R/r re-entry + ABG;
+- multi-instance S with per-S n/r and aggregate source t;
+- D(s) Disruptive Gambit, with D(0)=off;
+- exact L1/L2/L3 isolation semantics;
+- MAIN/SOURCE/D_EXCLUSIVE/META/IDLE Formal Active Time;
+- hard-verification-aware stop checks and canonical proof;
+- strict deterministic helpers, schemas, property tests and deterministic release validation.
+
+## Time states
+| State | T | t |
+|---|---:|---:|
+| MAIN | yes | no |
+| SOURCE | yes | yes |
+| D_EXCLUSIVE | no | no |
+| META | no | no |
+| IDLE | no | no |
+
+Routing happens before task runtime and is not Formal Active Time.
+
+## D and L
+D performs non-local, plausibly high-upside interventions. A valid D requires Decree + Execution + Result + Reintegration. Disturbance/ambition/coup propensity remain semantic and non-numeric.
+
+L is exact, not a minimum:
+- L1: semantic isolation in the same context;
+- L2: separate LLM history/context + controlled telemetry + state firewall;
+- L3: L2 plus independent agent identity/instructions/execution loop/tool execution.
+
+API names such as handoff, nested run, sandbox or worktree do not self-certify L2/L3.
+
+## Canonical proof
+`DIGR（N/实际N，T/实际T，R/实际R，B，Sᵢ（n/实际n，t/实际t，r/实际r，b），D（s）/D（实际s），L（e）/L（实际e））`
+
+Unknown/unverified hard actual is `?`. Version/provenance/logs/EST/D-State are not included by default.
+
+## Local personalization
+Use `local-personalization/CHATGPT_LOCAL_PERSONALIZATION.txt`. The Free/Go compatibility file is byte-identical to the primary router, preventing semantic drift. The FULL file is explanatory reference only.
+
+The release builder can export the standalone direct-copy text from the **same internal source bytes**, so ZIP and standalone configuration cannot silently diverge.
+
+## Repository layout
+- `bootstrap/BOOTSTRAP.md`: repository-version startup semantics after routing;
+- `entry/`: invocation/help execution entry;
+- `core/`: normative DIGR semantics;
+- `runtime/routing.py`: version-semantic-free route/provenance validation;
+- `runtime/protocol_authority.py`: P_run binding to route receipt;
+- `runtime/task_startup.py`: 4.1 executing-task clock readiness;
+- `runtime/*`: time/contract/source/isolation/stop/proof helpers;
+- `schemas/`: closed machine-readable records;
+- `tests/`: control-plane, runtime, property, hygiene and release tests;
+- `tools/build_release.py`: deterministic ZIP + cold validation + personalization export.
+
+## Validation
+Run:
+
+```bash
+python -m unittest discover -v
+python tests/validate_repo.py
+python tools/build_release.py --output ../Deep-Iteration-GPT-Runtime-4.1.0.zip --personalization-output ../DIGR-4.1.0-CHATGPT-LOCAL-PERSONALIZATION.txt
+```
+
+The build is local and does not require Git automation.

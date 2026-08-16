@@ -1,0 +1,10 @@
+{
+  "name": "Deep Iteration GPT Runtime",
+  "short_name": "DIGR",
+  "version": "3.0.0",
+  "protocol": "digr-v3.0",
+  "core": ["core/00_RESULT_SOVEREIGNTY.md", "core/10_INVOCATION_AND_U0.md", "core/20_MINIMUM_GUARANTEES.md"],
+  "entrypoint": "entry/DEEP_ITERATION_ENTRY.md",
+  "help": "entry/HELP.md",
+  "local_fallback_core": "bootstrap/LOCAL_FALLBACK_CORE.md"
+}

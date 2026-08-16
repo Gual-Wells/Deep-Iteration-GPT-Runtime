@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/task-startup.schema.json",
+  "title": "DIGR 4.1 Executing Task Startup Receipt",
+  "type": "object",
+  "required": ["authority", "clock", "u0_frozen"],
+  "properties": {
+    "authority": {"$ref": "protocol-authority.schema.json"},
+    "clock": {
+      "type": "object",
+      "required": ["anchor", "probe", "ready"],
+      "properties": {
+        "anchor": {"$ref": "#/$defs/snapshot"},
+        "probe": {"$ref": "#/$defs/snapshot"},
+        "ready": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "u0_frozen": {"const": false}
+  },
+  "$defs": {
+    "snapshot": {
+      "type": "object",
+      "required": ["provider", "session_id", "boot_id", "monotonic_ns", "wall_ns"],
+      "properties": {
+        "provider": {"type": "string", "minLength": 1},
+        "session_id": {"type": "string", "minLength": 1},
+        "boot_id": {"type": ["string", "null"], "minLength": 1},
+        "monotonic_ns": {"type": "integer", "minimum": 0},
+        "wall_ns": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
