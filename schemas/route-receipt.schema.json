@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/route-receipt.schema.json",
+  "title": "DIGR 4.1 Routing Receipt",
+  "type": "object",
+  "required": ["repository_full_name", "requested_ref", "pinned_commit", "manifest_path", "manifest_sha256"],
+  "properties": {
+    "repository_full_name": {"const": "Gual-Wells/Deep-Iteration-GPT-Runtime"},
+    "requested_ref": {"const": "stable"},
+    "pinned_commit": {"type": "string", "pattern": "^[0-9a-fA-F]{40}$"},
+    "manifest_path": {"const": "manifest.json"},
+    "manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

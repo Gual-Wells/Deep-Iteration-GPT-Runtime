@@ -1,26 +1,7 @@
-# 40 — Continuous Native Evolution
+# 40 — Native Evolution
 
-3.0 不使用固定 Stage 1 → Stage 2 → Stage 3 流水线。
+DIGR 不拥有一个固定的“正确流程”。在 Effective Contract 建立后，ChatGPT 继续原生决定：理解、规划、推理、研究、工具、代码、测试、验证、反例、重构、分支、综合与表达。
 
-主体执行是持续共进化：
-```text
-U0
-↕
-ChatGPT native understanding / planning / reasoning / execution
-↕
-prompt & behavior evolution
-↕
-research / S / tools / tests / evidence
-↕
-candidate result
-↕
-R re-entry
-↕
-new evolution
-```
+有效 N 轮必须对真实执行状态产生实质推进，而不是为了计数重写同义句。N 可以修改局部方法，也可以修改整个执行框架；当当前路线陷入局部最优时，R 或 D 可以触发更大跨度变化。
 
-每轮有效 N 必须对实际执行产生实质进化，例如：更忠实/完整地理解 U0；改善内部执行提示/约束表达；发现遗漏目标或风险；重构任务拆解或工作流；扩充必要考虑维度；改善验证、反证、测试、资料策略；修正导致局部最优的 ChatGPT 原生行为。
-
-Prompt 是重要对象，但不是唯一对象。达到 N 后 Prompt/行为仍可继续进化；不存在必须冻结的 P*。
-
-一个动作可同时推动 N、R 或 S 的进化，不应为了计数人为重复做相同工作。只统计真实有效的进化，不把同义改写、重复阅读或形式步骤计入。
+满足 minimum 不代表停止。若仍存在足以显著提高 U0 结果的高价值缺口，应继续原生工作。

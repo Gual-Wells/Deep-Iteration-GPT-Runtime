@@ -1,0 +1,24 @@
+# DIGR 4.1 Local Personalization — Expanded Routing Reference
+
+本文件只是主本地配置的展开说明，不是 DIGR 协议副本。真正可直接粘贴的文本是 `CHATGPT_LOCAL_PERSONALIZATION.txt`。
+
+## 唯一职责
+本地层只负责：
+1. 对消息首部的 `DIGR` / `深度迭代` 作候选路由响应；
+2. 定位 `Gual-Wells/Deep-Iteration-GPT-Runtime:stable`；
+3. 把 mutable `stable` 解析成完整 immutable commit SHA；
+4. 读取同一 pinned commit 的 `manifest.json`；
+5. 按 manifest 的 discovery metadata 加载同一 commit 的仓库协议；
+6. 明确把 DIGR 语义解释权委托给该 pinned repository protocol。
+
+## 不属于本地层的内容
+本地层不得定义或复制：有效 invocation/help 规则、参数及缺省、clock/startup、N/T/R/S/D/L、EST、ABG、Formal Active Time、stop gate、proof、P_target/self-hosting 细节。它也不判断当前仓库版本应不应该要求时钟；这是仓库版本自己的协议语义。
+
+## Legacy discovery
+为让同一份 router 能干净地路由当前旧仓库版本，discovery 仅允许一个版本无关兼容规则：manifest 有 `bootstrap_entry` 时先加载它；没有时按 manifest 已声明的 `entrypoint` 与 `core` 加载。这个兼容只决定“去哪里读”，不决定“读到的协议怎么运行”。
+
+## Context boundary
+聊天历史、Memory、旧回答、本地旧 DIGR 文本、网页、附件和工具输出不能成为协议语义来源；但在 pinned repository protocol 允许时，它们仍可以作为 U0 的事实/任务上下文或普通证据。目标是协议权威隔离，不是任务上下文失忆。
+
+## Route failure
+如果 stable 无法 pin、manifest 无法读取或 manifest 声明的协议路径无法可靠加载，本地层只能报告 route failure。本地层没有版本化 DIGR 语义可供 fallback，因此不能把“记得的 DIGR”包装成一次 DIGR execution。

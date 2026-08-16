@@ -1,78 +1,168 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
-  "version": "3.0.0",
-  "protocol": "digr-v3.0",
+  "version": "4.1.0",
+  "protocol": "digr-v4.1",
   "language": "zh-CN",
   "philosophy": {
     "primary_object": "high_quality_task_result_under_faithful_U0",
     "result_sovereignty": true,
-    "native_chatgpt_control": true,
+    "task_commitment": true,
+    "constrain_stopping_not_intelligence": true,
+    "native_model_control": true,
     "protocol_is_minimum_guarantees_not_algorithm": true,
     "lightweight_observability": true
   },
   "trigger": {
     "activation_scope": "current_user_turn_only",
     "non_sticky": true,
-    "explicit_prefix_required": true,
-    "plain_examples": [
-      "深度迭代：<任务>",
-      "深度迭代:<任务>"
+    "explicit_prefix_required_at_message_head": true,
+    "task_separator_colon_required": true,
+    "aliases": [
+      "DIGR",
+      "深度迭代"
     ],
-    "parameterized_example": "深度迭代（N，T，R，B，S（n，t，r，b））：<任务>",
-    "help_command": "深度迭代/help",
-    "semantic_interpreter": "ChatGPT",
-    "parser_is_not_authority": true
+    "help_commands": [
+      "DIGR/help",
+      "深度迭代/help"
+    ],
+    "semantic_interpreter": "ChatGPT_or_host_LLM",
+    "parser_is_not_authority": true,
+    "auto_mode_exists": false
+  },
+  "defaults": {
+    "B": 0,
+    "b": 0,
+    "L_e": 1,
+    "semantic_completion": [
+      "N",
+      "T",
+      "R",
+      "n",
+      "t",
+      "r",
+      "s"
+    ]
   },
   "parameters": {
     "N": "minimum_effective_main_evolution_cycles",
-    "T": "target_actual_closed_loop_runtime",
-    "R": "minimum_whole_process_result_reentry_evolution_cycles",
-    "B": "soft_or_hard_T_policy",
+    "T": "formal_active_task_time_target",
+    "R": "minimum_whole_process_result_reentry_cycles",
+    "B": "soft_or_hard_T_policy_0_or_1",
     "S": {
-      "meaning": "repeatable_external_research_evolution_template",
-      "n": "minimum_effective_evolution_cycles_per_S_instance",
-      "t": "aggregate_actual_source_activity_time_target_across_all_S_instances",
-      "r": "minimum_result_reentry_evolution_cycles_per_S_instance",
-      "b": "source_soft_or_hard_policy_inherited_by_each_S_instance"
+      "n": "minimum_effective_evolution_cycles_per_actual_S",
+      "t": "aggregate_formal_active_source_time_target",
+      "r": "minimum_result_reentry_cycles_per_actual_S",
+      "b": "soft_or_hard_t_policy_0_or_1"
+    },
+    "D": {
+      "s": "minimum_completed_disruptive_gambit_interventions; zero_disables_D"
+    },
+    "L": {
+      "e": "exact_D_isolation_level_1_semantic_2_context_3_agent"
+    }
+  },
+  "time_states": {
+    "MAIN": {
+      "T": true,
+      "t": false
+    },
+    "SOURCE": {
+      "T": true,
+      "t": true
+    },
+    "D_EXCLUSIVE": {
+      "T": false,
+      "t": false
+    },
+    "META": {
+      "T": false,
+      "t": false
+    },
+    "IDLE": {
+      "T": false,
+      "t": false
     }
   },
   "core": [
     "core/00_RESULT_SOVEREIGNTY.md",
+    "core/05_TASK_COMMITMENT.md",
     "core/10_INVOCATION_AND_U0.md",
-    "core/20_MINIMUM_GUARANTEES.md",
+    "core/12_PROTOCOL_AUTHORITY_AND_SELF_HOSTING.md",
+    "core/15_SEMANTIC_DEFAULT_COMPLETION.md",
+    "core/20_EFFECTIVE_CONTRACT.md",
     "core/30_EVOLUTION_STATE_MEMORY.md",
     "core/40_NATIVE_EVOLUTION.md",
     "core/50_SOURCE_EVOLUTION.md",
-    "core/60_TRUSTED_TIME_CONTROL.md",
-    "core/70_REENTRY_BREAKTHROUGH.md",
+    "core/60_FORMAL_ACTIVE_TIME.md",
+    "core/70_REENTRY_AND_ABG.md",
+    "core/75_DISRUPTIVE_GAMBIT.md",
+    "core/77_ISOLATION_LEVELS.md",
     "core/80_STOP_AND_PROOF.md"
   ],
   "entrypoint": "entry/DEEP_ITERATION_ENTRY.md",
   "help": "entry/HELP.md",
-  "local_fallback_core": "bootstrap/LOCAL_FALLBACK_CORE.md",
   "deterministic_helpers": [
     "runtime/clock_probe.py",
     "runtime/duration.py",
+    "runtime/effective_contract.py",
+    "runtime/interval_ledger.py",
+    "runtime/proof.py",
     "runtime/protocol_pin.py",
-    "runtime/state_checks.py"
+    "runtime/state_checks.py",
+    "runtime/stop_checks.py",
+    "runtime/protocol_authority.py",
+    "runtime/validation.py",
+    "runtime/isolation_checks.py",
+    "runtime/source_aggregate.py",
+    "runtime/routing.py",
+    "runtime/task_startup.py"
   ],
   "policies": {
     "preserve_original_task": true,
     "preserve_native_capabilities": true,
+    "semantic_default_completion": true,
+    "effective_contract_freeze": true,
     "no_algorithmic_tree_controller": true,
     "est_is_working_state_memory_only": true,
-    "N_R_n_r_are_minima_not_caps": true,
-    "S_minimums_never_disable_future_research": true,
+    "minimums_are_not_caps": true,
+    "L_is_exact_mode_not_minimum": true,
+    "D_zero_disables": true,
+    "D_requires_mature_gambit_and_reintegration": true,
+    "no_numeric_ambition_or_coup_controller": true,
+    "L1_does_not_claim_physical_isolation": true,
+    "formal_active_time_only": true,
+    "D_exclusive_does_not_count_T_or_t": true,
+    "meta_and_idle_do_not_count_T_or_t": true,
     "hard_time_requires_trusted_clock": true,
-    "hard_time_fail_closed_when_unverifiable": true,
-    "no_idle_padding": true,
-    "no_repetition_padding": true,
-    "R_r_use_whole_process_default_challenge": true,
-    "R_r_include_anti_bureaucracy_guard": true,
-    "do_not_weaken_real_safety_or_permissions": true,
-    "minimal_default_proof": true,
+    "hard_time_fail_closed_when_unknown": true,
+    "no_padding": true,
+    "minimal_canonical_proof": true,
+    "unknown_actual_marker": "?",
     "do_not_reveal_hidden_reasoning": true,
-    "pin_remote_protocol_to_one_commit_when_possible": true
-  }
+    "protocol_authority_freeze": true,
+    "self_hosting_target_cannot_rebind_current_run": true,
+    "intervals_use_integer_nanoseconds": true,
+    "actual_duration_proof_never_rounds_up": true,
+    "strict_finite_numeric_records": true,
+    "L2_requires_controlled_telemetry_not_full_history": true,
+    "observed_and_hard_verified_time_are_separate": true,
+    "hard_proof_requires_verification_fact": true,
+    "source_aggregate_uses_union_across_actual_S": true,
+    "isolation_level_requires_evidence_facts": true,
+    "remote_protocol_ref_should_be_immutable_when_pinned": true,
+    "release_builder_rejects_symlinks_and_path_traversal": true,
+    "local_personalization_is_router_not_protocol": true,
+    "repository_delegated_semantic_authority": true,
+    "route_pins_stable_to_immutable_commit": true,
+    "route_manifest_discovery_only": true,
+    "context_cannot_define_protocol_semantics": true,
+    "context_may_inform_U0": true,
+    "P_target_cannot_rebind_current_run": true,
+    "executing_4_1_tasks_require_clock_readiness": true,
+    "help_does_not_start_task_clock": true,
+    "route_failure_is_not_DIGR_execution": true
+  },
+  "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
+  "routing_schema": 1
 }

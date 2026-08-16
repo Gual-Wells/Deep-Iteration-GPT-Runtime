@@ -1,39 +1,19 @@
-# Architecture — DIGR 3.0
+# Architecture — DIGR 4.1.0
 
-DIGR 3.0 是 **light control plane over ChatGPT native execution**。
+DIGR 4.1 uses six separated control/evidence layers:
 
-## Control plane only guarantees
-- U0 fidelity
-- minimum evolution constraints
-- trusted hard-time verification
-- lightweight EST continuity
-- whole-process R/r breakthrough re-entry
-- per-S source evolution minimums
-- minimal truthful proof
+1. **Reliable Routing Plane (local personalization)** — candidate response, repository location, `stable`→immutable SHA, pinned manifest discovery, authority delegation. No versioned DIGR semantics.
+2. **Repository Bootstrap Plane** — `bootstrap/BOOTSTRAP.md`, loaded from the pinned commit. This is where 4.1 versioned startup rules begin.
+3. **Repository Authority Plane** — bind P_run to the same pinned route receipt; quarantine context/local/other-commit/P_target from protocol semantics while still allowing context into U0/evidence.
+4. **Semantic Contract Plane** — repository-defined invocation classification, executing-task clock readiness, U0, explicit parameters, semantic completion and Effective Contract.
+5. **Native Execution Plane** — Main evolution, S, R/r, EST, D/L, tools/research/validation remain model-native within protocol boundaries.
+6. **Deterministic Evidence Plane** — routing/provenance, clock facts, Formal Active Time, source aggregation, isolation facts, mechanical stop and proof validation. Helpers do not create natural-language semantics.
 
-## Native plane owns
-- language understanding
-- planning
-- reasoning
-- search/research choices
-- tool strategy
-- testing/debugging
-- hypothesis generation
-- branch/depth choice
-- synthesis
-- final expression
+## No pre-protocol protocol
+4.1 intentionally has no root execution-gate file. Local personalization cannot say “clock first”, “help does X”, or “P_target means Y”. It only routes to repository content. This removes the authority cycle that let a future loader impose future rules on a legacy repository version.
 
-## Continuous co-evolution
-不存在固定 Stage 1/2/3。Prompt/行为、研究、S、测试、结果与 R 可以互相重新驱动。
+## Time
+P_run=4.1 classifies invocation first. Only executing tasks then establish mandatory task-clock readiness before U0/substantive work. Soft observed duration and hard continuity verification remain separate facts. Foreground states are mutually exclusive; parallel multi-S source work unions at source aggregation.
 
-## State
-Runtime state 应保持最小：
-- U0
-- requested/actual minima
-- trusted clock anchor/capability
-- Main EST compact snapshot
-- current result
-- S instances: objective + compact EST + n/r + active source intervals
-- aggregate source time
-
-不维护隐藏思维日志。
+## Isolation
+L1 is same-context semantic firewall; L2 requires separate LLM history/context + controlled telemetry + state firewall; L3 adds independent agent identity/instructions/loop/tool execution. Provider primitives are substrate, not self-certifying conformance.
