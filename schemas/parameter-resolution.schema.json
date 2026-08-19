@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/parameter-resolution.schema.json",
+  "title": "DIGR 5.0 Alpha 2 Parameter Resolution",
+  "type": "object",
+  "required": [
+    "status",
+    "N",
+    "T_seconds",
+    "R",
+    "B",
+    "S",
+    "D_s",
+    "L_e",
+    "normalized_surface",
+    "diagnostics"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "RESOLVED",
+        "AMBIGUOUS",
+        "INVALID"
+      ]
+    },
+    "N": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "T_seconds": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "R": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "B": {
+      "enum": [
+        0,
+        1
+      ]
+    },
+    "S": {
+      "type": "object",
+      "required": [
+        "n",
+        "t_seconds",
+        "r",
+        "b"
+      ],
+      "properties": {
+        "n": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "t_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "r": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "b": {
+          "enum": [
+            0,
+            1
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "D_s": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "L_e": {
+      "enum": [
+        1,
+        2,
+        3
+      ]
+    },
+    "normalized_surface": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

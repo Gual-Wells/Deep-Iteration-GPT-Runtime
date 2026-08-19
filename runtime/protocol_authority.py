@@ -1,9 +1,9 @@
-"""Immutable repository-delegated protocol authority records for DIGR 4.1.0."""
+"""Immutable repository-delegated protocol authority records for DIGR 5.0.0-alpha.2."""
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 from typing import Any
 from .protocol_pin import validate_commit_sha
-from .routing import AUTHORITATIVE_REPOSITORY, RouteReceipt, load_manifest_for_route
+from .routing import AUTHORITATIVE_REPOSITORY, RouteReceipt, load_route_metadata
 from .validation import require_nonempty_text
 
 @dataclass(frozen=True)
@@ -41,12 +41,11 @@ class ProtocolAuthority:
         return {'route': self.route.to_dict(), 'P_run': asdict(self.P_run)}
 
 
-
-def authority_from_manifest_bytes(route: RouteReceipt, data: bytes) -> ProtocolAuthority:
-    manifest = load_manifest_for_route(route, data)
+def authority_from_route_bytes(route: RouteReceipt, manifest_data: bytes, version_data: bytes) -> ProtocolAuthority:
+    manifest, version = load_route_metadata(route, manifest_data, version_data)
     ident = ProtocolIdentity(
         protocol=require_nonempty_text('manifest protocol', manifest.get('protocol')),
-        version=require_nonempty_text('manifest version', manifest.get('version')),
+        version=version,
         repository_full_name=route.repository_full_name,
         commit_sha=route.pinned_commit,
     )

@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/run-brief.schema.json",
+  "title": "DIGR 5.0 Alpha 2 Derived Run Brief",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "U0_sha256",
+    "contract_present",
+    "phase",
+    "strategy_revision",
+    "candidate_revision",
+    "active_source_ids",
+    "D_completed",
+    "blocking_gap_ids",
+    "key_evidence_refs",
+    "latest_meaningful_event_refs",
+    "content_digest"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{7,127}$"
+    },
+    "U0_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "contract_present": {
+      "type": "boolean"
+    },
+    "phase": {
+      "enum": [
+        "GENESIS",
+        "PARAMETER_RESOLVED",
+        "U0_FROZEN",
+        "CONTRACT_FROZEN",
+        "EXECUTING",
+        "FINALIZING",
+        "FINISHED",
+        "ABORTED"
+      ]
+    },
+    "strategy_revision": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "candidate_revision": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "active_source_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+      }
+    },
+    "D_completed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "blocking_gap_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+      }
+    },
+    "key_evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "latest_meaningful_event_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "content_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": false
+}

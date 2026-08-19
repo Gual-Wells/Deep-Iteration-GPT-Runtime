@@ -1,6 +1,6 @@
 [project]
 name = "deep-iteration-gpt-runtime"
-version = "4.1.0"
-description = "A task-commitment and native-execution control protocol with repository-delegated semantic authority."
+version = "5.0.0-alpha.2"
+description = "A native-intelligence assist runtime with reliable routing, atomic clock genesis, explicit state memory, and audit support."
 requires-python = ">=3.10"
 license = "MIT"

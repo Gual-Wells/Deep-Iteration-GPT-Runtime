@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/isolation-receipt.schema.json",
+  "title": "DIGR 5.0 Alpha 2 D Isolation Receipt",
+  "type": "object",
+  "required": [
+    "receipt_id",
+    "L_target",
+    "L_cap",
+    "L_actual",
+    "facts",
+    "input_packet_ref",
+    "output_packet_ref",
+    "mode",
+    "target_met"
+  ],
+  "properties": {
+    "receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "L_target": {
+      "enum": [
+        1,
+        2,
+        3
+      ]
+    },
+    "L_cap": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "enum": [
+        1,
+        2,
+        3,
+        null
+      ]
+    },
+    "L_actual": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "enum": [
+        1,
+        2,
+        3,
+        null
+      ]
+    },
+    "facts": {
+      "$ref": "isolation-facts.schema.json"
+    },
+    "input_packet_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "output_packet_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mode": {
+      "enum": [
+        "exclusive",
+        "background"
+      ]
+    },
+    "target_met": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

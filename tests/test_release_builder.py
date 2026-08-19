@@ -57,4 +57,12 @@ class TestReleaseBuilder(unittest.TestCase):
             self.assertEqual(out.read_bytes(),src.read_bytes())
             self.assertEqual(digest,br.sha256(src))
 
+
+    def test_full_personalization_export_is_exact_bytes(self):
+        with tempfile.TemporaryDirectory() as td:
+            base=Path(td);root=base/'src';(root/'local-personalization').mkdir(parents=True)
+            src=root/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FULL.txt';src.write_bytes(b'expanded router reference\n')
+            out=base/'router-full.txt';digest=br.export_personalization(root,out,full=True)
+            self.assertEqual(out.read_bytes(),src.read_bytes());self.assertEqual(digest,br.sha256(src))
+
 if __name__ == '__main__': unittest.main()

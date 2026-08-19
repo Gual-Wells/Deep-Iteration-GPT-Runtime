@@ -1,155 +1,90 @@
-# Deep Iteration GPT Runtime (DIGR) 4.1.0
+# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.2
 
-DIGR 4.1 is a task-commitment/runtime-control protocol for preventing premature under-allocation of effort while preserving the model's native freedom to reason, research, use tools, test, redesign and synthesize.
+**Status:** corrected integration baseline intended to freeze for DIGR 5.0 final.
 
-**4.1's architectural correction:** local personalization is no longer a pre-protocol. It is a minimal **Reliable Routing Plane**. All versioned DIGR semantics live in the pinned repository protocol.
+DIGR 5.0 is a reliability exoskeleton around native model intelligence. It does not replace the model with a planner/search controller. It gives an explicitly invoked high-investment task a pinned protocol authority, early trusted timing, immutable U0/minimum commitments, revisable working strategy, external-source state, candidate-backed re-entry, isolated D interventions, evidence, persistence and recovery.
 
-## First design axiom
+## Why Alpha 2 exists
 
-> **本地负责叫醒、找到、钉住、交权；仓库负责定义、启动、执行、停止和证明。**
+Alpha 1 proved the Native Assist substrate and clock-journal foundation, but a full code/rule audit found several interfaces that were internally consistent yet protected behavior no longer suitable for the 5.0 final baseline. Alpha 2 deliberately reopens those interfaces rather than preserving correctness defects for compatibility.
 
-Formally:
+The central correction is:
 
-`Local Config = Candidate Response + Repository Routing + Immutable Pin + Authority Delegation`
+> **Freeze commitments, never freeze strategy.**
 
-`Pinned Repository Protocol = All Versioned DIGR Semantics`
+`P_run`, U0, user hard constraints and Effective Contract minimums are immutable. Task representation, decomposition, Strategy, Source direction, validation/tool plan, assumptions, Candidate and D gambits are revisioned working state and may pivot whenever evidence justifies it.
 
-`Runtime Helpers = Evidence / Verification, not Semantic Authority`
+Other Alpha 2 corrections include:
 
-## Control plane
+- exact-uppercase local `DIGR` capture + repository `NATIVE` sovereignty return;
+- two-stage repository startup so Clock Genesis is close to invocation detection;
+- deterministic unique-or-fail parameter resolution with typed T/t and mixed punctuation normalization;
+- source research presumed REQUIRED unless explicitly waived for a real reason;
+- source t from clock-journal SOURCE intervals bound to active S IDs (no second source-aggregate truth);
+- Candidate-backed whole-process R;
+- D proposal revisions until Decree, evidence/result revisions and concrete Main reintegration;
+- L target/capability/actual split and intervention-linked isolation receipts/packets;
+- one RunPhase lifecycle, artifact integrity index, derived run brief and comprehensive workspace recovery;
+- strict cross-session clock resume requiring equal non-empty boot identity;
+- Event Receipt v2 bound to clock/strategy/candidate/source;
+- expanded user-facing help.
+
+## Authority and startup
+
+Local personalization is intentionally thin. It broadly routes exact-uppercase `DIGR` / exact `深度迭代`, pins `stable` to one immutable SHA, validates pinned `manifest.json` + `VERSION`, then loads only the manifest-declared startup slice. The pinned repository returns `NATIVE`, `HELP`, `INVALID` or `EXECUTING`.
+
+`EXECUTING` performs trusted ≥3-sample Clock Genesis **before parameter resolution/U0/task work**, then loads the full pinned entry/core. Failure after genesis is an auditable aborted run, not “nothing happened”.
+
+## Execution shape
 
 ```text
-user message begins with DIGR / 深度迭代
-        ↓ candidate route only
-local personalization router
-        ↓
-stable → immutable 40-char commit SHA
-        ↓
-pinned manifest.json
-        ↓
-manifest discovery: bootstrap_entry (4.1+) or legacy entrypoint+core
-        ↓
-explicit authority delegation to pinned repository protocol
-──────────── semantic authority boundary ────────────
-repository version classifies task/help/off
-        ↓ executing 4.1 task only
-mandatory trusted task-clock readiness
-        ↓
-U0 → Semantic Completion → Effective Contract
-        ↓
-MAIN / SOURCE / R / D-L / validation
-        ↓
-Stop Gates → Result → Canonical Proof
+USER
+  ↓
+local broad route → stable→SHA→manifest/VERSION
+  ↓
+minimal startup slice → NATIVE | HELP | INVALID | EXECUTING
+                                      ↓
+                                  CLOCK GENESIS
+                                      ↓
+                              Parameter Resolution
+                                      ↓
+                                     U0
+                                      ↓
+                           Effective Contract minima
+                                      ↓
+                              MAIN / Strategy Genesis
+                         ↙             ↓              ↘
+                       N              S              D/L
+                         ↘             ↓              ↙
+                         Strategy ↔ Candidate ↔ Evidence
+                                      ↕
+                           R whole-process re-entry
+                                      ↓
+                         Completion / open-gap state
+                                      ↓
+                         finish clock + recovery audit
+                                      ↓
+                              RESULT + compact proof
 ```
 
-### Why this matters
-4.0.0 accidentally let the local loader define root-gate, clock, no-fallback and P_target behavior while also claiming that the local loader was “not protocol”. That created two semantic authorities and allowed the anti-contamination mechanism itself to contaminate an older repository version. 4.1 removes the pre-protocol gate completely.
-
-The local router may know only discovery facts: candidate route keys, repository/ref, immutable pin requirement, manifest location and manifest-declared protocol paths. It cannot define invocation validity, help behavior, defaults, clock rules, N/R/S/D/L, stop gates or proof.
-
-## Routing and legacy cleanliness
-The router reads `Gual-Wells/Deep-Iteration-GPT-Runtime:stable` on every candidate invocation and pins it to an immutable commit. It then reads **that commit's** `manifest.json`.
-
-- 4.1+ manifest: follow `bootstrap_entry`, then repository entry/core.
-- legacy manifest without `bootstrap_entry`: follow its declared `entrypoint` + `core`.
-
-This compatibility rule only decides **where to read**. It does not import 4.1 semantics into a legacy P_run. Therefore a pinned 3.0 repository can be routed and then run strictly by 3.0's own semantics instead of being rejected by a future 4.1 startup rule.
-
-A route failure happens before P_run exists and is not a DIGR execution. The router reports that no repository protocol was obtained; it does not reconstruct DIGR from conversation memory or a local protocol copy.
-
-## Repository-delegated semantic authority
-Once a pinned repository protocol is loaded, it is the DIGR semantic source for that user turn, subject to higher-priority instructions and current user hard constraints. Protocol decisions must be provenance-clean:
-
-`Context !-> ProtocolSemantics`
-
-but ordinary task continuation remains allowed:
-
-`Context -> U0 / Evidence`
-
-The goal is protocol authority isolation, not conversation amnesia.
-
-If a task modifies DIGR, the generated/edited protocol is `P_target`; it cannot rebind current `P_run`. A later user turn must route and pin again before a new repository version can become P_run.
-
-## 4.1 task startup
-After 4.1 itself classifies a candidate as an executing task, it requires trusted monotonic task-clock readiness **before U0 freeze or substantive work**. Help/invalid candidates do not start a task clock. This rule belongs to repository P_run=4.1; it is deliberately absent from local personalization.
-
-The timer substrate separates:
-- observed monotonic duration;
-- hard continuity verification.
-
-Soft T/t may use honest observed duration. Hard T/t must carry continuity-verification facts for the formal intervals they claim.
-
-## Invocation
-Canonical form:
-
-`DIGR（N，T，R，B，S（n，t，r，b），D（s），L（e））：<任务>`
-
-Alias: `深度迭代`.
-
-4.1 has no special AUTO mode. Any subset may be supplied. Fixed defaults are only `B=0`, `b=0`, `L(1)`; missing N/T/R/n/t/r/s are jointly completed by native semantic calibration.
-
-## Execution semantics retained from 4.0
-- Result Sovereignty and Task Commitment;
-- Effective Contract freeze;
-- EST as lightweight evolution-state memory, not a search algorithm;
-- N and whole-process R/r re-entry + ABG;
-- multi-instance S with per-S n/r and aggregate source t;
-- D(s) Disruptive Gambit, with D(0)=off;
-- exact L1/L2/L3 isolation semantics;
-- MAIN/SOURCE/D_EXCLUSIVE/META/IDLE Formal Active Time;
-- hard-verification-aware stop checks and canonical proof;
-- strict deterministic helpers, schemas, property tests and deterministic release validation.
-
-## Time states
-| State | T | t |
-|---|---:|---:|
-| MAIN | yes | no |
-| SOURCE | yes | yes |
-| D_EXCLUSIVE | no | no |
-| META | no | no |
-| IDLE | no | no |
-
-Routing happens before task runtime and is not Formal Active Time.
-
-## D and L
-D performs non-local, plausibly high-upside interventions. A valid D requires Decree + Execution + Result + Reintegration. Disturbance/ambition/coup propensity remain semantic and non-numeric.
-
-L is exact, not a minimum:
-- L1: semantic isolation in the same context;
-- L2: separate LLM history/context + controlled telemetry + state firewall;
-- L3: L2 plus independent agent identity/instructions/execution loop/tool execution.
-
-API names such as handoff, nested run, sandbox or worktree do not self-certify L2/L3.
-
-## Canonical proof
-`DIGR（N/实际N，T/实际T，R/实际R，B，Sᵢ（n/实际n，t/实际t，r/实际r，b），D（s）/D（实际s），L（e）/L（实际e））`
-
-Unknown/unverified hard actual is `?`. Version/provenance/logs/EST/D-State are not included by default.
-
-## Local personalization
-Use `local-personalization/CHATGPT_LOCAL_PERSONALIZATION.txt`. The Free/Go compatibility file is byte-identical to the primary router, preventing semantic drift. The FULL file is explanatory reference only.
-
-The release builder can export the standalone direct-copy text from the **same internal source bytes**, so ZIP and standalone configuration cannot silently diverge.
-
-## Repository layout
-- `bootstrap/BOOTSTRAP.md`: repository-version startup semantics after routing;
-- `entry/`: invocation/help execution entry;
-- `core/`: normative DIGR semantics;
-- `runtime/routing.py`: version-semantic-free route/provenance validation;
-- `runtime/protocol_authority.py`: P_run binding to route receipt;
-- `runtime/task_startup.py`: 4.1 executing-task clock readiness;
-- `runtime/*`: time/contract/source/isolation/stop/proof helpers;
-- `schemas/`: closed machine-readable records;
-- `tests/`: control-plane, runtime, property, hygiene and release tests;
-- `tools/build_release.py`: deterministic ZIP + cold validation + personalization export.
+See `entry/HELP.md` for user-facing invocation/parameter behavior and `docs/ARCHITECTURE.md` for the engineering model.
 
 ## Validation
+
 Run:
 
 ```bash
-python -m unittest discover -v
+python -m unittest discover -s tests -p 'test_*.py'
 python tests/validate_repo.py
-python tools/build_release.py --output ../Deep-Iteration-GPT-Runtime-4.1.0.zip --personalization-output ../DIGR-4.1.0-CHATGPT-LOCAL-PERSONALIZATION.txt
 ```
 
-The build is local and does not require Git automation.
+Deterministic release:
+
+```bash
+python tools/build_release.py \
+  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.2.zip \
+  --personalization-output ../DIGR-5.0.0-alpha.2-CHATGPT-LOCAL-PERSONALIZATION.txt \
+  --full-personalization-output ../DIGR-5.0.0-alpha.2-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
+```
+
+The builder regenerates release metadata, runs tests/validator in cold extracted trees and rejects unsafe/symlink ZIP members. Final release validation should build twice and compare byte identity.

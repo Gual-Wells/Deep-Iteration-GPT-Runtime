@@ -1,4 +1,4 @@
-"""Canonical compact DIGR 4.1.0 proof renderer.
+"""Canonical compact DIGR 5.0.0-alpha.2 proof renderer.
 
 Hard actual duration is visible only when the ProofData itself carries a true
 hard-verification fact.  This prevents callers from smuggling an observed but
@@ -147,3 +147,24 @@ class ProofData:
             f'D（{self.D_target}）/D（{self.D_actual}），'
             f'L（{self.L_target}）/L（{l_actual}））'
         )
+
+
+def proof_data_from_contract_actuals(contract, actual):
+    """Build canonical proof data from frozen contract + derived live actuals."""
+    from .effective_contract import EffectiveContract
+    from .stop_checks import ContractActuals
+    if not isinstance(contract, EffectiveContract):
+        raise TypeError('contract must be EffectiveContract')
+    if not isinstance(actual, ContractActuals):
+        raise TypeError('actual must be ContractActuals')
+    return ProofData(
+        N_target=contract.N, N_actual=actual.N,
+        T_target_seconds=contract.T_seconds, T_actual_seconds=actual.T_seconds,
+        R_target=contract.R, R_actual=actual.R, B=contract.B,
+        S_count=actual.S_count, n_target=contract.S.n, n_actual=actual.n_min,
+        t_target_seconds=contract.S.t_seconds, t_actual_seconds=actual.t_seconds,
+        r_target=contract.S.r, r_actual=actual.r_min, b=contract.S.b,
+        D_target=contract.D_s, D_actual=actual.D_s,
+        L_target=contract.L_e, L_actual=actual.L_e,
+        T_hard_verified=actual.T_hard_verified, t_hard_verified=actual.t_hard_verified,
+    )

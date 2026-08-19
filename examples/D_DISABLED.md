@@ -2,4 +2,4 @@
 
 `DIGR（D（0））：任务`
 
-D 完全关闭。L 仍可有配置值，但不会产生 D intervention。
+The frozen contract disables D. `LiveDIGRRun` rejects creation of a D intervention rather than merely ignoring it at final counting. L remains visible/configured for proof compatibility, but L conformance is non-blocking when no D is required.

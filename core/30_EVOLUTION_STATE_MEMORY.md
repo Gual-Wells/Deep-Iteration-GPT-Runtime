@@ -1,11 +1,7 @@
-# 30 — Evolution State Memory (EST)
+# Evolution State Tree (EST) as Reopenable Working Memory
 
-EST 是**进化状态工作记忆**，不是搜索算法。
+EST is lightweight external working memory, not BFS/DFS/MCTS and not a score/controller. It compresses where work has reached so later evolution can continue without restarting from scratch.
 
-主体自然维护 Main EST；每个 `Sᵢ` 维护自己的 S-EST。EST 只压缩保存足以继续工作的高层状态，例如：当前主要进化方向、最新状态、已确认成果、未解决问题/不确定性、当前仍值得推进的位置以及关键新变化。
+Alpha 2 avoids anchoring labels such as immutable `stable_facts` or `important_decisions`. A snapshot may record currently supported facts, current decisions, superseded assumptions, open questions, active routes, dormant-but-reopenable routes, the latest meaningful change and references to current Strategy/Candidate revisions.
 
-EST 不规定 BFS/DFS/MCTS、评分、剪枝、frontier queue，也不规定何时必须开分支、深挖或回溯。下一步由 ChatGPT 原生判断。
-
-默认从当前有效状态继续，而不是每轮从 U0 重新理解和重复推导。只在新证据、R/r 或原生判断确有必要时回看更早状态。
-
-EST 不保存完整隐藏思维链、逐步 rationale、冗长日志或无助于后续工作的历史。完成/暂时不活跃的分支可以压缩。
+Every EST statement is current working state. New evidence, R, S, D, failures or counterexamples may revise or supersede it.

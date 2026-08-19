@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/d-intervention.schema.json",
+  "title": "DIGR 5.0 Alpha 2 D Intervention Session",
+  "type": "object",
+  "required": [
+    "intervention_id",
+    "state_revision",
+    "isolation_receipt_id",
+    "proposals",
+    "decree",
+    "execution_events",
+    "results",
+    "reintegration",
+    "status",
+    "abort_reason",
+    "completed"
+  ],
+  "properties": {
+    "intervention_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "state_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "isolation_receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "revision",
+          "text",
+          "reason"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "decree": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "proposal_revision",
+            "text"
+          ],
+          "properties": {
+            "proposal_revision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "execution_events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "seq",
+          "summary",
+          "evidence_refs",
+          "clock_event_ref"
+        ],
+        "properties": {
+          "seq": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "clock_event_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "revision",
+          "summary",
+          "evidence_refs",
+          "output_packet_ref"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "output_packet_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "reintegration": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "candidate_before_revision",
+            "d_result_revision",
+            "accepted",
+            "rejected",
+            "main_consequence",
+            "strategy_revision",
+            "candidate_revision",
+            "clock_event_ref"
+          ],
+          "properties": {
+            "candidate_before_revision": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "d_result_revision": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "accepted": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rejected": {
+              "type": "string",
+              "minLength": 1
+            },
+            "main_consequence": {
+              "type": "string",
+              "minLength": 1
+            },
+            "strategy_revision": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "candidate_revision": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "clock_event_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "status": {
+      "enum": [
+        "ACTIVE",
+        "ABORTED",
+        "COMPLETED"
+      ]
+    },
+    "abort_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "completed": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

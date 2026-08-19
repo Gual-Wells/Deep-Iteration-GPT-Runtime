@@ -1,0 +1,49 @@
+{
+  "schema_version": 2,
+  "required_genesis_files": [
+    "authority.json",
+    "invocation.json",
+    "startup.json",
+    "time/clock.journal.ndjson",
+    "state/artifact-index.json",
+    "state/run-phase.json"
+  ],
+  "state_directories": [
+    "time",
+    "sources",
+    "dictator",
+    "evidence",
+    "final",
+    "state"
+  ],
+  "artifact_schemas": {
+    "authority.json": "schemas/protocol-authority.schema.json",
+    "invocation.json": "schemas/invocation-surface.schema.json",
+    "startup.json": "schemas/task-startup.schema.json",
+    "parameter-resolution.json": "schemas/parameter-resolution.schema.json",
+    "U0.json": "schemas/u0-receipt.schema.json",
+    "contract.json": "schemas/effective-contract.schema.json",
+    "time/clock.journal.ndjson": "schemas/clock-journal-event.schema.json",
+    "time/source-activity.ndjson": "schemas/source-activity-event.schema.json",
+    "events.ndjson": "schemas/evolution-event.schema.json",
+    "state/run-phase.json": "schemas/run-phase.schema.json",
+    "state/run-phase-r*.json": "schemas/run-phase.schema.json",
+    "state/artifact-index.json": "schemas/artifact-index.schema.json",
+    "state/strategy-latest.json": "schemas/strategy-state.schema.json",
+    "state/strategy-r*.json": "schemas/strategy-state.schema.json",
+    "state/candidate-latest.json": "schemas/candidate-snapshot.schema.json",
+    "state/candidate-r*.json": "schemas/candidate-snapshot.schema.json",
+    "state/est-*-latest.json": "schemas/est-snapshot.schema.json",
+    "state/est-*-r*.json": "schemas/est-snapshot.schema.json",
+    "state/run-brief.json": "schemas/run-brief.schema.json",
+    "sources/*/state.json": "schemas/source-workspace.schema.json",
+    "sources/*/state-r*.json": "schemas/source-workspace.schema.json",
+    "dictator/isolation/*.json": "schemas/isolation-receipt.schema.json",
+    "dictator/packets/*.json": "schemas/isolation-packet.schema.json",
+    "dictator/*.json": "schemas/d-intervention.schema.json",
+    "evidence/index.json": "schemas/evidence-index.schema.json",
+    "state/gaps/*-r*.json": "schemas/completion-gap.schema.json",
+    "state/completion.json": "schemas/completion-state.schema.json",
+    "final/run-summary.json": "schemas/run-summary.schema.json"
+  }
+}

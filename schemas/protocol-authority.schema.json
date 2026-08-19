@@ -1,19 +1,39 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/protocol-authority.schema.json",
-  "title": "DIGR 4.1 Repository-Delegated Protocol Authority",
+  "title": "DIGR 5.0 Repository-Delegated Protocol Authority",
   "type": "object",
-  "required": ["route", "P_run"],
+  "required": [
+    "route",
+    "P_run"
+  ],
   "properties": {
-    "route": {"$ref": "route-receipt.schema.json"},
+    "route": {
+      "$ref": "route-receipt.schema.json"
+    },
     "P_run": {
       "type": "object",
-      "required": ["protocol", "version", "repository_full_name", "commit_sha"],
+      "required": [
+        "protocol",
+        "version",
+        "repository_full_name",
+        "commit_sha"
+      ],
       "properties": {
-        "protocol": {"type": "string", "minLength": 1},
-        "version": {"type": "string", "minLength": 1},
-        "repository_full_name": {"const": "Gual-Wells/Deep-Iteration-GPT-Runtime"},
-        "commit_sha": {"type": "string", "pattern": "^[0-9a-fA-F]{40}$"}
+        "protocol": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "const": "5.0.0-alpha.2"
+        },
+        "repository_full_name": {
+          "const": "Gual-Wells/Deep-Iteration-GPT-Runtime"
+        },
+        "commit_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{40}$"
+        }
       },
       "additionalProperties": false
     }

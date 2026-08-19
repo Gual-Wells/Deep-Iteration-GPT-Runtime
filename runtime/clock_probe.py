@@ -1,11 +1,11 @@
-"""Trusted monotonic-clock facts for DIGR 4.1.0.
+"""Trusted monotonic-clock facts for DIGR 5.0.0-alpha.2.
 
 Two notions are intentionally separated:
 
 * observed monotonic duration: a non-negative delta from the same provider;
 * hard-verifiable duration: the same delta plus continuity identity proof.
 
-Every executing DIGR 4.1 task must establish repository-defined task-clock readiness
+Every executing DIGR 5.0 task must establish repository-defined task-clock readiness
 after invocation classification and before U0/substantive work. Soft T/t may then report honest observed duration.
 Hard T/t may only claim a number when continuity is additionally verified
 across the formal intervals used for the claim.
@@ -67,6 +67,17 @@ def observed_elapsed_ns(start: ClockSnapshot, end: ClockSnapshot) -> int:
         raise TypeError('start/end must be ClockSnapshot')
     if start.provider != end.provider:
         raise ValueError('clock provider changed; observed monotonic delta is unavailable')
+    if start.session_id == end.session_id:
+        # Same-process identity is sufficient, but an explicit contradictory
+        # boot fact still fails closed.
+        if start.boot_id is not None and end.boot_id is not None and start.boot_id != end.boot_id:
+            raise ValueError('clock boot identity changed within one session')
+    else:
+        # Alpha2 tightens cross-process timing: provider equality alone is not
+        # evidence that two monotonic counters share an epoch. Both boot IDs
+        # must be present and equal even for soft/observed continuity.
+        if start.boot_id is None or end.boot_id is None or start.boot_id != end.boot_id:
+            raise ValueError('cross-session monotonic continuity requires equal non-empty boot_id')
     delta = end.monotonic_ns - start.monotonic_ns
     if delta < 0:
         raise ValueError('monotonic clock moved backwards or changed epoch')

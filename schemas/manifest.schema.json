@@ -1,34 +1,138 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/manifest.schema.json",
-  "title": "DIGR 4.1 Manifest",
+  "title": "DIGR 5.0.0 Alpha 2 Manifest",
   "type": "object",
-  "required": ["name","short_name","version","protocol","language","philosophy","trigger","defaults","parameters","time_states","core","bootstrap_entry","entrypoint","help","deterministic_helpers","policies","routing_schema"],
+  "required": [
+    "name",
+    "short_name",
+    "version",
+    "protocol",
+    "language",
+    "philosophy",
+    "trigger",
+    "defaults",
+    "parameters",
+    "time_states",
+    "core",
+    "bootstrap_entry",
+    "startup_slice",
+    "entrypoint",
+    "help",
+    "deterministic_helpers",
+    "policies",
+    "routing_schema",
+    "invocation_surface_schema",
+    "parameter_resolution_schema",
+    "routing",
+    "run_session_schema",
+    "workspace_schema",
+    "clock_journal_schema",
+    "event_receipt_schema",
+    "release",
+    "workspace_spec"
+  ],
   "properties": {
-    "name": {"type": "string", "minLength": 1},
-    "short_name": {"const": "DIGR"},
-    "version": {"const": "4.1.0"},
-    "protocol": {"const": "digr-v4.1"},
-    "language": {"type": "string"},
-    "routing_schema": {"const": 1},
-    "bootstrap_entry": {"const": "bootstrap/BOOTSTRAP.md"},
-    "philosophy": {"type": "object"},
-    "trigger": {"type": "object"},
-    "defaults": {
-      "type": "object",
-      "required": ["B","b","L_e","semantic_completion"],
-      "properties": {
-        "B": {"const": 0}, "b": {"const": 0}, "L_e": {"const": 1},
-        "semantic_completion": {"const": ["N","T","R","n","t","r","s"]}
-      }, "additionalProperties": false
+    "name": {
+      "type": "string",
+      "minLength": 1
     },
-    "parameters": {"type": "object"},
-    "time_states": {"type": "object"},
-    "core": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
-    "entrypoint": {"const": "entry/DEEP_ITERATION_ENTRY.md"},
-    "help": {"const": "entry/HELP.md"},
-    "deterministic_helpers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "policies": {"type": "object"}
+    "short_name": {
+      "const": "DIGR"
+    },
+    "version": {
+      "const": "5.0.0-alpha.2"
+    },
+    "protocol": {
+      "const": "digr-v5.0"
+    },
+    "language": {
+      "type": "string"
+    },
+    "routing_schema": {
+      "const": 2
+    },
+    "invocation_surface_schema": {
+      "const": 2
+    },
+    "parameter_resolution_schema": {
+      "const": 1
+    },
+    "run_session_schema": {
+      "const": 2
+    },
+    "workspace_schema": {
+      "const": 2
+    },
+    "clock_journal_schema": {
+      "const": 1
+    },
+    "event_receipt_schema": {
+      "const": 2
+    },
+    "bootstrap_entry": {
+      "const": "bootstrap/BOOTSTRAP.md"
+    },
+    "startup_slice": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "entrypoint": {
+      "const": "entry/DEEP_ITERATION_ENTRY.md"
+    },
+    "help": {
+      "const": "entry/HELP.md"
+    },
+    "core": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "deterministic_helpers": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "workspace_spec": {
+      "const": "workspace/layout-v2.json"
+    },
+    "philosophy": {
+      "type": "object"
+    },
+    "trigger": {
+      "type": "object"
+    },
+    "defaults": {
+      "type": "object"
+    },
+    "parameters": {
+      "type": "object"
+    },
+    "time_states": {
+      "type": "object"
+    },
+    "policies": {
+      "type": "object"
+    },
+    "routing": {
+      "type": "object"
+    },
+    "release": {
+      "type": "object"
+    }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }

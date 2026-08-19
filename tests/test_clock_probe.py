@@ -20,14 +20,16 @@ class TestClockProbe(unittest.TestCase):
         self.assertEqual(continuity_kind(a,b),'same-boot-cross-process')
         self.assertTrue(pair_is_hard_verifiable(a,b))
 
-    def test_observed_is_weaker_than_hard(self):
+    def test_cross_session_without_boot_fails_even_observed(self):
         a=self.s(10,'a'); b=self.s(20,'b')
-        self.assertEqual(observed_elapsed_ns(a,b),10)
+        with self.assertRaises(ValueError): observed_elapsed_ns(a,b)
         self.assertFalse(pair_is_hard_verifiable(a,b))
         with self.assertRaises(ValueError): elapsed_ns(a,b)
 
-    def test_changed_boot_fails_hard(self):
-        with self.assertRaises(ValueError): elapsed_ns(self.s(1,'a','x'),self.s(2,'b','y'))
+    def test_changed_boot_fails_even_observed(self):
+        a,b=self.s(1,'a','x'),self.s(2,'b','y')
+        with self.assertRaises(ValueError): observed_elapsed_ns(a,b)
+        with self.assertRaises(ValueError): elapsed_ns(a,b)
 
     def test_provider_or_direction_fails_even_observed(self):
         with self.assertRaises(ValueError): observed_elapsed_ns(self.s(1),self.s(2,provider='other'))

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/run-session.schema.json",
+  "title": "DIGR 5.0 Live Run Snapshot v2",
+  "type": "object",
+  "required": [
+    "run_id",
+    "phase",
+    "task_startup",
+    "parameter_resolution",
+    "U0",
+    "contract",
+    "time",
+    "actuals",
+    "provenance"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{7,127}$"
+    },
+    "phase": {
+      "$ref": "run-phase.schema.json"
+    },
+    "task_startup": {
+      "$ref": "task-startup.schema.json"
+    },
+    "parameter_resolution": {
+      "$ref": "parameter-resolution.schema.json"
+    },
+    "U0": {
+      "$ref": "u0-receipt.schema.json"
+    },
+    "contract": {
+      "$ref": "effective-contract.schema.json"
+    },
+    "time": {
+      "type": "object"
+    },
+    "actuals": {
+      "type": "object"
+    },
+    "provenance": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}
