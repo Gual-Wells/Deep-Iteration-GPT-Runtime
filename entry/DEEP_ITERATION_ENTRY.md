@@ -1,4 +1,4 @@
-# DIGR 5.0.0-alpha.2 — Deep Iteration Entry
+# DIGR 5.0.0-alpha.3 — Deep Iteration Entry
 
 This entrypoint is loaded only after an EXECUTING surface has already crossed trusted Clock Genesis under the same pinned `P_run`. The full protocol never retroactively moves the clock boundary.
 

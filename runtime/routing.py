@@ -1,4 +1,4 @@
-"""Version-semantic-free repository routing helpers for DIGR 5.0.0-alpha.2.
+"""Version-semantic-free repository routing helpers for DIGR 5.0.0-alpha.3.
 
 The router performs only candidate response, exact GitHub location, immutable
 pinning metadata, manifest/VERSION integrity, and manifest-declared path
@@ -19,9 +19,11 @@ AUTHORITATIVE_REPOSITORY_URL = 'https://github.com/Gual-Wells/Deep-Iteration-GPT
 AUTHORITATIVE_API_BASE = 'https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime'
 AUTHORITATIVE_REF = 'stable'
 AUTHORITATIVE_REF_API_URL = AUTHORITATIVE_API_BASE + '/git/ref/heads/stable'
+AUTHORITATIVE_BRANCH_API_URL = AUTHORITATIVE_API_BASE + '/branches/stable'
 MANIFEST_PATH = 'manifest.json'
 VERSION_PATH = 'VERSION'
 CONTENT_API_TEMPLATE = AUTHORITATIVE_API_BASE + '/contents/{PATH}?ref={SHA}'
+PINNED_RAW_TEMPLATE = 'https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}'
 ROUTE_KEYS = ('DIGR', '深度迭代')
 
 
@@ -259,9 +261,13 @@ def validate_manifest_routing_metadata(manifest: Mapping[str, Any]) -> bool:
         'repository_url': AUTHORITATIVE_REPOSITORY_URL,
         'requested_ref': AUTHORITATIVE_REF,
         'ref_api_url': AUTHORITATIVE_REF_API_URL,
+        'branch_api_url': AUTHORITATIVE_BRANCH_API_URL,
         'manifest_path': MANIFEST_PATH,
         'version_path': VERSION_PATH,
         'content_api_template': CONTENT_API_TEMPLATE,
+        'pinned_raw_template': PINNED_RAW_TEMPLATE,
+        'content_raw_media_type': 'application/vnd.github.raw+json',
+        'mutable_ref_policy': 'direct_live_ref_plus_branch_consensus; search_index_forbidden; attempt_required_before_failure',
     }
     for key, value in expected.items():
         if meta.get(key) != value:

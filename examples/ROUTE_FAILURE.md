@@ -1,7 +1,18 @@
-# Route failure
+# Route failure — Alpha 3
 
-If `stable` cannot be resolved to a full immutable commit, pinned `manifest.json` cannot be read, or manifest-declared protocol paths cannot be reliably loaded, no P_run exists.
+A fixed route failure is valid only after the current candidate turn has actual canonical repository-acquisition evidence.
 
-Return a concise routing failure such as: `DIGR 路由失败：未取得仓库运行协议。`
+Examples of genuine route failure:
+- direct mutable `stable` acquisition fails;
+- ref and branch direct observations disagree;
+- the returned mutable-ref provenance is search/index/crawl rather than direct live repository access;
+- pinned manifest/VERSION bytes cannot be acquired or fail integrity/version equality;
+- a manifest-declared mandatory startup path cannot be obtained from the same SHA.
 
-Do not reconstruct DIGR semantics from conversation history, Memory or a local old protocol copy, and do not emit a DIGR execution proof.
+Not a route failure:
+- no acquisition tool/callback was invoked;
+- the model merely remembers that a previous fetch failed;
+- a search result looks stale;
+- a fixed failure string is easier to emit than trying the repository.
+
+If a genuine route failure occurs, return only `DIGR 路由失败：未取得仓库运行协议` and do not reconstruct DIGR semantics from conversation history, Memory or a local old protocol copy.

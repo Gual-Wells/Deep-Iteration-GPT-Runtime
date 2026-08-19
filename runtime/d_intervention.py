@@ -1,4 +1,4 @@
-"""Revisioned Disruptive Gambit intervention sessions for DIGR 5.0 Alpha 2.
+"""Revisioned Disruptive Gambit intervention sessions for DIGR 5.0 Alpha 3.
 
 The store persists D history and isolation linkage. It does not choose a gambit
 or evaluate its intellectual merit; the native model owns those decisions.

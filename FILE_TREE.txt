@@ -31,7 +31,8 @@ docs/INVOCATION_PARAMETERS.md
 docs/LOCAL_PERSONALIZATION_GUIDE.md
 docs/MIGRATION_FROM_4.1.1.md
 docs/PRE_RELEASE_BASELINE.md
-docs/PROTOCOL_SPEC_5.0.0-alpha.2.md
+docs/PROTOCOL_SPEC_5.0.0-alpha.3.md
+docs/REPOSITORY_TRANSPORT.md
 docs/ROUTING_CONTRACT.md
 docs/RUN_SESSION_ARCHITECTURE.md
 docs/SECURITY_AND_BOUNDARIES.md
@@ -57,11 +58,12 @@ examples/L_CAPABILITY_DOWNGRADE.md
 examples/MULTI_SOURCE_AGGREGATION.md
 examples/NON_STICKY.md
 examples/NON_TRIGGER_DISCUSSION.md
-examples/ONLY_B_HARD.md
-examples/ONLY_b_HARD.md
+examples/ONLY_MAIN_HARD_FLAG.md
+examples/ONLY_SOURCE_HARD_FLAG.md
 examples/PARTIAL_PARAMETERS.md
 examples/PERSONALIZATION_FRESH_CHAT_SMOKE_TEST.md
 examples/PROTOCOL_SELF_HOSTING.md
+examples/REPOSITORY_TRANSPORT.md
 examples/ROUTER_CANDIDATE_MATCHING.md
 examples/ROUTE_FAILURE.md
 examples/ROUTING_LEGACY_3_0.md
@@ -91,6 +93,7 @@ runtime/parameter_resolution.py
 runtime/proof.py
 runtime/protocol_authority.py
 runtime/protocol_pin.py
+runtime/repository_transport.py
 runtime/routing.py
 runtime/run_brief.py
 runtime/run_lifecycle.py
@@ -122,6 +125,7 @@ schemas/manifest.schema.json
 schemas/parameter-resolution.schema.json
 schemas/proof.schema.json
 schemas/protocol-authority.schema.json
+schemas/repository-transport-attempt.schema.json
 schemas/route-receipt.schema.json
 schemas/run-brief.schema.json
 schemas/run-phase.schema.json
@@ -159,6 +163,7 @@ tests/test_protocol_authority.py
 tests/test_protocol_pin.py
 tests/test_release_builder.py
 tests/test_repo_contract.py
+tests/test_repository_transport.py
 tests/test_routing.py
 tests/test_run_session.py
 tests/test_schemas.py
@@ -171,5 +176,6 @@ tests/test_workspace_and_state.py
 tests/test_workspace_schema_conformance.py
 tests/validate_repo.py
 tools/build_release.py
+tools/smoke_repository_transport.py
 workspace/RUN_WORKSPACE_SPEC.md
 workspace/layout-v2.json

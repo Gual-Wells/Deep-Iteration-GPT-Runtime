@@ -1,4 +1,4 @@
-"""Small deterministic minimum and exact interval helpers for DIGR 5.0.0-alpha.2."""
+"""Small deterministic minimum and exact interval helpers for DIGR 5.0.0-alpha.3."""
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable, Tuple

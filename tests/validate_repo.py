@@ -4,9 +4,10 @@ import json
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-VERSION='5.0.0-alpha.2'
+VERSION='5.0.0-alpha.3'
 INTERFACES={
-    'routing_schema':2,
+    'routing_schema':3,
+    'repository_transport_schema':1,
     'invocation_surface_schema':2,
     'parameter_resolution_schema':1,
     'run_session_schema':2,
@@ -50,6 +51,18 @@ def main() -> None:
     if m.get('workspace_spec')!='workspace/layout-v2.json':fail('workspace_spec')
     if m.get('routing',{}).get('candidate_match')!='lstrip_prefix; DIGR_exact_uppercase; remainder_unvalidated':fail('exact-uppercase candidate route metadata')
     if m.get('routing',{}).get('candidate_route_keys')!=['DIGR','深度迭代']:fail('candidate route keys')
+    routing=m.get('routing',{})
+    expected_routing={
+        'ref_api_url':'https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/stable',
+        'branch_api_url':'https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/stable',
+        'pinned_raw_template':'https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}',
+        'content_raw_media_type':'application/vnd.github.raw+json',
+        'mutable_ref_policy':'direct_live_ref_plus_branch_consensus; search_index_forbidden; attempt_required_before_failure',
+    }
+    for k,v in expected_routing.items():
+        if routing.get(k)!=v:fail(f'Alpha3 routing transport metadata {k}')
+    for k in ('route_requires_actual_acquisition_attempt','route_failure_requires_acquisition_evidence','mutable_ref_search_index_forbidden','mutable_ref_direct_live_provenance_required','mutable_ref_ref_branch_consensus_when_using_rest','pinned_raw_sha_content_is_cache_safe','contents_api_wrapper_must_be_raw_or_decoded','repository_transport_is_host_bridge_not_execution_semantics'):
+        if m.get('policies',{}).get(k) is not True:fail(f'Alpha3 transport policy {k}')
 
     required_paths=[m['bootstrap_entry'],*m['startup_slice'],m['entrypoint'],m['help'],m['workspace_spec'],*m['core'],*m['deterministic_helpers']]
     for rel in dict.fromkeys(required_paths):
@@ -99,13 +112,13 @@ def main() -> None:
     for token in (
         '精确大写 ASCII `DIGR`','`digr`、`Digr` 等不路由','宽捕获','NATIVE','原始消息交还普通 ChatGPT',
         'Gual-Wells/Deep-Iteration-GPT-Runtime','https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime',
-        '/git/ref/heads/stable','/contents/{PATH}?ref={SHA}','manifest.json','VERSION','startup_slice','entrypoint','core[]','manifest.help','40 位 SHA','同一 SHA',
+        '/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','startup_slice','entrypoint','core[]','manifest.help','完整 40 位 commit SHA','同一 SHA','必须实际获取','没有尝试本身不是路由失败',
         'DIGR 路由失败：未取得仓库运行协议',
     ):
         if token not in text:fail(f'router missing {token}')
     for bad in ('monotonic','LiveDIGRRun','P_target','B=0','b=0','L(1)','Mature Gambit','Formal Active','proof'):
         if bad in text:fail(f'compact router duplicates versioned execution semantics: {bad}')
-    for token in ('Expanded Routing Reference','Candidate response','Canonical locator and immutable pin','Staged navigation','Authority boundary and failure','NATIVE'):
+    for token in ('Expanded Routing/Transport Reference','Candidate routing is an obligation','Mutable-ref provenance','Immutable pinned content','Staged authority handoff','Failure evidence','NATIVE'):
         if token not in full_text:fail(f'full router reference missing {token}')
     if 'B=0' in full_text:fail('full local reference copies versioned execution defaults')
 
@@ -134,8 +147,8 @@ def main() -> None:
 
     for rel in (
         'docs/PRE_RELEASE_BASELINE.md','docs/CLOCK_RELIABILITY.md','docs/RUN_SESSION_ARCHITECTURE.md',
-        'docs/MIGRATION_FROM_4.1.1.md','docs/PROTOCOL_SPEC_5.0.0-alpha.2.md','docs/TEST_MATRIX.md',
-        'docs/ENGINEERING_VALIDATION_LOG.md',
+        'docs/MIGRATION_FROM_4.1.1.md','docs/PROTOCOL_SPEC_5.0.0-alpha.3.md','docs/TEST_MATRIX.md',
+        'docs/ENGINEERING_VALIDATION_LOG.md','docs/REPOSITORY_TRANSPORT.md',
     ):
         if not (ROOT/rel).is_file():fail(f'missing release documentation {rel}')
     smoke=read_text('examples/PERSONALIZATION_FRESH_CHAT_SMOKE_TEST.md')
@@ -144,6 +157,12 @@ def main() -> None:
     if '`digr/help` → route attempt' in read_text('examples/ROUTER_CANDIDATE_MATCHING.md'):
         fail('stale case-insensitive router example')
 
-    print('DIGR 5.0.0-alpha.2 corrected integration baseline: OK')
+    for rel in ('runtime/repository_transport.py','schemas/repository-transport-attempt.schema.json','tools/smoke_repository_transport.py','examples/REPOSITORY_TRANSPORT.md'):
+        if not (ROOT/rel).is_file():fail(f'missing Alpha3 transport artifact {rel}')
+    rt=read_text('runtime/repository_transport.py')
+    for token in ('AcquisitionAttemptReceipt','route_failure_permitted','stable_ref_corroboration','application/vnd.github.raw+json','Cache-Control'):
+        if token not in rt:fail(f'transport implementation missing {token}')
+
+    print('DIGR 5.0.0-alpha.3 transport-hardened integration baseline: OK')
 
 if __name__=='__main__':main()

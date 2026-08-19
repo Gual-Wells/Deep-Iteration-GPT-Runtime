@@ -8,7 +8,7 @@ SHA='a'*40
 
 def authority():
     r=RouteReceipt(AUTHORITATIVE_REPOSITORY,'stable',SHA,'manifest.json','b'*64,'VERSION','c'*64)
-    p=ProtocolIdentity('digr-v5.0','5.0.0-alpha.2',AUTHORITATIVE_REPOSITORY,SHA)
+    p=ProtocolIdentity('digr-v5.0','5.0.0-alpha.3',AUTHORITATIVE_REPOSITORY,SHA)
     return ProtocolAuthority(r,p)
 
 class FakeClock:

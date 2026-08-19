@@ -42,6 +42,22 @@ class TestReleaseBuilder(unittest.TestCase):
             br.build_zip(root,a,files); br.build_zip(root,b,files)
             self.assertEqual(br.sha256(a),br.sha256(b))
 
+
+    def test_casefold_collision_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); (root/'A.txt').write_text('a\n',encoding='utf-8'); (root/'a.txt').write_text('b\n',encoding='utf-8')
+            with self.assertRaises(RuntimeError): br.release_files(root)
+
+    def test_windows_reserved_name_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); (root/'CON.txt').write_text('x\n',encoding='utf-8')
+            with self.assertRaises(ValueError): br.release_files(root)
+
+    def test_windows_trailing_dot_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); (root/'name.').write_text('x\n',encoding='utf-8')
+            with self.assertRaises(ValueError): br.release_files(root)
+
     def test_personalization_export_inside_source_rejected(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td); (root/'local-personalization').mkdir()

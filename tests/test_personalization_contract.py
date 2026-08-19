@@ -9,14 +9,14 @@ class TestPersonalization(unittest.TestCase):
     def test_candidate_exact_uppercase_and_native_return(self):
         for x in ('精确大写 ASCII `DIGR`','`digr`、`Digr` 等不路由','宽捕获','NATIVE','原始消息交还普通 ChatGPT'):self.assertIn(x,self.text)
     def test_exact_repository_and_staged_navigation(self):
-        for x in ('Gual-Wells/Deep-Iteration-GPT-Runtime','https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime','/git/ref/heads/stable','/contents/{PATH}?ref={SHA}','manifest.json','VERSION','startup_slice','entrypoint','core[]','manifest.help','40 位 SHA','同一 SHA'):
+        for x in ('Gual-Wells/Deep-Iteration-GPT-Runtime','https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime','/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','startup_slice','entrypoint','core[]','manifest.help','完整 40 位 commit SHA','同一 SHA','必须实际获取','没有尝试本身不是路由失败'):
             self.assertIn(x,self.text)
         self.assertIn('DIGR 路由失败：未取得仓库运行协议',self.text)
     def test_no_versioned_execution_copy(self):
         for token in ('monotonic','LiveDIGRRun','P_target','B=0','b=0','L(1)','Mature Gambit','Formal Active','proof'):
             self.assertNotIn(token,self.text)
     def test_full_explains_transport_boundary(self):
-        for x in ('Expanded Routing Reference','Candidate response','Canonical locator and immutable pin','Staged navigation','Authority boundary and failure','NATIVE'):
+        for x in ('Expanded Routing/Transport Reference','Candidate routing is an obligation','Mutable-ref provenance','Immutable pinned content','Staged authority handoff','Failure evidence','NATIVE'):
             self.assertIn(x,self.full)
         self.assertNotIn('B=0',self.full)
 if __name__=='__main__':unittest.main()

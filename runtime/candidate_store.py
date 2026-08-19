@@ -1,4 +1,4 @@
-"""Revisioned candidate-result snapshots for DIGR 5.0 Alpha 2.
+"""Revisioned candidate-result snapshots for DIGR 5.0 Alpha 3.
 
 Candidate snapshots provide an external anchor for whole-process R re-entry
 without storing hidden chain-of-thought.

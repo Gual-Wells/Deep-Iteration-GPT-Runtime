@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and cold-validate a deterministic DIGR 5.0.0-alpha.2 source ZIP.
+"""Build and cold-validate a deterministic DIGR 5.0.0-alpha.3 source ZIP.
 
 Standard-library only.  The builder rejects symlinks/path traversal, tests the
 source before cache cleanup, regenerates FILE_TREE/SHA256SUMS, writes a sorted
@@ -26,6 +26,12 @@ TREE_FILE = 'FILE_TREE.txt'
 SUMS_FILE = 'SHA256SUMS.txt'
 FIXED_ZIP_TIME = (2026, 8, 19, 0, 0, 0)
 _HEX64 = re.compile(r'^[0-9a-f]{64}$')
+_WINDOWS_RESERVED = {
+    'CON', 'PRN', 'AUX', 'NUL', 'CLOCK$',
+    *(f'COM{i}' for i in range(1, 10)),
+    *(f'LPT{i}' for i in range(1, 10)),
+}
+_WINDOWS_INVALID_CHARS = set('<>:\"|?*')
 
 
 def run(cmd: list[str], cwd: Path) -> None:
@@ -38,7 +44,41 @@ def _safe_rel(text: str) -> PurePosixPath:
     p = PurePosixPath(text)
     if any(part in ('', '.', '..') for part in p.parts):
         raise ValueError(f'unsafe release path: {text!r}')
+    _windows_portable_key(p)
     return p
+
+
+def _windows_portable_key(path: PurePosixPath) -> str:
+    """Return a Windows-style collision key or reject a non-portable path.
+
+    Windows' common unpacking behavior is case-insensitive and also aliases
+    trailing spaces/dots and reserved device basenames.  Release archives must
+    therefore be portable before they are written, not merely valid POSIX ZIPs.
+    """
+    folded: list[str] = []
+    for part in path.parts:
+        if part.endswith((' ', '.')):
+            raise ValueError(f'Windows-nonportable trailing space/dot: {path.as_posix()!r}')
+        if any(ord(ch) < 32 or ch in _WINDOWS_INVALID_CHARS for ch in part):
+            raise ValueError(f'Windows-nonportable character in path: {path.as_posix()!r}')
+        stem = part.split('.', 1)[0].upper()
+        if stem in _WINDOWS_RESERVED:
+            raise ValueError(f'Windows-reserved path component: {path.as_posix()!r}')
+        folded.append(part.casefold())
+    return '/'.join(folded)
+
+
+def _assert_portable_unique(paths: list[str]) -> None:
+    seen: dict[str, str] = {}
+    for text in paths:
+        p = _safe_rel(text)
+        key = _windows_portable_key(p)
+        prior = seen.get(key)
+        if prior is not None and prior != text:
+            raise RuntimeError(
+                f'cross-platform release path collision: {prior!r} vs {text!r}'
+            )
+        seen[key] = text
 
 
 def clean_caches(root: Path) -> None:
@@ -67,7 +107,9 @@ def release_files(root: Path) -> list[Path]:
         if p.suffix in EXCLUDED_SUFFIXES:
             continue
         out.append(rel)
-    return sorted(out, key=lambda x: x.as_posix())
+    out = sorted(out, key=lambda x: x.as_posix())
+    _assert_portable_unique([p.as_posix() for p in out])
+    return out
 
 
 def sha256(path: Path) -> str:
@@ -123,6 +165,7 @@ def _declared_tree(root: Path) -> list[str]:
         raise RuntimeError('FILE_TREE contains duplicate paths')
     for line in lines:
         _safe_rel(line)
+    _assert_portable_unique(lines)
     return lines
 
 
@@ -168,6 +211,7 @@ def cold_validate(output: Path) -> None:
             raise RuntimeError('ZIP members are not sorted deterministically')
         if len(members) != len(set(members)):
             raise RuntimeError('ZIP contains duplicate member names')
+        _assert_portable_unique(members)
         for info in zf.infolist():
             _safe_rel(info.filename)
             if _zip_member_is_symlink(info):
