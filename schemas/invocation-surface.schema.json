@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/invocation-surface.schema.json",
+  "title": "DIGR 5.0 Alpha 2 Surface Receipt",
+  "type": "object",
+  "required": [
+    "kind",
+    "alias",
+    "raw_message_sha256",
+    "parameter_surface",
+    "task_raw",
+    "reason"
+  ],
+  "properties": {
+    "kind": {
+      "enum": [
+        "EXECUTING",
+        "HELP",
+        "NATIVE",
+        "INVALID"
+      ]
+    },
+    "alias": {
+      "enum": [
+        "DIGR",
+        "深度迭代"
+      ]
+    },
+    "raw_message_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "parameter_surface": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "task_raw": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "EXECUTING"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "task_raw": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "HELP",
+              "NATIVE",
+              "INVALID"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "task_raw": {
+            "const": null
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

@@ -1,23 +1,22 @@
-# 50 — Source Evolution (S)
+# Source Evolution — Presumed Required
 
-S 是作用域限定在外源资料研究目标上的、与主体同构的进化闭环。一次任务可以自然产生独立的 `S₁...Sᵢ`，数量不预先固定。
+Normal executing DIGR work has `SourceDisposition=REQUIRED` and a real source strategy. `SourceDisposition=WAIVED` is allowed only for a concrete U0/host reason (for example a closed transformation where external material is prohibited or genuinely irrelevant). Omitted S, `S()`, or zero numeric S minima are not waivers. External source is broad: web, official docs, repositories/code, user files, datasets, papers, community material, tool/test outputs or any information not solely from model prior.
 
-每个实际 `Sᵢ`：
-1. 有明确但可进化理解的研究目标 `Qᵢ`；
-2. 维护轻量 S-EST；
-3. 至少完成 n 轮有效研究进化；
-4. 执行真实查询、阅读、论文/文档/源码/数据/文件检查、交叉验证或其他外源研究；
-5. 形成当前研究结论；
-6. 至少 r 次把研究结果回代 Qᵢ，从整个已发生研究流程寻找突破并实际再进化；
-7. 把有效发现回注 Main。
+## What counts as an actual S
 
-n/r 与 N/R 使用同等“实质变化”标准，不是多搜关键词或重复阅读。
+Opening a SourceWorkspace is only state preparation. For Source Presumption/completion, an actual S must be supported by **both**:
 
-t 是所有 S 的 **Formal Active Source Time** 区间并集目标；并行 source work 不重复累计。满足 t 不关闭后续研究，满足某个 S 的 n/r 也不关闭该 S 或其他 S 的高价值研究。
+- a formal `SOURCE` clock state whose source-activity binding names that SourceWorkspace; and
+- at least one semantic `SOURCE_EVOLUTION` or `SOURCE_REENTRY` receipt bound to that SOURCE state and a real source revision.
 
-## Proof aggregation
-若实际 S 数量为 i：
-- `n_actual = min_j(n_j_actual)`
-- `r_actual = min_j(r_j_actual)`
-- `t_actual` 为全部正式 source-active 区间并集时间
-- proof 使用 `Sᵢ` 的数字下标表示实际 S 总数；无 S 时为 `S₀`。
+This prevents an empty S object from satisfying the external-research obligation.
+
+## Revision and re-entry
+
+Each S is revisioned: objective, current direction, findings, contradictions, evidence and pivot/reopen history. A source may OPEN → pivot → continue → close → reopen. Distinct research directions may use S2/S3, while minor pivots can revise the same S.
+
+Source `r` is SourceWorkspace-result/revision backed, not dependent on a global Main Candidate. A re-entry binds `source_before`; if the result changes it must bind a newer `source_after`, while independent challenge with justified retention may retain the before revision.
+
+## Time
+
+Formal aggregate source time `t` has one truth source: clock-journal SOURCE intervals. Every SOURCE state-start is bound to a non-empty `active_source_ids` set. `t` is the union of time when any real S is active; parallel/concurrent sources never double-count, and a floating SOURCE state without real source binding is invalid.

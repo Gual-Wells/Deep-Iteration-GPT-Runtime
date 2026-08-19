@@ -1,9 +1,7 @@
-# Multiple S aggregation
+# Multiple source workspaces and aggregate t
 
-Suppose three actual source loops complete:
+Suppose S1 and S2 are active together during one SOURCE interval, then S2 continues alone, and S3 is active later. The clock journal records SOURCE state boundaries and each SOURCE state-start is bound to the non-empty set of active source IDs.
 
-- S1: n=5, r=3, source interval [0, 10]
-- S2: n=4, r=6, source interval [5, 20]
-- S3: n=7, r=4, source interval [30, 40]
+Aggregate `t` is the union of those SOURCE intervals. It is **not** the sum of each source's duration, so parallel S1/S2 work cannot double-count time.
 
-Then proof uses `S₃`; `n_actual=4`, `r_actual=3`; source time is the union of all source-active intervals, not the sum of overlapping work: [0,20] + [30,40].
+An opened SourceWorkspace by itself is not an actual S for completion. To count, the source must participate in real SOURCE-time binding and have a semantic SOURCE evolution/re-entry receipt. Per-source `n`/`r` are then derived from those bound receipts; source `r` references SourceWorkspace before/after revisions rather than a Main Candidate.

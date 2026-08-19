@@ -1,24 +1,11 @@
-# Implementation Notes — DIGR 4.1.0
+# Alpha 2 Implementation Notes
 
-Non-normative. Core semantics live in `core/`.
+`runtime/routing.py` is transport-only. `runtime/invocation_surface.py` classifies the pinned startup surface. `runtime/parameter_resolution.py` performs deterministic unique mapping after clock genesis. None of these chooses task strategy.
 
-## Routing
-`runtime/routing.py` validates already-resolved repository provenance: authoritative repo, `stable`, full commit SHA, `manifest.json` and its digest. `discovery_plan_from_manifest()` follows `bootstrap_entry` when present or legacy `entrypoint`+`core` when absent. It intentionally has no invocation/time/default/stop/proof logic.
+`LiveDIGRRun` is the lifecycle/evidence binding layer. The old raw `.events.append()` path is replaced by thin semantic wrappers because a syntactically valid receipt in the wrong work state is not a valid actual. Wrappers validate references, not intellectual quality; specifically they also validate phase and foreground clock state.
 
-## Protocol authority
-`ProtocolAuthority` binds P_run to the exact `RouteReceipt`; repository and commit must match. P_target is not a routing field. Self-hosting semantics begin only after P_run is loaded.
+Strategy/Candidate/EST/Source/D/Completion stores are revisioned. Source time has no standalone aggregate helper: formal SOURCE intervals plus source-activity bindings are the one time chain. An actual S additionally needs semantic source work, so creating an empty workspace cannot satisfy Source Presumption. Main R is Candidate-backed; source r is SourceWorkspace-revision-backed.
 
-## 4.1 task startup
-`runtime/task_startup.py` contains versioned 4.1 task-startup evidence. `ClockReadiness` requires hard-verifiable compatible snapshots. `TaskStartupReceipt` is created before U0 freeze. Help/off candidates do not instantiate it.
+D/L is one temporal information-flow lifecycle. An L2/L3 controlled Input Packet is indexed before isolated execution; Output Packet is indexed after isolated work and attached to its result. D execution and reintegration bind formal clock states. Terminal D sessions reject mutation. Isolation facts describe capability while isolation receipts select the target-bounded actual mode.
 
-## Clock and Formal Active Time
-`time.monotonic_ns()` is the integer-ns substrate. Observed monotonic delta and hard-verifiable continuity are distinct. `FormalTimeLedger` sums per-interval duration; parallel S activity is unioned separately by `source_aggregate.py`.
-
-## L2/L3
-Provider API names are not conformance evidence. Default full-history handoff is not L2. Nested agent/tool runs can still share application context. L2 requires separate LLM history/context, controlled telemetry, D-State firewall and no unfiltered app-state bypass. L3 adds independent agent identity/instructions/execution loop/tool capability.
-
-## Strict data / proof
-Count/policy fields reject bool-as-int; durations reject NaN/Infinity. Hard actual is visible only when verification is true; otherwise proof uses `?`.
-
-## Release builder
-The builder rejects symlinks and unsafe paths, runs source tests, regenerates FILE_TREE/SHA256SUMS, creates a fixed-timestamp sorted ZIP, cold-extracts and reruns validation. With `--personalization-output`, it copies the canonical internal source bytes after validation. This prevents ZIP/standalone configuration drift.
+Recovery first verifies artifact bytes/latest pointers, then cross-checks semantic references against clock/source/Strategy/Candidate/D state, verifies the derived Run Brief, and rederives a FINISHED run summary. Resume separately establishes a new same-boot clock bridge; integrity alone is not time continuity.

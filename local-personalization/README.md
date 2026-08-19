@@ -1,5 +1,7 @@
-# Local Personalization — Reliable Router
+# Local personalization files
 
-`CHATGPT_LOCAL_PERSONALIZATION.txt` is the canonical direct-copy router. The Free/Go compatibility file is generated from the exact same bytes so the two cannot drift. `CHATGPT_LOCAL_PERSONALIZATION_FULL.txt` is explanatory reference only.
+- `CHATGPT_LOCAL_PERSONALIZATION.txt`: compact direct-copy router transport contract.
+- `CHATGPT_LOCAL_PERSONALIZATION_FREE_GO.txt`: byte-identical compact variant for short personalization fields.
+- `CHATGPT_LOCAL_PERSONALIZATION_FULL.txt`: explanatory reference.
 
-The local text is deliberately **not** a DIGR protocol copy. It only performs candidate-prefix response, repository location, immutable pinning, manifest discovery and explicit authority delegation. All versioned DIGR behavior comes from the pinned repository protocol.
+These files deliberately remain thin. Alpha 2 changed exact English routing and staged startup navigation, but all invocation/parameter/time/N/S/R/D/L semantics still live only in the pinned repository protocol.

@@ -1,18 +1,17 @@
-"""Mechanical DIGR 4.1 contract-minimum checks.
+"""Mechanical DIGR 5.0 Alpha 2 contract-minimum checks.
 
-This helper never decides Result Quality Gate or whether an N/R/D action was
-semantically valid.  For hard T/t it requires both a numeric actual and an
-explicit hard-verification fact.
+This layer checks frozen minimum commitments against evidence-backed actuals.
+It deliberately does not judge whether an idea is insightful or whether the
+model should continue after minimums are met.
 """
 from __future__ import annotations
 from dataclasses import dataclass
 from .effective_contract import EffectiveContract
 from .validation import (
-    require_bool,
-    require_finite_nonnegative_number,
-    require_isolation_level,
-    require_nonnegative_int,
+    require_bool, require_finite_nonnegative_number,
+    require_isolation_level, require_nonnegative_int,
 )
+
 
 @dataclass(frozen=True)
 class ContractActuals:
@@ -40,6 +39,7 @@ class ContractActuals:
         if self.L_e is not None:
             require_isolation_level('L_e', self.L_e)
 
+
 @dataclass(frozen=True)
 class MechanicalStopCheck:
     N_ok: bool
@@ -51,6 +51,7 @@ class MechanicalStopCheck:
     hard_t_ok: bool
     D_ok: bool
     L_ok: bool
+    L_target_met: bool
 
     @property
     def minima_satisfied(self) -> bool:
@@ -65,24 +66,37 @@ def check_mechanical_minima(contract: EffectiveContract, actual: ContractActuals
         raise TypeError('contract must be EffectiveContract')
     if not isinstance(actual, ContractActuals):
         raise TypeError('actual must be ContractActuals')
+
     source_required = contract.source_required
     source_instance_ok = actual.S_count >= 1 if source_required else True
     n_ok = actual.n_min >= contract.S.n if source_required else True
     r_ok = actual.r_min >= contract.S.r if source_required else True
+
     hard_T_ok = True
     if contract.B == 1:
         hard_T_ok = (
-            actual.T_hard_verified
-            and actual.T_seconds is not None
+            actual.T_hard_verified and actual.T_seconds is not None
             and actual.T_seconds >= contract.T_seconds
         )
     hard_t_ok = True
     if contract.S.b == 1:
         hard_t_ok = (
-            actual.t_hard_verified
-            and actual.t_seconds is not None
+            actual.t_hard_verified and actual.t_seconds is not None
             and actual.t_seconds >= contract.S.t_seconds
         )
+
+    d_ok = actual.D_s >= contract.D_s
+    # L is an implementation mode for D, not a universal task stop gate.
+    # If D is off there is nothing to isolate. If D is on, mismatch remains
+    # visible but only blocks delivery when the U0/contract explicitly says so.
+    l_target_met = actual.L_e is not None and actual.L_e == contract.L_e
+    if contract.D_s == 0:
+        l_ok = True
+    elif contract.L_mismatch_blocks_delivery:
+        l_ok = l_target_met
+    else:
+        l_ok = actual.L_e is not None
+
     return MechanicalStopCheck(
         N_ok=actual.N >= contract.N,
         R_ok=actual.R >= contract.R,
@@ -91,6 +105,7 @@ def check_mechanical_minima(contract: EffectiveContract, actual: ContractActuals
         r_ok=r_ok,
         hard_T_ok=hard_T_ok,
         hard_t_ok=hard_t_ok,
-        D_ok=actual.D_s >= contract.D_s,
-        L_ok=actual.L_e is not None and actual.L_e == contract.L_e,
+        D_ok=d_ok,
+        L_ok=l_ok,
+        L_target_met=l_target_met,
     )

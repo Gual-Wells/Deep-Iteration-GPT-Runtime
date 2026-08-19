@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/isolation-packet.schema.json",
+  "title": "DIGR 5.0 Alpha 2 D Isolation Packet",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "packet_id",
+    "direction",
+    "payload"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "packet_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "direction": {
+      "enum": [
+        "input",
+        "output"
+      ]
+    },
+    "payload": {}
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/strategy-state.schema.json",
+  "title": "DIGR 5.0 Alpha 2 Strategy State",
+  "type": "object",
+  "required": [
+    "revision",
+    "current_task_model",
+    "current_primary_route",
+    "alternative_routes",
+    "source_strategy",
+    "validation_strategy",
+    "tool_strategy",
+    "current_assumptions",
+    "current_risks",
+    "pivot_reason",
+    "triggering_event_refs"
+  ],
+  "properties": {
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "current_task_model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "current_primary_route": {
+      "type": "string",
+      "minLength": 1
+    },
+    "alternative_routes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "source_strategy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "validation_strategy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tool_strategy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "current_assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "current_risks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "pivot_reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "triggering_event_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "not": {
+    "anyOf": [
+      {
+        "required": [
+          "next_step"
+        ]
+      },
+      {
+        "required": [
+          "score"
+        ]
+      },
+      {
+        "required": [
+          "priority"
+        ]
+      }
+    ]
+  },
+  "additionalProperties": false
+}

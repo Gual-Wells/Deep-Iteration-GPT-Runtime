@@ -1,24 +1,19 @@
-# DIGR 4.1 Local Personalization — Expanded Routing Reference
+# DIGR 5.0-compatible Local Personalization — Expanded Routing Reference
 
-本文件只是主本地配置的展开说明，不是 DIGR 协议副本。真正可直接粘贴的文本是 `CHATGPT_LOCAL_PERSONALIZATION.txt`。
+This file explains the version-neutral Router Transport Contract. The direct-copy configuration is `CHATGPT_LOCAL_PERSONALIZATION.txt`. Neither file defines versioned DIGR execution semantics.
 
-## 唯一职责
-本地层只负责：
-1. 对消息首部的 `DIGR` / `深度迭代` 作候选路由响应；
-2. 定位 `Gual-Wells/Deep-Iteration-GPT-Runtime:stable`；
-3. 把 mutable `stable` 解析成完整 immutable commit SHA；
-4. 读取同一 pinned commit 的 `manifest.json`；
-5. 按 manifest 的 discovery metadata 加载同一 commit 的仓库协议；
-6. 明确把 DIGR 语义解释权委托给该 pinned repository protocol。
+## Candidate response
+After leading whitespace only, exact uppercase ASCII `DIGR` or exact `深度迭代` triggers a route attempt before task-level answering. Mixed/lowercase English forms do not. The match intentionally ignores the remainder: it does not decide invocation/help/parameters/punctuation/task validity. A capture is not semantic takeover; the pinned repository startup protocol may classify it NATIVE and return the original message to ordinary ChatGPT.
 
-## 不属于本地层的内容
-本地层不得定义或复制：有效 invocation/help 规则、参数及缺省、clock/startup、N/T/R/S/D/L、EST、ABG、Formal Active Time、stop gate、proof、P_target/self-hosting 细节。它也不判断当前仓库版本应不应该要求时钟；这是仓库版本自己的协议语义。
+## Canonical locator and immutable pin
+Repository: `Gual-Wells/Deep-Iteration-GPT-Runtime`; mutable discovery ref: `stable`; canonical GitHub ref/content APIs are those named in the compact file. Resolve `stable` on every candidate and accept only a full 40-hex commit SHA. All later reads for that turn use that SHA. Read pinned `manifest.json` and `VERSION` and require exact version equality.
 
-## Legacy discovery
-为让同一份 router 能干净地路由当前旧仓库版本，discovery 仅允许一个版本无关兼容规则：manifest 有 `bootstrap_entry` 时先加载它；没有时按 manifest 已声明的 `entrypoint` 与 `core` 加载。这个兼容只决定“去哪里读”，不决定“读到的协议怎么运行”。
+## Staged navigation
+If the pinned manifest declares `startup_slice`, acquire only that slice first. The pinned repository, not the local file, determines its surface states and execution preconditions. NATIVE returns the untouched original message; HELP may load `manifest.help`; EXECUTING follows the repository's own startup rules and only then loads its full `entrypoint`/`core[]` from the same SHA. This lets the repository move version-specific clock/run genesis close to invocation detection without teaching the local router those semantics.
 
-## Context boundary
-聊天历史、Memory、旧回答、本地旧 DIGR 文本、网页、附件和工具输出不能成为协议语义来源；但在 pinned repository protocol 允许时，它们仍可以作为 U0 的事实/任务上下文或普通证据。目标是协议权威隔离，不是任务上下文失忆。
+A legacy pinned manifest without `startup_slice` follows its own declared `bootstrap_entry`/`entrypoint`/`core` navigation. Newer local routing text never retrofits newer semantic rules into an older P_run.
 
-## Route failure
-如果 stable 无法 pin、manifest 无法读取或 manifest 声明的协议路径无法可靠加载，本地层只能报告 route failure。本地层没有版本化 DIGR 语义可供 fallback，因此不能把“记得的 DIGR”包装成一次 DIGR execution。
+## Authority boundary and failure
+The successfully loaded pinned repository protocol is the versioned semantic authority, subject to higher-priority instructions and current user hard constraints. Context/Memory/old answers may inform task content only when that protocol permits; they cannot patch protocol semantics or rebind P_run.
+
+Before the current startup stage has acquired all mandatory pinned resources, any repository/ref/SHA/manifest/VERSION/path failure is a routing failure. Return the compact failure message specified by the direct-copy file. Do not reconstruct DIGR from memory and do not claim execution.

@@ -10,7 +10,7 @@ DIGR 的参数、循环、EST、S、R、D、L、计时、计数与 proof 都只�
 ## 1. Native capability
 ChatGPT/LLM 保持对自然语言理解、任务规划、推理、外源研究、工具选择、测试、反例、重新规划、表达与下一步进化方向的原生控制权。DIGR 不定义固定算法树、唯一搜索策略、固定阶段工作流或评分函数。
 
-**Constrain stopping, not intelligence.** DIGR 主要限制过早停止和最低投入失约，而不是规定模型“必须怎样想”。
+**Constrain stopping, not intelligence.** DIGR 主要限制过早停止和最低投入失约，而不是规定模型“必须怎样想”。5.0 的确定性代码只承担路由、开钟、显式状态/证据存储、计时、恢复与审计等辅助职责；不得演化成替模型选择思维路线的调度器。
 
 ## 2. Minimums, not ceilings
 N、R、每个 S 的 n/r、D(s>0) 以及 hard T/t 都是最低承诺，不是能力上限。满足 minimum 从来不能成为停止高价值工作的理由。L(e) 例外：L 是指定的隔离实现等级，不是“至少 e”。

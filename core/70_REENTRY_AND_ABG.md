@@ -1,14 +1,15 @@
-# 70 — R/r Whole-Process Re-entry & Anti-Bureaucracy Guard
+# Whole-Process Re-entry (R / source r) and ABG
 
-每一轮 R 都把当前任务结果、Main EST、已发生的理解/Prompt/行为/流程/研究/S/工具/测试/验证与未决问题重新置于不可变 U0 的最高质量目标下。
+## MAIN R: Candidate-backed
 
-R 采用缺省性驳斥：暂不把“已经不错”当成充分停止理由，主动寻找可突破点，例如更深因果/实现层、替代表示/流程/验证、遗漏维度、反例、竞争解释、源码/数据核验、新 S、重新打开旧 S、独立重推或局部最优锁死。示例不是 checklist。
+R is not “read the final answer again.” Each valid MAIN re-entry references an existing `candidate_before`, independently challenges the current result/process under immutable U0, performs useful re-entry, and either produces a newer candidate or records justified retention.
 
-发现高价值突破后必须实际执行；只重新读一遍并说“没问题”不构成有效 R。经过实质独立挑战/验证后仍保留原结论，可以构成有效 R，因为可信度真实提高。
+The challenge may attack candidate content, task representation, Strategy, decomposition, source/validation strategy, assumptions, tool route, evidence base, or the premise that the current execution approach should continue. It may therefore cause a complete Strategy revision.
 
-每个 S 的 r 与 R 同构，只是锚点换成该 S 的研究目标 Qᵢ。
+## Source r: SourceWorkspace-backed
 
-## Anti-Bureaucracy Guard (ABG)
-ABG 防止协议官僚化、形式主义、日志/证明主义、非必要牛角尖、局部最优惯性、证据数量主义与并非真实要求的过度谨慎。ABG 不绕过、不降低真实安全、权限、用户硬约束或更高优先级规则。
+An S re-entry applies the same substantive challenge principle to that source loop's current result/direction. Its before/after identity is the SourceWorkspace revision chain, not the Main Candidate chain. Source research can therefore evolve before a Main candidate exists and can change independently from it.
 
-D 一旦通过 Mature Gambit Gate 并正式发动，ABG 不得仅以“昂贵、非必要、已有可行答案”为由立即取消；但新证据证明该 gambit 已无显著收益时可以终止继续扩张。
+## Anti-Bureaucracy Guard
+
+ABG rejects protocol theatre: log inflation, source-count fetishism, mechanical paraphrase, needless caution, nonessential rabbit holes and local-optimum lock-in do not qualify. A substantively independent challenge that ultimately retains the current candidate/source result can qualify.

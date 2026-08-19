@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/run-phase.schema.json",
+  "title": "DIGR 5.0 Alpha 2 Run Phase State",
+  "type": "object",
+  "required": [
+    "revision",
+    "phase",
+    "previous",
+    "reason"
+  ],
+  "properties": {
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "phase": {
+      "enum": [
+        "GENESIS",
+        "PARAMETER_RESOLVED",
+        "U0_FROZEN",
+        "CONTRACT_FROZEN",
+        "EXECUTING",
+        "FINALIZING",
+        "FINISHED",
+        "ABORTED"
+      ]
+    },
+    "previous": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "GENESIS",
+        "PARAMETER_RESOLVED",
+        "U0_FROZEN",
+        "CONTRACT_FROZEN",
+        "EXECUTING",
+        "FINALIZING",
+        "FINISHED",
+        "ABORTED",
+        null
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

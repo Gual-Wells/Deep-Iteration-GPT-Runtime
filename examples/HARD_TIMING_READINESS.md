@@ -1,7 +1,9 @@
-# 4.1 task-clock readiness and hard timing
+# Alpha 2 task-clock readiness and hard timing
 
-After routing has loaded P_run=4.1, **this repository version** first classifies the candidate message. Help/off candidates do not start task clock. Every executing 4.1 task must then establish trusted monotonic task-clock readiness before U0 or substantive work, even when B/b are soft.
+For a routed candidate, the pinned startup slice first returns `NATIVE`, `HELP`, `INVALID`, or `EXECUTING`. Only `EXECUTING` creates a run. It establishes >=3 compatible monotonic samples and clock-journal genesis **before** parameter resolution, U0 or task analysis.
 
-For `DIGR（T=10min，B=1）：工程任务`, hard T adds a stricter requirement: every formal interval used to prove T must retain continuity verification.
+Example: `DIGR（T=10min，B=1）：工程任务`.
 
-Wrong: apply this 4.1 clock rule to a legacy repository version before that version loads. Wrong: analyze/write code first, then start a timer and backfill earlier work. If 4.1 startup readiness fails, the executing task cannot start; if later hard continuity is lost, hard proof remains unverified.
+`B=1` makes T a hard minimum. Every interval used for that hard proof must retain trusted continuity. If continuity later cannot be proven, the runtime reports the relevant actual as `?` / fails the hard minimum rather than estimating.
+
+Wrong: analyze or write code first and start the clock later. Wrong: treat wall-clock waiting as task time. Wrong: infer cross-process monotonic continuity merely because numeric values look increasing. Cross-session continuity requires compatible provider facts and equal non-empty boot identity.

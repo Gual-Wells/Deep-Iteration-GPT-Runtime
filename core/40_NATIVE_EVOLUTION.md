@@ -1,7 +1,7 @@
-# 40 — Native Evolution
+# Native Evolution and Event Receipts
 
-DIGR 不拥有一个固定的“正确流程”。在 Effective Contract 建立后，ChatGPT 继续原生决定：理解、规划、推理、研究、工具、代码、测试、验证、反例、重构、分支、综合与表达。
+N counts substantive MAIN evolution determined by the native model/host under faithful U0—not mechanical rewriting. Alpha 2 Event Receipt v2 binds each meaningful event to a real clock-journal **STATE** event, the current Strategy revision and, when applicable, Candidate/Source/evidence references.
 
-有效 N 轮必须对真实执行状态产生实质推进，而不是为了计数重写同义句。N 可以修改局部方法，也可以修改整个执行框架；当当前路线陷入局部最优时，R 或 D 可以触发更大跨度变化。
+A MAIN evolution or MAIN re-entry must bind a `MAIN` state event. A SOURCE evolution/re-entry must bind a `SOURCE` state event and a source that is active in that same source-activity binding. A receipt whose hash exists but whose work-state/scope does not match is invalid.
 
-满足 minimum 不代表停止。若仍存在足以显著提高 U0 结果的高价值缺口，应继续原生工作。
+The raw event log is not a public counter API. `LiveDIGRRun` semantic wrappers validate lifecycle, work-state/scope and reference existence before appending receipts. They deliberately do **not** score intellectual quality or prescribe the next action; semantic qualification remains native-model responsibility.

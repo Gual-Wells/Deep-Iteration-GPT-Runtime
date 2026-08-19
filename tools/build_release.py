@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and cold-validate a deterministic DIGR 4.1.0 source ZIP.
+"""Build and cold-validate a deterministic DIGR 5.0.0-alpha.2 source ZIP.
 
 Standard-library only.  The builder rejects symlinks/path traversal, tests the
 source before cache cleanup, regenerates FILE_TREE/SHA256SUMS, writes a sorted
@@ -24,7 +24,7 @@ EXCLUDED_DIRS = {'.git', '.pytest_cache', '.mypy_cache', '.ruff_cache', '__pycac
 EXCLUDED_SUFFIXES = {'.pyc', '.pyo'}
 TREE_FILE = 'FILE_TREE.txt'
 SUMS_FILE = 'SHA256SUMS.txt'
-FIXED_ZIP_TIME = (2026, 8, 16, 0, 0, 0)
+FIXED_ZIP_TIME = (2026, 8, 19, 0, 0, 0)
 _HEX64 = re.compile(r'^[0-9a-f]{64}$')
 
 
@@ -189,17 +189,19 @@ def build_release(root: Path, output: Path) -> str:
     run([sys.executable, 'tests/validate_repo.py'], root)
     clean_caches(root)
     files = write_manifests(root)
+    verify_tree_and_hashes(root)
     build_zip(root, output, files)
     cold_validate(output)
     return sha256(output)
 
 
-def export_personalization(root: Path, output: Path) -> str:
+def export_personalization(root: Path, output: Path, *, full: bool=False) -> str:
     root = root.resolve()
     output = output.resolve()
     if root == output or root in output.parents:
         raise ValueError('personalization output must be outside the release root')
-    src = root / 'local-personalization' / 'CHATGPT_LOCAL_PERSONALIZATION.txt'
+    name = 'CHATGPT_LOCAL_PERSONALIZATION_FULL.txt' if full else 'CHATGPT_LOCAL_PERSONALIZATION.txt'
+    src = root / 'local-personalization' / name
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(src.read_bytes())
     return sha256(output)
@@ -209,12 +211,17 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('--output', required=True, type=Path)
     ap.add_argument('--personalization-output', type=Path)
+    ap.add_argument('--full-personalization-output', type=Path)
     args = ap.parse_args()
     digest = build_release(ROOT, args.output)
-    extra = ''
+    extras=[]
     if args.personalization_output is not None:
         pdigest = export_personalization(ROOT, args.personalization_output)
-        extra = f'; personalization={args.personalization_output.resolve()} sha256={pdigest}'
+        extras.append(f'personalization={args.personalization_output.resolve()} sha256={pdigest}')
+    if args.full_personalization_output is not None:
+        fdigest = export_personalization(ROOT, args.full_personalization_output, full=True)
+        extras.append(f'full_personalization={args.full_personalization_output.resolve()} sha256={fdigest}')
+    extra=('; '+'; '.join(extras)) if extras else ''
     print(f'built {args.output.resolve()} ({len(release_files(ROOT))} files, sha256={digest}){extra}')
     return 0
 

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/run-workspace.schema.json",
+  "title": "DIGR 5.0 Alpha 2 Run Workspace Layout v2",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "required_genesis_files",
+    "state_directories",
+    "artifact_schemas"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "required_genesis_files": {
+      "const": [
+        "authority.json",
+        "invocation.json",
+        "startup.json",
+        "time/clock.journal.ndjson",
+        "state/artifact-index.json",
+        "state/run-phase.json"
+      ]
+    },
+    "state_directories": {
+      "const": [
+        "time",
+        "sources",
+        "dictator",
+        "evidence",
+        "final",
+        "state"
+      ]
+    },
+    "artifact_schemas": {
+      "type": "object",
+      "minProperties": 28,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "additionalProperties": false
+}

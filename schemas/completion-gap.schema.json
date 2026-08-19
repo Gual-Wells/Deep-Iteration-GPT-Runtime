@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/completion-gap.schema.json",
+  "title": "DIGR 5.0 Alpha 2 Completion Gap Revision",
+  "type": "object",
+  "required": [
+    "gap_id",
+    "revision",
+    "description",
+    "blocking",
+    "status",
+    "resolution",
+    "change_reason"
+  ],
+  "properties": {
+    "gap_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "blocking": {
+      "type": "boolean"
+    },
+    "status": {
+      "enum": [
+        "OPEN",
+        "CLOSED"
+      ]
+    },
+    "resolution": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "change_reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}
