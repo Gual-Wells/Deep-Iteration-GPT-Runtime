@@ -25,6 +25,16 @@ class TestStaticHygiene(unittest.TestCase):
                 bad=[c for c in t if ord(c)<32 and c not in '\n\t']
                 self.assertEqual(bad,[])
 
+
+    def test_release_tree_has_no_casefold_path_collisions(self):
+        seen={}
+        for p in ROOT.rglob('*'):
+            if not p.is_file() or '__pycache__' in p.parts: continue
+            rel=p.relative_to(ROOT).as_posix()
+            key=rel.casefold()
+            self.assertNotIn(key,seen,f'case-insensitive path collision: {seen.get(key)} vs {rel}')
+            seen[key]=rel
+
     def test_local_markdown_relative_links_exist(self):
         pat=re.compile(r'\[[^\]]*\]\(([^)]+)\)')
         for p in ROOT.rglob('*.md'):

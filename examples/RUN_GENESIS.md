@@ -2,7 +2,7 @@
 
 Input: `DIGR（R=3）：检查并改进方案`
 
-Required order for the pinned Alpha 2 protocol:
+Required order for the pinned Alpha 3 protocol:
 
 1. local route resolves `stable` → immutable SHA and reads pinned manifest/VERSION plus the manifest-declared startup slice;
 2. repository startup surface returns `EXECUTING`;

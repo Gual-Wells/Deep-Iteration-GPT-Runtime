@@ -1,4 +1,4 @@
-# Alpha 2 task-clock readiness and hard timing
+# Alpha 3 task-clock readiness and hard timing
 
 For a routed candidate, the pinned startup slice first returns `NATIVE`, `HELP`, `INVALID`, or `EXECUTING`. Only `EXECUTING` creates a run. It establishes >=3 compatible monotonic samples and clock-journal genesis **before** parameter resolution, U0 or task analysis.
 

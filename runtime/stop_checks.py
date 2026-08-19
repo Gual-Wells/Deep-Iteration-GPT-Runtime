@@ -1,4 +1,4 @@
-"""Mechanical DIGR 5.0 Alpha 2 contract-minimum checks.
+"""Mechanical DIGR 5.0 Alpha 3 contract-minimum checks.
 
 This layer checks frozen minimum commitments against evidence-backed actuals.
 It deliberately does not judge whether an idea is insightful or whether the

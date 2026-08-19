@@ -1,4 +1,4 @@
-"""Immutable repository-delegated protocol authority records for DIGR 5.0.0-alpha.2."""
+"""Immutable repository-delegated protocol authority records for DIGR 5.0.0-alpha.3."""
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 from typing import Any

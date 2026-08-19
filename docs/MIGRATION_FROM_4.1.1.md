@@ -1,6 +1,6 @@
-# Migration from 4.1.1 to 5.0.0 Alpha 2
+# Migration from 4.1.1 to 5.0.0 Alpha 3
 
-Alpha 2 is the corrected integration baseline for the 5.0 final line. The migration is intentionally not a compatibility wrapper around every intermediate pre-release interface: where audit found a correctness or reliability defect, the surrounding interface was reopened rather than preserved.
+Alpha 3 is the transport-hardened integration baseline for the 5.0 final line. Alpha 2 supplied the corrected execution/state baseline; Alpha 3 preserves it and closes the host repository-transport boundary exposed by live deployment. The migration is intentionally not a compatibility wrapper around every intermediate pre-release interface: where audit found a correctness or reliability defect, the surrounding interface was reopened rather than preserved.
 
 ## What remains conceptually stable
 
@@ -9,6 +9,10 @@ Alpha 2 is the corrected integration baseline for the 5.0 final line. The migrat
 - `P_run`, U0, user hard constraints and Effective Contract minima are commitments;
 - Result Sovereignty, semantic completion, Formal Active Time, trusted monotonic clock facts, `?` for unverifiable actuals, compact visible proof, deterministic releases and non-sticky activation remain foundational;
 - the deterministic runtime constrains integrity, lifecycle and evidence. It does not choose the model's task strategy.
+
+## Alpha 3 transport hardening
+
+After Alpha 2 deployment, real candidate turns could emit the fixed route-failure message without performing repository acquisition. Alpha 3 makes current-turn acquisition evidence a prerequisite, rejects search/index/crawl snapshots as mutable-ref authority, cross-checks the Git ref and Branches endpoints in REST mode, uses immutable raw-SHA URLs for pinned files and normalizes Contents API base64 wrappers. These changes are routing/transport corrections, not new N/S/R/D/L execution semantics.
 
 ## What changed for the 5.0 integration baseline
 
@@ -44,4 +48,4 @@ Workspace v2 has one authoritative RunPhase lifecycle and one artifact index. Re
 
 ## Intermediate pre-release note
 
-5.0.0-alpha.1 was an important Native Assist and clock-journal substrate. Alpha 2 deliberately keeps the reliable foundation while replacing integration behavior that the later audit showed should not be frozen for final 5.0.
+5.0.0-alpha.1 was an important Native Assist and clock-journal substrate. Alpha 2 deliberately kept the reliable foundation while replacing integration behavior that the later audit showed should not be frozen. Alpha 3 retains that execution model and hardens the deployment transport edge.

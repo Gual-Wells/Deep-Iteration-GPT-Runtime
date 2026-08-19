@@ -1,4 +1,4 @@
-"""Comprehensive DIGR 5.0 Alpha 2 workspace integrity/recovery verification.
+"""Comprehensive DIGR 5.0 Alpha 3 workspace integrity/recovery verification.
 
 Verification proves persisted structure and cross-store bindings.  It deliberately
 separates *workspace integrity* from *future clock continuity*: LiveDIGRRun.resume

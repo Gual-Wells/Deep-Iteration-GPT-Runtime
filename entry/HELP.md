@@ -1,4 +1,4 @@
-# DIGR 5.0.0-alpha.2 Help
+# DIGR 5.0.0-alpha.3 Help
 
 DIGR is an explicit high-investment execution mode. It is turn-scoped (non-sticky): a later message is ordinary ChatGPT unless that later message invokes DIGR again.
 

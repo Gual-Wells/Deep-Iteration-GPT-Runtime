@@ -9,12 +9,20 @@ class TestSchemas(unittest.TestCase):
         for p in S.glob('*.json'):
             d=load(p.name);self.assertEqual(d['$schema'],'https://json-schema.org/draft/2020-12/schema');self.assertTrue(d['$id'].endswith('/'+p.name));Draft202012Validator.check_schema(d)
     def test_manifest_alpha2_interfaces(self):
-        d=load('manifest.schema.json');self.assertEqual(d['properties']['version']['const'],'5.0.0-alpha.2');self.assertEqual(d['properties']['protocol']['const'],'digr-v5.0')
-        expect={'routing_schema':2,'invocation_surface_schema':2,'parameter_resolution_schema':1,'run_session_schema':2,'workspace_schema':2,'clock_journal_schema':1,'event_receipt_schema':2}
+        d=load('manifest.schema.json');self.assertEqual(d['properties']['version']['const'],'5.0.0-alpha.3');self.assertEqual(d['properties']['protocol']['const'],'digr-v5.0')
+        expect={'routing_schema':3,'repository_transport_schema':1,'invocation_surface_schema':2,'parameter_resolution_schema':1,'run_session_schema':2,'workspace_schema':2,'clock_journal_schema':1,'event_receipt_schema':2}
         for k,v in expect.items():self.assertIn(k,d['required']);self.assertEqual(d['properties'][k]['const'],v)
         self.assertIn('startup_slice',d['required']);self.assertEqual(d['properties']['workspace_spec']['const'],'workspace/layout-v2.json')
     def test_manifest_instance_conforms_to_manifest_schema(self):
         schema=load('manifest.schema.json');manifest=json.loads((ROOT/'manifest.json').read_text(encoding='utf-8'));validate(manifest,schema)
+    def test_alpha3_routing_schema_is_transport_specific(self):
+        d=load('manifest.schema.json')['properties']['routing']
+        self.assertFalse(d['additionalProperties'])
+        for k in ('ref_api_url','branch_api_url','pinned_raw_template','content_raw_media_type','mutable_ref_policy'):
+            self.assertIn(k,d['required'])
+        t=load('repository-transport-attempt.schema.json')
+        self.assertIn('freshness',t['required']);self.assertIn('success',t['required'])
+
     def test_surface_four_states_and_syntax_only(self):
         d=load('invocation-surface.schema.json');self.assertEqual(set(d['properties']['kind']['enum']),{'EXECUTING','HELP','NATIVE','INVALID'});self.assertNotIn('N',d['properties']);self.assertNotIn('R',d['properties'])
     def test_parameter_resolution_unique_or_fail_schema(self):

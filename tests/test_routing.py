@@ -28,7 +28,7 @@ class TestRouting(unittest.TestCase):
         m={'bootstrap_entry':'bootstrap/BOOTSTRAP.md','entrypoint':'entry/E.md','core':['core/A.md'],'help':'entry/H.md'}
         p=discovery_plan_from_manifest(m); self.assertFalse(p.legacy_manifest); self.assertFalse(p.staged_startup); self.assertEqual(p.initial_paths,('bootstrap/BOOTSTRAP.md','entry/E.md','core/A.md'))
     def test_exact_locator_constants(self):
-        self.assertEqual(AUTHORITATIVE_REPOSITORY,'Gual-Wells/Deep-Iteration-GPT-Runtime'); self.assertEqual(AUTHORITATIVE_REF,'stable'); self.assertEqual(AUTHORITATIVE_REF_API_URL,'https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/stable'); self.assertEqual(content_api_url(SHA,'manifest.json'),f'https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/contents/manifest.json?ref={SHA}')
+        self.assertEqual(AUTHORITATIVE_REPOSITORY,'Gual-Wells/Deep-Iteration-GPT-Runtime'); self.assertEqual(AUTHORITATIVE_REF,'stable'); self.assertEqual(AUTHORITATIVE_REF_API_URL,'https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/stable'); self.assertEqual(AUTHORITATIVE_BRANCH_API_URL,'https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/stable'); self.assertIn('{SHA}/{PATH}',PINNED_RAW_TEMPLATE); self.assertEqual(content_api_url(SHA,'manifest.json'),f'https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/contents/manifest.json?ref={SHA}')
     def test_route_receipt_exact_locator_and_two_digests(self):
         r=receipt(); self.assertEqual(r.pinned_commit,SHA)
         with self.assertRaises(ValueError): RouteReceipt('Other/Repo','stable',SHA,'manifest.json','b'*64,'VERSION','c'*64)
@@ -38,7 +38,7 @@ class TestRouting(unittest.TestCase):
         r=receipt(); self.assertEqual(load_manifest_for_route(r,MANIFEST)['version'],'3.0.0'); self.assertEqual(load_version_for_route(r,VERSION),'3.0.0'); self.assertEqual(load_route_metadata(r,MANIFEST,VERSION)[1],'3.0.0')
         with self.assertRaises(ValueError): load_manifest_for_route(r,b'{}')
     def test_manifest_routing_metadata_crosscheck(self):
-        meta={'candidate_route_keys':['DIGR','深度迭代'],'candidate_match':'lstrip_prefix; DIGR_exact_uppercase; remainder_unvalidated','repository_full_name':AUTHORITATIVE_REPOSITORY,'repository_url':AUTHORITATIVE_REPOSITORY_URL,'requested_ref':'stable','ref_api_url':AUTHORITATIVE_REF_API_URL,'manifest_path':'manifest.json','version_path':'VERSION','content_api_template':CONTENT_API_TEMPLATE}
+        meta={'candidate_route_keys':['DIGR','深度迭代'],'candidate_match':'lstrip_prefix; DIGR_exact_uppercase; remainder_unvalidated','repository_full_name':AUTHORITATIVE_REPOSITORY,'repository_url':AUTHORITATIVE_REPOSITORY_URL,'requested_ref':'stable','ref_api_url':AUTHORITATIVE_REF_API_URL,'branch_api_url':AUTHORITATIVE_BRANCH_API_URL,'manifest_path':'manifest.json','version_path':'VERSION','content_api_template':CONTENT_API_TEMPLATE,'pinned_raw_template':PINNED_RAW_TEMPLATE,'content_raw_media_type':'application/vnd.github.raw+json','mutable_ref_policy':'direct_live_ref_plus_branch_consensus; search_index_forbidden; attempt_required_before_failure'}
         self.assertTrue(validate_manifest_routing_metadata({'routing':meta})); self.assertFalse(validate_manifest_routing_metadata({}))
         bad=dict(meta);bad['candidate_match']='lstrip_prefix; DIGR_ascii_case_insensitive; remainder_unvalidated'
         with self.assertRaises(ValueError):validate_manifest_routing_metadata({'routing':bad})

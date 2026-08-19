@@ -1,4 +1,4 @@
-"""Typed DIGR 5.0 Alpha 2 Effective Contract.
+"""Typed DIGR 5.0 Alpha 3 Effective Contract.
 
 The Effective Contract freezes minimum commitments, never an execution
 strategy. Missing semantic values have already been completed by the native

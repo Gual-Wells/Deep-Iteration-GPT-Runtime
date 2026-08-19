@@ -1,19 +1,34 @@
-# DIGR 5.0-compatible Local Personalization — Expanded Routing Reference
+# DIGR 5.0-compatible Local Personalization — Expanded Routing/Transport Reference
 
-This file explains the version-neutral Router Transport Contract. The direct-copy configuration is `CHATGPT_LOCAL_PERSONALIZATION.txt`. Neither file defines versioned DIGR execution semantics.
+This is an explanation of the version-neutral local Router Transport Contract. Direct-copy text is `CHATGPT_LOCAL_PERSONALIZATION.txt`. Neither file is a copy of versioned DIGR execution semantics.
 
-## Candidate response
-After leading whitespace only, exact uppercase ASCII `DIGR` or exact `深度迭代` triggers a route attempt before task-level answering. Mixed/lowercase English forms do not. The match intentionally ignores the remainder: it does not decide invocation/help/parameters/punctuation/task validity. A capture is not semantic takeover; the pinned repository startup protocol may classify it NATIVE and return the original message to ordinary ChatGPT.
+## 1. Candidate routing is an obligation, not a guessed result
+For every user message, remove leading whitespace only. Exact uppercase ASCII `DIGR` or exact `深度迭代` triggers routing before task-level interpretation. Lower/mixed-case English does not. The local layer intentionally ignores the remainder; the pinned startup protocol later decides NATIVE/HELP/INVALID/EXECUTING.
 
-## Canonical locator and immutable pin
-Repository: `Gual-Wells/Deep-Iteration-GPT-Runtime`; mutable discovery ref: `stable`; canonical GitHub ref/content APIs are those named in the compact file. Resolve `stable` on every candidate and accept only a full 40-hex commit SHA. All later reads for that turn use that SHA. Read pinned `manifest.json` and `VERSION` and require exact version equality.
+A candidate match requires an **actual repository acquisition action before any user-visible reply**. “I probably cannot fetch it”, an old remembered result, or simply having the fixed failure string available is not an acquisition attempt and cannot justify route failure.
 
-## Staged navigation
-If the pinned manifest declares `startup_slice`, acquire only that slice first. The pinned repository, not the local file, determines its surface states and execution preconditions. NATIVE returns the untouched original message; HELP may load `manifest.help`; EXECUTING follows the repository's own startup rules and only then loads its full `entrypoint`/`core[]` from the same SHA. This lets the repository move version-specific clock/run genesis close to invocation detection without teaching the local router those semantics.
+## 2. Mutable-ref provenance
+Repository: `Gual-Wells/Deep-Iteration-GPT-Runtime`; discovery ref: `stable`.
 
-A legacy pinned manifest without `startup_slice` follows its own declared `bootstrap_entry`/`entrypoint`/`core` navigation. Newer local routing text never retrofits newer semantic rules into an older P_run.
+The only mutable step is `stable → commit SHA`, so it has the strictest freshness requirement. Search-engine results, snippets, crawled/indexed GitHub HTML, cached conversation text and Memory are inadmissible ref authority. Prefer a connected GitHub repository connector that directly resolves the current branch head. Otherwise use direct GitHub REST acquisition.
 
-## Authority boundary and failure
-The successfully loaded pinned repository protocol is the versioned semantic authority, subject to higher-priority instructions and current user hard constraints. Context/Memory/old answers may inform task content only when that protocol permits; they cannot patch protocol semantics or rebind P_run.
+For REST acquisition, read both in the same route attempt:
+- ref API: `https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/stable`
+- branch API: `https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/stable`
 
-Before the current startup stage has acquired all mandatory pinned resources, any repository/ref/SHA/manifest/VERSION/path failure is a routing failure. Return the compact failure message specified by the direct-copy file. Do not reconstruct DIGR from memory and do not claim execution.
+Both must identify the same full 40-hex commit SHA. Disagreement is fail-closed; never choose whichever answer looks newer.
+
+## 3. Immutable pinned content
+After the SHA is accepted, every later read for the turn uses that SHA. The simplest canonical file transport is:
+
+`https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}`
+
+Caching at this stage is harmless when the URL is truly commit-pinned because the referenced Git object is immutable. If a host must use the GitHub Contents API instead, it must request `application/vnd.github.raw+json` or decode the normal JSON file object's base64 `content` field before giving bytes to the DIGR route verifier. Passing the wrapper JSON itself as `manifest.json`/`VERSION` is invalid.
+
+## 4. Staged authority handoff
+Acquire pinned `manifest.json` and `VERSION`, require version equality, then follow only paths declared by that pinned manifest. If it has `startup_slice`, fetch only that slice first. The pinned repository may return NATIVE, HELP, INVALID or EXECUTING. NATIVE returns the untouched original message; HELP loads `manifest.help`; EXECUTING follows the repository's own startup rules and only then loads `entrypoint`/`core[]` from the same SHA. A legacy manifest without `startup_slice` follows its own navigation; the local layer never backports newer semantics into it.
+
+## 5. Failure evidence
+The fixed route-failure response is permitted only after this turn has at least one real repository acquisition attempt and the currently mandatory repository/ref/SHA/manifest/VERSION/path acquisition still fails, conflicts or has inadmissible provenance. Skipping acquisition is a router-execution failure, not a repository route failure.
+
+Once the pinned repository startup protocol is acquired, it is the sole source of versioned DIGR semantics for that turn, subject to higher-priority instructions and current hard user constraints. Conversation context, Memory, previous answers and target versions cannot reconstruct or override protocol semantics.

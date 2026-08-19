@@ -1,7 +1,7 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
-  "version": "5.0.0-alpha.2",
+  "version": "5.0.0-alpha.3",
   "protocol": "digr-v5.0",
   "language": "zh-CN",
   "philosophy": {
@@ -110,6 +110,7 @@
   "help": "entry/HELP.md",
   "deterministic_helpers": [
     "runtime/routing.py",
+    "runtime/repository_transport.py",
     "runtime/protocol_authority.py",
     "runtime/invocation_surface.py",
     "runtime/parameter_resolution.py",
@@ -219,10 +220,18 @@
     "run_brief_is_derived_not_authoritative": true,
     "resume_reestablishes_clock_continuity": true,
     "source_time_uses_clock_union_not_per_source_sum": true,
-    "recovery_does_not_assume_clock_continuity_without_resume_bridge": true
+    "recovery_does_not_assume_clock_continuity_without_resume_bridge": true,
+    "route_requires_actual_acquisition_attempt": true,
+    "route_failure_requires_acquisition_evidence": true,
+    "mutable_ref_search_index_forbidden": true,
+    "mutable_ref_direct_live_provenance_required": true,
+    "mutable_ref_ref_branch_consensus_when_using_rest": true,
+    "pinned_raw_sha_content_is_cache_safe": true,
+    "contents_api_wrapper_must_be_raw_or_decoded": true,
+    "repository_transport_is_host_bridge_not_execution_semantics": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
-  "routing_schema": 2,
+  "routing_schema": 3,
   "routing": {
     "candidate_route_keys": [
       "DIGR",
@@ -235,7 +244,11 @@
     "ref_api_url": "https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/stable",
     "manifest_path": "manifest.json",
     "version_path": "VERSION",
-    "content_api_template": "https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/contents/{PATH}?ref={SHA}"
+    "content_api_template": "https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/contents/{PATH}?ref={SHA}",
+    "branch_api_url": "https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/stable",
+    "pinned_raw_template": "https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}",
+    "content_raw_media_type": "application/vnd.github.raw+json",
+    "mutable_ref_policy": "direct_live_ref_plus_branch_consensus; search_index_forbidden; attempt_required_before_failure"
   },
   "run_session_schema": 2,
   "workspace_schema": 2,
@@ -244,24 +257,25 @@
   "release": {
     "channel": "alpha",
     "baseline_target": "5.0.0",
-    "status": "corrected integration baseline intended to freeze for 5.0 final",
-    "compatibility_intent": "Alpha 2 reopens Alpha 1 interfaces only where audit found correctness/reliability defects; clock-journal facts remain stable.",
+    "status": "transport-hardened integration baseline intended to freeze for 5.0 final",
+    "compatibility_intent": "Alpha 3 preserves Alpha 2 execution semantics while closing the host repository-transport boundary exposed by real fresh-chat route failures; clock-journal and Alpha 2 state semantics remain stable.",
     "frozen_interfaces": [
-      "clock_journal_schema"
-    ],
-    "corrected_interfaces": [
-      "routing_schema",
       "invocation_surface_schema",
       "parameter_resolution_schema",
       "run_session_schema",
       "workspace_schema",
+      "clock_journal_schema",
       "event_receipt_schema"
+    ],
+    "corrected_interfaces": [
+      "routing_schema",
+      "repository_transport_schema"
     ],
     "allowed_pre_final_evolution": [
       "bug fixes",
       "documentation",
       "tests",
-      "non-semantic ergonomics that preserve corrected contracts"
+      "non-semantic ergonomics that preserve Alpha 3 transport and Alpha 2 execution contracts"
     ]
   },
   "workspace_spec": "workspace/layout-v2.json",
@@ -270,5 +284,6 @@
     "entry/STARTUP.md"
   ],
   "invocation_surface_schema": 2,
-  "parameter_resolution_schema": 1
+  "parameter_resolution_schema": 1,
+  "repository_transport_schema": 1
 }

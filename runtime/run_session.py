@@ -1,4 +1,4 @@
-"""DIGR 5.0 Alpha 2 Native Assist run session.
+"""DIGR 5.0 Alpha 3 Native Assist run session.
 
 The session is a reliability exoskeleton. It freezes authority/U0/minimum
 commitments and binds timing/evidence/state, while leaving task strategy and
