@@ -21,8 +21,11 @@ class TestStopChecks(unittest.TestCase):
         x=check_mechanical_minima(self.contract(L_e=2),self.actual(L_e=1));self.assertTrue(x.L_ok);self.assertFalse(x.L_target_met)
     def test_L_mismatch_can_be_u0_hard_constraint(self):
         c=self.contract(L_e=2,L_mismatch_blocks_delivery=True);x=check_mechanical_minima(c,self.actual(L_e=1));self.assertFalse(x.L_ok)
-    def test_D_zero_makes_L_nonblocking(self):
+    def test_no_completed_D_has_no_completed_intervention_L_gate(self):
         c=self.contract(D_s=0,L_e=3);x=check_mechanical_minima(c,self.actual(D_s=0,L_e=None));self.assertTrue(x.L_ok)
+    def test_zero_D_minimum_with_actual_D_uses_normal_L_gate(self):
+        c=self.contract(D_s=0,L_e=3,L_mismatch_blocks_delivery=True);x=check_mechanical_minima(c,self.actual(D_s=1,L_e=1));self.assertFalse(x.L_ok);self.assertFalse(x.L_target_met)
+        y=check_mechanical_minima(c,self.actual(D_s=1,L_e=3));self.assertTrue(y.L_ok);self.assertTrue(y.L_target_met)
     def test_invalid_actuals(self):
         with self.assertRaises(TypeError):self.actual(N=True)
         with self.assertRaises(ValueError):self.actual(T_seconds=float('nan'))

@@ -1,51 +1,40 @@
-# Migration from 4.1.1 to 5.0.0 Alpha 3
+# Migration from 4.1.1 to 5.0.0 Alpha 4
 
-Alpha 3 is the transport-hardened integration baseline for the 5.0 final line. Alpha 2 supplied the corrected execution/state baseline; Alpha 3 preserves it and closes the host repository-transport boundary exposed by live deployment. The migration is intentionally not a compatibility wrapper around every intermediate pre-release interface: where audit found a correctness or reliability defect, the surrounding interface was reopened rather than preserved.
+Alpha 4 is the current 5.0 pre-final integration baseline. Alpha 2 supplied the corrected execution/state mother-base; Alpha 3 hardened repository transport; Alpha 4 uses live black-box evidence to correct connector routing, D/L lower-bound semantics, timing terminology and canonical user presentation.
 
-## What remains conceptually stable
+## Stable conceptual commitments
 
-- local personalization is a thin routing/authority transport layer, not a copy of versioned DIGR semantics;
-- each routed turn resolves `stable` to one immutable commit and binds `manifest.json` + `VERSION` + all protocol reads to that same commit;
-- `P_run`, U0, user hard constraints and Effective Contract minima are commitments;
-- Result Sovereignty, semantic completion, Formal Active Time, trusted monotonic clock facts, `?` for unverifiable actuals, compact visible proof, deterministic releases and non-sticky activation remain foundational;
-- the deterministic runtime constrains integrity, lifecycle and evidence. It does not choose the model's task strategy.
+- local personalization is a thin routing/authority transport layer, not a copy of versioned DIGR execution semantics;
+- each routed turn resolves `stable` to one immutable commit and binds manifest/VERSION/startup/core reads to that same commit;
+- P_run, U0, explicit user hard constraints and the Effective Contract are frozen for the run; Strategy/Candidate/Source/D working state remains revisable;
+- Result Sovereignty, semantic completion, Formal Active Time, trusted monotonic clock facts, `?` for unverifiable actuals, compact proof, deterministic releases and non-sticky activation remain foundational;
+- deterministic runtime validates integrity/lifecycle/evidence and does not choose the model's intellectual strategy.
 
-## Alpha 3 transport hardening
+## Transport evolution
 
-After Alpha 2 deployment, real candidate turns could emit the fixed route-failure message without performing repository acquisition. Alpha 3 makes current-turn acquisition evidence a prerequisite, rejects search/index/crawl snapshots as mutable-ref authority, cross-checks the Git ref and Branches endpoints in REST mode, uses immutable raw-SHA URLs for pinned files and normalizes Contents API base64 wrappers. These changes are routing/transport corrections, not new N/S/R/D/L execution semantics.
+Alpha 3 proved that “no acquisition attempt” cannot be treated as repository failure and introduced direct provenance + immutable pinning. Alpha 4 further distinguishes host capabilities: an already-connected GitHub repository connector may resolve the public `stable` branch HEAD directly; a genuine REST client performs branch/ref consensus. Search/crawl/index representations remain inadmissible mutable-ref authority.
 
-## What changed for the 5.0 integration baseline
+## Parameter and timing semantics
 
-### Routing and startup
+Header punctuation normalization, typed T/t and unique-or-fail mapping remain. Fixed defaults are B=0, b=0 and L1; missing N/T/R/n/t/r/s are semantically completed from U0 + explicit parameters.
 
-The local candidate router now captures exact uppercase ASCII `DIGR` or exact `深度迭代` after leading whitespace only. The repository startup surface has four outcomes: `NATIVE`, `HELP`, `INVALID`, `EXECUTING`. A routed discussion such as `DIGR是什么？` can therefore return unchanged to ordinary ChatGPT without creating a run.
+Alpha 4 clarifies the contract categories:
 
-Repository loading is staged. The pinned startup slice is sufficient to classify the surface and establish Run Genesis. An `EXECUTING` call starts trusted clock/journal state before parameter resolution, then loads the remaining protocol from the same pinned commit.
+- N/R/n/r/D are lower bounds;
+- T/t are frozen time targets;
+- B/b=0 makes the corresponding target soft;
+- B/b=1 upgrades it to a hard lower bound requiring trusted timing evidence.
 
-### Parameter surface
+## Source, D and L
 
-The invocation header is punctuation-normalized before deterministic mapping, so mixed full/half-width parentheses, comma and colon forms are equivalent without rewriting U0. Time slots require duration semantics; a bare number can never be invented into T/t. `S`, `S()`, `D`, `D()`, `L`, `L()` are legal structural markers. A mapping is accepted only when the constraints leave exactly one interpretation.
+Normal execution still defaults SourceDisposition to REQUIRED unless a concrete U0/host reason records a waiver. S numeric zeros do not disable source presumption.
 
-### Frozen commitments versus mutable work
+D is a revisioned intervention lifecycle with proposal, Decree, execution/result evidence and MAIN reintegration. `D(0)` means no completed D is required; it does not prohibit D. Actual D may exceed target. L_target/L_cap/L_actual remain distinct, and completed-D L applicability follows actual execution rather than the D minimum.
 
-5.0 separates immutable commitments from revisioned current understanding. Strategy, Candidate, EST, Source direction, D proposals before decree and Completion gaps can all change as evidence or failure demands. Strategy snapshots are external memory, not a planner: no scheduler score, priority or deterministic `next_step` decides what GPT should think next.
+## Recovery and proof
 
-### Source research and re-entry
-
-Normal execution presumes `SourceDisposition=REQUIRED` unless a concrete U0/host reason records a waiver. This obligation is independent of the numeric `S(n,t,r,b)` minima. An actual S requires a real SourceWorkspace, a formal SOURCE-time binding naming that source, and a semantic SOURCE receipt; opening an empty source object does not satisfy the obligation.
-
-MAIN R is Candidate-backed whole-process re-entry. Source `r` is independently SourceWorkspace-result/revision backed and does not require a global Main Candidate. This keeps source research independently revisable while preserving auditable before/after state.
-
-### D and L
-
-D is now a revisioned intervention session. Proposal revisions remain mutable until Decree binds one revision. D execution is tied to its actual clock state; reintegration is MAIN work and records its MAIN clock binding plus concrete Main consequence. Terminal interventions cannot be silently mutated.
-
-`L_target`, `L_cap` and `L_actual` are distinct. L2/L3 use indexed controlled Input/Output Packet artifacts: input exists before isolated execution, output is produced by the isolated work and bound to the result. Capability alone never proves an actual isolation mode.
-
-### Recovery
-
-Workspace v2 has one authoritative RunPhase lifecycle and one artifact index. Recovery verifies not only file hashes but cross-store semantics: clock/source bindings, Strategy/Candidate/Source revisions, D isolation packets and clock states, EST references, derived Run Brief fields and the final summary. `LiveDIGRRun.resume()` must then establish a fresh same-provider, equal-nonempty-boot clock bridge; file integrity alone is not clock continuity.
+Workspace v2, RunPhase, artifact index and recovery integrity remain. Resume still requires a fresh trusted same-provider/equal-nonempty-boot bridge. Canonical proof continues to be compact; Alpha 4 explicitly forbids raw fractional/nanosecond leakage in visible actual duration and requires hard-unverified time to render as `?`.
 
 ## Intermediate pre-release note
 
-5.0.0-alpha.1 was an important Native Assist and clock-journal substrate. Alpha 2 deliberately kept the reliable foundation while replacing integration behavior that the later audit showed should not be frozen. Alpha 3 retains that execution model and hardens the deployment transport edge.
+Alpha 1 established the Native Assist/clock-journal substrate. Alpha 2 corrected execution integration. Alpha 3 hardened host transport. Alpha 4 is a narrow correction pass driven by successful live connector operation and subsequent black-box execution findings rather than a new execution architecture.

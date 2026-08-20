@@ -3,13 +3,21 @@ from runtime.protocol_authority import ProtocolIdentity,ProtocolAuthority
 from runtime.routing import RouteReceipt,AUTHORITATIVE_REPOSITORY
 from runtime.invocation_surface import classify_surface
 from runtime.task_startup import start_task
+from runtime.execution_protocol import ExecutingProtocolLoadReceipt,ProtocolMemberReceipt
 
 SHA='a'*40
 
 def authority():
     r=RouteReceipt(AUTHORITATIVE_REPOSITORY,'stable',SHA,'manifest.json','b'*64,'VERSION','c'*64)
-    p=ProtocolIdentity('digr-v5.0','5.0.0-alpha.3',AUTHORITATIVE_REPOSITORY,SHA)
+    p=ProtocolIdentity('digr-v5.0','5.0.0-alpha.4',AUTHORITATIVE_REPOSITORY,SHA)
     return ProtocolAuthority(r,p)
+
+def protocol_load_receipt():
+    return ExecutingProtocolLoadReceipt(
+        1,SHA,'b'*64,'5.0.0-alpha.4','digr-v5.0','bundle',
+        'bundle/EXECUTION_PROTOCOL.json','d'*64,
+        (ProtocolMemberReceipt('entry/DEEP_ITERATION_ENTRY.md','e'*64,1),),
+    )
 
 class FakeClock:
     def __init__(self, start=0, step=100_000_000, provider='test', session='same', boot='boot-test'):

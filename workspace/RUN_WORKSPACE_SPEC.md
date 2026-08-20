@@ -1,6 +1,6 @@
-# DIGR 5.0 Alpha 3 Run Workspace
+# DIGR 5.0 Alpha 4 Run Workspace
 
-`workspace/layout-v2.json` is the single current layout contract. Alpha 3 retains the Alpha 2 removal of overlapping legacy runtime-state/invocation state copies and persists one RunPhase lifecycle plus revisioned authoritative stores.
+`workspace/layout-v2.json` is the single current layout contract. Alpha 4 retains the Alpha 2 removal of overlapping legacy runtime-state/invocation state copies and persists one RunPhase lifecycle plus revisioned authoritative stores.
 
 Genesis creates authority/invocation/startup/clock journal, artifact index and RunPhase=GENESIS. Parameter/U0/contract artifacts appear only as their phases are crossed. Strategy, Candidate, EST, S, D/isolation, evidence and completion states are revisioned. Layout v2 maps both latest pointers and immutable revision-history artifacts to schemas; completion-gap revisions have their own schema rather than borrowing the aggregate CompletionState shape. Append-only clock/source-activity/semantic-event journals are re-indexed after writes.
 

@@ -1,10 +1,10 @@
-# Route failure — Alpha 3
+# Route failure — Alpha 4
 
 A fixed route failure is valid only after the current candidate turn has actual canonical repository-acquisition evidence.
 
 Examples of genuine route failure:
-- direct mutable `stable` acquisition fails;
-- ref and branch direct observations disagree;
+- connector branch-head or direct REST mutable `stable` acquisition fails;
+- direct REST branch/ref observations disagree;
 - the returned mutable-ref provenance is search/index/crawl rather than direct live repository access;
 - pinned manifest/VERSION bytes cannot be acquired or fail integrity/version equality;
 - a manifest-declared mandatory startup path cannot be obtained from the same SHA.

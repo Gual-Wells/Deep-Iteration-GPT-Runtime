@@ -1,4 +1,4 @@
-"""Mechanical evidence and receipts for DIGR D isolation levels (Alpha 3).
+"""Mechanical evidence and receipts for DIGR D isolation levels (Alpha 4).
 
 Capability, requested target, and actual implementation are deliberately
 separate.  A host that can support L3 does not thereby claim that a particular

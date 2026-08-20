@@ -1,4 +1,4 @@
-"""Revisioned Disruptive Gambit intervention sessions for DIGR 5.0 Alpha 3.
+"""Revisioned Disruptive Gambit intervention sessions for DIGR 5.0 Alpha 4.
 
 The store persists D history and isolation linkage. It does not choose a gambit
 or evaluate its intellectual merit; the native model owns those decisions.
@@ -278,7 +278,8 @@ class DInterventionStore:
         levels = [x for x in levels if x is not None]
         if levels:
             return min(levels)
-        # D=0 keeps L configured/visible but non-blocking.
+        # With no completed D, L may still be configured or evidenced by an
+        # isolation receipt, but it is not a completed-D stop gate.
         if self._isolations:
             return list(self._isolations.values())[-1].L_actual
         return None

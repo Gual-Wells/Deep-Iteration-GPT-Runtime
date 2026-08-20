@@ -1,9 +1,15 @@
-# 5.0.0-alpha.3 Transport-Hardened Corrected Integration Baseline
+# 5.0.0-alpha.4 Black-Box Corrected Integration Baseline
 
-Alpha 2 remains the corrected integration baseline and mother-base for the 5.0 execution/state model: revisable Strategy/Candidate/Source/D state around immutable commitments, Source Presumption, Candidate-backed R, D/L integration, RunPhase, comprehensive recovery and the retained clock-journal foundation.
+Alpha 2 remains the mother-base for the corrected 5.0 execution/state model. Alpha 3 hardened the host repository-transport boundary after real route failures skipped acquisition. Alpha 4 is the next evidence-driven correction pass: successful live connector routing plus full-parameter black-box execution exposed mismatches that unit tests and static protocol review had not fully captured.
 
-Alpha 3 exists because real fresh-chat deployment produced two reproducible failures (`DIGR/help` and `DIGR：返回版本号`) where the host emitted the fixed route-failure text without making any repository acquisition call. The subsequent source audit also found the GitHub Contents API/raw-byte adapter gap and the absence of mechanically represented mutable-ref provenance.
+Alpha 4 reopens only interfaces with demonstrated defects:
 
-Alpha 3 therefore reopens only the routing/host-transport edge. `routing_schema=3` and `repository_transport_schema=1` add actual-attempt evidence, direct mutable-ref provenance, REST ref/branch consensus, immutable raw-SHA content and Contents-wrapper normalization. Invocation surface, parameter resolution, run session/workspace/event and clock-journal semantics remain at their Alpha 2 schema versions.
+- `routing_schema=4` and `repository_transport_schema=3` distinguish connector branch-head authority from direct REST consensus with one bounded retry for live push races;
+- `run_session_schema=4` preserves corrected D/L semantics and additionally makes verified full execution-protocol load a hard post-genesis prerequisite;
+- timing documentation converges on soft/hard T/t targets rather than incorrectly calling all contract fields unconditional minima;
+- canonical proof rendering and canonical zh-CN Help are tightened to prevent host-side semantic drift;
+- one deterministic immutable execution bundle transports the logical entrypoint + 17 core modules after Clock Genesis, with a persisted `ExecutingProtocolLoadReceipt` and mandatory abort on load failure.
 
-Change discipline remains runtime behavior first, then schema/docs/examples/tests converge on the same behavior. No “prompt-only fix” is accepted as sufficient evidence. Deterministic release, cold validation and standalone personalization byte checks remain mandatory.
+The mother-base invariants remain: immutable P_run/U0/contract commitments, revisable Strategy/Candidate/Source/D state, Source Presumption, Candidate-backed R, D/L evidence binding, trusted monotonic clock-journal, comprehensive workspace recovery, compact proof and deterministic releases.
+
+Change discipline remains behavior first, then schema/docs/examples/tests converge on the same behavior. No prompt-only workaround, remembered result, or “completed” label counts as engineering evidence. Deterministic double build, cold extraction, full tests/validator, cross-platform path checks and standalone personalization byte checks remain mandatory.

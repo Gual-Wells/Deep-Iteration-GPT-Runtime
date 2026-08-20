@@ -6,6 +6,7 @@ README.md
 SHA256SUMS.txt
 VERSION
 bootstrap/BOOTSTRAP.md
+bundle/EXECUTION_PROTOCOL.json
 core/00_RESULT_SOVEREIGNTY.md
 core/05_TASK_COMMITMENT.md
 core/10_INVOCATION_AND_U0.md
@@ -31,7 +32,7 @@ docs/INVOCATION_PARAMETERS.md
 docs/LOCAL_PERSONALIZATION_GUIDE.md
 docs/MIGRATION_FROM_4.1.1.md
 docs/PRE_RELEASE_BASELINE.md
-docs/PROTOCOL_SPEC_5.0.0-alpha.3.md
+docs/PROTOCOL_SPEC_5.0.0-alpha.4.md
 docs/REPOSITORY_TRANSPORT.md
 docs/ROUTING_CONTRACT.md
 docs/RUN_SESSION_ARCHITECTURE.md
@@ -43,10 +44,10 @@ entry/HELP.md
 entry/STARTUP.md
 examples/ALL_DEFAULTS.md
 examples/DIGR_ALIAS.md
-examples/D_DISABLED.md
 examples/D_L1.md
 examples/D_L2.md
 examples/D_L3.md
+examples/D_ZERO_MINIMUM.md
 examples/EVENT_BACKED_R.md
 examples/EXAMPLE_HELP.md
 examples/FORMAL_TIME_PAUSE.md
@@ -86,6 +87,7 @@ runtime/effective_contract.py
 runtime/est_store.py
 runtime/evidence_index.py
 runtime/evolution_events.py
+runtime/execution_protocol.py
 runtime/interval_ledger.py
 runtime/invocation_surface.py
 runtime/isolation_checks.py
@@ -117,6 +119,8 @@ schemas/effective-contract.schema.json
 schemas/est-snapshot.schema.json
 schemas/evidence-index.schema.json
 schemas/evolution-event.schema.json
+schemas/executing-protocol-load.schema.json
+schemas/execution-protocol-bundle.schema.json
 schemas/invocation-surface.schema.json
 schemas/isolation-facts.schema.json
 schemas/isolation-packet.schema.json
@@ -150,6 +154,7 @@ tests/test_d_intervention.py
 tests/test_duration.py
 tests/test_effective_contract.py
 tests/test_evolution_events.py
+tests/test_execution_protocol.py
 tests/test_implementation_notes.py
 tests/test_interval_ledger.py
 tests/test_invocation_surface.py

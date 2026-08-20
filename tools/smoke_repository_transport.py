@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Live public-GitHub smoke check for the Alpha 3 repository transport boundary."""
+"""Live public-GitHub smoke check for the Alpha 4 repository transport boundary."""
 from __future__ import annotations
 import json
 from pathlib import Path

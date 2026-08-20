@@ -1,8 +1,8 @@
-"""Mechanical DIGR 5.0 Alpha 3 contract-minimum checks.
+"""Mechanical DIGR 5.0 Alpha 4 contract-minimum checks.
 
-This layer checks frozen minimum commitments against evidence-backed actuals.
-It deliberately does not judge whether an idea is insightful or whether the
-model should continue after minimums are met.
+This layer checks frozen mechanical contract gates against evidence-backed
+actuals. Count/D minima and B/b-governed timing gates are distinct; this layer
+never judges intellectual quality or whether useful work should continue.
 """
 from __future__ import annotations
 from dataclasses import dataclass
@@ -90,7 +90,12 @@ def check_mechanical_minima(contract: EffectiveContract, actual: ContractActuals
     # If D is off there is nothing to isolate. If D is on, mismatch remains
     # visible but only blocks delivery when the U0/contract explicitly says so.
     l_target_met = actual.L_e is not None and actual.L_e == contract.L_e
-    if contract.D_s == 0:
+    # L applicability follows actual D execution, not the D minimum.
+    # D_s=0 means no completed-D minimum; it does not disable D.  When no D
+    # completed, there is no completed intervention whose isolation must gate
+    # delivery.  Once actual D exists, normal target/capability/actual
+    # semantics apply regardless of the frozen D minimum.
+    if actual.D_s == 0:
         l_ok = True
     elif contract.L_mismatch_blocks_delivery:
         l_ok = l_target_met

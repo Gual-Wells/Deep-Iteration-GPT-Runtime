@@ -1,19 +1,20 @@
-"""Host-facing repository transport for DIGR 5.0.0-alpha.3.
+"""Host-facing repository transport for DIGR 5.0.0-alpha.4.
 
 Alpha 2 deliberately kept ``runtime.routing`` free of network I/O, but the
 production personalization path then had no executable bridge between a route
-obligation and the bytes consumed by the deterministic verifier.  Alpha 3
+obligation and the bytes consumed by the deterministic verifier.  Alpha 4
 closes that boundary without moving DIGR execution semantics into the local
 layer.
 
 The transport has four jobs only:
 
 * make an *actual* direct acquisition attempt before route failure is allowed;
-* resolve mutable ``stable`` through direct GitHub REST observations and reject
+* resolve mutable ``stable`` through a repository-native connector branch HEAD or direct GitHub REST observations and reject
   search/index/crawl snapshots as ref authority;
 * pin all later reads to the resolved immutable 40-hex commit;
 * deliver complete pinned bytes, accepting either raw responses or the GitHub
-  Contents API base64 wrapper when a host cannot request the raw media type.
+  Contents API base64 wrapper when a host cannot request the raw media type;
+* aggregate the post-genesis logical entrypoint/core transport through the manifest-declared immutable execution bundle when available.
 
 The module includes a standard-library HTTPS fetcher for ordinary Python hosts.
 ChatGPT integrations may instead provide a connector-backed ``fetch`` callable,
@@ -32,11 +33,15 @@ import urllib.request
 from urllib.parse import urlparse
 
 from .protocol_pin import raw_file_url, validate_commit_sha, validate_repo_path
+from .execution_protocol import (
+    ExecutionProtocolBundle, receipt_from_individual_files, verify_execution_bundle,
+)
 from .routing import (
     AUTHORITATIVE_API_BASE,
     AUTHORITATIVE_REF_API_URL,
     AUTHORITATIVE_BRANCH_API_URL,
     AUTHORITATIVE_REPOSITORY,
+    AUTHORITATIVE_REPOSITORY_URL,
     AUTHORITATIVE_REF,
     MANIFEST_PATH,
     VERSION_PATH,
@@ -47,12 +52,13 @@ from .routing import (
     candidate_route_key,
     discovery_plan_from_manifest_bytes,
     ref_resolution_from_github_payload,
+    ref_resolution_from_branch_payload,
     route_receipt_from_ref_resolution,
 )
 
 CONTENTS_RAW_ACCEPT = 'application/vnd.github.raw+json'
 GITHUB_JSON_ACCEPT = 'application/vnd.github+json'
-USER_AGENT = 'Deep-Iteration-GPT-Runtime/5.0.0-alpha.3'
+USER_AGENT = 'Deep-Iteration-GPT-Runtime/5.0.0-alpha.4'
 
 LIVE_SOURCE_KINDS = frozenset({'direct_https', 'github_connector'})
 FRESHNESS_LIVE_DIRECT = 'live_direct'
@@ -197,7 +203,7 @@ class UrllibDirectFetcher:
 
     Mutable-ref requests ask intermediaries to revalidate instead of serving a
     search/index snapshot.  This cannot make an external CDN mathematically
-    instantaneous, so Alpha 3 also corroborates ``stable`` with the independent
+    instantaneous, so Alpha 4 also corroborates ``stable`` with the independent
     Branches endpoint before accepting the pin.
     """
     def __init__(self, timeout: float = 15.0):
@@ -244,21 +250,6 @@ def _response_ok(request: FetchRequest, response: TransportResponse, *, mutable:
         raise ValueError('mutable stable ref requires live direct freshness provenance')
     if not mutable and response.freshness not in (FRESHNESS_LIVE_DIRECT,FRESHNESS_IMMUTABLE):
         raise ValueError('pinned resource provenance is untrusted')
-
-
-def _branch_sha(payload: bytes | Mapping[str,Any]) -> str:
-    if isinstance(payload,(bytes,bytearray)):
-        try: payload=json.loads(bytes(payload).decode('utf-8'))
-        except (UnicodeDecodeError,json.JSONDecodeError) as exc:
-            raise ValueError('GitHub branch response is not valid UTF-8 JSON') from exc
-    if not isinstance(payload,Mapping):
-        raise TypeError('GitHub branch response must be a mapping or bytes')
-    if payload.get('name') != 'stable':
-        raise ValueError('GitHub branch response is not stable')
-    commit=payload.get('commit')
-    if not isinstance(commit,Mapping):
-        raise ValueError('GitHub branch response missing commit')
-    return validate_commit_sha(commit.get('sha'))
 
 
 def _contents_wrapper_bytes(body: bytes, expected_path: str | None = None) -> bytes | None:
@@ -343,28 +334,44 @@ class RepositoryTransportSession:
         raise RouteAcquisitionError(str(exc),self.receipts) from exc
 
     def resolve_stable(self) -> RefResolution:
-        primary_req=FetchRequest(AUTHORITATIVE_REF_API_URL,'stable_ref_primary',GITHUB_JSON_ACCEPT,True)
-        primary=self._do(primary_req,mutable=True)
-        try:
-            resolution=ref_resolution_from_github_payload(primary.body)
-        except Exception as exc:
-            self._validation_failure('stable_ref_primary_validation',primary_req.url,exc,freshness=FRESHNESS_LIVE_DIRECT)
+        """Resolve current ``stable`` using transport-specific authority.
 
-        branch_req=FetchRequest(AUTHORITATIVE_BRANCH_API_URL,'stable_ref_corroboration',GITHUB_JSON_ACCEPT,True)
-        branch=self._do(branch_req,mutable=True)
-        try:
-            corroborated=_branch_sha(branch.body)
-        except Exception as exc:
-            self._validation_failure('stable_ref_corroboration_validation',branch_req.url,exc,freshness=FRESHNESS_LIVE_DIRECT)
-        if corroborated != resolution.commit_sha:
-            # Add an explicit failed consensus receipt rather than silently picking one.
-            self._receipts.append(AcquisitionAttemptReceipt(
-                len(self._receipts)+1,'stable_ref_consensus',AUTHORITATIVE_REF_API_URL,
-                'consensus',FRESHNESS_LIVE_DIRECT,200,False,None,None,
-                f'ref/branch SHA mismatch: {resolution.commit_sha} != {corroborated}',
-            ))
-            raise RouteAcquisitionError('stable ref observations disagree',self.receipts)
-        return resolution
+        A connected GitHub repository connector may directly expose the current
+        branch resource and is accepted from that single repository-native HEAD
+        observation. Direct REST corroborates Branches + Git-ref. If a push lands
+        between the two live observations, one bounded re-observation is allowed
+        before fail-closed consensus is declared. Search/index/crawl provenance
+        remains inadmissible.
+        """
+        last_pair=None
+        for observation_round in (1,2):
+            branch_req=FetchRequest(AUTHORITATIVE_BRANCH_API_URL,f'stable_branch_primary_r{observation_round}',GITHUB_JSON_ACCEPT,True)
+            branch=self._do(branch_req,mutable=True)
+            try:
+                resolution=ref_resolution_from_branch_payload(branch.body)
+            except Exception as exc:
+                self._validation_failure(f'stable_branch_primary_validation_r{observation_round}',branch_req.url,exc,freshness=FRESHNESS_LIVE_DIRECT)
+
+            if branch.source_kind == 'github_connector':
+                return resolution
+
+            ref_req=FetchRequest(AUTHORITATIVE_REF_API_URL,f'stable_ref_corroboration_r{observation_round}',GITHUB_JSON_ACCEPT,True)
+            ref=self._do(ref_req,mutable=True)
+            try:
+                corroborated=ref_resolution_from_github_payload(ref.body)
+            except Exception as exc:
+                self._validation_failure(f'stable_ref_corroboration_validation_r{observation_round}',ref_req.url,exc,freshness=FRESHNESS_LIVE_DIRECT)
+            if corroborated.commit_sha == resolution.commit_sha:
+                return resolution
+            last_pair=(resolution.commit_sha,corroborated.commit_sha)
+
+        assert last_pair is not None
+        self._receipts.append(AcquisitionAttemptReceipt(
+            len(self._receipts)+1,'stable_ref_consensus',AUTHORITATIVE_BRANCH_API_URL,
+            'consensus',FRESHNESS_LIVE_DIRECT,200,False,None,None,
+            f'branch/ref SHA mismatch after bounded retry: {last_pair[0]} != {last_pair[1]}',
+        ))
+        raise RouteAcquisitionError('stable ref observations disagree after bounded retry',self.receipts)
 
     def fetch_pinned_file(self, commit_sha: str, path: str) -> bytes:
         sha=validate_commit_sha(commit_sha); rel=validate_repo_path(path)
@@ -412,6 +419,57 @@ class RepositoryTransportSession:
         return RepositoryStartupBundle(
             resolution,route,manifest_data,version_data,plan,tuple(startup),self.receipts
         )
+
+
+    def acquire_execution_protocol(self, startup: 'RepositoryStartupBundle') -> ExecutionProtocolBundle:
+        """Acquire and verify the logical entrypoint/core after Clock Genesis.
+
+        Current manifests use one immutable execution bundle. Older staged
+        manifests remain supported through individually pinned logical files.
+        Legacy non-staged manifests already carry their full protocol in the
+        startup bundle and are normalized into the same load receipt shape.
+        """
+        if not isinstance(startup,RepositoryStartupBundle):
+            raise TypeError('startup must be RepositoryStartupBundle')
+        sha=startup.resolution.commit_sha;plan=startup.discovery_plan
+        expected=plan.full_protocol_paths
+        if plan.execution_bundle_path is not None:
+            raw=self.fetch_pinned_file(sha,plan.execution_bundle_path)
+            try:
+                return verify_execution_bundle(
+                    raw,commit_sha=sha,manifest_bytes=startup.manifest_bytes,
+                    expected_paths=expected,
+                )
+            except Exception as exc:
+                url=raw_file_url('Gual-Wells','Deep-Iteration-GPT-Runtime',sha,plan.execution_bundle_path)
+                self._validation_failure('execution_bundle_validation',url,exc,commit_sha=sha)
+        if plan.staged_startup:
+            files=tuple((path,self.fetch_pinned_file(sha,path)) for path in expected)
+        else:
+            by_path=dict(startup.startup_files)
+            try: files=tuple((path,by_path[path]) for path in expected)
+            except KeyError as exc:
+                self._validation_failure('legacy_execution_protocol_missing',AUTHORITATIVE_REPOSITORY_URL,exc,commit_sha=sha)
+        try:
+            return receipt_from_individual_files(
+                commit_sha=sha,manifest_bytes=startup.manifest_bytes,
+                expected_paths=expected,files=files,
+            )
+        except Exception as exc:
+            self._validation_failure('individual_execution_protocol_validation',AUTHORITATIVE_REPOSITORY_URL,exc,commit_sha=sha)
+
+    def load_execution_protocol_for_run(self, run, startup: 'RepositoryStartupBundle') -> ExecutionProtocolBundle:
+        """Host bridge: post-genesis load either binds a receipt or aborts the born run."""
+        try:
+            bundle=self.acquire_execution_protocol(startup)
+            run.bind_protocol_load(bundle.receipt)
+            return bundle
+        except Exception as exc:
+            try:
+                run.abort_protocol_load(f'execution protocol acquisition/validation failed: {exc}')
+            except Exception:
+                pass
+            raise
 
 
 @dataclass(frozen=True)

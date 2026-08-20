@@ -1,4 +1,4 @@
-"""Deterministic DIGR 5.0 Alpha 3 repository-surface classification.
+"""Deterministic DIGR 5.0 Alpha 4 repository-surface classification.
 
 The local router intentionally over-captures exact-uppercase ``DIGR`` and
 ``深度迭代`` prefixes.  After the pinned repository startup slice is available,

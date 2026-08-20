@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and cold-validate a deterministic DIGR 5.0.0-alpha.3 source ZIP.
+"""Build and cold-validate a deterministic DIGR 5.0.0-alpha.4 source ZIP.
 
 Standard-library only.  The builder rejects symlinks/path traversal, tests the
 source before cache cleanup, regenerates FILE_TREE/SHA256SUMS, writes a sorted
@@ -9,6 +9,7 @@ hash, and reruns the full validation suite from the extracted copy.
 from __future__ import annotations
 import argparse
 import hashlib
+import json
 import os
 from pathlib import Path, PurePosixPath
 import re
@@ -24,7 +25,7 @@ EXCLUDED_DIRS = {'.git', '.pytest_cache', '.mypy_cache', '.ruff_cache', '__pycac
 EXCLUDED_SUFFIXES = {'.pyc', '.pyo'}
 TREE_FILE = 'FILE_TREE.txt'
 SUMS_FILE = 'SHA256SUMS.txt'
-FIXED_ZIP_TIME = (2026, 8, 19, 0, 0, 0)
+FIXED_ZIP_TIME = (2026, 8, 20, 0, 0, 0)
 _HEX64 = re.compile(r'^[0-9a-f]{64}$')
 _WINDOWS_RESERVED = {
     'CON', 'PRN', 'AUX', 'NUL', 'CLOCK$',
@@ -118,6 +119,36 @@ def sha256(path: Path) -> str:
         for chunk in iter(lambda: f.read(1024 * 1024), b''):
             h.update(chunk)
     return h.hexdigest()
+
+
+def write_execution_bundle(root: Path) -> Path:
+    """Regenerate the manifest-declared immutable execution transport bundle."""
+    root=root.resolve()
+    manifest=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
+    meta=manifest.get('execution_bundle')
+    if not isinstance(meta,dict):
+        raise RuntimeError('manifest execution_bundle metadata missing')
+    rel=_safe_rel(meta.get('path','')).as_posix()
+    if meta.get('schema')!=1:
+        raise RuntimeError('unsupported execution bundle schema')
+    expected=[manifest['entrypoint'],*manifest['core']]
+    if meta.get('members')!=expected:
+        raise RuntimeError('execution bundle member declaration drift')
+    members=[]
+    for member in expected:
+        safe=_safe_rel(member).as_posix();data=(root/safe).read_bytes()
+        try: content=data.decode('utf-8')
+        except UnicodeDecodeError as exc: raise RuntimeError(f'execution protocol member is not UTF-8: {safe}') from exc
+        members.append({
+            'path':safe,
+            'sha256':hashlib.sha256(data).hexdigest(),
+            'byte_length':len(data),
+            'content':content,
+        })
+    payload={'schema_version':1,'version':manifest['version'],'protocol':manifest['protocol'],'members':members}
+    out=root/rel;out.parent.mkdir(parents=True,exist_ok=True)
+    out.write_text(json.dumps(payload,ensure_ascii=False,sort_keys=True,separators=(',',':'))+'\n',encoding='utf-8',newline='\n')
+    return out
 
 
 def write_manifests(root: Path) -> list[Path]:
@@ -229,6 +260,7 @@ def cold_validate(output: Path) -> None:
 def build_release(root: Path, output: Path) -> str:
     root = root.resolve()
     output = output.resolve()
+    write_execution_bundle(root)
     run([sys.executable, '-m', 'unittest', 'discover', '-s', 'tests', '-q'], root)
     run([sys.executable, 'tests/validate_repo.py'], root)
     clean_caches(root)

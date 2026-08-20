@@ -1,43 +1,25 @@
-# Repository Transport — Alpha 3
+# Repository transport
 
-`runtime/repository_transport.py` is the executable bridge that Alpha 2 lacked between the local routing obligation and `runtime/routing.py`'s deterministic byte validators.
+Alpha 4 keeps repository transport outside DIGR execution semantics and makes transport mode explicit.
 
-## Host contract
+## Admissible mutable-ref sources
 
-A host provides `FetchRequest -> TransportResponse`. The response must identify its provenance:
+- `github_connector`: an already-connected GitHub repository connector may read the public repository `stable` branch resource and accept its current full 40-hex HEAD SHA. Connector mode does not require a Git-ref endpoint the connector product does not expose.
+- `direct_https`: a real direct GitHub REST client reads both the stable branch resource and Git-ref resource. If a push lands between those two live reads, one bounded re-observation is allowed; only a matching full SHA is accepted.
+- search/index/crawl/snippet/browser-search snapshots are never mutable-ref authority.
 
-- `direct_https` or `github_connector`: admissible direct repository transport;
-- anything else (for example a search/index/crawl result): not admissible for mutable `stable`.
+A public DIGR bootstrap must not require the user to establish a new GitHub OAuth connection merely to read this repository. If a connector is already connected, it is preferred; otherwise a host may use genuine direct REST if available.
 
-Mutable requests additionally require freshness marker `live_direct`. Pinned SHA resources may be `live_direct` or `immutable_sha` because the object cannot change at that commit.
+## Immutable staged phase
 
-## Stable resolution
+After stable resolves to one SHA, every later resource is read at that exact SHA. `raw.githubusercontent.com/{SHA}/{PATH}` is canonical. GitHub Contents API is an allowed fallback only when the response is raw media or its JSON/base64 wrapper is decoded into actual file bytes.
 
-REST mode requests both canonical endpoints in one session:
+The first immutable stage remains deliberately small: `manifest.json`, `VERSION`, then `startup_slice`. This preserves cheap NATIVE/HELP/INVALID classification and keeps Clock Genesis at the same early boundary.
 
-1. Git ref `refs/heads/stable`;
-2. Branches `stable`.
+For EXECUTING, Alpha 4 separates **logical protocol modularity** from **physical transport count**. The repository continues to maintain one entrypoint and 17 core source files, but the release builder deterministically generates `bundle/EXECUTION_PROTOCOL.json`. After Clock Genesis the host fetches this single pinned bundle, verifies that it contains exactly the manifest-declared entrypoint/core members in order with matching byte lengths and SHA-256 digests, and persists an `ExecutingProtocolLoadReceipt`. Parameter resolution cannot start without that receipt.
 
-Both must return the same full commit SHA. A disagreement is not resolved by version-string heuristics or “newer-looking” content; it fails closed.
+Older staged manifests without an execution bundle remain compatible by loading their entrypoint/core individually and normalizing those verified files into the same receipt shape.
 
-The included `UrllibDirectFetcher` sends `Cache-Control: no-cache` and `Pragma: no-cache` for mutable ref requests. Hosts with a connected GitHub connector may use that connector instead if it directly resolves the current branch head rather than searching indexed GitHub pages.
+A post-genesis mandatory protocol-load failure is a failure of a **born** run: the standard host bridge persists `ABORTED`, and the run cannot continue parameter resolution from an unverified GENESIS state.
 
-## Pinned file acquisition
-
-Primary URL:
-
-`https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}`
-
-Fallback URL:
-
-`https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/contents/{PATH}?ref={SHA}`
-
-The fallback requests `application/vnd.github.raw+json`. `normalize_pinned_file_bytes()` also accepts GitHub's ordinary file-object response and base64-decodes `content`. Path mismatches, non-file objects and malformed base64 are rejected.
-
-## Failure model
-
-`RouteAcquisitionError` carries the session's `AcquisitionAttemptReceipt` values. `route_failure_permitted()` is a **necessary** check only: at least one canonical repository request must have occurred. The caller must also be handling a genuine mandatory-stage error. This prevents a host from using the fixed failure sentence as an alternative to making the first repository call.
-
-## Deployment smoke test
-
-`python tools/smoke_repository_transport.py 'DIGR/help'` performs a real public-GitHub transport check from an environment with network access. It prints the pinned SHA, pinned version, startup paths and repository surface. It is intentionally not part of the offline unit suite or deterministic release build.
+Transport receipts prove that real acquisitions occurred. They do not contain or define N/T/R/S/D/L, timing, stop or proof semantics.

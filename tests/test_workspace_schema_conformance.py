@@ -15,7 +15,7 @@ from runtime.interval_ledger import WorkState
 from runtime.isolation_checks import IsolationFacts
 from runtime.run_session import LiveDIGRRun
 from runtime.strategy_store import StrategyState
-from tests.helpers import FakeClock, authority
+from tests.helpers import FakeClock, authority, protocol_load_receipt
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / 'schemas'
@@ -43,6 +43,7 @@ class TestWorkspaceSchemaConformance(unittest.TestCase):
     def build_full_workspace(self, td):
         c = FakeClock()
         run = LiveDIGRRun.start(authority(), 'DIGR(D,L(2)):x', Path(td), c, run_id='digr-12345678')
+        run.bind_protocol_load(protocol_load_receipt())
         run.resolve_parameters(); run.freeze_u0('x')
         run.freeze_contract(EffectiveContract(1, 0, 1, 0, SourceContract(1, 0, 1, 0), 1, 2, SourceDisposition.REQUIRED))
         run.transition(WorkState.MAIN, c())

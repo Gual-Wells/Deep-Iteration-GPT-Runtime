@@ -1,7 +1,7 @@
-"""Typed DIGR 5.0 Alpha 3 Effective Contract.
+"""Typed DIGR 5.0 Alpha 4 Effective Contract.
 
-The Effective Contract freezes minimum commitments, never an execution
-strategy. Missing semantic values have already been completed by the native
+The Effective Contract freezes contract commitments, never an execution
+strategy. Count/D fields are minima; T/t are B/b-governed timing targets. Missing semantic values have already been completed by the native
 model/host before this deterministic record is created.
 """
 from __future__ import annotations
@@ -71,7 +71,13 @@ class EffectiveContract:
         return self.source_disposition is SourceDisposition.REQUIRED
 
     @property
-    def dictator_enabled(self) -> bool:
+    def D_minimum_positive(self) -> bool:
+        """Whether the frozen contract requires at least one completed D.
+
+        D_s is a lower bound, not an enable/disable switch.  A zero minimum
+        therefore permits quality-driven D interventions even though none are
+        mechanically required.
+        """
         return self.D_s > 0
 
     @property

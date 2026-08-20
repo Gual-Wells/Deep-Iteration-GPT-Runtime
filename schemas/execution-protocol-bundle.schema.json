@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/execution-protocol-bundle.schema.json",
+  "title": "DIGR Execution Protocol Bundle",
+  "type": "object",
+  "required": ["schema_version", "version", "protocol", "members"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "version": {"const": "5.0.0-alpha.4"},
+    "protocol": {"const": "digr-v5.0"},
+    "members": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256", "byte_length", "content"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "byte_length": {"type": "integer", "minimum": 0},
+          "content": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

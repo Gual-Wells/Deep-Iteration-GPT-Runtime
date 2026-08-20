@@ -1,4 +1,4 @@
-"""Comprehensive DIGR 5.0 Alpha 3 workspace integrity/recovery verification.
+"""Comprehensive DIGR 5.0 Alpha 4 workspace integrity/recovery verification.
 
 Verification proves persisted structure and cross-store bindings.  It deliberately
 separates *workspace integrity* from *future clock continuity*: LiveDIGRRun.resume
@@ -15,6 +15,7 @@ from .clock_journal import ClockJournal, derive_work_intervals
 from .completion_state import CompletionState
 from .d_intervention import DInterventionStore
 from .effective_contract import EffectiveContract, SourceContract, SourceDisposition
+from .execution_protocol import ExecutingProtocolLoadReceipt
 from .est_store import ESTStore
 from .evidence_index import EvidenceIndex
 from .evolution_events import EvolutionEventLog, EvolutionKind
@@ -96,16 +97,24 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
 
     phase=RunPhaseStore.load(ws)
     phase_requires={
-        RunPhase.PARAMETER_RESOLVED:('parameter-resolution.json',),
-        RunPhase.U0_FROZEN:('parameter-resolution.json','U0.json'),
-        RunPhase.CONTRACT_FROZEN:('parameter-resolution.json','U0.json','contract.json'),
-        RunPhase.EXECUTING:('parameter-resolution.json','U0.json','contract.json'),
-        RunPhase.FINALIZING:('parameter-resolution.json','U0.json','contract.json'),
-        RunPhase.FINISHED:('parameter-resolution.json','U0.json','contract.json','final/run-summary.json'),
+        RunPhase.PARAMETER_RESOLVED:('protocol-load.json','parameter-resolution.json'),
+        RunPhase.U0_FROZEN:('protocol-load.json','parameter-resolution.json','U0.json'),
+        RunPhase.CONTRACT_FROZEN:('protocol-load.json','parameter-resolution.json','U0.json','contract.json'),
+        RunPhase.EXECUTING:('protocol-load.json','parameter-resolution.json','U0.json','contract.json'),
+        RunPhase.FINALIZING:('protocol-load.json','parameter-resolution.json','U0.json','contract.json'),
+        RunPhase.FINISHED:('protocol-load.json','parameter-resolution.json','U0.json','contract.json','final/run-summary.json'),
     }
     for rel in phase_requires.get(phase.phase,()):
         if not ws.path(rel).is_file():
             raise ValueError(f'phase {phase.phase.value} missing {rel}')
+
+    if ws.path('protocol-load.json').is_file():
+        pl=ExecutingProtocolLoadReceipt.from_dict(ws.read_json('protocol-load.json'))
+        ident=authority.get('P_run',{})
+        route=authority.get('route',{})
+        if (pl.commit_sha!=ident.get('commit_sha') or pl.version!=ident.get('version') or pl.protocol!=ident.get('protocol')
+                or pl.manifest_sha256!=route.get('manifest_sha256')):
+            raise ValueError('protocol-load receipt does not match persisted P_run/manifest')
 
     contract_raw=ws.read_json('contract.json') if ws.path('contract.json').is_file() else None
     contract=_load_contract(contract_raw) if contract_raw is not None else None
@@ -195,8 +204,6 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
     # D/L is one integrated information-flow lifecycle.  Capability alone does
     # not prove actual isolation, and L2/L3 packets must be real indexed
     # artifacts. Execution and reintegration must be clock-state bound.
-    if contract is not None and contract.D_s==0 and dstore.items:
-        raise ValueError('frozen D=0 contract contains D interventions')
     for item in dstore.items:
         iso=dstore.isolation(item.isolation_receipt_id)
         if contract is not None and iso.L_target!=contract.L_e:

@@ -1,5 +1,26 @@
 # Changelog
 
+## 5.0.0-alpha.4 — live black-box integration corrections
+
+Alpha 4 follows Alpha 3 after successful live GitHub-connector routing and subsequent full-parameter black-box runs exposed remaining integration defects. It preserves Alpha 3 immutable repository authority, staged startup, trusted clock genesis, workspace/state model and recovery design.
+
+### Corrected interfaces
+- routing schema 4 + repository transport schema 3: connector branch-head acquisition remains first-class; direct REST keeps branch/ref consensus with one bounded re-observation for push-between-reads races;
+- run-session schema 4: post-genesis full execution-protocol readiness is now a persisted prerequisite for parameter resolution; mandatory load failure aborts the born run;
+- execution bundle schema 1 + execution-protocol-load schema 1: the 1 entrypoint + 17 core logical modules remain independent source authority but are transported in one deterministic immutable bundle after Clock Genesis;
+- `D(0)` remains a zero minimum rather than a disable switch, D actual may exceed target, recovery accepts such runs and L applicability follows actual completed D;
+- timing terminology converges on unconditional N/R/n/r/D minima versus B/b-governed soft/hard T/t targets;
+- canonical proof presentation is made explicit to the host: actual durations floor to whole seconds and hard-unverified time is `?`;
+- canonical `entry/HELP.md` is rewritten in zh-CN as a normative user reference with fixed-default precedence and exact Source/D/L/timing semantics.
+
+### Black-box evidence preserved
+- connected GitHub connector resolved live `stable` to the same SHA as direct `git ls-remote`, then successfully loaded pinned VERSION/manifest/startup/help;
+- full-parameter invocation showed initialization wall-clock cost is dominated by authority/protocol/host orchestration rather than semantic default completion, so Alpha 4 does not remove or bypass startup reliability work;
+- user-visible proof output demonstrated host-side rendering drift (fractional actual seconds), motivating explicit canonical rendering requirements rather than weakening the deterministic proof helper.
+
+### Release discipline
+Alpha 4 adds connector-specific transport tests, bounded direct-REST consensus retry, deterministic execution-bundle generation/verification, post-genesis protocol-load barrier/abort tests, zero-minimum D execution/recovery tests, actual-D L-gate tests, timing-policy documentation checks and stronger Help/proof conformance checks. Cross-platform ZIP path validation introduced in late Alpha 3 remains mandatory.
+
 ## 5.0.0-alpha.3 — host transport hardening
 
 Alpha 3 is a focused follow-up to the Alpha 2 corrected integration baseline. It was triggered by two real fresh-chat deployment failures: `DIGR/help` and `DIGR：返回版本号` both emitted the fixed route-failure message without any observable repository acquisition. A source audit then found a second concrete gap: the personalization advertised GitHub's Contents API while `runtime/routing.py` expected raw file bytes.

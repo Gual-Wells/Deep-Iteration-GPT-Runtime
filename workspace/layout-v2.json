@@ -20,6 +20,7 @@
     "authority.json": "schemas/protocol-authority.schema.json",
     "invocation.json": "schemas/invocation-surface.schema.json",
     "startup.json": "schemas/task-startup.schema.json",
+    "protocol-load.json": "schemas/executing-protocol-load.schema.json",
     "parameter-resolution.json": "schemas/parameter-resolution.schema.json",
     "U0.json": "schemas/u0-receipt.schema.json",
     "contract.json": "schemas/effective-contract.schema.json",

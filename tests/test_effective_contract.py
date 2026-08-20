@@ -6,7 +6,7 @@ class TestEffectiveContract(unittest.TestCase):
         base=dict(N=1,T_seconds=2.0,R=1,B=0,S=SourceContract(1,2.0,1,0),D_s=0,L_e=1)
         base.update(kw); return EffectiveContract(**base)
     def test_properties(self):
-        c=self.good(); self.assertTrue(c.source_required); self.assertFalse(c.dictator_enabled); self.assertFalse(c.hard_timing_required)
+        c=self.good(); self.assertTrue(c.source_required); self.assertFalse(c.D_minimum_positive); self.assertFalse(c.hard_timing_required)
         c=self.good(B=1); self.assertTrue(c.hard_timing_required)
     def test_bool_ints_rejected(self):
         for field in ('N','R','B','D_s','L_e'):
