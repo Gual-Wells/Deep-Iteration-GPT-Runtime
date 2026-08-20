@@ -1,7 +1,7 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
-  "version": "5.0.0-alpha.3",
+  "version": "5.0.0-alpha.4",
   "protocol": "digr-v5.0",
   "language": "zh-CN",
   "philosophy": {
@@ -111,6 +111,7 @@
   "deterministic_helpers": [
     "runtime/routing.py",
     "runtime/repository_transport.py",
+    "runtime/execution_protocol.py",
     "runtime/protocol_authority.py",
     "runtime/invocation_surface.py",
     "runtime/parameter_resolution.py",
@@ -149,7 +150,6 @@
     "no_algorithmic_tree_controller": true,
     "est_is_working_state_memory_only": true,
     "minimums_are_not_caps": true,
-    "D_zero_disables": true,
     "D_requires_mature_gambit_and_reintegration": true,
     "no_numeric_ambition_or_coup_controller": true,
     "L1_does_not_claim_physical_isolation": true,
@@ -206,7 +206,6 @@
     "D_reintegration_binds_main_consequence": true,
     "L_target_cap_actual_are_distinct": true,
     "L_mismatch_nonblocking_unless_U0_requires_exact": true,
-    "D_zero_makes_L_nonblocking": true,
     "router_DIGR_requires_exact_uppercase": true,
     "surface_has_native_sovereignty_return": true,
     "parameter_resolution_unique_or_fail": true,
@@ -228,10 +227,19 @@
     "mutable_ref_ref_branch_consensus_when_using_rest": true,
     "pinned_raw_sha_content_is_cache_safe": true,
     "contents_api_wrapper_must_be_raw_or_decoded": true,
-    "repository_transport_is_host_bridge_not_execution_semantics": true
+    "repository_transport_is_host_bridge_not_execution_semantics": true,
+    "D_zero_means_no_minimum_not_disabled": true,
+    "L_applicability_follows_actual_D": true,
+    "timing_targets_soft_when_policy_zero": true,
+    "timing_targets_hard_lower_bounds_when_policy_one": true,
+    "canonical_proof_actual_durations_floor_to_whole_seconds": true,
+    "executing_protocol_bundle_preserves_logical_modularity": true,
+    "executing_protocol_load_receipt_required_before_parameter_resolution": true,
+    "post_genesis_protocol_load_failure_aborts_born_run": true,
+    "execution_bundle_is_immutable_sha_pinned": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
-  "routing_schema": 3,
+  "routing_schema": 4,
   "routing": {
     "candidate_route_keys": [
       "DIGR",
@@ -248,34 +256,39 @@
     "branch_api_url": "https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/stable",
     "pinned_raw_template": "https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}",
     "content_raw_media_type": "application/vnd.github.raw+json",
-    "mutable_ref_policy": "direct_live_ref_plus_branch_consensus; search_index_forbidden; attempt_required_before_failure"
+    "mutable_ref_policy": "connector_branch_head_or_direct_rest_branch_ref_consensus; search_index_forbidden; attempt_required_before_failure"
   },
-  "run_session_schema": 2,
+  "run_session_schema": 4,
   "workspace_schema": 2,
   "clock_journal_schema": 1,
   "event_receipt_schema": 2,
   "release": {
     "channel": "alpha",
     "baseline_target": "5.0.0",
-    "status": "transport-hardened integration baseline intended to freeze for 5.0 final",
-    "compatibility_intent": "Alpha 3 preserves Alpha 2 execution semantics while closing the host repository-transport boundary exposed by real fresh-chat route failures; clock-journal and Alpha 2 state semantics remain stable.",
+    "status": "black-box corrected integration baseline intended to converge toward DIGR 5.0 final",
+    "compatibility_intent": "Alpha 4 preserves its black-box corrected semantics while hardening post-genesis execution-protocol loading: connector/direct-REST authority remains unchanged; the manifest-declared entrypoint/core protocol is transported as one deterministic immutable bundle with a verified load receipt, and parameter resolution cannot begin without that receipt.",
     "frozen_interfaces": [
       "invocation_surface_schema",
       "parameter_resolution_schema",
-      "run_session_schema",
       "workspace_schema",
       "clock_journal_schema",
       "event_receipt_schema"
     ],
     "corrected_interfaces": [
       "routing_schema",
-      "repository_transport_schema"
+      "repository_transport_schema",
+      "run_session_schema",
+      "D/L minimum semantics",
+      "timing target semantics",
+      "canonical proof/help presentation",
+      "execution bundle transport",
+      "post-genesis protocol-load barrier"
     ],
     "allowed_pre_final_evolution": [
       "bug fixes",
       "documentation",
       "tests",
-      "non-semantic ergonomics that preserve Alpha 3 transport and Alpha 2 execution contracts"
+      "measured performance work that preserves Alpha 4 authority, clock, contract and execution semantics"
     ]
   },
   "workspace_spec": "workspace/layout-v2.json",
@@ -285,5 +298,31 @@
   ],
   "invocation_surface_schema": 2,
   "parameter_resolution_schema": 1,
-  "repository_transport_schema": 1
+  "repository_transport_schema": 3,
+  "execution_bundle_schema": 1,
+  "execution_protocol_load_schema": 1,
+  "execution_bundle": {
+    "path": "bundle/EXECUTION_PROTOCOL.json",
+    "schema": 1,
+    "members": [
+      "entry/DEEP_ITERATION_ENTRY.md",
+      "core/00_RESULT_SOVEREIGNTY.md",
+      "core/05_TASK_COMMITMENT.md",
+      "core/10_INVOCATION_AND_U0.md",
+      "core/11_PARAMETER_FORMAT_AND_RESOLUTION.md",
+      "core/12_PROTOCOL_AUTHORITY_AND_SELF_HOSTING.md",
+      "core/15_SEMANTIC_DEFAULT_COMPLETION.md",
+      "core/20_EFFECTIVE_CONTRACT.md",
+      "core/25_RUN_SESSION_AND_EXTERNAL_MEMORY.md",
+      "core/30_EVOLUTION_STATE_MEMORY.md",
+      "core/35_STRATEGY_AND_CANDIDATE_STATE.md",
+      "core/40_NATIVE_EVOLUTION.md",
+      "core/50_SOURCE_EVOLUTION.md",
+      "core/60_FORMAL_ACTIVE_TIME.md",
+      "core/70_REENTRY_AND_ABG.md",
+      "core/75_DISRUPTIVE_GAMBIT.md",
+      "core/77_ISOLATION_LEVELS.md",
+      "core/80_STOP_AND_PROOF.md"
+    ]
+  }
 }

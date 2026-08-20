@@ -1,4 +1,4 @@
-"""DIGR 5.0 Alpha 3 Native Assist run session.
+"""DIGR 5.0 Alpha 4 Native Assist run session.
 
 The session is a reliability exoskeleton. It freezes authority/U0/minimum
 commitments and binds timing/evidence/state, while leaving task strategy and
@@ -17,6 +17,7 @@ from .clock_probe import ClockSnapshot,snapshot
 from .completion_state import CompletionState
 from .d_intervention import DInterventionStore,ReintegrationReceipt
 from .effective_contract import EffectiveContract,SourceContract,SourceDisposition
+from .execution_protocol import ExecutingProtocolLoadReceipt
 from .est_store import ESTStore
 from .evidence_index import EvidenceIndex
 from .evolution_events import EvolutionEventLog,EvolutionKind
@@ -69,12 +70,14 @@ def _load_contract(d)->EffectiveContract:
 class LiveDIGRRun:
     def __init__(self,run_id,startup,workspace,journal,snapshot_fn,*,restoring=False):
         self.run_id=run_id;self.startup=startup;self.workspace=workspace;self.clock_journal=journal;self._snapshot_fn=snapshot_fn
-        self.U0=None;self.contract=None;self.parameters=None;self.ledger=None
+        self.U0=None;self.contract=None;self.parameters=None;self.ledger=None;self.protocol_load=None
         if restoring:
             self.events=EvolutionEventLog.load(workspace.path('events.ndjson'))
             self.est=ESTStore.load(workspace);self.evidence=EvidenceIndex.load(workspace);self.sources=SourceWorkspaceRegistry.load(workspace)
             self.source_activity=SourceActivityLog.load(workspace.path('time/source-activity.ndjson'))
             self.strategy=StrategyStore.load(workspace);self.candidates=CandidateStore.load(workspace);self.dictator=DInterventionStore.load(workspace);self.completion=CompletionState.load(workspace);self.phase=RunPhaseStore.load(workspace)
+            if workspace.path('protocol-load.json').is_file():
+                self.protocol_load=ExecutingProtocolLoadReceipt.from_dict(workspace.read_json('protocol-load.json'))
         else:
             self.events=EvolutionEventLog(workspace.path('events.ndjson'));self.est=ESTStore(workspace);self.evidence=EvidenceIndex(workspace);self.sources=SourceWorkspaceRegistry(workspace);self.source_activity=SourceActivityLog(workspace.path('time/source-activity.ndjson'));self.strategy=StrategyStore(workspace);self.candidates=CandidateStore(workspace);self.dictator=DInterventionStore(workspace);self.completion=CompletionState(workspace);self.phase=RunPhaseStore(workspace)
             workspace.write_json('authority.json',startup.authority.to_dict(),kind='authority');workspace.write_json('invocation.json',startup.invocation.to_dict(),kind='invocation-surface');workspace.write_json('startup.json',startup.to_dict(),kind='startup')
@@ -84,7 +87,7 @@ class LiveDIGRRun:
     @classmethod
     def start(cls,authority:ProtocolAuthority,message:str,workspace_parent:Path|None=None,snapshot_fn:Callable[[],ClockSnapshot]=snapshot,run_id:str|None=None):
         surface=classify_surface(message)
-        if surface is None or surface.kind is not InvocationKind.EXECUTING:raise RunGenesisError('SURFACE','message is not an executing DIGR 5.0 Alpha2 invocation')
+        if surface is None or surface.kind is not InvocationKind.EXECUTING:raise RunGenesisError('SURFACE','message is not an executing DIGR 5.0 Alpha4 invocation')
         try: startup=start_task(authority,surface,snapshot_fn)
         except Exception as exc:raise RunGenesisError('CLOCK',str(exc)) from exc
         rid=run_id or ('digr-'+uuid.uuid4().hex);parent=Path(workspace_parent) if workspace_parent is not None else Path(tempfile.gettempdir())/'.digr-runs';ws=None
@@ -126,8 +129,35 @@ class LiveDIGRRun:
     def refresh_brief(self):
         brief=build_run_brief(self);self.workspace.write_json('state/run-brief.json',brief,kind='run-brief');return brief
 
+    def bind_protocol_load(self,receipt:ExecutingProtocolLoadReceipt)->ExecutingProtocolLoadReceipt:
+        """Bind verified full execution semantics to this born run before parameters."""
+        if self.phase.phase is not RunPhase.GENESIS:
+            raise RuntimeError('executing protocol load is only bindable at GENESIS')
+        if self.protocol_load is not None or self.workspace.path('protocol-load.json').exists():
+            raise RuntimeError('executing protocol load receipt already exists')
+        if not isinstance(receipt,ExecutingProtocolLoadReceipt):
+            raise TypeError('receipt must be ExecutingProtocolLoadReceipt')
+        ident=self.startup.authority.P_run
+        if (receipt.commit_sha!=ident.commit_sha or receipt.version!=ident.version or receipt.protocol!=ident.protocol
+                or receipt.manifest_sha256!=self.startup.authority.route.manifest_sha256):
+            raise ValueError('executing protocol load receipt does not match P_run/manifest')
+        self.protocol_load=receipt
+        self.workspace.write_json('protocol-load.json',receipt.to_dict(),kind='executing-protocol-load')
+        self.clock_journal.append('PROTOCOL_READY',self._snapshot_fn(),WorkState.META)
+        self._reindex_journals();self.refresh_brief();return receipt
+
+    def abort_protocol_load(self,reason:str):
+        """Persist a post-genesis mandatory protocol-load failure as ABORTED."""
+        if self.phase.phase is not RunPhase.GENESIS:
+            raise RuntimeError('protocol-load abort is only valid before parameter resolution')
+        text=require_nonempty_text('protocol load abort reason',reason)
+        self.clock_journal.append('PROTOCOL_LOAD_ABORT',self._snapshot_fn(),WorkState.META)
+        self._reindex_journals();self.phase.abort(text);self.refresh_brief()
+
     def resolve_parameters(self,semantic_normalizations=None)->ParameterResolution:
         if self.phase.phase is not RunPhase.GENESIS:raise RuntimeError('parameter resolution only allowed at GENESIS')
+        if self.protocol_load is None:
+            raise RuntimeError('verified executing protocol load receipt required before parameter resolution')
         r=resolve_parameter_surface(self.startup.invocation.parameter_surface,semantic_normalizations);self.parameters=r;self.workspace.write_json('parameter-resolution.json',r.to_dict(),kind='parameter-resolution')
         if r.status is ResolutionStatus.RESOLVED:self.phase.transition(RunPhase.PARAMETER_RESOLVED,'parameter surface uniquely resolved')
         else:self.phase.abort(f'parameter resolution {r.status.value}: {r.reason or "unresolved"}')
@@ -155,7 +185,7 @@ class LiveDIGRRun:
         if self.phase.phase is not RunPhase.U0_FROZEN:raise RuntimeError('freeze U0 before contract')
         if not isinstance(contract,EffectiveContract):raise TypeError('contract must be EffectiveContract')
         self._validate_contract_against_parameters(contract)
-        self.contract=contract;self.ledger=FormalTimeLedger(self.startup,hard_T=contract.B==1,hard_t=contract.S.b==1);self.workspace.write_json('contract.json',contract.to_dict(),kind='effective-contract');self.clock_journal.append('CONTRACT_FROZEN',self._snapshot_fn(),WorkState.META);self._reindex_journals();self.phase.transition(RunPhase.CONTRACT_FROZEN,'minimum commitments frozen; strategy remains mutable');self.refresh_brief()
+        self.contract=contract;self.ledger=FormalTimeLedger(self.startup,hard_T=contract.B==1,hard_t=contract.S.b==1);self.workspace.write_json('contract.json',contract.to_dict(),kind='effective-contract');self.clock_journal.append('CONTRACT_FROZEN',self._snapshot_fn(),WorkState.META);self._reindex_journals();self.phase.transition(RunPhase.CONTRACT_FROZEN,'contract commitments frozen; strategy remains mutable');self.refresh_brief()
 
     def save_strategy(self,state:StrategyState):
         # Strategy Genesis is real task work.  The run must already be in MAIN/
@@ -278,7 +308,7 @@ class LiveDIGRRun:
     def create_d_intervention(self,intervention_id:str,isolation_receipt_id:str,proposal:str,reason:str='initial gambit'):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('D intervention requires EXECUTING phase')
         if not self.strategy.has_state:raise RuntimeError('Strategy Genesis must exist before D intervention')
-        if self.contract is None or not self.contract.dictator_enabled:raise RuntimeError('D is disabled by the frozen contract')
+        if self.contract is None:raise RuntimeError('D intervention requires a frozen contract')
         out=self.dictator.create(intervention_id,isolation_receipt_id,proposal,reason);self.refresh_brief();return out
     def revise_d_proposal(self,intervention_id:str,proposal:str,reason:str):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('D proposal revision requires EXECUTING phase')

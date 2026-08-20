@@ -1,4 +1,4 @@
-"""Hash-chained semantic event receipts for DIGR 5.0 Alpha 3.
+"""Hash-chained semantic event receipts for DIGR 5.0 Alpha 4.
 
 Event receipts are deliberately thin: they bind meaningful work to the current
 run/journal/strategy/candidate/source state, but do not judge whether the idea

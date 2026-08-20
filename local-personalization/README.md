@@ -1,7 +1,5 @@
-# Local personalization files
+# ChatGPT local personalization
 
-- `CHATGPT_LOCAL_PERSONALIZATION.txt`: compact direct-copy router/transport contract.
-- `CHATGPT_LOCAL_PERSONALIZATION_FREE_GO.txt`: byte-identical compact variant for short personalization fields.
-- `CHATGPT_LOCAL_PERSONALIZATION_FULL.txt`: expanded transport reference.
+Use `CHATGPT_LOCAL_PERSONALIZATION.txt` as the primary compact router. `CHATGPT_LOCAL_PERSONALIZATION_FREE_GO.txt` is byte-identical for clients with smaller personalization surfaces. `CHATGPT_LOCAL_PERSONALIZATION_FULL.txt` explains the same router/transport contract in expanded form.
 
-These files deliberately remain thin. Alpha 3 adds only deployment-boundary requirements: an actual acquisition action before route failure, admissible mutable-ref provenance, REST ref/branch consensus, immutable raw-SHA content and Contents-wrapper normalization. All invocation/parameter/time/N/S/R/D/L/stop/proof semantics still live only in the pinned repository protocol.
+These files deliberately remain thin. Alpha 4 adds no versioned execution semantics locally. The local layer only enforces candidate routing, an actual repository acquisition attempt, admissible mutable-ref provenance, transport-specific connector/REST resolution, immutable SHA pinning, staged authority handoff and failure evidence. All invocation/parameter/time/N/S/R/D/L/stop/proof semantics still live only in the pinned repository protocol.

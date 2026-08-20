@@ -1,101 +1,156 @@
-# DIGR 5.0.0-alpha.3 Help
+# DIGR 5.0.0-alpha.4 帮助
 
-DIGR is an explicit high-investment execution mode. It is turn-scoped (non-sticky): a later message is ordinary ChatGPT unless that later message invokes DIGR again.
+DIGR（Deep Iteration GPT Runtime）是显式调用的高投入执行模式。它在单条用户消息内生效，不自动粘连到下一轮；未再次调用时，下一条消息按普通 ChatGPT 处理。
 
-## 1. Calling DIGR
+## 1. 调用与路由
+
+正式调用形式：
 
 ```text
-DIGR：<task>
-DIGR(<parameters>)：<task>
-深度迭代：<task>
-深度迭代(<parameters>)：<task>
+DIGR：<任务>
+DIGR(<参数>)：<任务>
+深度迭代：<任务>
+深度迭代(<参数>)：<任务>
 ```
 
-`DIGR` is exact uppercase ASCII. `digr`, `Digr`, etc. do not route. Chinese/ASCII parentheses, comma and colon are interchangeable in the invocation header and may be mixed. `DIGR/help` and `深度迭代/help` open this help without starting a task run.
+`DIGR` 必须是精确大写 ASCII；`digr`、`Digr` 等不触发。仅调用头中的全角/半角括号、逗号与冒号可等价规范化；任务正文保持原样。
 
-The local router intentionally captures some DIGR-prefixed discussion too. The pinned repository then returns that message to ordinary ChatGPT as NATIVE, e.g. `DIGR是什么？` or `DIGR(R=3)这种格式怎么样？`.
+`DIGR/help` 与 `深度迭代/help` 只读取当前固定版本的帮助，不建立 DIGR Run、任务时钟、U0 或执行合同。
 
-## 2. Parameters
+本地路由采用宽捕获。某些以 DIGR 开头但并非执行调用的讨论，会在取得当前固定仓库启动协议后被分类为 `NATIVE`，并将原始消息交还普通 ChatGPT；例如“DIGR是什么？”不是执行任务。
 
-| Parameter | Meaning | Default when omitted |
+## 2. 参数解析顺序与缺省规则
+
+公开参数顺序为：
+
+```text
+N < T < R < B < S < D < L
+```
+
+`S` 内部顺序为：
+
+```text
+n < t < r < b
+```
+
+缺省处理分两层，顺序固定：
+
+1. 先应用三个确定性缺省：`B=0`、`b=0`、`L(1)`；
+2. 再由原生模型结合 U0 与全部已给参数，对缺失的 `N/T/R/n/t/r/s` 做语义补全；
+3. 形成并冻结本轮 Effective Contract。冻结的是本轮承诺，不冻结策略。
+
+因此：
+
+- 显式 `T>0` 而省略 B：B 固定为 0，T 是 soft target；
+- 显式 `B=1` 而省略 T：T 仍必须按任务规模语义补全，补全结果成为 hard lower bound；
+- `t/b` 同理；
+- 裸数字永远不能被猜成 T/t 的时间单位。
+
+参数映射必须唯一。省略字段不会让后续参数任意左移；若无法得到唯一映射，则调用为 AMBIGUOUS/INVALID，不得擅自猜测。
+
+## 3. 参数参考
+
+| 参数 | 语义 | 省略时 |
 |---|---|---|
-| N | minimum meaningful MAIN evolutions | semantic completion |
-| T | Formal Active Task Time target | semantic completion |
-| R | minimum whole-process candidate re-entries | semantic completion |
-| B | T policy: 0 soft / 1 hard | 0 |
-| S(n,t,r,b) | source-research evolution / aggregate source time / source re-entry / t policy | n/t/r semantic completion, b=0 |
-| D(s) | minimum completed disruptive-gambit interventions | s semantic completion |
-| L(e) | D isolation implementation target | L1 |
+| `N` | MAIN 最少有效进化次数 | 语义补全 |
+| `T` | Formal Active Task Time 目标 | 语义补全 |
+| `R` | MAIN 候选结果最少整体重入次数 | 语义补全 |
+| `B` | T 时间政策：0 soft / 1 hard | `0` |
+| `S(n,t,r,b)` | 来源进化下限 / 来源有效时间目标 / 来源重入下限 / t 时间政策 | n/t/r 语义补全，b=`0` |
+| `D(s)` | 最少完成并重新整合的 D intervention 数 | 语义补全 |
+| `L(e)` | D 隔离实现目标，`e∈{1,2,3}` | `L(1)` |
 
-N/T/R/n/t/r/s are minimums, not caps. Meeting them does not force an early stop if result quality can still materially improve.
+`N/R/n/r/D` 是无条件下限而非上限。`T/t` 是时间目标：当 `B/b=0` 时为 soft target；当 `B/b=1` 时升级为必须由可信时钟事实证明达到的 hard lower bound。达到任何下限或目标都不自动迫使停止；Result Sovereignty 仍要求判断继续工作是否还能实质改善结果。
 
-## 3. Format, omission and ambiguity
+`S`、`S()`、`D`、`D()`、`L`、`L()` 都是合法标记。`S()` 表示 n/t/r 留给语义补全且 b=0；`D()` 表示 s 留给语义补全；`L()` 表示 L1。
 
-Canonical relative order is `N,T,R,B,S,D,L`; inside S it is `n,t,r,b`. Omitted fields do not reorder what remains. T/t must contain recognizable duration semantics; a bare number can **never** be invented into minutes/seconds.
-
-`S`, `S()`, `D`, `D()`, `L`, `L()` are valid markers. Empty S leaves n/t/r to semantic completion and fixes b=0; empty D leaves s to semantic completion; empty L means L1.
-
-Examples:
+边界示例：
 
 ```text
-DIGR(1,1)：task                 # valid -> N=1, R=1; T omitted
-DIGR(1)：task                   # ambiguous -> no unique N vs R mapping
-DIGR(1,1,1)：task               # invalid -> middle item would have to be T but has no time unit
-DIGR(1,10min,1)：task           # valid -> N=1, T=10min, R=1
-DIGR(1,10min,1,S())：task       # valid; S numeric minima omitted
-DIGR(1,1,S,D,L)：task           # valid strong markers
-DIGR（1,10min,1)：task          # valid mixed punctuation
-DIGR是什么？                    # not an invocation; returned to native ChatGPT
+DIGR(1,1)：任务
+# 唯一映射为 N=1，R=1；T 省略
+
+DIGR(1)：任务
+# 单个裸计数在 N/R 之间歧义
+
+DIGR(1,10min,1,S())：任务
+# N=1，T=10min，R=1；S 的 n/t/r 语义补全，b=0
 ```
 
-If the outer shell is clearly EXECUTING, DIGR establishes trusted Clock Genesis **before** resolving the inside parameters. An ambiguous/invalid parameter set then aborts that born run without starting task analysis.
+## 4. Effective Contract 与来源策略
 
-## 4. What execution does
+EXECUTING 调用先建立可信 Clock Genesis，再做参数解析、U0 冻结与合同形成。Effective Contract 包含显式参数、确定性缺省、语义补全结果、SourceDisposition、L 目标及用户硬约束。
 
-A successful run follows this conceptual chain:
+正常执行的 `SourceDisposition` 默认为 `REQUIRED`。只有 U0 或宿主现实给出明确理由时才可 `WAIVED`，例如用户禁止外部来源、任务是封闭变换且外部材料确实无关，或宿主没有任何外部通道。“模型已经知道答案”不能作为 waiver。
+
+`S(0,0s,0,0)` 只把 S 的数值下限/时间目标降到零，不会自动关闭来源研究。真实 S actual 必须绑定 SourceWorkspace、SOURCE 时钟状态与语义 source evolution/re-entry 证据。
+
+## 5. N / R / D / L
+
+`N` 计数的是有实质变化的 MAIN evolution，不是机械改写次数。
+
+`R` 是把已有候选结果重新送回整个解决过程接受独立挑战，可挑战候选、任务表示、策略、分解、证据、来源计划、工具路线或验证方法。经过实质挑战后保留原候选是允许的，但必须有对应 re-entry 证据。
+
+`D(s)` 中的 s 是最少完成次数。`D(0)` 仅表示“没有必须完成的 D 下限”，**不禁止**模型在结果质量需要时主动执行 D；实际 completed D 可以大于目标。
+
+L 始终区分三个事实：
+
+- `L_target`：合同请求的隔离目标；
+- `L_cap`：宿主有证据支持的最高能力；
+- `L_actual`：某次 D isolation receipt 实际采用的等级。
+
+L1/L2/L3 分别表示语义隔离、受控上下文/信息包隔离、独立 agent 生命周期隔离。能力不能自动升级为 actual。若本轮没有 completed D，proof 中 L actual 可以保持 `?`；若实际完成了 D，则 L 按 intervention-linked receipts 正常判定。L mismatch 默认可见但不普遍阻断交付；只有 U0 明确把精确 L 设为硬交付条件时才成为 stop gate。
+
+## 6. 时间与停止
+
+Formal Active Time 只记录有效主动工作：
+
+- `T = MAIN + SOURCE`；
+- `t = SOURCE`；
+- `META`、`IDLE`、exclusive D 不计入 T/t；
+- 并行来源共享同一 SOURCE 时间并集，不重复累加。
+
+等待、sleep、重复查询、日志、机械重写或纯工具排队不得拿来填充 T/t。
+
+`B=1` / `b=1` 时，只有完整相关区间都具有可验证的单调时钟连续性，才允许声明对应 hard target 已达到；无法可靠证明时 actual 使用 `?`，不得估算或补齐。跨进程/会话恢复必须重新证明连续性，未知间隔不计为任务时间。
+
+停止要求同时考虑机械合同与结果质量。满足机械条件只打开停止资格，不自动命令结束。
+
+## 7. 执行链与启动成本
+
+一次 EXECUTING 调用的规范顺序是：
 
 ```text
-pinned repository authority
-→ minimal startup classification
-→ trusted clock genesis
-→ parameter resolution + U0
-→ frozen minimum contract
-→ MAIN / revisable Strategy Genesis
-↔ N evolution
-↔ source S research (normally presumed required)
-↔ candidate-backed R re-entry
-↔ optional D non-local intervention under L isolation
-→ completion/open-gap assessment
-→ timing + workspace verification
-→ result + compact proof
+当前仓库 authority → immutable P_run
+→ startup slice 分类
+→ trusted Clock Genesis
+→ 同 SHA execution bundle / 完整 entrypoint+core 验证
+→ ExecutingProtocolLoadReceipt
+→ 参数解析 + U0
+→ Effective Contract freeze
+→ MAIN / Strategy Genesis
+↔ N / S / R / 可选 D-L
+→ 完成度与开放问题检查
+→ timing / workspace 验证
+→ 结果 + canonical proof
 ```
 
-Only P_run, U0, user hard constraints and contract minimums are frozen. Strategy is explicitly mutable: new evidence, failed tests, R, S or D can redirect the task model, decomposition, research/tool/validation plan and assumptions. The runtime records this state but never scores routes or chooses the model's next thought.
+仓库 pin、启动切片、完整执行协议验证、参数/合同建立与 META 验证属于高投入模式的启动/可靠性成本，不应为了缩短墙钟时间而绕过；当前版本用一个确定性 execution bundle 聚合传输逻辑上的 entrypoint+core，以减少仓库往返而不减少协议内容。完整协议验证失败会终止已经出生的 Run，且这些启动成本不会被伪装成 T/t 正式任务时间。
 
-S means external information broadly: web, official docs, code/repository, files, data, papers, community material, tools and test results. Normal DIGR runs presume a real source strategy unless U0 or host reality justifies an explicit source waiver. `S(0,0s,0,0)` lowers numeric minimums; it does not itself disable research.
+## 8. 输出与 canonical proof
 
-R is a whole-process re-entry into an existing candidate, not a final proofreading pass. It may challenge the candidate, representation, strategy, decomposition, evidence, source plan, tool route or validation method; after a substantive independent challenge, retaining the original candidate is allowed.
-
-D is a disruptive non-local intervention. Its proposal can evolve until Decree; completion requires execution/result evidence and reintegration into Main. L1/L2/L3 describe the isolation actually used for D, separately from what the host is capable of.
-
-## 5. Time and stopping
-
-T counts useful MAIN+SOURCE active time; t counts SOURCE only. META/IDLE and exclusive D do not count. Background isolated D does not count T/t while Main may continue independently.
-
-B=1 or b=1 makes the corresponding time a hard lower bound. Hard elapsed time is claimed only with verifiable monotonic continuity; after a process boundary, equal non-empty boot identity is required. If continuity cannot be proved, DIGR uses `?` rather than guessing.
-
-Padding is forbidden: waiting, sleeping, repeated searches, logging and mechanical rewrites do not become useful task time. Reaching all minimums only opens the stop gate; Result Sovereignty still asks whether more useful work would materially improve the result.
-
-L mismatch is reported honestly. It blocks delivery only when the user's U0 explicitly makes the requested isolation mode mandatory. With D(0), L is non-blocking because no D intervention exists to isolate.
-
-## 6. Return format
-
-The task result comes first. The final line is a compact run proof using the existing DIGR proof shape, conceptually:
+正常回答先给任务结果，最后只附一行紧凑 canonical proof：
 
 ```text
-DIGR(N/actualN, T/actualT, R/actualR, B,
-     S_i(n/actualn, t/actualt, r/actualr, b),
-     D(s)/D(actuals), L(e)/L(actuale))
+DIGR(N_target/N_actual, T_target/T_actual, R_target/R_actual, B,
+     S_i(n_target/n_actual, t_target/t_actual, r_target/r_actual, b),
+     D(target)/D(actual), L(target)/L(actual))
 ```
 
-`?` means an actual value cannot be reliably verified. The normal response does not dump Strategy/EST, hidden reasoning, query logs, clock journal, schemas or repository audit files.
+`?` 表示该 actual 无法可靠验证。用户可见 proof 必须遵守 canonical renderer 语义：actual duration 向下取整到完整秒，不输出内部纳秒值或未经规范化的浮点秒；B/b=1 且 hard verification 不成立时，对应 actual time 必须显示 `?`。
+
+正常回答不倾倒隐藏推理、Strategy/EST、查询日志、clock journal、schema 或仓库审计文件。
+
+## 9. 版本与权威
+
+本帮助属于当前 pinned `P_run` 的用户级参考。具体仓库提交 SHA、manifest/VERSION 一致性与启动路径由本轮 repository authority 负责验证；帮助文本本身不替代版本化执行协议。

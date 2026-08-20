@@ -1,4 +1,4 @@
-"""Deterministic parameter-format resolution for DIGR 5.0 Alpha 3.
+"""Deterministic parameter-format resolution for DIGR 5.0 Alpha 4.
 
 This module is deliberately *not* a workload planner.  It resolves only the
 structural part of an already-routed EXECUTING invocation:

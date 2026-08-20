@@ -1,6 +1,6 @@
 # Run Session Architecture v2
 
-RunPhase is the authoritative lifecycle: GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → FINISHED, with ABORTED available from nonterminal phases. It validates legal persistence/lifecycle operations only; it does not choose task strategy. CONTRACT_FROZEN cannot skip directly to FINALIZING: real task work begins in MAIN/EXECUTING.
+RunPhase is the authoritative lifecycle: GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → FINISHED, with ABORTED available from nonterminal phases. It validates legal persistence/lifecycle operations only; it does not choose task strategy. CONTRACT_FROZEN cannot skip directly to FINALIZING: real task work begins in MAIN/EXECUTING. GENESIS also requires a verified `ExecutingProtocolLoadReceipt` before parameter resolution; this is a readiness barrier, not a new planning phase. Protocol-load failure after Clock Genesis persists ABORTED.
 
 `LiveDIGRRun` owns thin semantic wrappers for event receipts, SOURCE transitions with active-S binding, D packet/isolation/execution/reintegration binding, final timing parity and recovery/resume. Strategy/Candidate/EST/Source/D/Completion stores remain explicit and revisioned.
 

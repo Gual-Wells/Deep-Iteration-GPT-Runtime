@@ -1,30 +1,26 @@
-# Routing Transport Contract v3
+# Routing Contract
 
-Candidate match remains version-neutral: remove leading whitespace only, then exact uppercase `DIGR` or exact `深度迭代`; the remainder is unvalidated locally.
+The local layer is a broad candidate router plus repository-authority handoff. It never redefines DIGR execution semantics.
 
-## Acquisition is an observable precondition
+## Candidate capture
 
-A candidate route MUST cause an actual repository acquisition action before any user-visible reply or task-level interpretation. Merely knowing the fixed failure string, remembering an earlier SHA, or assuming the network/tool is unavailable is not a route attempt. The fixed route-failure response is admissible only after current-turn acquisition evidence exists and a mandatory stage still fails, conflicts, or has inadmissible provenance.
+After removing leading whitespace only, exact uppercase ASCII `DIGR` or exact `深度迭代` is a route candidate. The remainder is deliberately not interpreted locally. The pinned startup surface decides NATIVE/HELP/INVALID/EXECUTING.
 
-## Mutable `stable` is the only freshness-sensitive step
+## Actual acquisition before failure
 
-Search results, snippets, crawled/indexed GitHub HTML and conversation memory are not ref authority. A connected GitHub repository connector that directly resolves the current branch head is admissible. Direct REST acquisition uses both:
+A candidate must cause a real repository acquisition action before any user-visible route result. No-attempt is not acquisition failure. Search results, snippets, crawled/indexed GitHub pages and remembered results are inadmissible mutable-ref authority.
 
-- `GET /repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/stable`
-- `GET /repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/stable`
+## `stable → SHA`
 
-Both observations must identify the same full 40-hex commit SHA. Disagreement fails closed. The standard-library `UrllibDirectFetcher` asks intermediaries to revalidate mutable requests with `Cache-Control: no-cache` and `Pragma: no-cache`; this is transport hardening, not a claim that an external CDN has zero propagation delay.
+Two transport modes are valid:
 
-## Immutable pinned resources
+1. **Already-connected GitHub repository connector:** read the repository `stable` branch resource and accept its current full 40-hex HEAD SHA. No Git-ref endpoint is additionally required in connector mode.
+2. **Direct REST client:** read both the Branches endpoint and Git-ref endpoint during the same route attempt and require the same full 40-hex commit SHA. Disagreement fails closed.
 
-After the SHA is accepted, every later read uses that SHA. Primary pinned transport is the immutable raw URL:
+The standard-library direct fetcher requests cache revalidation on mutable REST reads. This is transport hardening, not a claim of mathematical zero-latency propagation.
 
-`https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}`
+## Pinned authority
 
-A GitHub Contents API fallback is allowed only at the same SHA. It requests `application/vnd.github.raw+json`; if a host still returns the ordinary JSON file object, `runtime/repository_transport.py` decodes its base64 `content` field before routing validators consume the bytes. The Alpha 2 ambiguity—Contents wrapper JSON passed to raw-byte loaders—is therefore closed.
+Bind pinned `manifest.json` and `VERSION`, require version equality, then follow only manifest-declared paths. A manifest with `startup_slice` loads only that slice before repository surface classification. NATIVE/HELP avoid unnecessary full protocol loading; EXECUTING follows the pinned startup rules, crosses Clock Genesis, then acquires the manifest-declared same-SHA execution bundle when present (otherwise logical entry/core individually). The verified bundle members remain the entry/core authority and produce the receipt required before parameter resolution. Legacy manifests without staged startup retain their own navigation.
 
-## Staged authority
-
-Bind pinned `manifest.json` and `VERSION`, require version equality, then follow only manifest-declared paths. A manifest with `startup_slice` loads only that slice before repository surface classification. NATIVE/HELP avoid unnecessary full protocol loading; EXECUTING follows the pinned startup rules and only then loads entry/core from the same SHA. Legacy manifests without staged startup retain their own navigation.
-
-Routing/transport failure is not DIGR execution and never authorizes reconstruction from Memory, conversation history or an old local protocol copy.
+The fixed route-failure response is allowed only after actual acquisition evidence exists and a mandatory current-stage resource still fails, conflicts or has inadmissible provenance.

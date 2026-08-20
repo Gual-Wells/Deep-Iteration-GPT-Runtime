@@ -1,6 +1,6 @@
-# DIGR 5.0 Alpha 3 Architecture
+# DIGR 5.0 Alpha 4 Architecture
 
-Alpha 3 separates five planes. Alpha 2 already separated the execution/state planes; Alpha 3 makes the previously implicit host-transport plane explicit.
+Alpha 4 separates five planes. Alpha 2 already separated the execution/state planes; Alpha 4 makes the previously implicit host-transport plane explicit.
 
 1. **Host repository transport:** actual direct acquisition → mutable `stable` corroboration → immutable pinned bytes + attempt receipts.
 2. **Transport/authority verification:** candidate route → pinned manifest/VERSION → startup/full protocol discovery.
@@ -24,7 +24,7 @@ The first three are deterministic reliability boundaries. The fourth belongs to 
 - Authoritative stores own state; Run Brief is derived and may be regenerated.
 
 ## Mutable versus frozen
-Frozen: `P_run`, U0, user hard constraints, Effective Contract minima.
+Frozen: `P_run`, U0, user hard constraints, Effective Contract commitments (count/D minima plus B/b-governed T/t targets).
 Revisionable: task model, decomposition, routes, source/validation/tool strategies, assumptions/risks, candidates, source objectives/directions, D proposals before decree, completion gaps and EST.
 
 This distinction remains the defense against turning the exoskeleton into a workflow that traps GPT in its initial plan.

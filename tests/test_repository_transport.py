@@ -20,26 +20,48 @@ from runtime.routing import (
     content_api_url,
 )
 from runtime.protocol_pin import raw_file_url
+from runtime.protocol_authority import authority_from_route_bytes
+from runtime.run_session import LiveDIGRRun
+from runtime.run_lifecycle import RunPhase
+from tests.helpers import FakeClock
 
 SHA='a'*40
 OTHER='b'*40
 MANIFEST={
-    'version':'5.0.0-alpha.3',
+    'version':'5.0.0-alpha.4',
     'protocol':'digr-v5.0',
     'bootstrap_entry':'bootstrap/BOOTSTRAP.md',
     'entrypoint':'entry/DEEP_ITERATION_ENTRY.md',
     'core':['core/00_RESULT_SOVEREIGNTY.md'],
     'help':'entry/HELP.md',
     'startup_slice':['bootstrap/BOOTSTRAP.md','entry/STARTUP.md'],
+    'execution_bundle':{
+        'path':'bundle/EXECUTION_PROTOCOL.json','schema':1,
+        'members':['entry/DEEP_ITERATION_ENTRY.md','core/00_RESULT_SOVEREIGNTY.md'],
+    },
 }
 MANIFEST_BYTES=(json.dumps(MANIFEST,separators=(',',':'))+'\n').encode()
-VERSION=b'5.0.0-alpha.3\n'
+VERSION=b'5.0.0-alpha.4\n'
+LOGICAL={
+    'entry/DEEP_ITERATION_ENTRY.md':b'# entry\n',
+    'core/00_RESULT_SOVEREIGNTY.md':b'# core\n',
+}
+BUNDLE_BYTES=(json.dumps({
+    'schema_version':1,'version':'5.0.0-alpha.4','protocol':'digr-v5.0',
+    'members':[
+        {'path':p,'sha256':__import__('hashlib').sha256(b).hexdigest(),'byte_length':len(b),'content':b.decode()}
+        for p,b in LOGICAL.items()
+    ],
+},sort_keys=True,separators=(',',':'))+'\n').encode()
 FILES={
     'manifest.json':MANIFEST_BYTES,
     'VERSION':VERSION,
     'bootstrap/BOOTSTRAP.md':b'# boot\n',
     'entry/STARTUP.md':b'# startup\n',
+    **LOGICAL,
+    'bundle/EXECUTION_PROTOCOL.json':BUNDLE_BYTES,
 }
+
 
 
 def direct(url,body,status=200,mutable=False):
@@ -87,7 +109,7 @@ class TestRepositoryTransport(unittest.TestCase):
         self.assertEqual(bundle.resolution.commit_sha,SHA)
         self.assertEqual(bundle.version_bytes,VERSION)
         self.assertEqual(tuple(p for p,_ in bundle.startup_files),('bootstrap/BOOTSTRAP.md','entry/STARTUP.md'))
-        self.assertEqual([r.purpose for r in bundle.attempts[:2]],['stable_ref_primary','stable_ref_corroboration'])
+        self.assertEqual([r.purpose for r in bundle.attempts[:2]],['stable_branch_primary_r1','stable_ref_corroboration_r1'])
         self.assertTrue(all(r.success for r in bundle.attempts))
         self.assertTrue(route_failure_permitted(bundle.attempts))
 
@@ -103,8 +125,24 @@ class TestRepositoryTransport(unittest.TestCase):
         with self.assertRaises(RouteAcquisitionError) as cm:
             s.acquire_startup('DIGR/help')
         self.assertTrue(route_failure_permitted(cm.exception.receipts))
-        self.assertEqual(cm.exception.receipts[0].purpose,'stable_ref_primary')
+        self.assertEqual(cm.exception.receipts[0].purpose,'stable_branch_primary_r1')
         self.assertFalse(cm.exception.receipts[0].success)
+
+
+    def test_connected_connector_uses_branch_head_without_ref_endpoint(self):
+        class ConnectorFetcher(FakeFetcher):
+            def __init__(self):
+                super().__init__(source_kind='github_connector')
+            def __call__(self,req):
+                if req.url==AUTHORITATIVE_REF_API_URL:
+                    raise AssertionError('connector mode must not require Git-ref endpoint')
+                return super().__call__(req)
+        f=ConnectorFetcher();s=RepositoryTransportSession(f)
+        b=s.acquire_startup('DIGR/help')
+        self.assertEqual(b.resolution.commit_sha,SHA)
+        self.assertEqual(b.resolution.source_url,AUTHORITATIVE_BRANCH_API_URL)
+        self.assertEqual(b.attempts[0].purpose,'stable_branch_primary_r1')
+        self.assertFalse(any(r.purpose.startswith('stable_ref_corroboration') for r in b.attempts))
 
     def test_ref_branch_disagreement_fails_closed(self):
         s=RepositoryTransportSession(FakeFetcher(branch_sha=OTHER))
@@ -112,6 +150,59 @@ class TestRepositoryTransport(unittest.TestCase):
             s.resolve_stable()
         self.assertEqual(cm.exception.receipts[-1].purpose,'stable_ref_consensus')
         self.assertIn('mismatch',cm.exception.receipts[-1].failure)
+
+    def test_execution_protocol_uses_one_bundle_fetch_after_startup(self):
+        f=FakeFetcher(source_kind='github_connector');s=RepositoryTransportSession(f)
+        startup=s.acquire_startup('DIGR：x')
+        before=len(f.requests)
+        protocol=s.acquire_execution_protocol(startup)
+        after=f.requests[before:]
+        self.assertEqual(protocol.receipt.source_mode,'bundle')
+        self.assertEqual(protocol.receipt.member_paths,('entry/DEEP_ITERATION_ENTRY.md','core/00_RESULT_SOVEREIGNTY.md'))
+        self.assertEqual(len(after),1)
+        self.assertIn('/bundle/EXECUTION_PROTOCOL.json',after[0].url)
+
+    def test_execution_bundle_corruption_fails_closed(self):
+        class Corrupt(FakeFetcher):
+            def __call__(self,req):
+                r=super().__call__(req)
+                if req.url.endswith('/bundle/EXECUTION_PROTOCOL.json'):
+                    bad=json.loads(r.body.decode());bad['members'][0]['content']='tampered\n'
+                    return TransportResponse(req.url,200,json.dumps(bad).encode(),self.source_kind,r.freshness)
+                return r
+        sess=RepositoryTransportSession(Corrupt(source_kind='github_connector'));startup=sess.acquire_startup('DIGR：x')
+        with self.assertRaises(RouteAcquisitionError) as cm:
+            sess.acquire_execution_protocol(startup)
+        self.assertEqual(cm.exception.receipts[-1].purpose,'execution_bundle_validation')
+
+    def test_direct_rest_consensus_allows_one_bounded_retry(self):
+        class Racing(FakeFetcher):
+            def __init__(self): super().__init__();self.branch_reads=0
+            def __call__(self,req):
+                if req.url==AUTHORITATIVE_BRANCH_API_URL:
+                    self.requests.append(req);self.branch_reads+=1
+                    sha=OTHER if self.branch_reads==1 else SHA
+                    body=json.dumps({'name':'stable','commit':{'sha':sha}}).encode()
+                    return TransportResponse(req.url,200,body,'direct_https',FRESHNESS_LIVE_DIRECT)
+                return super().__call__(req)
+        sess=RepositoryTransportSession(Racing())
+        self.assertEqual(sess.resolve_stable().commit_sha,SHA)
+        self.assertEqual(sum(r.purpose.startswith('stable_branch_primary') for r in sess.receipts),2)
+
+    def test_standard_post_genesis_bridge_aborts_when_bundle_cannot_load(self):
+        class BrokenBundle(FakeFetcher):
+            def __call__(self,req):
+                if 'bundle/EXECUTION_PROTOCOL.json' in req.url:
+                    self.requests.append(req)
+                    freshness=FRESHNESS_IMMUTABLE
+                    return TransportResponse(req.url,503,b'',self.source_kind,freshness)
+                return super().__call__(req)
+        f=BrokenBundle(source_kind='github_connector');sess=RepositoryTransportSession(f);startup=sess.acquire_startup('DIGR：x')
+        authority=authority_from_route_bytes(startup.route_receipt,startup.manifest_bytes,startup.version_bytes)
+        with __import__('tempfile').TemporaryDirectory() as td:
+            run=LiveDIGRRun.start(authority,'DIGR：x',__import__('pathlib').Path(td),FakeClock(),run_id='digr-12345678')
+            with self.assertRaises(RouteAcquisitionError):sess.load_execution_protocol_for_run(run,startup)
+            self.assertEqual(run.phase.phase,RunPhase.ABORTED)
 
     def test_contents_base64_wrapper_is_decoded(self):
         payload=json.dumps({'type':'file','path':'VERSION','encoding':'base64','content':base64.b64encode(VERSION).decode()}).encode()
@@ -140,7 +231,7 @@ class TestRepositoryTransport(unittest.TestCase):
         sess=RepositoryTransportSession(BadRef())
         with self.assertRaises(RouteAcquisitionError) as cm:
             sess.resolve_stable()
-        self.assertEqual(cm.exception.receipts[-1].purpose,'stable_ref_primary_validation')
+        self.assertEqual(cm.exception.receipts[-1].purpose,'stable_ref_corroboration_validation_r1')
         self.assertTrue(route_failure_permitted(cm.exception.receipts))
 
     def test_manifest_version_integrity_error_is_route_acquisition_error(self):

@@ -1,4 +1,4 @@
-"""Canonical compact DIGR 5.0.0-alpha.3 proof renderer.
+"""Canonical compact DIGR 5.0.0-alpha.4 proof renderer.
 
 Hard actual duration is visible only when the ProofData itself carries a true
 hard-verification fact.  This prevents callers from smuggling an observed but

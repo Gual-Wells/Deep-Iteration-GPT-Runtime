@@ -1,4 +1,4 @@
-"""Version-semantic-free repository routing helpers for DIGR 5.0.0-alpha.3.
+"""Version-semantic-free repository routing helpers for DIGR 5.0.0-alpha.4.
 
 The router performs only candidate response, exact GitHub location, immutable
 pinning metadata, manifest/VERSION integrity, and manifest-declared path
@@ -69,7 +69,7 @@ class RefResolution:
     source_url: str = AUTHORITATIVE_REF_API_URL
 
     def __post_init__(self):
-        if self.source_url != AUTHORITATIVE_REF_API_URL:
+        if self.source_url not in (AUTHORITATIVE_REF_API_URL, AUTHORITATIVE_BRANCH_API_URL):
             raise ValueError('unexpected ref source URL')
         if self.ref != 'refs/heads/stable':
             raise ValueError('unexpected GitHub ref')
@@ -94,6 +94,32 @@ def ref_resolution_from_github_payload(payload: Mapping[str, Any] | bytes) -> Re
         ref=require_nonempty_text('ref', payload.get('ref')),
         object_type=require_nonempty_text('object.type', obj.get('type')),
         commit_sha=require_nonempty_text('object.sha', obj.get('sha')),
+    )
+
+
+def ref_resolution_from_branch_payload(payload: Mapping[str, Any] | bytes) -> RefResolution:
+    """Validate GitHub's stable branch resource as a current-head resolution.
+
+    This is the canonical connector path: repository connectors commonly expose
+    branch resources even when arbitrary Git-ref REST endpoints are unavailable.
+    """
+    if isinstance(payload, (bytes, bytearray)):
+        try:
+            payload = json.loads(bytes(payload).decode('utf-8'))
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ValueError('GitHub branch response is not valid UTF-8 JSON') from exc
+    if not isinstance(payload, Mapping):
+        raise TypeError('GitHub branch response must be a mapping or bytes')
+    if payload.get('name') != 'stable':
+        raise ValueError('GitHub branch response is not stable')
+    commit = payload.get('commit')
+    if not isinstance(commit, Mapping):
+        raise ValueError('GitHub branch response missing commit')
+    return RefResolution(
+        ref='refs/heads/stable',
+        object_type='commit',
+        commit_sha=require_nonempty_text('commit.sha', commit.get('sha')),
+        source_url=AUTHORITATIVE_BRANCH_API_URL,
     )
 
 
@@ -169,6 +195,8 @@ class DiscoveryPlan:
     help_path: str | None
     startup_slice: tuple[str, ...]
     legacy_manifest: bool
+    execution_bundle_path: str | None = None
+    execution_bundle_schema: int | None = None
 
     def __post_init__(self):
         if self.bootstrap_entry is not None:
@@ -186,6 +214,12 @@ class DiscoveryPlan:
             raise ValueError('startup_slice contains duplicate paths')
         if not isinstance(self.legacy_manifest, bool):
             raise TypeError('legacy_manifest must be bool')
+        if self.execution_bundle_path is not None:
+            object.__setattr__(self,'execution_bundle_path',validate_repo_path(self.execution_bundle_path))
+            if self.execution_bundle_schema != 1:
+                raise ValueError('unsupported execution bundle schema')
+        elif self.execution_bundle_schema is not None:
+            raise ValueError('execution_bundle_schema requires execution_bundle_path')
 
     @property
     def staged_startup(self) -> bool:
@@ -213,7 +247,16 @@ class DiscoveryPlan:
 
     @property
     def post_startup_paths(self) -> tuple[str, ...]:
-        return self.full_protocol_paths if self.startup_slice else ()
+        """Physical acquisitions needed after staged classification.
+
+        A manifest-declared execution bundle transports the logical entrypoint/core
+        in one immutable read.  Older manifests fall back to individual files.
+        """
+        if not self.startup_slice:
+            return ()
+        if self.execution_bundle_path is not None:
+            return (self.execution_bundle_path,)
+        return self.full_protocol_paths
 
     @property
     def authority_paths(self) -> tuple[str, ...]:
@@ -240,6 +283,8 @@ class DiscoveryPlan:
             'staged_startup': self.staged_startup,
             'initial_paths': list(self.initial_paths),
             'post_startup_paths': list(self.post_startup_paths),
+            'execution_bundle_path': self.execution_bundle_path,
+            'execution_bundle_schema': self.execution_bundle_schema,
             'optional_paths': list(self.optional_paths),
         }
 
@@ -267,7 +312,7 @@ def validate_manifest_routing_metadata(manifest: Mapping[str, Any]) -> bool:
         'content_api_template': CONTENT_API_TEMPLATE,
         'pinned_raw_template': PINNED_RAW_TEMPLATE,
         'content_raw_media_type': 'application/vnd.github.raw+json',
-        'mutable_ref_policy': 'direct_live_ref_plus_branch_consensus; search_index_forbidden; attempt_required_before_failure',
+        'mutable_ref_policy': 'connector_branch_head_or_direct_rest_branch_ref_consensus; search_index_forbidden; attempt_required_before_failure',
     }
     for key, value in expected.items():
         if meta.get(key) != value:
@@ -301,7 +346,22 @@ def discovery_plan_from_manifest(manifest: Mapping[str, Any]) -> DiscoveryPlan:
     startup = tuple(validate_repo_path(x) for x in raw_startup)
     if startup and boot is not None and boot not in startup:
         raise ValueError('bootstrap_entry must be included in startup_slice')
-    return DiscoveryPlan(boot, entry, core, help_path, startup, boot is None)
+    bundle_path=None;bundle_schema=None
+    bundle=manifest.get('execution_bundle')
+    if bundle is not None:
+        if not isinstance(bundle,Mapping):
+            raise ValueError('manifest execution_bundle must be an object')
+        bundle_path=validate_repo_path(bundle.get('path'))
+        bundle_schema=bundle.get('schema')
+        raw_members=bundle.get('members')
+        if not isinstance(raw_members,Sequence) or isinstance(raw_members,(str,bytes)):
+            raise ValueError('manifest execution_bundle members must be a sequence')
+        members=tuple(validate_repo_path(x) for x in raw_members)
+        if members != tuple(dict.fromkeys((entry,*core))):
+            raise ValueError('execution_bundle members must exactly match entrypoint/core order')
+        if not startup:
+            raise ValueError('execution_bundle requires staged startup')
+    return DiscoveryPlan(boot, entry, core, help_path, startup, boot is None, bundle_path, bundle_schema)
 
 
 def load_manifest_for_route(route: RouteReceipt, data: bytes) -> dict[str, Any]:
