@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/audit-log-event.schema.json",
+  "title": "DIGR Berta1 user-facing audit log event",
+  "type": "object",
+  "required": ["schema_version", "parameter", "event", "details"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "parameter": {"enum": ["N", "T", "R", "B", "S", "D", "V", "L"]},
+    "event": {"type": "string", "minLength": 1},
+    "details": {"type": "object"}
+  },
+  "additionalProperties": false
+}

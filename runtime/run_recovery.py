@@ -1,4 +1,4 @@
-"""Comprehensive DIGR 5.0 Alpha 4 workspace integrity/recovery verification.
+"""Comprehensive DIGR 5.0.0-Berta1 workspace verification and recovery.
 
 Verification proves persisted structure and cross-store bindings.  It deliberately
 separates *workspace integrity* from *future clock continuity*: LiveDIGRRun.resume
@@ -14,6 +14,12 @@ from .candidate_store import CandidateStore
 from .clock_journal import ClockJournal, derive_work_intervals
 from .completion_state import CompletionState
 from .d_intervention import DInterventionStore
+from .delivery import (
+    CAPABILITY_NEGOTIATION_PATH,
+    DELIVERY_ENVELOPE_PATH, DELIVERY_PAYLOAD_PATH, DELIVERY_PROOF_PATH,
+    DELIVERY_SUMMARY_PATH, PREFLIGHT_RECEIPT_PATH, DeliveryEnvelope,
+    verify_delivery_artifacts,verify_enforced_host_delivery_authority,
+)
 from .effective_contract import EffectiveContract, SourceContract, SourceDisposition
 from .execution_protocol import ExecutingProtocolLoadReceipt
 from .est_store import ESTStore
@@ -22,10 +28,13 @@ from .evolution_events import EvolutionEventLog, EvolutionKind
 from .interval_ledger import WorkState
 from .run_brief import verify_run_brief
 from .run_lifecycle import RunPhase, RunPhaseStore
+from .proof import proof_data_from_contract_actuals
 from .source_workspace import SourceActivityLog, SourceWorkspaceRegistry
 from .stop_checks import ContractActuals, check_mechanical_minima
 from .strategy_store import StrategyStore
 from .workspace import RunWorkspace, validate_run_id
+from .exclusive_activity import ExclusiveActivityLog
+from .viewpoint_store import ViewpointStore
 
 
 def _load_contract(d: dict) -> EffectiveContract:
@@ -35,10 +44,11 @@ def _load_contract(d: dict) -> EffectiveContract:
         SourceContract(s['n'],s['t_seconds'],s['r'],s['b']),
         d['D_s'],d['L_e'],SourceDisposition(d.get('source_disposition','REQUIRED')),
         d.get('source_waiver_reason'),d.get('L_mismatch_blocks_delivery',False),
+        d.get('V_o',0),
     )
 
 
-def _derived_actuals(events, sources, activity, dstore, intervals) -> ContractActuals:
+def _derived_actuals(events, sources, activity, dstore, intervals, viewpoints=None,d_activity=None,v_activity=None) -> ContractActuals:
     known={s.source_id for s in sources.states}
     active={sid for item in activity.items for sid in item.source_ids}
     semantic={
@@ -51,6 +61,13 @@ def _derived_actuals(events, sources, activity, dstore, intervals) -> ContractAc
     r=[events.count(EvolutionKind.SOURCE_REENTRY,f'S:{sid}') for sid in actual_source_ids]
     T_rel=[x for x in intervals if x.state in (WorkState.MAIN,WorkState.SOURCE)]
     t_rel=[x for x in intervals if x.state is WorkState.SOURCE]
+    D_rel=[x for x in intervals if x.state is WorkState.D_EXCLUSIVE]
+    V_rel=[x for x in intervals if x.state is WorkState.V_EXCLUSIVE]
+    completed_ids={x.intervention_id for x in dstore.completed}
+    d_bound={x for item in (() if d_activity is None else d_activity.items) for x in item.component_ids}
+    qualified=() if viewpoints is None else viewpoints.qualified
+    qualified_ids={x.viewpoint_id for x in qualified}
+    v_bound={x for item in (() if v_activity is None else v_activity.items) for x in item.component_ids}
     return ContractActuals(
         N=events.count(EvolutionKind.MAIN_EVOLUTION,'MAIN'),
         T_seconds=sum(x.observed_ns for x in T_rel)/1e9,
@@ -63,6 +80,11 @@ def _derived_actuals(events, sources, activity, dstore, intervals) -> ContractAc
         r_min=min(r) if r else 0,
         D_s=dstore.completed_count,
         L_e=dstore.actual_isolation_level,
+        D_actual_seconds=sum(x.observed_ns for x in D_rel)/1e9,
+        D_time_verified=(not completed_ids) or (completed_ids<=d_bound and bool(D_rel) and all(x.observed_ns>0 for x in D_rel)),
+        V_o=len(qualified),
+        V_actual_seconds=sum(x.observed_ns for x in V_rel)/1e9,
+        V_time_verified=(not qualified_ids) or (qualified_ids<=v_bound and bool(V_rel) and all(x.observed_ns>0 for x in V_rel)),
     )
 
 
@@ -102,6 +124,16 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         RunPhase.CONTRACT_FROZEN:('protocol-load.json','parameter-resolution.json','U0.json','contract.json'),
         RunPhase.EXECUTING:('protocol-load.json','parameter-resolution.json','U0.json','contract.json'),
         RunPhase.FINALIZING:('protocol-load.json','parameter-resolution.json','U0.json','contract.json'),
+        RunPhase.DELIVERED:(
+            'protocol-load.json','parameter-resolution.json','U0.json','contract.json',
+            PREFLIGHT_RECEIPT_PATH,CAPABILITY_NEGOTIATION_PATH,
+            DELIVERY_PAYLOAD_PATH,DELIVERY_SUMMARY_PATH,DELIVERY_PROOF_PATH,
+            DELIVERY_ENVELOPE_PATH,
+        ),
+        RunPhase.INCOMPLETE:(
+            'protocol-load.json','parameter-resolution.json','U0.json','contract.json',
+            'final/incomplete-summary.json',
+        ),
         RunPhase.FINISHED:('protocol-load.json','parameter-resolution.json','U0.json','contract.json','final/run-summary.json'),
     }
     for rel in phase_requires.get(phase.phase,()):
@@ -115,6 +147,7 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         if (pl.commit_sha!=ident.get('commit_sha') or pl.version!=ident.get('version') or pl.protocol!=ident.get('protocol')
                 or pl.manifest_sha256!=route.get('manifest_sha256')):
             raise ValueError('protocol-load receipt does not match persisted P_run/manifest')
+        pl.verify_complete_members()
 
     contract_raw=ws.read_json('contract.json') if ws.path('contract.json').is_file() else None
     contract=_load_contract(contract_raw) if contract_raw is not None else None
@@ -130,6 +163,9 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
     candidates=CandidateStore.load(ws)
     sources=SourceWorkspaceRegistry.load(ws)
     dstore=DInterventionStore.load(ws)
+    viewpoints=ViewpointStore.load(ws)
+    d_activity=ExclusiveActivityLog.load(ws.path('time/d-activity.ndjson'),'D')
+    v_activity=ExclusiveActivityLog.load(ws.path('time/v-activity.ndjson'),'V')
     est=ESTStore.load(ws)
     evidence=EvidenceIndex.load(ws)
     completion=CompletionState.load(ws)
@@ -137,6 +173,15 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
     events.verify()
     activity=SourceActivityLog.load(ws.path('time/source-activity.ndjson'))
     activity.verify()
+
+    d_state_refs={e.record_hash for e in journal.events if e.event=='STATE' and e.state is WorkState.D_EXCLUSIVE}
+    v_state_refs={e.record_hash for e in journal.events if e.event=='STATE' and e.state is WorkState.V_EXCLUSIVE}
+    known_d={x.intervention_id for x in dstore.items};known_v={x.viewpoint_id for x in viewpoints.states}
+    for log,refs,known,label in ((d_activity,d_state_refs,known_d,'D'),(v_activity,v_state_refs,known_v,'V')):
+        log.verify()
+        for item in log.items:
+            if item.clock_event_ref not in refs:raise ValueError(f'{label} activity references the wrong clock state')
+            if any(x not in known for x in item.component_ids):raise ValueError(f'{label} activity references an unknown component')
 
     known_sources={x.source_id for x in sources.states}
     source_state_refs={
@@ -223,6 +268,8 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
                 raise ValueError('exclusive D execution is not bound to D_EXCLUSIVE state')
             if iso.mode=='background' and ce.state not in (WorkState.MAIN,WorkState.SOURCE):
                 raise ValueError('background D execution is not bound to MAIN/SOURCE state')
+            if authority.get('P_run',{}).get('version')=='5.0.0-Berta1' and (iso.mode!='exclusive' or ce.state is not WorkState.D_EXCLUSIVE):
+                raise ValueError('Berta1 D execution lacks owned D_EXCLUSIVE time')
 
         for result in item.results:
             if iso.L_actual is not None and iso.L_actual>=2:
@@ -264,11 +311,103 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
             'candidate_revision':candidates.current.revision if candidates.has_state else None,
             'active_source_ids':[s.source_id for s in sources.open_states],
             'D_completed':dstore.completed_count,
+            'V_qualified':len(viewpoints.qualified),
             'blocking_gap_ids':[g.gap_id for g in completion.blocking_open],
             'key_evidence_refs':[x.evidence_id for x in evidence.items][-24:],
             'latest_meaningful_event_refs':[e.event_id for e in events.events[-8:]],
         }
         verify_run_brief(ws,brief_expected)
+
+    if phase.phase is RunPhase.DELIVERED:
+        if contract is None or u0 is None:
+            raise ValueError('DELIVERED run missing U0/contract')
+        actual=_derived_actuals(events,sources,activity,dstore,intervals,viewpoints,d_activity,v_activity)
+        stop=check_mechanical_minima(contract,actual)
+        if not stop.minima_satisfied or not completion.ready:
+            raise ValueError('DELIVERED run no longer satisfies delivery gates')
+        if not candidates.has_state:
+            raise ValueError('DELIVERED run has no candidate')
+        envelope=DeliveryEnvelope.from_dict(ws.read_json(DELIVERY_ENVELOPE_PATH))
+        verify_delivery_artifacts(ws,envelope)
+        host_authority=verify_enforced_host_delivery_authority(ws)
+        if contract.source_required and not host_authority.source_tools:
+            raise ValueError('DELIVERED run required source tools unavailable')
+        candidate=candidates.current
+        if (candidate.revision!=envelope.candidate_revision
+                or candidate.digest!=envelope.candidate_digest
+                or envelope.candidate_payload_path not in candidate.artifact_refs):
+            raise ValueError('DELIVERED candidate/envelope binding mismatch')
+        candidate_record=ws.require_indexed_artifact(
+            envelope.candidate_payload_path,kind='candidate-payload',
+        )
+        if candidate_record.sha256!=envelope.payload_sha256:
+            raise ValueError('DELIVERED candidate bytes differ from payload')
+        audit_expected={}
+        for name in ('TOTAL','N','T','R','B','S','D','V','L'):
+            rel=f'logs/{name}.ndjson';data=ws.path(rel).read_bytes()
+            rec=ws.require_indexed_artifact(rel,kind='audit-total' if name=='TOTAL' else f'audit-{name.lower()}')
+            value={'path':rel,'sha256':sha256(data).hexdigest(),'byte_length':len(data)}
+            if rec.sha256!=value['sha256']:raise ValueError(f'{name} audit log digest drift')
+            audit_expected[name]=value
+        expected_summary={
+            'run_id':run_id,
+            'authority':authority,
+            'invocation':invocation,
+            'phase':'DELIVERED',
+            'U0':u0,
+            'contract':contract.to_dict(),
+            'actuals':actual.__dict__,
+            'provenance':ActualsProvenance().__dict__,
+            'mechanical_checks':stop.__dict__,
+            'mechanical_minima_satisfied':True,
+            'semantic_completion_assessed':True,
+            'structured_completion_ready':completion.structured_ready,
+            'blocking_open_gaps':0,
+            'delivery_ready':True,
+            'clock_journal_events':len(journal.events),
+            'final':envelope.final_binding,
+            'audit_logs':audit_expected,
+        }
+        summary=ws.read_json(DELIVERY_SUMMARY_PATH)
+        if summary!=expected_summary:
+            bad=sorted(k for k in set(summary)|set(expected_summary) if summary.get(k)!=expected_summary.get(k))
+            raise ValueError(f'delivered run summary drift: {bad}')
+        expected_proof={
+            'schema_version':1,'run_id':run_id,'status':'DELIVERED',
+            'delivery':envelope.final_binding,
+            'proof':(proof_data_from_contract_actuals(contract,actual).to_dict_berta() if authority.get('P_run',{}).get('version')=='5.0.0-Berta1' else proof_data_from_contract_actuals(contract,actual).to_dict()),
+        }
+        if ws.read_json(DELIVERY_PROOF_PATH)!=expected_proof:
+            raise ValueError('stable proof semantic drift')
+
+    if phase.phase is RunPhase.INCOMPLETE:
+        if contract is None or u0 is None:
+            raise ValueError('INCOMPLETE run missing U0/contract')
+        if any(ws.path(x).exists() for x in (
+            DELIVERY_PAYLOAD_PATH,DELIVERY_SUMMARY_PATH,DELIVERY_PROOF_PATH,
+            DELIVERY_ENVELOPE_PATH,
+        )):
+            raise ValueError('INCOMPLETE run must not carry delivery artifacts')
+        actual=_derived_actuals(events,sources,activity,dstore,intervals,viewpoints,d_activity,v_activity)
+        stop=check_mechanical_minima(contract,actual)
+        summary=ws.read_json('final/incomplete-summary.json')
+        if (summary.get('run_id')!=run_id or summary.get('phase')!='INCOMPLETE'
+                or summary.get('delivery_ready') is not False
+                or summary.get('mechanical_minima_satisfied')!=stop.minima_satisfied
+                or summary.get('semantic_completion_assessed')!=completion.semantically_assessed
+                or summary.get('blocking_open_gaps')!=len(completion.blocking_open)):
+            raise ValueError('incomplete run summary drift')
+        unmet=summary.get('unmet')
+        if not isinstance(unmet,list) or not unmet or any(not isinstance(x,str) or not x for x in unmet):
+            raise ValueError('INCOMPLETE run requires non-empty unmet gate codes')
+        derived=list(stop.unmet_requirements)+list(completion.delivery_failures)
+        if not candidates.has_state:
+            derived.append('FINAL_CANDIDATE_MISSING')
+        elif not any(x.startswith('state/candidate-payloads/') for x in candidates.current.artifact_refs):
+            derived.append('FINAL_PAYLOAD_NOT_BOUND_TO_CANDIDATE')
+        missing=[x for x in derived if x not in unmet]
+        if missing:
+            raise ValueError(f'incomplete summary omits current gate failures: {missing}')
 
     if phase.phase is RunPhase.FINISHED:
         summary=ws.read_json('final/run-summary.json')

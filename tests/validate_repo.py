@@ -1,188 +1,76 @@
 from __future__ import annotations
-import ast
-import json
-from pathlib import Path
-
-ROOT=Path(__file__).resolve().parents[1]
-VERSION='5.0.0-alpha.4'
-INTERFACES={
-    'routing_schema':4,
-    'repository_transport_schema':3,
-    'invocation_surface_schema':2,
-    'parameter_resolution_schema':1,
-    'run_session_schema':4,
-    'workspace_schema':2,
-    'clock_journal_schema':1,
-    'event_receipt_schema':2,
-}
-
-
-def fail(msg: str) -> None:
-    print(f'FAIL: {msg}')
-    raise SystemExit(1)
-
-
-def read_text(rel: str) -> str:
-    try:
-        return (ROOT/rel).read_text(encoding='utf-8')
-    except Exception as exc:
-        fail(f'unreadable UTF-8 text {rel}: {exc}')
-
-
-def check_local_refs(obj, owner: str) -> None:
-    if isinstance(obj, dict):
+import ast,hashlib,json,re
+from pathlib import Path,PurePosixPath
+ROOT=Path(__file__).resolve().parents[1];VERSION='5.0.0-Berta1';PACKAGE_VERSION='5.0.0.dev1+berta1';HEX64=re.compile(r'^[0-9a-f]{64}$')
+def fail(message):print('FAIL:',message);raise SystemExit(1)
+def read(rel):return (ROOT/rel).read_text(encoding='utf-8')
+def digest(data):return hashlib.sha256(data).hexdigest()
+def refs(obj,owner):
+    if isinstance(obj,dict):
         for k,v in obj.items():
             if k=='$ref' and isinstance(v,str) and '://' not in v and not v.startswith('#'):
                 rel=v.split('#',1)[0]
-                if rel and not (ROOT/'schemas'/rel).is_file():
-                    fail(f'{owner} references missing schema {rel}')
-            check_local_refs(v,owner)
+                if rel and not (ROOT/'schemas'/rel).is_file():fail(f'{owner} missing ref {rel}')
+            refs(v,owner)
     elif isinstance(obj,list):
-        for v in obj:check_local_refs(v,owner)
-
-
-def main() -> None:
-    if read_text('VERSION').strip()!=VERSION:fail('VERSION')
-    m=json.loads(read_text('manifest.json'))
-    if m.get('protocol')!='digr-v5.0' or m.get('version')!=VERSION:fail('manifest version/protocol')
-    for k,v in INTERFACES.items():
-        if m.get(k)!=v:fail(f'manifest interface {k}')
-    if m.get('startup_slice')!=['bootstrap/BOOTSTRAP.md','entry/STARTUP.md']:fail('startup_slice')
-    if m.get('workspace_spec')!='workspace/layout-v2.json':fail('workspace_spec')
-    if m.get('routing',{}).get('candidate_match')!='lstrip_prefix; DIGR_exact_uppercase; remainder_unvalidated':fail('exact-uppercase candidate route metadata')
-    if m.get('routing',{}).get('candidate_route_keys')!=['DIGR','深度迭代']:fail('candidate route keys')
-    routing=m.get('routing',{})
-    expected_routing={
-        'ref_api_url':'https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/stable',
-        'branch_api_url':'https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/stable',
-        'pinned_raw_template':'https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}',
-        'content_raw_media_type':'application/vnd.github.raw+json',
-        'mutable_ref_policy':'connector_branch_head_or_direct_rest_branch_ref_consensus; search_index_forbidden; attempt_required_before_failure',
-    }
-    for k,v in expected_routing.items():
-        if routing.get(k)!=v:fail(f'Alpha4 routing transport metadata {k}')
-    for k in ('route_requires_actual_acquisition_attempt','route_failure_requires_acquisition_evidence','mutable_ref_search_index_forbidden','mutable_ref_direct_live_provenance_required','mutable_ref_ref_branch_consensus_when_using_rest','pinned_raw_sha_content_is_cache_safe','contents_api_wrapper_must_be_raw_or_decoded','repository_transport_is_host_bridge_not_execution_semantics','D_zero_means_no_minimum_not_disabled','L_applicability_follows_actual_D','timing_targets_soft_when_policy_zero','timing_targets_hard_lower_bounds_when_policy_one','canonical_proof_actual_durations_floor_to_whole_seconds','executing_protocol_bundle_preserves_logical_modularity','executing_protocol_load_receipt_required_before_parameter_resolution','post_genesis_protocol_load_failure_aborts_born_run','execution_bundle_is_immutable_sha_pinned'):
-        if m.get('policies',{}).get(k) is not True:fail(f'Alpha4 policy {k}')
-    for retired in ('D_zero_disables','D_zero_makes_L_nonblocking'):
-        if retired in m.get('policies',{}):fail(f'retired Alpha3 D policy still present: {retired}')
-
-    if m.get('execution_bundle_schema')!=1 or m.get('execution_protocol_load_schema')!=1:fail('execution bundle/load schemas')
-    eb=m.get('execution_bundle')
-    if not isinstance(eb,dict) or eb.get('path')!='bundle/EXECUTION_PROTOCOL.json' or eb.get('schema')!=1 or eb.get('members')!=[m['entrypoint'],*m['core']]:fail('execution bundle metadata')
-    required_paths=[m['bootstrap_entry'],*m['startup_slice'],m['entrypoint'],m['help'],m['workspace_spec'],eb['path'],*m['core'],*m['deterministic_helpers']]
-    for rel in dict.fromkeys(required_paths):
+        for v in obj:refs(v,owner)
+def main():
+    d=json.loads(read('runtime-descriptor.json'));m=json.loads(read('manifest.json'))
+    if set(d)!={'schema','protocol','version','package_version','surface','engine_api','minimum_adapter','artifacts'}:fail('descriptor core fields')
+    if (d['schema'],d['protocol'],d['version'],d['package_version'])!=('digr-runtime-descriptor/v1','digr-v5.0',VERSION,PACKAGE_VERSION):fail('descriptor identity')
+    if read('VERSION').strip()!=VERSION or m.get('version')!=VERSION or m.get('protocol')!=d['protocol'] or m.get('navigation_authority') is not True:fail('pinned navigation identity')
+    if m.get('bootstrap_entry')!='entry/STARTUP.md' or m.get('startup_slice')!=['entry/STARTUP.md']:fail('sole self-contained startup slice')
+    if d.get('surface',{}).get('navigation_authority')!='manifest.json' or d.get('surface',{}).get('load_phase')!='after_verified_startup_slice':fail('descriptor navigation role')
+    adapter=d.get('minimum_adapter',{});expected_adapter={'repository':'Gual-Wells/Deep-Iteration-GPT-Runtime','ref':'stable','descriptor_path':'runtime-descriptor.json','navigation_source':'manifest.json','activation':'after_pinned_startup_classifies_EXECUTING','artifact_integrity':'sha256_and_byte_length','execution_set_integrity':'ordered_member_count_and_execution_set_sha256'}
+    if any(adapter.get(k)!=v for k,v in expected_adapter.items()):fail('descriptor minimum adapter locator/integrity')
+    api=d.get('engine_api',{});expected_api={'preflight':'digr.preflight','commit_delivery':'digr.commit_delivery','preflight_binding':'runtime.host_adapter.HostAdapter.preflight','start_binding':'runtime.host_adapter.HostAdapter.start','commit_delivery_binding':'runtime.run_session.LiveDIGRRun.commit_delivery','enforced_host_integration':'required'}
+    if any(api.get(k)!=v for k,v in expected_api.items()):fail('descriptor logical/Python API binding')
+    if f'version = "{PACKAGE_VERSION}"' not in read('pyproject.toml'):fail('PEP 440 package version mapping')
+    for retired in ('defaults','parameters','time_states','policies','philosophy','release','routing'):
+        if retired in m:fail(f'manifest retains execution semantics: {retired}')
+    artifacts=d['artifacts']
+    for name,item in artifacts.items():
+        path=ROOT/item['path'];data=path.read_bytes()
+        if not path.is_file() or item['byte_length']!=len(data) or item['sha256']!=digest(data) or not HEX64.fullmatch(item['sha256']):fail(f'descriptor artifact {name}')
+    bundle=json.loads((ROOT/artifacts['execution_bundle']['path']).read_text(encoding='utf-8'));rows=[{k:x[k] for k in ('path','sha256','byte_length')} for x in bundle['members']]
+    canonical=json.dumps(rows,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode('utf-8')
+    if artifacts['execution_bundle']['member_count']!=len(rows) or artifacts['execution_bundle']['execution_set_sha256']!=digest(canonical):fail('execution set gate')
+    expected=[m['entrypoint'],*m['core']]
+    if m['execution_bundle'].get('members')!=expected:fail('manifest execution member declaration')
+    if [x['path'] for x in bundle['members']]!=expected:fail('execution member order')
+    for item in bundle['members']:
+        data=(ROOT/item['path']).read_bytes()
+        if (item['sha256'],item['byte_length'],item['content'])!=(digest(data),len(data),data.decode('utf-8')):fail(f'bundle member {item["path"]}')
+    paths=[m['runtime_descriptor'],m['bootstrap_entry'],*m['startup_slice'],m['model_protocol_source'],m['entrypoint'],m['help'],m['workspace_spec'],m['execution_bundle']['path'],*m['core'],*m['deterministic_helpers'],*m['schemas'].values()]
+    for rel in paths:
+        p=PurePosixPath(rel)
+        if '\\' in rel or rel.startswith('/') or any(x in ('','.','..') for x in p.parts):fail(f'unsafe manifest path {rel}')
         if not (ROOT/rel).is_file():fail(f'missing manifest path {rel}')
-    if len(m['core'])!=len(set(m['core'])):fail('duplicate core path')
-    if len(m['deterministic_helpers'])!=len(set(m['deterministic_helpers'])):fail('duplicate deterministic helper')
-
-    obsolete=(
-        'DIGR_EXECUTION_GATE.md','bootstrap/REPOSITORY_ONLY_LOADER.md','runtime/bootstrap_gate.py',
-        'schemas/bootstrap-gate.schema.json','bootstrap/LOCAL_FALLBACK_CORE.md','runtime/source_aggregate.py',
-        'schemas/runtime-state.schema.json','schemas/invocation.schema.json','workspace/layout-v1.json',
-        'docs/PROTOCOL_SPEC_5.0.0-alpha.1.md',
-    )
-    for rel in obsolete:
-        if (ROOT/rel).exists():fail(f'obsolete Alpha1/legacy artifact {rel}')
-
-    schema_ids=set()
     for p in sorted((ROOT/'schemas').glob('*.json')):
-        try:d=json.loads(p.read_text(encoding='utf-8'))
-        except Exception as exc:fail(f'invalid schema JSON {p.name}: {exc}')
-        if d.get('$schema')!='https://json-schema.org/draft/2020-12/schema':fail(f'schema draft metadata {p.name}')
-        expected=f'https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/{p.name}'
-        if d.get('$id')!=expected:fail(f'schema id {p.name}')
-        if d['$id'] in schema_ids:fail(f'duplicate schema id {p.name}')
-        schema_ids.add(d['$id']);check_local_refs(d,p.name)
-
-    layout=json.loads(read_text(m['workspace_spec']))
-    if layout.get('schema_version')!=2:fail('workspace layout schema_version')
-    if 'state/artifact-index.json' not in layout.get('required_genesis_files',[]):fail('artifact index not genesis-required')
-    if 'state/run-phase.json' not in layout.get('required_genesis_files',[]):fail('run phase not genesis-required')
-    art=layout.get('artifact_schemas',{})
-    for spec in art.values():
-        rel=spec.split('#',1)[0]
-        if not (ROOT/rel).is_file():fail(f'workspace artifact schema missing {rel}')
-    if art.get('protocol-load.json')!='schemas/executing-protocol-load.schema.json':fail('protocol load receipt not mapped')
-    if art.get('dictator/packets/*.json')!='schemas/isolation-packet.schema.json':fail('D packet artifacts not mapped')
-    if art.get('state/gaps/*-r*.json')!='schemas/completion-gap.schema.json':fail('completion gap history not mapped')
-    for pat in ('state/run-phase-r*.json','state/strategy-r*.json','state/candidate-r*.json','state/est-*-r*.json','sources/*/state-r*.json'):
-        if pat not in art:fail(f'revision history artifact family not mapped: {pat}')
-
-    primary=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION.txt').read_bytes()
-    free=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FREE_GO.txt').read_bytes()
-    full=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FULL.txt').read_bytes()
-    if primary!=free:fail('primary/free router drift')
-    try:text=primary.decode('utf-8');full_text=full.decode('utf-8')
-    except UnicodeDecodeError:fail('local personalization is not UTF-8')
-    if len(text)>1500:fail(f'compact router too long: {len(text)} chars')
-    for token in (
-        '精确大写 ASCII `DIGR`','`digr`、`Digr` 等不路由','宽捕获','NATIVE','原始消息交还普通 ChatGPT',
-        'Gual-Wells/Deep-Iteration-GPT-Runtime','https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime',
-        '/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','startup_slice','execution bundle','entrypoint','core[]','manifest.help','完整 40 位 commit SHA','同一 SHA','必须实际获取','没有尝试本身不是路由失败',
-        'DIGR 路由失败：未取得仓库运行协议',
-    ):
-        if token not in text:fail(f'router missing {token}')
-    for bad in ('monotonic','LiveDIGRRun','P_target','B=0','b=0','L(1)','Mature Gambit','Formal Active','proof'):
-        if bad in text:fail(f'compact router duplicates versioned execution semantics: {bad}')
-    for token in ('Expanded Routing/Transport Reference','Candidate routing is an obligation','Mutable-ref provenance','Immutable pinned content','Staged authority handoff','Failure evidence','NATIVE'):
-        if token not in full_text:fail(f'full router reference missing {token}')
-    if 'B=0' in full_text:fail('full local reference copies versioned execution defaults')
-
-    help_text=read_text('entry/HELP.md')
-    for token in ('## 1. 调用与路由','## 2. 参数解析顺序与缺省规则','## 3. 参数参考','## 4. Effective Contract 与来源策略','## 5. N / R / D / L','## 6. 时间与停止','## 7. 执行链与启动成本','## 8. 输出与 canonical proof','## 9. 版本与权威'):
-        if token not in help_text:fail(f'help missing section {token}')
-    for token in ('`B=0`、`b=0`、`L(1)`','`REQUIRED`','`D(0)`','soft target','hard lower bound','actual duration 向下取整到完整秒','ExecutingProtocolLoadReceipt','NATIVE'):
-        if token not in help_text:fail(f'help missing Alpha4 user-level rule {token}')
-
-    # The release claims Python >=3.10, so every Python file must parse under
-    # that grammar rather than only under the builder's current interpreter.
-    for p in sorted(ROOT.rglob('*.py')):
-        if any(x in p.parts for x in ('.git','__pycache__')):continue
+        obj=json.loads(p.read_text(encoding='utf-8'))
+        if obj.get('$schema')!='https://json-schema.org/draft/2020-12/schema' or obj.get('$id')!=f'https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/{p.name}':fail(f'schema metadata {p.name}')
+        refs(obj,p.name)
+    compact=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION.txt').read_bytes();free=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FREE_GO.txt').read_bytes();standalone=(ROOT/'CHATGPT_LOCAL_PERSONALIZATION.txt').read_bytes();full=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FULL.txt').read_bytes()
+    if compact!=free or compact!=standalone or len(compact.decode())>1500:fail('compact personalization equality/size')
+    sentinel=b'<!-- DIGR_LOCAL_PERSONALIZATION_END -->\n'
+    if not compact.endswith(sentinel) or not full.endswith(sentinel):fail('personalization sentinel')
+    model=(ROOT/'dist/MODEL_PROTOCOL.md').read_bytes()
+    if not (2000<=len(model)<=5000) or b'digr.preflight' not in model or b'digr.commit_delivery' not in model:fail('compact model protocol')
+    if (ROOT/'dist/HELP.zh-CN.md').read_bytes()!=(ROOT/'entry/HELP.md').read_bytes():fail('help distribution drift')
+    current='\n'.join(read(x) for x in ('entry/STARTUP.md','entry/HELP.md','entry/MODEL_PROTOCOL_SOURCE.md','core/11_PARAMETER_FORMAT_AND_RESOLUTION.md','core/15_SEMANTIC_DEFAULT_COMPLETION.md','core/20_EFFECTIVE_CONTRACT.md'))
+    if 'zero_disables_D' in current or 'semantically complete missing' in current:fail('retired stable semantics')
+    router=compact.decode('utf-8')
+    for required in ('只去掉开头空白','真实仓库获取','`stable` branch 的当前 HEAD','/branches/stable','/git/ref/heads/stable','manifest.json','VERSION','startup_slice','没有尝试本身不是路由失败'):
+        if required not in router:fail(f'local routing contract missing {required}')
+    for forbidden in ('digr.preflight','digr.commit_delivery','DIGR~','DELIVERED','N=2','R=1'):
+        if forbidden in router:fail(f'local layer duplicates execution semantics: {forbidden}')
+    for p in ROOT.rglob('*.py'):
+        if '__pycache__' in p.parts:continue
         try:ast.parse(p.read_text(encoding='utf-8'),filename=str(p),feature_version=(3,10))
-        except Exception as exc:fail(f'Python 3.10 parse failure {p.relative_to(ROOT)}: {exc}')
-
-    # Text release files are canonical UTF-8/LF. This also prevents platform
-    # newline drift from defeating deterministic builds.
-    for p in sorted(ROOT.rglob('*')):
-        if not p.is_file() or any(x in p.parts for x in ('.git','__pycache__')):continue
-        if p.suffix.lower() not in {'.py','.md','.txt','.json'} and p.name not in {'VERSION'}:continue
-        raw=p.read_bytes()
-        if b'\r' in raw:fail(f'CR line ending in {p.relative_to(ROOT)}')
-        try:raw.decode('utf-8')
-        except UnicodeDecodeError:fail(f'non-UTF8 text {p.relative_to(ROOT)}')
-
-    for rel in (
-        'docs/PRE_RELEASE_BASELINE.md','docs/CLOCK_RELIABILITY.md','docs/RUN_SESSION_ARCHITECTURE.md',
-        'docs/MIGRATION_FROM_4.1.1.md','docs/PROTOCOL_SPEC_5.0.0-alpha.4.md','docs/TEST_MATRIX.md',
-        'docs/ENGINEERING_VALIDATION_LOG.md','docs/REPOSITORY_TRANSPORT.md',
-    ):
-        if not (ROOT/rel).is_file():fail(f'missing release documentation {rel}')
-    smoke=read_text('examples/PERSONALIZATION_FRESH_CHAT_SMOKE_TEST.md')
-    if 'If stable points to 4.1' in smoke or 'apply this 4.1 clock rule' in read_text('examples/HARD_TIMING_READINESS.md'):
-        fail('stale 4.1 current-flow example')
-    if '`digr/help` → route attempt' in read_text('examples/ROUTER_CANDIDATE_MATCHING.md'):
-        fail('stale case-insensitive router example')
-
-    for rel in ('runtime/repository_transport.py','runtime/execution_protocol.py','schemas/repository-transport-attempt.schema.json','schemas/execution-protocol-bundle.schema.json','schemas/executing-protocol-load.schema.json','tools/smoke_repository_transport.py','examples/REPOSITORY_TRANSPORT.md'):
-        if not (ROOT/rel).is_file():fail(f'missing Alpha4 transport artifact {rel}')
-    rt=read_text('runtime/repository_transport.py')
-    for token in ('AcquisitionAttemptReceipt','route_failure_permitted','stable_branch_primary','stable_ref_corroboration','github_connector','acquire_execution_protocol','load_execution_protocol_for_run','application/vnd.github.raw+json','Cache-Control'):
-        if token not in rt:fail(f'transport implementation missing {token}')
-
-    import hashlib
-    bundle=json.loads(read_text(eb['path']))
-    if bundle.get('schema_version')!=1 or bundle.get('version')!=VERSION or bundle.get('protocol')!='digr-v5.0':fail('execution bundle identity')
-    members=bundle.get('members')
-    if not isinstance(members,list) or [x.get('path') for x in members]!=eb['members']:fail('execution bundle member path/order')
-    for item in members:
-        rel=item['path'];data=(ROOT/rel).read_bytes()
-        if item.get('byte_length')!=len(data) or item.get('sha256')!=hashlib.sha256(data).hexdigest() or item.get('content')!=data.decode('utf-8'):
-            fail(f'execution bundle member drift {rel}')
-    rs=read_text('runtime/run_session.py')
-    for token in ('bind_protocol_load','abort_protocol_load','verified executing protocol load receipt required before parameter resolution'):
-        if token not in rs:fail(f'run-session protocol-load barrier missing {token}')
-    if 'dictator_enabled' in read_text('runtime/effective_contract.py'):fail('retired D enable/disable helper remains')
-
-    print('DIGR 5.0.0-alpha.4 black-box corrected integration baseline: OK')
-
+        except Exception as exc:fail(f'Python 3.10 parse {p.relative_to(ROOT)}: {exc}')
+    for p in ROOT.rglob('*'):
+        if not p.is_file() or '__pycache__' in p.parts:continue
+        if p.suffix.lower() not in {'.py','.md','.txt','.json','.toml'} and p.name!='VERSION':continue
+        if b'\r' in p.read_bytes():fail(f'CR line ending {p.relative_to(ROOT)}')
+    print('DIGR 5.0.0-Berta1 pinned-manifest repository: OK')
 if __name__=='__main__':main()

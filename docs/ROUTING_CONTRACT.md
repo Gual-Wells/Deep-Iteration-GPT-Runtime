@@ -1,26 +1,15 @@
 # Routing Contract
 
-The local layer is a broad candidate router plus repository-authority handoff. It never redefines DIGR execution semantics.
+## Local candidate boundary
 
-## Candidate capture
+The local layer removes leading whitespace only and broadly captures any remainder beginning with exact uppercase ASCII `DIGR` or exact `深度迭代`. It does not decide help, task, parameter, bracket, punctuation, NATIVE or INVALID semantics. `digr`, `Digr` and other English casing are not captured.
 
-After removing leading whitespace only, exact uppercase ASCII `DIGR` or exact `深度迭代` is a route candidate. The remainder is deliberately not interpreted locally. The pinned startup surface decides NATIVE/HELP/INVALID/EXECUTING.
+Every captured candidate performs real repository acquisition before any user-visible response or task-level explanation. Only the pinned startup protocol classifies the untouched original message. NATIVE returns that original message to ordinary ChatGPT; INVALID returns structural correction without Run Genesis.
 
-## Actual acquisition before failure
+## Repository boundary
 
-A candidate must cause a real repository acquisition action before any user-visible route result. No-attempt is not acquisition failure. Search results, snippets, crawled/indexed GitHub pages and remembered results are inadmissible mutable-ref authority.
+An existing GitHub connector reads the current full 40-hex `stable` branch HEAD. Direct REST reads both `/branches/stable` and `/git/ref/heads/stable` in the same attempt and requires identical SHAs. Search/crawl/index snapshots are never mutable-ref authority.
 
-## `stable → SHA`
+At the accepted SHA, first read pinned `manifest.json` and pinned `VERSION` and require version agreement. Then load exactly `manifest.startup_slice`; Berta1 declares only self-contained `entry/STARTUP.md`. HELP follows `manifest.help`; EXECUTING follows `manifest.entrypoint` and `manifest.core[]`, or a bundle verified to contain those members in order. The descriptor is a later execution/release description, not navigation authority.
 
-Two transport modes are valid:
-
-1. **Already-connected GitHub repository connector:** read the repository `stable` branch resource and accept its current full 40-hex HEAD SHA. No Git-ref endpoint is additionally required in connector mode.
-2. **Direct REST client:** read both the Branches endpoint and Git-ref endpoint during the same route attempt and require the same full 40-hex commit SHA. Disagreement fails closed.
-
-The standard-library direct fetcher requests cache revalidation on mutable REST reads. This is transport hardening, not a claim of mathematical zero-latency propagation.
-
-## Pinned authority
-
-Bind pinned `manifest.json` and `VERSION`, require version equality, then follow only manifest-declared paths. A manifest with `startup_slice` loads only that slice before repository surface classification. NATIVE/HELP avoid unnecessary full protocol loading; EXECUTING follows the pinned startup rules, crosses Clock Genesis, then acquires the manifest-declared same-SHA execution bundle when present (otherwise logical entry/core individually). The verified bundle members remain the entry/core authority and produce the receipt required before parameter resolution. Legacy manifests without staged startup retain their own navigation.
-
-The fixed route-failure response is allowed only after actual acquisition evidence exists and a mandatory current-stage resource still fails, conflicts or has inadmissible provenance.
+A repository-failure response is valid only after a real current-turn attempt left a required repo/ref/SHA/manifest/VERSION/path unavailable, conflicting or untrusted. No attempt is not repository-failure evidence.

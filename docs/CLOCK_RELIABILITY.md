@@ -1,11 +1,7 @@
-# Clock Reliability — Alpha 4
+# Clock Reliability — Berta1
 
-Clock journal format remains the stable Alpha 1 core: ≥3 readiness samples, provider/session/boot identities, monotonic and wall readings, sequence/hash chain, state and formal-ledger parity.
+The standard profile has no T/t time requirement. Hard time exists only through explicit `min=<duration>` and requires continuous trusted monotonic-clock capability during local preflight. `target=<duration>` is soft. ClockJournal projects `T=MAIN+SOURCE`, `t=SOURCE`, `D=D_EXCLUSIVE`, and `V=V_EXCLUSIVE`; META/IDLE count nowhere and D/V never inflate T.
 
-Alpha 4 preserves the Alpha 2 clock-journal rules. Alpha 2 changed *where and how continuity is used*:
-- repository startup is staged so EXECUTING reaches Clock Genesis before verified full-protocol loading (normally one immutable execution bundle) and before parameter resolution;
-- cross-process/session observed time now requires equal non-empty boot identity, not provider equality alone;
-- resume verifies the persisted workspace, probes ≥3 fresh samples, proves the persisted-last→new-anchor bridge, appends `RESUME_*`, and drops any unclosed semantic tail rather than charging an unknown process gap; the resumed live session therefore has no inferred foreground work state until the caller explicitly re-enters MAIN/SOURCE/D_EXCLUSIVE/META/IDLE with a fresh STATE receipt;
-- hard time still fails closed; `?` is preferred to an invented duration.
+Clock Genesis happens after parameter/capability preflight and descriptor artifact verification, immediately before workspace creation. Only substantive MAIN/SOURCE intervals count. META, transport, waiting, polling, journaling, mechanical rewriting and exclusive D never pad time.
 
-T/t remain formal active time, not wall occupancy. MAIN+SOURCE count T, SOURCE counts t, D_EXCLUSIVE/META/IDLE do not.
+Cross-session continuity requires matching provider and non-empty boot identity. Unknown continuity stays unknown; proof never estimates or rounds actual time upward.

@@ -1,4 +1,4 @@
-"""Version-semantic-free repository routing helpers for DIGR 5.0.0-alpha.4.
+"""Version-semantic-free repository routing helpers for DIGR 5.0 stable.
 
 The router performs only candidate response, exact GitHub location, immutable
 pinning metadata, manifest/VERSION integrity, and manifest-declared path
@@ -22,6 +22,7 @@ AUTHORITATIVE_REF_API_URL = AUTHORITATIVE_API_BASE + '/git/ref/heads/stable'
 AUTHORITATIVE_BRANCH_API_URL = AUTHORITATIVE_API_BASE + '/branches/stable'
 MANIFEST_PATH = 'manifest.json'
 VERSION_PATH = 'VERSION'
+RUNTIME_DESCRIPTOR_PATH = 'runtime-descriptor.json'
 CONTENT_API_TEMPLATE = AUTHORITATIVE_API_BASE + '/contents/{PATH}?ref={SHA}'
 PINNED_RAW_TEMPLATE = 'https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}'
 ROUTE_KEYS = ('DIGR', '深度迭代')
@@ -46,6 +47,17 @@ def candidate_route_key(message: str) -> str | None:
 
 def is_candidate_route(message: str) -> bool:
     return candidate_route_key(message) is not None
+
+
+def route_requires_repository(message: str) -> bool:
+    """Return whether the broad candidate route requires repository I/O.
+
+    This function deliberately aliases candidate matching.  Invocation/help/
+    malformed/native classification is versioned startup behavior and therefore
+    cannot narrow repository acquisition before the current ``stable`` protocol
+    has been pinned.
+    """
+    return is_candidate_route(message)
 
 
 def content_api_url(commit_sha: str, path: str) -> str:
@@ -147,11 +159,9 @@ class RouteReceipt:
         if ref != AUTHORITATIVE_REF:
             raise ValueError(f'unexpected DIGR routing ref: {ref}')
         mpath = validate_repo_path(self.manifest_path)
-        if mpath != MANIFEST_PATH:
-            raise ValueError(f'unexpected DIGR manifest path: {mpath}')
         vpath = validate_repo_path(self.version_path)
-        if vpath != VERSION_PATH:
-            raise ValueError(f'unexpected DIGR VERSION path: {vpath}')
+        if (mpath, vpath) != (MANIFEST_PATH, VERSION_PATH):
+            raise ValueError(f'unexpected DIGR authority path pair: {mpath}, {vpath}')
         mdigest = _digest('manifest_sha256', self.manifest_sha256)
         vdigest = _digest('version_sha256', self.version_sha256)
         object.__setattr__(self, 'repository_full_name', repo)

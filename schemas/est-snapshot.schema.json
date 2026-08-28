@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/est-snapshot.schema.json",
-  "title": "DIGR 5.0 Alpha 4 EST Snapshot",
+  "title": "DIGR 5.0.0-Berta1 EST Snapshot",
   "type": "object",
   "required": [
     "scope",

@@ -1,6 +1,9 @@
 [project]
 name = "deep-iteration-gpt-runtime"
-version = "5.0.0-alpha.4"
-description = "A native-intelligence assist runtime with transport-hardened repository routing, atomic clock genesis, explicit state memory, and audit support."
+version = "5.0.0.dev1+berta1"
+description = "A pinned-manifest native-intelligence assist runtime with deterministic protocol distribution and audit support."
 requires-python = ">=3.10"
 license = "MIT"
+
+[project.optional-dependencies]
+test = ["jsonschema>=4.23"]

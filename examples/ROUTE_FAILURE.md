@@ -1,18 +1,5 @@
-# Route failure — Alpha 4
+# Route failure — Berta1
 
-A fixed route failure is valid only after the current candidate turn has actual canonical repository-acquisition evidence.
+Every broad-captured candidate performs a real current-turn repository attempt before pinned classification. Failure to obtain a trusted current `stable` SHA, same-SHA manifest/VERSION agreement or the manifest-declared startup slice permits `DIGR 路由失败：未取得仓库运行协议`.
 
-Examples of genuine route failure:
-- connector branch-head or direct REST mutable `stable` acquisition fails;
-- direct REST branch/ref observations disagree;
-- the returned mutable-ref provenance is search/index/crawl rather than direct live repository access;
-- pinned manifest/VERSION bytes cannot be acquired or fail integrity/version equality;
-- a manifest-declared mandatory startup path cannot be obtained from the same SHA.
-
-Not a route failure:
-- no acquisition tool/callback was invoked;
-- the model merely remembers that a previous fetch failed;
-- a search result looks stale;
-- a fixed failure string is easier to emit than trying the repository.
-
-If a genuine route failure occurs, return only `DIGR 路由失败：未取得仓库运行协议` and do not reconstruct DIGR semantics from conversation history, Memory or a local old protocol copy.
+NATIVE, HELP, INVALID and EXECUTING are not known until that startup acquisition succeeds. A later EXECUTING descriptor/bundle or Genesis failure is a Berta1 startup/execution failure, not evidence that the local router never acquired P_run.

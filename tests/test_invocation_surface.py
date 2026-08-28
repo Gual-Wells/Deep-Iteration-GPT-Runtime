@@ -9,10 +9,10 @@ class TestInvocationSurface(unittest.TestCase):
         for text in ('DIGR/help',' DIGR /help',' 深度迭代/help '): self.assertEqual(classify_surface(text).kind,InvocationKind.HELP)
         self.assertIsNone(classify_surface('digr/help'))
     def test_native_sovereignty_return(self):
-        for text in ('DIGR是什么？','DIGR这个设计合理吗？','DIGR（R=3）这种格式怎么样？','深度迭代这个名字如何？','DIGR'):
+        for text in ('DIGR是什么？','DIGR这个设计合理吗？','DIGR 协议这种格式怎么样？','深度迭代这个名字如何？','DIGR'):
             x=classify_surface(text); self.assertIsNotNone(x); self.assertEqual(x.kind,InvocationKind.NATIVE,text)
     def test_invalid_only_broken_invocation_shape(self):
-        for text in ('DIGR：','DIGR(R=3：任务','深度迭代（R=2：任务'):
+        for text in ('DIGR：','DIGR(R=3：任务','深度迭代（R=2：任务','DIGR(R=3)','深度迭代（R=2）'):
             x=classify_surface(text); self.assertIsNotNone(x); self.assertEqual(x.kind,InvocationKind.INVALID,text)
     def test_non_candidate_is_none(self):
         for t in ('讨论一下 DIGR','digr：任务','Digr: task','DiGr: task'):

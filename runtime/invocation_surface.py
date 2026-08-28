@@ -1,4 +1,4 @@
-"""Deterministic DIGR 5.0 Alpha 4 repository-surface classification.
+"""Deterministic DIGR 5.0 stable repository-surface classification.
 
 The local router intentionally over-captures exact-uppercase ``DIGR`` and
 ``深度迭代`` prefixes.  After the pinned repository startup slice is available,
@@ -119,13 +119,10 @@ def classify_surface(message: str) -> InvocationSurface | None:
     if rest.startswith(('(', '（')):
         consumed = _consume_group_mixed(rest)
         if consumed is None:
-            # A colon inside an unfinished parameter group is a strong signal of
-            # a broken invocation; otherwise broad-router discussion returns to
-            # native ChatGPT rather than being mislabeled INVALID.
-            normalized = rest.translate(_PUNCT)
-            kind = InvocationKind.INVALID if ':' in normalized else InvocationKind.NATIVE
-            reason = 'unbalanced parameter surface' if kind is InvocationKind.INVALID else 'broad route capture is not an invocation'
-            return InvocationSurface(kind, alias, digest, reason=reason)
+            return InvocationSurface(
+                InvocationKind.INVALID, alias, digest,
+                reason='unbalanced parameter surface',
+            )
         parameter_surface, rest = consumed
         rest = rest.lstrip()
 
@@ -142,8 +139,14 @@ def classify_surface(message: str) -> InvocationSurface | None:
             parameter_surface=parameter_surface, task_raw=task,
         )
 
-    # Balanced parameter-like discussion without a task separator is native
-    # discussion, as are ordinary phrases such as "DIGR是什么？".
+    if parameter_surface is not None:
+        return InvocationSurface(
+            InvocationKind.INVALID, alias, digest,
+            parameter_surface=parameter_surface,
+            reason='parameter surface requires a task separator',
+        )
+
+    # Ordinary broad-prefix phrases such as "DIGR是什么？" remain native.
     return InvocationSurface(
         InvocationKind.NATIVE, alias, digest,
         parameter_surface=parameter_surface,

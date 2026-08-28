@@ -1,35 +1,11 @@
-# DIGR 5.0.0-alpha.4 — Deep Iteration Entry
+# DIGR 5.0.0-Berta1 — Deep Iteration Entry
 
-This entrypoint is semantically available only after an EXECUTING surface has crossed trusted Clock Genesis and the complete pinned entrypoint/core set has been verified under the same `P_run` (normally through the manifest-declared execution bundle). The bundle is transport-only; these logical files remain the protocol authority. The full protocol never retroactively moves the clock boundary.
+This logical entry is available only after pinned manifest/VERSION and STARTUP classified EXECUTING, HostAdapter resolved parameters, required execution artifacts were verified, and Clock Genesis bound the run. `dist/MODEL_PROTOCOL.md` is a compact release/advisory rendering; manifest entry/core or their verified execution bundle remain the executable protocol set.
 
-## Authority and immutable commitments
+Keep pinned P_run identity (commit SHA plus manifest protocol/version and manifest/VERSION receipts), exact task/U0 bytes and hash, deterministic preflight parameters, explicit user hard constraints and Effective Contract immutable. The descriptor integrity-binds later artifacts but does not define P_run. Put interpretation and planning in revisable StrategyState.
 
-Keep `P_run`, raw-message binding, U0 and the frozen Effective Contract immutable. A self-hosting/repository-edit task may create `P_target`, but it cannot rebind the current run. Higher-priority safety/permission constraints remain in force.
+The Berta1 standard profile is N=2, R=1, no time requirement, source=auto, D=0, V=0 and L1. Public order is `N,T,R,B,S,D,V,L`; explicit typed labels may move only when the remaining unlabeled mapping stays unique. The model may exceed minima for quality, but cannot lower or remap them.
 
-## META before substantive work
+MAIN begins with StrategyState and a concrete Candidate. Count only substantive N evolution. R requires candidate-backed whole-process challenge. Source=auto chooses useful external evidence or records an evidence-backed WAIVED reason. `D(0)` and `V(0)` are lower bounds, not disable switches. D uses opaque D+/D−/Dx mechanisms and reintegrates into MAIN. Qualified V channels have private ledgers, positive V time, semantic distance and no V-to-V communication. L actual requires intervention-linked evidence.
 
-After genesis, resolve the parameter header using `core/11_PARAMETER_FORMAT_AND_RESOLUTION.md`. AMBIGUOUS/INVALID aborts before U0. If RESOLVED, freeze faithful U0; semantically complete missing N/T/R/n/t/r/s according to task scale; determine SourceDisposition and host isolation capability; freeze the Effective Contract with count/D minima and B/b-governed timing targets. META must not pre-solve the task or freeze a detailed strategy.
-
-## MAIN begins with revisable strategy
-
-Immediately after contract freeze, enter MAIN for substantive task understanding and Strategy Genesis. Strategy is a revisioned working state—not a workflow. The model may pivot representation, decomposition, tool/research/validation plan or assumptions whenever evidence, tests, R, S or D justify it.
-
-Maintain Candidate snapshots when a meaningful result exists. Maintain EST only as compact reopenable memory. Prefer references between stores over duplicated truth.
-
-## N / S / R / D-L
-
-- N: meaningful MAIN evolution events, event-v2 bound to current run/clock/strategy.
-- S: source research is presumed REQUIRED unless a specific waiver is justified. Each SOURCE interval names active S IDs; parallel S shares the same aggregate t interval.
-- R: once a candidate exists, whole-process re-entry attacks candidate/process/strategy and either creates a new candidate or explicitly retains the old one after substantive challenge.
-- D: `D(s)` is a completed-intervention minimum, not an enable switch. Run non-local intervention sessions when required by the minimum or when useful for result quality; actual D may exceed target. Proposals may evolve until Decree. D result must reintegrate into Main with concrete consequence.
-- L: actual D isolation comes from intervention-linked receipts with distinct target/capability/actual values. Do not promote host capability into an unearned actual claim.
-
-The model chooses when and how to use these mechanisms beyond frozen minima/targets. The runtime validates lifecycle/reference/timing facts, not intellectual merit.
-
-## Completion, recovery and finalization
-
-Keep completion gaps revisioned and reopenable. Meeting applicable count/D minima and hard timing gates is necessary but never itself a quality stop command; soft T/t targets guide effort without becoming mechanical lower-bound gates. Before delivery, close or consciously retain non-blocking gaps, perform a semantic completion assessment, finalize timing, verify clock/ledger parity and workspace integrity, then persist final summary.
-
-If execution crosses a process boundary, verify the complete workspace first, then resume only with a new three-sample clock sequence whose provider and non-empty boot identity prove continuity. Otherwise keep time unverifiable rather than inventing continuity.
-
-Return the real task result first, followed only by the compact canonical proof. The user-visible proof must follow `runtime/proof.py` rendering semantics exactly: actual durations floor to whole seconds, and hard-unverified B/b time actuals display `?` rather than raw observed floats. Do not expose hidden chain-of-thought or turn the workspace into a user-facing protocol report unless the task itself asks for audit details.
+Before stopping, assess semantic completeness and open high-value gaps. Call `digr.commit_delivery` with exact final bytes, media type and current Candidate binding. Delivery materializes TOTAL and independent N/T/R/B/S/D/V/L audit logs. Only verified `DELIVERED` permits canonical proof. Failed gates close `INCOMPLETE`; no HostAdapter means visible `DIGR~` advisory output without canonical proof.

@@ -1,6 +1,6 @@
 # Mutable Strategy and Candidate State
 
-**Freeze commitments, never freeze strategy.** P_run, U0, user hard constraints and Effective Contract commitments are frozen; count/D fields are minima while T/t are B/b-governed targets; task representation, decomposition, Strategy, assumptions, source/validation/tool routes, Candidate and D gambit remain working state.
+**Freeze commitments, never freeze strategy.** P_run, U0, user hard constraints and Effective Contract commitments are frozen; count/D/V fields are minima while T/t are B/b-governed targets; task representation, decomposition, Strategy, assumptions, source/validation/tool routes, Candidate and D/V choices remain working state.
 
 After Contract freeze, substantive task work enters MAIN. Strategy Genesis forms the current task model, primary/alternative routes, source strategy, validation strategy, tool strategy, assumptions and risks. Because this is real task work it counts toward T and may naturally qualify as N when it is a meaningful evolution.
 

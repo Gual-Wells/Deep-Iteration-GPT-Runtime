@@ -9,21 +9,26 @@ from runtime.run_session import LiveDIGRRun,RunGenesisError,RunResumeError
 from runtime.strategy_store import StrategyState
 from runtime.candidate_store import CandidateSnapshot
 from runtime.isolation_checks import IsolationFacts
-from tests.helpers import authority,FakeClock,protocol_load_receipt
+from tests.helpers import (
+    authority,FakeClock,persist_enforced_host_receipts,protocol_load_receipt,
+    stable_invocation_for_contract,stable_preflight_parameters,
+)
 
 class TestRunSession(unittest.TestCase):
     def bootstrap(self,td,msg='DIGR(1,1,S,D,L):任务',contract=None,clock=None):
+        contract=contract or EffectiveContract(1,0,1,0,SourceContract(1,0,1,0),1,1,SourceDisposition.REQUIRED)
+        msg=stable_invocation_for_contract(contract,'task')
+        resolved=stable_preflight_parameters(msg)
         c=clock or FakeClock();run=LiveDIGRRun.start(authority(),msg,Path(td),c,run_id='digr-12345678')
         run.bind_protocol_load(protocol_load_receipt())
-        r=run.resolve_parameters();self.assertEqual(r.status.value,'RESOLVED');run.freeze_u0('任务')
-        contract=contract or EffectiveContract(1,0,1,0,SourceContract(1,0,1,0),1,1,SourceDisposition.REQUIRED)
+        r=run.bind_preflight_parameters(resolved);self.assertEqual(r.status.value,'RESOLVED');persist_enforced_host_receipts(run);run.freeze_u0()
         run.freeze_contract(contract);return run,c
     def genesis_strategy(self,run,c):
         run.transition(WorkState.MAIN,c()); return run.save_strategy(StrategyState(0,'task model','primary',('alternative',),'research sources','run tests','use tools',(),(),'genesis',()))
     def complete_run(self,td):
         run,c=self.bootstrap(td); self.genesis_strategy(run,c)
         run.record_main_evolution('changed architecture','implemented','better')
-        run.save_candidate(CandidateSnapshot(0,'candidate result'))
+        run.save_candidate_bytes(b'candidate result',summary='candidate result')
         run.record_main_reentry(0,'challenge whole approach','rerun process','retained with evidence',retained=True)
         run.open_source('S1','research x');run.transition(WorkState.SOURCE,c(),active_source_ids=('S1',));run.record_source_evolution('S1','new evidence','searched','found');run.record_source_reentry('S1',0,'cross-check','independent check','confirmed',retained=True)
         run.transition(WorkState.MAIN,c());run.add_isolation_facts('iso1',IsolationFacts(True));run.create_d_intervention('D1','iso1','try orthogonal model');run.revise_d_proposal('D1','try adversarial countermodel','stronger pivot');run.decree_d('D1','execute current gambit');run.transition(WorkState.D_EXCLUSIVE,c());run.record_d_execution('D1','ran challenge');run.record_d_result('D1','no better alternative');run.transition(WorkState.MAIN,c());run.reintegrate_d('D1',accepted='none',rejected='countermodel',main_consequence='retain candidate after independent challenge',candidate_before_revision=0)
@@ -32,7 +37,7 @@ class TestRunSession(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR：任务',Path(td),c,run_id='digr-12345678');self.assertEqual(run.phase.phase,RunPhase.GENESIS);self.assertGreaterEqual(len(run.clock_journal.events),3)
             with self.assertRaises(RuntimeError):run.freeze_u0('任务')
-            run.bind_protocol_load(protocol_load_receipt());run.resolve_parameters();run.freeze_u0('任务');run.freeze_contract(EffectiveContract(0,0,0,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed transformation'))
+            run.bind_protocol_load(protocol_load_receipt());run.bind_preflight_parameters(stable_preflight_parameters('DIGR:task'));run.freeze_u0();run.freeze_contract(EffectiveContract(2,0,1,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed transformation'))
             self.assertEqual(run.phase.phase,RunPhase.CONTRACT_FROZEN)
     def test_parameter_resolution_requires_verified_protocol_load_receipt(self):
         with tempfile.TemporaryDirectory() as td:
@@ -40,7 +45,9 @@ class TestRunSession(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'protocol load receipt required'):
                 run.resolve_parameters()
             run.bind_protocol_load(protocol_load_receipt())
-            self.assertEqual(run.resolve_parameters().status.value,'RESOLVED')
+            with self.assertRaisesRegex(RuntimeError,'pre-Genesis preflight'):
+                run.resolve_parameters()
+            self.assertEqual(run.bind_preflight_parameters(stable_preflight_parameters('DIGR:task')).status.value,'RESOLVED')
 
     def test_post_genesis_protocol_load_abort_is_terminal(self):
         with tempfile.TemporaryDirectory() as td:
@@ -62,10 +69,13 @@ class TestRunSession(unittest.TestCase):
             self.assertFalse((Path(td)/'digr-12345678').exists())
     def test_parameter_invalid_aborts_after_clock_genesis_before_u0(self):
         with tempfile.TemporaryDirectory() as td:
-            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR(1,1,1)：x',Path(td),c,run_id='digr-12345678');self.assertGreaterEqual(len(run.clock_journal.events),3);run.bind_protocol_load(protocol_load_receipt());r=run.resolve_parameters();self.assertEqual(r.status.value,'INVALID');self.assertEqual(run.phase.phase,RunPhase.ABORTED);self.assertFalse(run.workspace.path('U0.json').exists())
+            with self.assertRaises(ValueError):
+                stable_preflight_parameters('DIGR(1,1,1):x')
+            self.assertEqual(list(Path(td).iterdir()),[])
     def test_explicit_parameters_cannot_be_changed_by_contract_completion(self):
         with tempfile.TemporaryDirectory() as td:
-            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR(N=2,R=1)：x',Path(td),c,run_id='digr-12345678');run.bind_protocol_load(protocol_load_receipt());run.resolve_parameters();run.freeze_u0('x')
+            message='DIGR(N=2,R=1):x';resolved=stable_preflight_parameters(message)
+            c=FakeClock();run=LiveDIGRRun.start(authority(),message,Path(td),c,run_id='digr-12345678');run.bind_protocol_load(protocol_load_receipt());run.bind_preflight_parameters(resolved);run.freeze_u0()
             with self.assertRaises(ValueError):run.freeze_contract(EffectiveContract(3,0,1,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed'))
     def test_strategy_genesis_is_main_work_not_meta(self):
         with tempfile.TemporaryDirectory() as td:
@@ -103,8 +113,8 @@ class TestRunSession(unittest.TestCase):
             run.create_d_intervention('D1','iso','quality-driven non-local challenge');run.decree_d('D1','execute')
             run.transition(WorkState.D_EXCLUSIVE,c());run.record_d_execution('D1','ran challenge');run.record_d_result('D1','useful result')
             run.transition(WorkState.MAIN,c());run.reintegrate_d('D1',accepted='result',rejected='none',main_consequence='improved answer')
-            run.completion.assess('ready');run.finish_time(c());self.assertEqual(run.actuals().D_s,1);self.assertTrue(run.stop_check().D_ok)
-            run.write_run_summary();self.assertTrue(verify_run_workspace(run.workspace.root,run.run_id)['integrity_ok'])
+            run.save_candidate_bytes(b'final result',summary='final result');run.completion.assess('ready');run.finish_time(c());self.assertEqual(run.actuals().D_s,1);self.assertTrue(run.stop_check().D_ok)
+            run.write_run_summary(b'final result');self.assertTrue(verify_run_workspace(run.workspace.root,run.run_id)['integrity_ok'])
 
     def test_source_reentry_is_source_result_backed_without_main_candidate(self):
         with tempfile.TemporaryDirectory() as td:
@@ -124,19 +134,19 @@ class TestRunSession(unittest.TestCase):
             run.transition(WorkState.D_EXCLUSIVE,c());run.record_d_execution('D1','isolated work')
             out=run.write_d_packet('D1-out','output',{'finding':'counterexample not sustained'});run.record_d_result('D1','result',output_packet_ref=out)
             run.transition(WorkState.MAIN,c());run.reintegrate_d('D1',accepted='none',rejected='counterexample',main_consequence='retain route')
-            run.completion.assess('ready');run.finish_time(c());run.write_run_summary();self.assertTrue(verify_run_workspace(run.workspace.root,run.run_id)['integrity_ok'])
+            run.save_candidate_bytes(b'final result',summary='final result');run.completion.assess('ready');run.finish_time(c());run.write_run_summary(b'final result');self.assertTrue(verify_run_workspace(run.workspace.root,run.run_id)['integrity_ok'])
 
     def test_l2_output_packet_tamper_is_rejected_even_if_result_exists(self):
         with tempfile.TemporaryDirectory() as td:
             contract=EffectiveContract(0,0,0,0,SourceContract(0,0,0,0),1,2,SourceDisposition.WAIVED,'closed')
             run,c=self.bootstrap(td,'DIGR(D,L(2)):x',contract);self.genesis_strategy(run,c);inp=run.write_d_packet('D1-in','input',{'x':1});l2=IsolationFacts(True,True,True,True,True)
             run.add_isolation_facts('iso2',l2,input_packet_ref=inp);run.create_d_intervention('D1','iso2','p');run.decree_d('D1','d');run.transition(WorkState.D_EXCLUSIVE,c());run.record_d_execution('D1','e');out=run.write_d_packet('D1-out','output',{'y':2});run.record_d_result('D1','r',output_packet_ref=out);run.transition(WorkState.MAIN,c());run.reintegrate_d('D1',accepted='a',rejected='r',main_consequence='c')
-            run.workspace.path(out).write_text('{"tampered":true}')
+            run.workspace.path(out).write_text('{"tampered":true}',encoding='utf-8')
             with self.assertRaises(ValueError):verify_run_workspace(run.workspace.root,run.run_id)
 
     def test_end_to_end_actuals_d_and_recovery(self):
         with tempfile.TemporaryDirectory() as td:
-            run,c=self.complete_run(td);a=run.actuals();self.assertEqual((a.N,a.R,a.S_count,a.n_min,a.r_min,a.D_s,a.L_e),(1,1,1,1,1,1,1));self.assertTrue(run.stop_check().minima_satisfied);self.assertTrue(run.delivery_ready());summary=run.write_run_summary();self.assertTrue(summary['delivery_ready']);self.assertEqual(run.phase.phase,RunPhase.FINISHED);self.assertTrue(run.render_proof().startswith('DIGR（'));report=verify_run_workspace(run.workspace.root,run.run_id);self.assertTrue(report['integrity_ok'])
+            run,c=self.complete_run(td);a=run.actuals();self.assertEqual((a.N,a.R,a.S_count,a.n_min,a.r_min,a.D_s,a.L_e),(1,1,1,1,1,1,1));self.assertTrue(run.stop_check().minima_satisfied);self.assertTrue(run.delivery_ready());summary=run.write_run_summary(b'candidate result');self.assertTrue(summary['delivery_ready']);self.assertEqual(run.phase.phase,RunPhase.DELIVERED);self.assertTrue(run.render_proof().startswith('DIGR（'));report=verify_run_workspace(run.workspace.root,run.run_id);self.assertTrue(report['integrity_ok'])
     def test_finish_requires_main_and_strategy(self):
         with tempfile.TemporaryDirectory() as td:
             contract=EffectiveContract(0,0,0,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed')
@@ -144,12 +154,13 @@ class TestRunSession(unittest.TestCase):
             with self.assertRaises(RuntimeError):run.finish_time(c())
             run.transition(WorkState.MAIN,c())
             with self.assertRaises(RuntimeError):run.finish_time(c())
-            run.save_strategy(StrategyState(0,'m','r'));run.completion.assess('ready');run.finish_time(c());self.assertTrue(run.delivery_ready())
+            run.save_strategy(StrategyState(0,'m','r'));run.save_candidate_bytes(b'final',summary='final');run.completion.assess('ready');run.finish_time(c());self.assertTrue(run.delivery_ready())
     def test_u0_contract_single_freeze(self):
         with tempfile.TemporaryDirectory() as td:
-            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR：x',Path(td),c,run_id='digr-12345678');run.bind_protocol_load(protocol_load_receipt());run.resolve_parameters();run.freeze_u0('x')
+            message='DIGR:x';resolved=stable_preflight_parameters(message)
+            c=FakeClock();run=LiveDIGRRun.start(authority(),message,Path(td),c,run_id='digr-12345678');run.bind_protocol_load(protocol_load_receipt());run.bind_preflight_parameters(resolved);run.freeze_u0()
             with self.assertRaises(RuntimeError):run.freeze_u0('y')
-            k=EffectiveContract(0,0,0,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed');run.freeze_contract(k)
+            k=EffectiveContract(2,0,1,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed');run.freeze_contract(k)
             with self.assertRaises(RuntimeError):run.freeze_contract(k)
     def test_resume_requires_equal_nonempty_boot_and_restores_live_state(self):
         with tempfile.TemporaryDirectory() as td:
@@ -187,13 +198,13 @@ class TestRunSession(unittest.TestCase):
 
     def test_final_summary_semantic_tamper_rejected_after_reindex(self):
         with tempfile.TemporaryDirectory() as td:
-            run,c=self.complete_run(td);run.write_run_summary();rel='final/run-summary.json';d=run.workspace.read_json(rel);d['delivery_ready']=not d['delivery_ready'];run.workspace.write_json(rel,d,kind='run-summary')
-            with self.assertRaisesRegex(ValueError,'final run summary drift'):
+            run,c=self.complete_run(td);run.write_run_summary(b'candidate result');rel='final/run-summary.json';d=run.workspace.read_json(rel);d['delivery_ready']=not d['delivery_ready'];run.workspace.write_json(rel,d,kind='run-summary')
+            with self.assertRaisesRegex(ValueError,'run summary.*(drift|disagrees|describe)'):
                 verify_run_workspace(run.workspace.root,run.run_id)
 
     def test_reintegration_clock_binding_is_semantically_verified(self):
         with tempfile.TemporaryDirectory() as td:
-            run,c=self.complete_run(td);run.write_run_summary();item=run.dictator.latest('D1');d=item.to_dict()
+            run,c=self.complete_run(td);run.write_run_summary(b'candidate result');item=run.dictator.latest('D1');d=item.to_dict()
             d_exclusive=next(e.record_hash for e in run.clock_journal.events if e.event=='STATE' and e.state is WorkState.D_EXCLUSIVE)
             d['reintegration']['clock_event_ref']=d_exclusive
             rev=item.state_revision
@@ -204,6 +215,6 @@ class TestRunSession(unittest.TestCase):
 
     def test_artifact_tamper_detected(self):
         with tempfile.TemporaryDirectory() as td:
-            run,c=self.complete_run(td);p=run.workspace.path('state/strategy-latest.json');d=json.loads(p.read_text());d['current_primary_route']='tampered';p.write_text(json.dumps(d))
+            run,c=self.complete_run(td);p=run.workspace.path('state/strategy-latest.json');d=json.loads(p.read_text(encoding='utf-8'));d['current_primary_route']='tampered';p.write_text(json.dumps(d),encoding='utf-8')
             with self.assertRaises(ValueError):verify_run_workspace(run.workspace.root,run.run_id)
 if __name__=='__main__':unittest.main()

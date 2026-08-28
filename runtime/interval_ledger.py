@@ -15,7 +15,7 @@ from .validation import require_bool
 
 
 class WorkState(str, Enum):
-    MAIN='MAIN'; SOURCE='SOURCE'; D_EXCLUSIVE='D_EXCLUSIVE'; META='META'; IDLE='IDLE'
+    MAIN='MAIN'; SOURCE='SOURCE'; D_EXCLUSIVE='D_EXCLUSIVE'; V_EXCLUSIVE='V_EXCLUSIVE'; META='META'; IDLE='IDLE'
 
 _FORMAL={WorkState.MAIN,WorkState.SOURCE}
 
@@ -98,12 +98,20 @@ class FormalTimeLedger:
 
     def formal_T_ns(self)->int: return sum(x.observed_ns for x in self._intervals if x.state in _FORMAL)
     def formal_t_ns(self)->int: return sum(x.observed_ns for x in self._intervals if x.state is WorkState.SOURCE)
+    def formal_D_ns(self)->int: return sum(x.observed_ns for x in self._intervals if x.state is WorkState.D_EXCLUSIVE)
+    def formal_V_ns(self)->int: return sum(x.observed_ns for x in self._intervals if x.state is WorkState.V_EXCLUSIVE)
     def T_hard_verified(self)->bool:
         rel=[x for x in self._intervals if x.state in _FORMAL]
         return bool(rel) and all(x.hard_verified for x in rel)
     def t_hard_verified(self)->bool:
         rel=[x for x in self._intervals if x.state is WorkState.SOURCE]
         return bool(rel) and all(x.hard_verified for x in rel)
+    def D_time_verified(self)->bool:
+        rel=[x for x in self._intervals if x.state is WorkState.D_EXCLUSIVE]
+        return bool(rel) and all(x.observed_ns>0 for x in rel)
+    def V_time_verified(self)->bool:
+        rel=[x for x in self._intervals if x.state is WorkState.V_EXCLUSIVE]
+        return bool(rel) and all(x.observed_ns>0 for x in rel)
 
     def to_dict(self)->dict:
         return {
@@ -111,6 +119,9 @@ class FormalTimeLedger:
             'foreground_state':self._state.value if self._state else None,
             'intervals':[{'state':x.state.value,'start':x.start.to_dict(),'end':x.end.to_dict(),'observed_ns':x.observed_ns,'hard_verified':x.hard_verified} for x in self._intervals],
             'T_actual_seconds':self.formal_T_ns()/1e9,'t_actual_seconds':self.formal_t_ns()/1e9,
+            'D_actual_seconds':self.formal_D_ns()/1e9,'V_actual_seconds':self.formal_V_ns()/1e9,
             'T_actual_ns':self.formal_T_ns(),'t_actual_ns':self.formal_t_ns(),
+            'D_actual_ns':self.formal_D_ns(),'V_actual_ns':self.formal_V_ns(),
             'T_hard_verified':self.T_hard_verified(),'t_hard_verified':self.t_hard_verified(),
+            'D_time_verified':self.D_time_verified(),'V_time_verified':self.V_time_verified(),
         }

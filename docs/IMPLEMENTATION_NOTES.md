@@ -1,31 +1,17 @@
-# Alpha 4 Implementation Notes
+# Berta1 Implementation Notes
 
-Alpha 4 is a black-box integration correction release over the Alpha 3 transport-hardened baseline.
+Berta1 converts the pre-stable repository protocol into a pinned-manifest host contract. Broad local capture triggers live acquisition; only the pinned STARTUP classifies the surface. Deterministic profiles remove model-completed contract numbers, and capability negotiation distinguishes ENFORCED from ADVISORY/PROMPT_ONLY execution.
 
-## Repository transport
+The release builder derives compact model protocol, Chinese Help, full execution bundle and all personalization variants. Descriptor artifact hashes, lengths, bundle member count and ordered execution-set digest are rewritten atomically.
 
-`runtime/repository_transport.py` now models transport capability rather than pretending every direct source exposes the same endpoint set. The first mutable observation is the public repository `stable` branch resource. If provenance is `github_connector`, that current branch HEAD is sufficient and no Git-ref endpoint is required. If provenance is `direct_https`, the Git-ref endpoint is additionally read and the two full 40-hex SHAs must agree. Search/index/crawl provenance remains rejected. All later reads are immutable-SHA pinned.
+The generated compact model protocol is a release/advisory artifact, not a promised runtime fetch. Manifest entry/core or their verified bundle remain executable sources. Stable delivery requires exact-byte Candidate binding and closes as DELIVERED or INCOMPLETE.
 
-This mirrors the live ChatGPT GitHub connector behavior observed during Alpha 3 testing: the connector returned the same `stable` HEAD as direct `git ls-remote` and successfully fetched pinned VERSION/manifest/startup/help, while its generic fetch surface did not expose the Git-ref REST endpoint.
+The symbolic APIs `digr.preflight` and `digr.commit_delivery` map to `HostAdapter.preflight` / `HostAdapter.start` and `LiveDIGRRun.commit_delivery`. They are not automatically registered as ChatGPT client tools. A text-only personalization installation is therefore ADVISORY unless an external client/host binding supplies the declared capabilities and calls these boundaries.
 
-## D/L correction
+## Runtime separation and persistence
 
-`D_s` is mechanically a completed-intervention lower bound. Alpha 3 accidentally introduced an enable/disable interpretation through `EffectiveContract.dictator_enabled`, `LiveDIGRRun.create_d_intervention()` and recovery validation. Alpha 4 removes that gate. D actual may exceed a zero target when the native model judges a disruptive intervention useful.
+`runtime/routing.py`, `runtime/repository_transport.py`, `runtime/invocation_surface.py`, and `runtime/parameter_resolution.py` form the deterministic host boundary. None of these chooses task strategy. Intellectual choices stay with the model while host code enforces transport, parsing, immutable bindings, state and evidence integrity.
 
-L remains `target/capability/actual`. Mechanical L applicability is based on actual completed D, not the D minimum. A zero D target with an actual completed D therefore receives normal L validation; a run with no completed D has no completed-intervention L gate.
+Callers use thin semantic methods instead of raw `.events.append()`. Wrappers validate references, not intellectual quality. Strategy/Candidate/EST/Source/D/Completion stores are revisioned; source work is tied to formal SOURCE intervals and a source-activity binding. Isolation facts are capability evidence, while isolation receipts bind what an individual intervention actually used.
 
-## Timing and proof
-
-The deterministic stop code already treated B/b=0 as soft and B/b=1 as hard. Alpha 4 aligns protocol language with that behavior: N/R/n/r/D are unconditional minima, T/t are targets whose stop-gate strength is controlled by B/b.
-
-`runtime/proof.py` remains the canonical renderer. Live host output had exposed raw fractional seconds; Alpha 4 makes the protocol-level presentation rule explicit: actual duration floors to whole seconds, and hard-unverified B/b time is hidden as `?`. This is a host-integration requirement, not a change to the renderer algorithm.
-
-## Initialization
-
-Alpha 4 intentionally does not remove staged authority, complete pinned execution-protocol verification, Clock Genesis, U0/contract setup or META verification to reduce wall-clock latency. Full-parameter black-box runs showed that semantic default completion is only one part of startup cost. The logical entrypoint + 17 core modules remain separate source files, while a deterministic execution bundle reduces their post-genesis physical repository acquisitions from 18 to 1. Any later performance work must preserve the same authority/clock/contract boundaries.
-
-## Retained Alpha 2/3 state machinery
-
-`runtime/routing.py`, `runtime/repository_transport.py`, `runtime/invocation_surface.py` and `runtime/parameter_resolution.py` remain boundary helpers. None of these chooses task strategy. `LiveDIGRRun` continues to replace raw `.events.append()` use with thin semantic wrappers. Wrappers validate references, not intellectual quality.
-
-Strategy/Candidate/EST/Source/D/Completion stores remain revisioned. Source time still derives from formal SOURCE intervals plus source-activity bindings rather than a second aggregate truth. Isolation facts describe evidenced capability; isolation receipts bind target-bounded actual mode to interventions. Recovery still verifies complete workspace semantics before resume; integrity alone is not time continuity.
+Recovery verifies hashes, indexes and state chains, but integrity alone is not time continuity. Continuous-time claims still require supported monotonic-provider and boot/session evidence.

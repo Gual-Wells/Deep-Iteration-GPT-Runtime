@@ -1,25 +1,17 @@
-# Repository transport
+# Repository Transport — Berta1
 
-Alpha 4 keeps repository transport outside DIGR execution semantics and makes transport mode explicit.
+Transport starts for every broad candidate whose lstripped message begins with exact uppercase `DIGR` or exact `深度迭代`; surface classification happens only after pinned startup is loaded.
 
-## Admissible mutable-ref sources
+## Mutable ref
 
-- `github_connector`: an already-connected GitHub repository connector may read the public repository `stable` branch resource and accept its current full 40-hex HEAD SHA. Connector mode does not require a Git-ref endpoint the connector product does not expose.
-- `direct_https`: a real direct GitHub REST client reads both the stable branch resource and Git-ref resource. If a push lands between those two live reads, one bounded re-observation is allowed; only a matching full SHA is accepted.
-- search/index/crawl/snippet/browser-search snapshots are never mutable-ref authority.
+- `github_connector`: accept the current full 40-hex `stable` branch HEAD from an already-connected repository connector.
+- `direct_https`: read `/branches/stable` and `/git/ref/heads/stable` in the same attempt; accept only identical full SHAs.
+- search/index/crawl/snippet representations are inadmissible.
 
-A public DIGR bootstrap must not require the user to establish a new GitHub OAuth connection merely to read this repository. If a connector is already connected, it is preferred; otherwise a host may use genuine direct REST if available.
+Do not require new OAuth solely to bootstrap this public repository.
 
-## Immutable staged phase
+## Immutable navigation and artifacts
 
-After stable resolves to one SHA, every later resource is read at that exact SHA. `raw.githubusercontent.com/{SHA}/{PATH}` is canonical. GitHub Contents API is an allowed fallback only when the response is raw media or its JSON/base64 wrapper is decoded into actual file bytes.
+Read pinned `manifest.json` and `VERSION` first and require their versions to agree. Follow only manifest-declared paths at the same SHA. Load every `startup_slice` member before classifying the original message. NATIVE returns untouched text; HELP loads `manifest.help`; EXECUTING loads `entrypoint`/`core[]` or their exact verified bundle.
 
-The first immutable stage remains deliberately small: `manifest.json`, `VERSION`, then `startup_slice`. This preserves cheap NATIVE/HELP/INVALID classification and keeps Clock Genesis at the same early boundary.
-
-For EXECUTING, Alpha 4 separates **logical protocol modularity** from **physical transport count**. The repository continues to maintain one entrypoint and 17 core source files, but the release builder deterministically generates `bundle/EXECUTION_PROTOCOL.json`. After Clock Genesis the host fetches this single pinned bundle, verifies that it contains exactly the manifest-declared entrypoint/core members in order with matching byte lengths and SHA-256 digests, and persists an `ExecutingProtocolLoadReceipt`. Parameter resolution cannot start without that receipt.
-
-Older staged manifests without an execution bundle remain compatible by loading their entrypoint/core individually and normalizing those verified files into the same receipt shape.
-
-A post-genesis mandatory protocol-load failure is a failure of a **born** run: the standard host bridge persists `ABORTED`, and the run cannot continue parameter resolution from an unverified GENESIS state.
-
-Transport receipts prove that real acquisitions occurred. They do not contain or define N/T/R/S/D/L, timing, stop or proof semantics.
+The manifest-declared runtime descriptor records hashes, byte lengths and media types for generated execution/release artifacts. Raw pinned SHA URLs are canonical; Contents API wrappers must be decoded to real bytes. Descriptor verification cannot replace manifest/VERSION startup navigation.

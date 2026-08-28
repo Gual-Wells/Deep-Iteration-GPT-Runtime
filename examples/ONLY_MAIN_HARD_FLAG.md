@@ -1,5 +1,5 @@
 # Only B hard
 
-`DIGR（B=1）：深度分析该问题`
+`DIGR（B=1）：验证边界条件`
 
-模型必须生成与任务相称的非退化 T；生成 T 与 B=1 组成 hard contract。不能用 T=0 架空用户 hard 意图。
+Berta1 返回 NEEDS_CORRECTION：硬标志不能授权模型或 host 补全时长。请使用 `DIGR（min=10min）：验证边界条件`，或在 legacy-compatible 表面同时显式给出正 `T` 与 `B=1`。

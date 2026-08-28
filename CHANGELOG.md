@@ -1,5 +1,39 @@
 # Changelog
 
+## 5.0.0-Berta1 — V, four-clock and local-audit integration candidate
+
+Berta1 is based on stable.1 and selectively absorbs alpha5-r3 reliability mechanisms. It is intentionally a Berta-series candidate, not a formal stable release.
+
+- public parameters are `N,T,R,B,S,D,V,L`; V(o) is a persistent, qualified, semantically distant viewpoint minimum between D and L;
+- typed parameters may be reordered, flat nested labels are supported, duplicates fail, and remaining unlabeled values are unique-or-fail with candidate diagnostics;
+- V channels have private revisioned VLedgers, no V-to-V API, positive owned V_EXCLUSIVE time and Main-sovereign reintegration;
+- ClockJournal projects T, t, D and V clocks; D/V are excluded from T, and IDLE/META count nowhere;
+- D retains one public mechanism while internally supporting opaque D+, D− and Dx/D⊥ semantic directions;
+- completion can record four structured criteria while preserving migration compatibility with stable.1 assessments;
+- delivery emits content-addressed TOTAL and independent N/T/R/B/S/D/V/L local NDJSON logs;
+- MCP, dynamic UI, PWA, remote bridge and backend implementation branches are absent;
+- ClockJournal appends are durable before in-memory publication; stable.1 exact-candidate and two-phase fail-closed delivery remain intact.
+
+## Inherited stable.1 pinned-manifest foundation
+
+Berta1 preserves the validated 5.0 execution foundation while making the pinned navigation boundary explicit.
+
+### Authority and distribution
+
+- exact-uppercase DIGR/深度迭代 prefixes are broadly captured and always acquire pinned startup before classification;
+- connector reads current stable HEAD; direct REST requires same-attempt branch and Git-ref SHA agreement;
+- pinned `manifest.json` is navigation authority, pinned `VERSION` must agree, and the sole startup slice is self-contained `entry/STARTUP.md`;
+- `runtime-descriptor.json` is a later execution/release artifact description, not the first read or navigation authority;
+- `dist/MODEL_PROTOCOL.md`, `dist/HELP.zh-CN.md` and `dist/EXECUTION_PROTOCOL.json` are deterministically generated from the logical protocol sources;
+- one personalization template generates compact, FREE_GO, expanded and root standalone copies, each with a terminal truncation sentinel;
+- the release builder gains a prepare-only mode and excludes Python/test caches from reproducible packages.
+
+### Semantic and lifecycle closure
+
+- the last contradictory `zero_disables_D` descriptor text is removed: `D(0)` is only a zero minimum and never an off switch;
+- new runs use a two-phase, fail-closed, recoverable delivery commit; only verified payload/summary/proof/envelope preparation may transition to `DELIVERED`;
+- bootstrap, Help, migration and routing documentation agree on pinned manifest/STARTUP handoff.
+
 ## 5.0.0-alpha.4 — live black-box integration corrections
 
 Alpha 4 follows Alpha 3 after successful live GitHub-connector routing and subsequent full-parameter black-box runs exposed remaining integration defects. It preserves Alpha 3 immutable repository authority, staged startup, trusted clock genesis, workspace/state model and recovery design.

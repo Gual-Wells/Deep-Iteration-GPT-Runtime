@@ -1,13 +1,7 @@
-# Effective Contract — Freeze Commitments, Not Strategy
+# Effective Contract
 
-After parameter resolution and native semantic completion, freeze one Effective Contract containing count/intervention minima `N/R/n/r/D`, time targets `T/t`, fixed B/b timing policies, requested L target, SourceDisposition and any user hard constraint that makes L mismatch delivery-blocking.
+HostAdapter forms the Effective Contract from pinned P_run identity, exact U0, deterministic parameter resolution, capability negotiation and explicit hard constraints. It freezes commitments, never StrategyState.
 
-`B=0` / `b=0` makes the corresponding T/t value a soft target: it remains part of the frozen contract and may guide effort calibration, but it is not a mechanical lower-bound stop gate. `B=1` / `b=1` upgrades the corresponding time target to a hard lower bound that must be evidence-backed before the mechanical gate passes.
+The public contract order is `N,T,R,B,S,D,V,L`. V(o) is the minimum number of qualified, nonredundant and semantically distant persistent viewpoint channels. Main remains sovereign: V produces compact value events; it never owns final selection. V channels have private VLedgers and receive no V-to-V state.
 
-`SourceDisposition` is orthogonal to S numeric minima/targets. It defaults to `REQUIRED`. `WAIVED` requires an explicit reason grounded in U0/host reality (for example user forbids external sources, a closed transformation cannot benefit from them, or no external channel exists). “I already know enough” is not a waiver. A waived source cannot simultaneously carry non-zero S minima or a non-zero source-time target.
-
-`S(0,0s,0,0)` therefore does not switch source research off. It only lowers numerical source minima/time target; default source presumption still requires real external-source work.
-
-`D_s` is a completed-intervention minimum, not an enable/disable switch. `D(0)` means no completed D is mechanically required, while quality-driven D interventions remain permitted. Actual D may exceed the target just as other minimum-governed actuals may exceed their frozen lower bounds.
-
-L target is an implementation request for D and remains distinct from host capability and actual isolation. L applicability follows actual D execution, not the D minimum: if no D completes, there is no completed intervention whose L mismatch can gate delivery; if D does complete, intervention-linked `L_actual` is evaluated normally. L mismatch is visible but blocks delivery only when U0 explicitly makes exact L a hard delivery condition.
+`source=auto` requires a grounded REQUIRED or WAIVED decision. `D(0)` and `V(0)` permit quality-driven work beyond their zero minima. L applies to D isolation evidence. The model may exceed minima but cannot remap parameters, weaken hard constraints or self-certify unavailable host capabilities.

@@ -1,95 +1,67 @@
-# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.4
+# Deep Iteration GPT Runtime (DIGR) 5.0.0-Berta1
 
-**Status:** black-box corrected integration baseline intended to converge toward DIGR 5.0 final.
+**Status:** Berta-series integration candidate; not a stable release.
 
-DIGR 5.0 is a reliability exoskeleton around native model intelligence. It does not replace the model with a planner/search controller. An explicitly invoked high-investment task receives pinned protocol authority, early trusted timing, immutable U0/contract commitments, revisable strategy/source/candidate state, disruptive interventions, evidence, persistence and recovery.
+DIGR is a reliability exoskeleton around native model intelligence. An explicitly invoked high-investment task receives immutable protocol identity, early trusted timing, frozen U0/contract commitments, revisable strategy/source/candidate state, disruptive interventions, evidence, persistence and recovery.
 
-## Why Alpha 4 exists
+## Berta1 contract
 
-Alpha 3 closed the host repository-transport gap exposed by route failures that occurred before any repository acquisition. Live Alpha 3 deployment then supplied a second round of black-box evidence:
+The local shell broadly captures exact-uppercase `DIGR`/`深度迭代` prefixes and performs live transport before classification. An existing connector reads the current `stable` branch HEAD; direct REST reads branch and Git-ref in the same attempt and requires matching full SHAs. At that SHA, `manifest.json` is the navigation authority: its version must equal pinned `VERSION`, and its sole startup slice is the self-contained `entry/STARTUP.md`.
 
-- once GitHub was connected, the ChatGPT GitHub connector resolved the real current `stable` HEAD and read pinned files successfully, but the deterministic transport adapter still modeled connector and REST acquisition as the same two-endpoint workflow;
-- `D(0)` had been partially encoded as “D disabled”, contradicting the project-wide lower-bound semantics and the lower-level D store/actuals implementation;
-- L applicability was keyed to the frozen D minimum rather than actual completed D;
-- documentation blurred unconditional count/D minima with B/b-governed soft/hard time targets;
-- user-visible ChatGPT proofs leaked raw fractional seconds instead of the canonical deterministic renderer's whole-second actual format;
-- `entry/HELP.md` was English despite `language=zh-CN`, and model translation weakened normative wording such as SourceDisposition `REQUIRED`.
+The protocol version is `5.0.0-Berta1`; Python packaging uses the PEP 440 mapping `5.0.0.dev1+berta1`, recorded as descriptor `package_version`. `runtime-descriptor.json` is loaded only through manifest navigation as an execution/release artifact description, never as the first read or a replacement for manifest navigation.
 
-Alpha 4 corrects these defects while preserving the Alpha 3 authority/clock/state architecture.
+The runtime descriptor integrity-binds three deterministic distribution artifacts:
 
-## Alpha 4 corrections
+- `dist/MODEL_PROTOCOL.md`: compact model protocol generated from one author source;
+- `dist/HELP.zh-CN.md`: generated canonical Chinese help;
+- `dist/EXECUTION_PROTOCOL.json`: generated member-order, byte-length and SHA-256 bundle.
 
-### Transport capability split
+The logical source files remain reviewable under `bootstrap/`, `entry/` and `core/`. Generation changes transport shape, not semantics.
 
-Mutable `stable` has explicit transport-specific authority:
+## Berta1 additions: V, four clocks and local logs
 
-- an **already-connected GitHub repository connector** may read the public repository's `stable` branch resource and accept its current 40-hex HEAD SHA;
-- a genuine **direct REST client** reads both Branches and Git-ref resources and requires SHA consensus;
-- search/index/crawl snapshots remain inadmissible mutable-ref authority;
-- no new GitHub OAuth connection is required solely to bootstrap this public repository.
+The public parameter order is `N,T,R,B,S(n,t,r,b),D(s),V(o),L(e)`. Clearly typed labels may be reordered; remaining unlabeled values must still have one unique mapping. Flat `n/t/r/b/s/o/e` labels are supported. D(0) and V(0) are zero minima, not off switches.
 
-After one SHA is accepted, all manifest/VERSION/startup/core reads remain pinned to that immutable commit.
+V is a persistent isolated viewpoint channel with a private VLedger, semantic-distance and nonredundancy evidence, positive owned time, and no V-to-V communication. Main remains sovereign. D internally uses opaque D+/D−/Dx mechanisms while its public syntax remains D.
 
-### D/L lower-bound correction
+The four clock projections are `T=MAIN+SOURCE`, `t=SOURCE`, `D_time=D_EXCLUSIVE`, and `V_time=V_EXCLUSIVE`; META/IDLE count nowhere. Canonical presentation groups them as `T目标/T真实（+D真实时间，+V真实时间）`.
 
-`D(s)` is a minimum completed/reintegrated intervention count. `D(0)` means “no completed D is mechanically required”, not “D is disabled”. Quality-driven D remains permitted and actual D may exceed target. L continues to preserve `L_target`, `L_cap` and `L_actual`; L stop applicability follows **actual completed D**, not the D minimum.
+The standard profile is N2/R1/no-time/source-auto/D0/V0/L1. Explicit `min=<duration>` is a hard lower bound and `target=<duration>` is soft.
 
-### Timing target terminology
+Berta1 closes new runs as `DELIVERED` or `INCOMPLETE`. Delivery writes local `TOTAL` plus independent N/T/R/B/S/D/V/L NDJSON audit logs. MCP, dynamic UI, PWA, remote bridge and backend code are deliberately absent. An incomplete run cannot claim a canonical proof.
 
-`N/R/n/r/D` are unconditional lower bounds. T/t are frozen **targets** governed by B/b:
+## Host integration and client boundary
 
-- B/b=0: soft target, not a mechanical lower-bound stop gate;
-- B/b=1: hard lower bound requiring trusted timing evidence.
+`digr.preflight` and `digr.commit_delivery` are logical protocol API names. In this package they map to `runtime.host_adapter.HostAdapter.preflight` / `.start` and `runtime.run_session.LiveDIGRRun.commit_delivery`. The package does not install a ChatGPT tool, MCP server, plugin, or native iOS/Web/Desktop host binding.
 
-Initialization/repository/META work remains outside T/t unless it becomes substantive MAIN/SOURCE task work.
+Local personalization can enforce candidate routing and repository handoff only to the extent supported by the client. Without a host integration that actually exposes the Python-equivalent preflight, persistent workspace, trusted continuous clock and final-output interposer, execution is `DIGR~` ADVISORY and cannot claim mechanical actuals or canonical proof. Therefore identical personalization text alone cannot guarantee identical enforced behavior across ChatGPT clients.
 
-### Canonical proof and Help
+## Local personalization
 
-The protocol now explicitly requires the same user-visible proof semantics as `runtime/proof.py`: actual durations floor to whole seconds; hard-unverified time is `?`; raw float/nanosecond values do not leak. The canonical Help is now a professional zh-CN reference with explicit default precedence, timing policy, SourceDisposition, D/L and proof rules.
+`local-personalization/PERSONALIZATION_TEMPLATE.txt` is the single editable source for compact, FREE_GO, expanded and root standalone configurations. Generated configurations end with `<!-- DIGR_LOCAL_PERSONALIZATION_END -->` so truncated copies fail visibly.
 
-## Authority and startup
+Prepare generated artifacts without creating a ZIP:
 
-```text
-candidate message
-  ↓
-ACTUAL direct repository acquisition
-  ↓
-connector branch HEAD
-  OR direct REST branch+ref consensus
-  ↓
-immutable 40-hex SHA
-  ↓
-pinned manifest/VERSION
-  ↓
-manifest startup_slice
-  ↓
-NATIVE | HELP | INVALID | EXECUTING
-                           ↓
-                       CLOCK GENESIS
-                           ↓
-              pinned execution bundle
-                           ↓
-             verified entrypoint/core[]
-                           ↓
-            ExecutingProtocolLoadReceipt
+```bash
+python tools/build_release.py --prepare-only
 ```
 
-## Validation
-
-Run:
+## Validation and release
 
 ```bash
 python -m unittest discover -s tests -p 'test_*.py'
 python tests/validate_repo.py
 ```
 
-Deterministic release:
+The optional schema test dependency is declared as `test`; repository structural validation remains standard-library-only.
+
+To build a deterministic release after validation:
 
 ```bash
 python tools/build_release.py \
-  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.4.zip \
-  --personalization-output ../DIGR-5.0.0-alpha.4-CHATGPT-LOCAL-PERSONALIZATION.txt \
-  --full-personalization-output ../DIGR-5.0.0-alpha.4-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
+  --output ../Deep-Iteration-GPT-Runtime-5.0.0-Berta1.zip \
+  --personalization-output ../DIGR-5.0.0-Berta1-CHATGPT-LOCAL-PERSONALIZATION.txt \
+  --full-personalization-output ../DIGR-5.0.0-Berta1-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
 ```
 
-The builder regenerates release metadata, rejects cross-platform path collisions/symlinks/traversal/cache artifacts, cold-extracts the ZIP, verifies all hashes and reruns the full suite + repository validator.
+The builder regenerates descriptor-declared artifacts, rejects symlinks/path traversal/cross-platform collisions, excludes Python and test caches, fixes ZIP timestamps, verifies hashes after cold extraction and reruns validation. DEFLATE byte reproducibility is guaranteed only within the same Python/zlib build environment.

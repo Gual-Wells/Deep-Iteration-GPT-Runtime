@@ -1,4 +1,4 @@
-"""Minimal evidence locator index for DIGR 5.0 Alpha 4 run workspaces."""
+"""Minimal evidence locator index for DIGR 5.0.0-Berta1 run workspaces."""
 from __future__ import annotations
 from dataclasses import dataclass,asdict
 from typing import Any

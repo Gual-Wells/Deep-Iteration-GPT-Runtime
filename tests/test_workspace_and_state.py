@@ -16,7 +16,7 @@ class TestWorkspaceState(unittest.TestCase):
             with self.assertRaises(ValueError):ws.path('../x')
     def test_artifact_index_detects_tamper(self):
         with tempfile.TemporaryDirectory() as td:
-            ws=self.make(td);ws.write_json('state/x.json',{'x':1},kind='test',revision=0);self.assertTrue(ws.verify_artifact_index());ws.path('state/x.json').write_text('{"x":2}')
+            ws=self.make(td);ws.write_json('state/x.json',{'x':1},kind='test',revision=0);self.assertTrue(ws.verify_artifact_index());ws.path('state/x.json').write_text('{"x":2}',encoding='utf-8')
             with self.assertRaises(ValueError):ws.verify_artifact_index()
     def test_artifact_index_rejects_unindexed_authoritative_file(self):
         with tempfile.TemporaryDirectory() as td:

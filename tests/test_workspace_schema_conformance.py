@@ -4,10 +4,14 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from jsonschema import Draft202012Validator
-from referencing import Registry, Resource
+try:
+    from jsonschema import Draft202012Validator
+    from referencing import Registry, Resource
+    HAS_JSONSCHEMA = True
+except ImportError:
+    Draft202012Validator = Registry = Resource = None
+    HAS_JSONSCHEMA = False
 
-from runtime.candidate_store import CandidateSnapshot
 from runtime.effective_contract import EffectiveContract, SourceContract, SourceDisposition
 from runtime.est_store import ESTSnapshot
 from runtime.evidence_index import EvidenceRecord
@@ -15,7 +19,10 @@ from runtime.interval_ledger import WorkState
 from runtime.isolation_checks import IsolationFacts
 from runtime.run_session import LiveDIGRRun
 from runtime.strategy_store import StrategyState
-from tests.helpers import FakeClock, authority, protocol_load_receipt
+from tests.helpers import (
+    FakeClock,authority,persist_enforced_host_receipts,protocol_load_receipt,
+    stable_invocation_for_contract,stable_preflight_parameters,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / 'schemas'
@@ -39,17 +46,21 @@ def best_schema(rel: str, mapping: dict[str, str]):
     return sorted(matches, key=lambda x: (x[0].count('*'), -len(x[0])))[0]
 
 
+@unittest.skipUnless(HAS_JSONSCHEMA, 'optional test dependency jsonschema is not installed')
 class TestWorkspaceSchemaConformance(unittest.TestCase):
     def build_full_workspace(self, td):
         c = FakeClock()
-        run = LiveDIGRRun.start(authority(), 'DIGR(D,L(2)):x', Path(td), c, run_id='digr-12345678')
+        contract=EffectiveContract(1,0,1,0,SourceContract(1,0,1,0),1,2,SourceDisposition.REQUIRED)
+        message=stable_invocation_for_contract(contract);resolved=stable_preflight_parameters(message)
+        run = LiveDIGRRun.start(authority(), message, Path(td), c, run_id='digr-12345678')
         run.bind_protocol_load(protocol_load_receipt())
-        run.resolve_parameters(); run.freeze_u0('x')
-        run.freeze_contract(EffectiveContract(1, 0, 1, 0, SourceContract(1, 0, 1, 0), 1, 2, SourceDisposition.REQUIRED))
+        run.bind_preflight_parameters(resolved); run.freeze_u0('x')
+        run.freeze_contract(contract)
         run.transition(WorkState.MAIN, c())
         run.save_strategy(StrategyState(0, 'task model', 'primary route', ('alternative',), 'source route', 'validate', 'tools'))
         run.record_main_evolution('architecture changed', 'implemented', 'better')
-        run.save_candidate(CandidateSnapshot(0, 'candidate'))
+        final_bytes = b'candidate delivery payload'
+        run.save_candidate_bytes(final_bytes, summary='candidate')
         run.record_main_reentry(0, 'challenge', 'rerun', 'retained', retained=True)
         run.est.save(ESTSnapshot('MAIN', 0, ('fact',), ('decision',), (), ('question',), ('primary route',), (), ('updated',), 0, 0))
         run.evidence.add(EvidenceRecord('E1', 'test', 'local:test', 'test evidence'))
@@ -73,7 +84,7 @@ class TestWorkspaceSchemaConformance(unittest.TestCase):
         run.transition(WorkState.MAIN, c())
         run.reintegrate_d('D1', accepted='none', rejected='counterexample', main_consequence='retain route')
         run.completion.assess('ready')
-        run.finish_time(c()); run.write_run_summary()
+        run.finish_time(c()); persist_enforced_host_receipts(run); run.commit_delivery(final_bytes, media_type='text/plain')
         return run
 
     def test_every_persisted_artifact_family_has_schema_and_instance_conforms(self):
@@ -89,6 +100,9 @@ class TestWorkspaceSchemaConformance(unittest.TestCase):
                 if match is None:
                     unmatched.append(rel); continue
                 _, schema_rel = match
+                if schema_rel == 'binary':
+                    if not path.read_bytes(): failures.append((rel, 0, ['binary artifact is empty']))
+                    continue
                 schema = schemas[schema_rel]
                 values = ([json.loads(line) for line in path.read_text(encoding='utf-8').splitlines() if line.strip()]
                           if rel.endswith('.ndjson') else [json.loads(path.read_text(encoding='utf-8'))])

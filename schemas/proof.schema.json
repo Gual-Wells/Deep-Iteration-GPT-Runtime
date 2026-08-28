@@ -1,12 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/proof.schema.json",
-  "title": "DIGR 5.0 Internal Proof Data",
+  "title": "DIGR 5.0.0-Berta1 Internal Proof Data (DELIVERED wrapper required)",
   "type": "object",
   "required": [
     "main",
     "source",
     "dictator",
+    "viewpoint",
     "isolation"
   ],
   "properties": {
@@ -121,10 +122,6 @@
     },
     "dictator": {
       "type": "object",
-      "required": [
-        "target",
-        "actual"
-      ],
       "properties": {
         "target": {
           "type": "integer",
@@ -133,7 +130,26 @@
         "actual": {
           "type": "integer",
           "minimum": 0
+        },
+        "actual_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "time_verified": {
+          "type": "boolean"
         }
+      },
+      "required": ["target", "actual", "actual_seconds", "time_verified"],
+      "additionalProperties": false
+    },
+    "viewpoint": {
+      "type": "object",
+      "required": ["target", "actual", "actual_seconds", "time_verified"],
+      "properties": {
+        "target": {"type": "integer", "minimum": 0},
+        "actual": {"type": "integer", "minimum": 0},
+        "actual_seconds": {"type": "number", "minimum": 0},
+        "time_verified": {"type": "boolean"}
       },
       "additionalProperties": false
     },

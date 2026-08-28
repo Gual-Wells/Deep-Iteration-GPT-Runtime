@@ -1,9 +1,11 @@
-# DIGR 5.0 Bootstrap — Repository Authority and Staged Startup
+# DIGR 5.0 Bootstrap Architecture Note (Non-startup)
 
-The local personalization is a transport router, not a copy of DIGR semantics. This pinned bootstrap assumes the current candidate already produced real repository-acquisition evidence; no-attempt is not route failure. Each candidate route resolves `stable` to one immutable 40-hex commit, binds `manifest.json` and `VERSION`, and treats that pinned repository version as `P_run`.
+This file is explanatory only. Berta1 declares `entry/STARTUP.md` as both `bootstrap_entry` and the sole `startup_slice` member so classification and startup navigation cannot drift across files.
 
-For manifests declaring `startup_slice`, acquire only that slice before repository classification. For this Alpha 4 commit the slice is `bootstrap/BOOTSTRAP.md` plus `entry/STARTUP.md`. Do not pre-load the full core before deciding NATIVE/HELP/INVALID/EXECUTING. For EXECUTING, the manifest may declare one deterministic `execution_bundle` that transports the logical entrypoint/core after Clock Genesis without changing their semantic authority.
+The local shell performs only broad candidate capture and repository transport. Every message whose lstripped text begins with exact uppercase ASCII `DIGR` or exact `深度迭代` reaches this repository path before semantic classification.
 
-All reads after pinning use the same SHA. Context, Memory, previous answers and a target version (`P_target`) may inform task content only after the pinned protocol permits it; `P_target` cannot redefine DIGR semantics or rebind the current `P_run`.
+Transport resolves `Gual-Wells/Deep-Iteration-GPT-Runtime:stable` to one immutable 40-hex commit. An existing GitHub connector may read the current stable branch HEAD. Direct REST must read both the branch and Git-ref endpoints in the same attempt and require identical SHAs. All later reads use that SHA.
 
-Legacy pinned manifests without `startup_slice` follow their own declared navigation and are not retrofitted with Alpha 4 startup semantics.
+Pinned `manifest.json` is the navigation authority. Its `version` must equal pinned `VERSION`; then every file in `startup_slice` is loaded in declared order. `runtime-descriptor.json` is a manifest-navigated execution/release description, not the first read and not a replacement for manifest navigation.
+
+`entry/STARTUP.md` classifies the untouched original message. NATIVE returns it to ordinary ChatGPT, HELP follows `manifest.help`, and EXECUTING follows `manifest.entrypoint` plus `manifest.core[]` or their verified execution bundle. Context, Memory, previous answers and `P_target` cannot reconstruct missing pinned protocol or rebind `P_run`.

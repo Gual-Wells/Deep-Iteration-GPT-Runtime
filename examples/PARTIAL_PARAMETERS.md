@@ -1,5 +1,3 @@
-# Partial parameters
+# Stable profile overlays
 
-`DIGR（N=5，R=3）：分析该架构`
-
-N/R 显式；B=0、b=0、L1 固定缺省；其余 workload native semantic completion。
+`DIGR(profile=standard,D(1),L(2))：任务` keeps standard N2/R1/no-time/source-auto while deterministically overlaying D1/L2. The parser owns this mapping; the model cannot fill or shift omitted values.

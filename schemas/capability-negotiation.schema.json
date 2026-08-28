@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/capability-negotiation.schema.json",
+  "title": "DIGR 5.0 stable.1 Host Capability Negotiation",
+  "type": "object",
+  "required": ["mode", "final_gate", "persistent_workspace", "monotonic_clock", "repository_transport", "source_tools", "isolation_max", "viewpoint_max", "reasons"],
+  "properties": {
+    "mode": {"enum": ["ENFORCED", "ADVISORY", "PROMPT_ONLY"]},
+    "final_gate": {"type": "boolean"},
+    "persistent_workspace": {"type": "boolean"},
+    "monotonic_clock": {"enum": ["CONTINUOUS", "SESSION_ONLY", "NONE"]},
+    "repository_transport": {"type": "boolean"},
+    "source_tools": {"type": "boolean"},
+    "isolation_max": {"type": "integer", "minimum": 1, "maximum": 3},
+    "viewpoint_max": {"type": "integer", "minimum": 0},
+    "reasons": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "additionalProperties": false
+}

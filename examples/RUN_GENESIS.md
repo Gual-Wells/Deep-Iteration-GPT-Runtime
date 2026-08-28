@@ -1,15 +1,10 @@
-# Two-stage Run Genesis
+# Stable Run Genesis
 
-Input: `DIGR（R=3）：检查并改进方案`
+1. broad local capture acquires current `stable`, pins manifest/VERSION and loads pinned STARTUP;
+2. pinned STARTUP classifies the exact original message;
+3. EXECUTING `digr.preflight` resolves deterministic parameters and capabilities;
+4. READY verifies the manifest-navigated descriptor and execution bundle;
+5. Clock Genesis creates the workspace and persists the exact preflight parameters;
+6. exact task/U0 binding and contract freeze follow, then MAIN begins.
 
-Required order for the pinned Alpha 4 protocol:
-
-1. local route resolves `stable` → immutable SHA and reads pinned manifest/VERSION plus the manifest-declared startup slice;
-2. repository startup surface returns `EXECUTING`;
-3. >=3 compatible monotonic samples establish TaskStartupReceipt and clock-journal genesis;
-4. `LiveDIGRRun` exists in `GENESIS`;
-5. the remaining entry/core protocol is loaded from the **same SHA**;
-6. parameter resolution runs (R=3 here), then U0 and Effective Contract freeze;
-7. MAIN begins and Strategy Genesis performs the first substantive task work.
-
-If parameter resolution is ambiguous/invalid, the already-born run becomes `ABORTED` and task analysis never starts. If clock genesis fails, no executing run workspace/U0 is created.
+NATIVE/invalid/ambiguous/advisory/unsupported preflight creates no run, but each candidate already has pinned startup acquisition evidence. Repository, descriptor or bundle failure before Genesis creates no run.

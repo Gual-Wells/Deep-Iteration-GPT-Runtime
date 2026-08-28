@@ -1,11 +1,11 @@
-# Run Session Architecture v2
+# Run Session Architecture — Berta1
 
-RunPhase is the authoritative lifecycle: GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → FINISHED, with ABORTED available from nonterminal phases. It validates legal persistence/lifecycle operations only; it does not choose task strategy. CONTRACT_FROZEN cannot skip directly to FINALIZING: real task work begins in MAIN/EXECUTING. GENESIS also requires a verified `ExecutingProtocolLoadReceipt` before parameter resolution; this is a readiness barrier, not a new planning phase. Protocol-load failure after Clock Genesis persists ABORTED.
+The local layer first broad-captures a candidate, resolves current `stable`, verifies same-SHA manifest/VERSION and loads the manifest-declared STARTUP slice. Pinned STARTUP then classifies the untouched message. EXECUTING preflight resolves deterministic parameters and capabilities; READY fetches and verifies the manifest-navigated descriptor and execution bundle before Clock Genesis. Genesis persists the exact resolved preflight receipt; no second parameter parser runs inside the born session.
 
-`LiveDIGRRun` owns thin semantic wrappers for event receipts, SOURCE transitions with active-S binding, D packet/isolation/execution/reintegration binding, final timing parity and recovery/resume. Strategy/Candidate/EST/Source/D/Completion stores remain explicit and revisioned.
+The receipt distinguishes `startup_acquisition_performed=true` for every candidate from `additional_artifact_fetch_required`, which is true only for READY/HELP continuation. NATIVE/INVALID/correction therefore never means “zero repository acquisition.”
 
-Semantic Event v2 binds a real foreground STATE clock event plus Strategy context. MAIN events must bind MAIN; SOURCE events must bind SOURCE plus an active source and valid Source revision. MAIN R uses Candidate before/after; S-r uses SourceWorkspace before/after.
+RunPhase is `GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → DELIVERED | INCOMPLETE`, with ABORTED from nonterminal states. Legacy FINISHED is recovery-readable only.
 
-D execution is clock-bound to D_EXCLUSIVE or supported background MAIN/SOURCE. L2/L3 Input/Output Packets are indexed artifacts. Reintegration is clock-bound MAIN work. Final synthesis must return to MAIN before `finish_time`; closing formal timing transitions to FINALIZING and no later task analysis is allowed outside the ledger.
+U0 binds exact task bytes/hash. Strategy, Candidate, sources, D and completion remain revisioned working state. Delivery uses a two-phase fail-closed commit: prepare and verify exact final bytes, media type, current Candidate, summary, stable proof and envelope, then transition to DELIVERED. Interruption before transition remains non-success and recoverable; any unmet gate closes INCOMPLETE and forbids canonical proof.
 
-Artifact index detects byte drift, but recovery also rederives semantics. Run Brief is a derived cache whose digest and authoritative fields are checked. A FINISHED run's summary is independently rebuilt from the authoritative stores/journals and compared. Resume additionally proves a fresh clock bridge; a terminal FINISHED/ABORTED run cannot be resumed as active execution.
+Recovery verifies artifact indexes, descriptor/bundle identity, revision histories, clock facts and delivery hashes before trusting persisted state.

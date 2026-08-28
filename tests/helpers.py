@@ -1,23 +1,105 @@
+import hashlib,json
+from pathlib import Path
+
 from runtime.clock_probe import ClockSnapshot
 from runtime.protocol_authority import ProtocolIdentity,ProtocolAuthority
 from runtime.routing import RouteReceipt,AUTHORITATIVE_REPOSITORY
 from runtime.invocation_surface import classify_surface
+from runtime.parameter_resolution import parameter_profile,resolve_stable_parameter_surface
 from runtime.task_startup import start_task
-from runtime.execution_protocol import ExecutingProtocolLoadReceipt,ProtocolMemberReceipt
+from runtime.execution_protocol import receipt_from_individual_files
 
 SHA='a'*40
+ROOT=Path(__file__).resolve().parents[1]
+
+def stable_invocation_for_contract(contract,task='x'):
+    """Create an explicit Berta1 test surface with no semantic completion."""
+    seconds=lambda value:format(float(value),'.15g')+'s'
+    s=contract.S
+    return (
+        f'DIGR(N={contract.N},T={seconds(contract.T_seconds)},R={contract.R},B={contract.B},'
+        f'S(n={s.n},t={seconds(s.t_seconds)},r={s.r},b={s.b}),'
+        f'D({contract.D_s}),L({contract.L_e}))：{task}'
+    )
+
+def stable_preflight_parameters(message):
+    """Resolve the exact Berta1 parameter receipt before a low-level test run."""
+    surface=classify_surface(message)
+    result=resolve_stable_parameter_surface(surface.parameter_surface)
+    result.require_stable_ready()
+    return result
+
+def _repository_protocol_fixture():
+    manifest_bytes=(ROOT/'manifest.json').read_bytes()
+    version_bytes=(ROOT/'VERSION').read_bytes()
+    manifest=json.loads(manifest_bytes.decode('utf-8'))
+    paths=(manifest['entrypoint'],*manifest['core'])
+    files=tuple((path,(ROOT/path).read_bytes()) for path in paths)
+    return manifest,manifest_bytes,version_bytes,paths,files
 
 def authority():
-    r=RouteReceipt(AUTHORITATIVE_REPOSITORY,'stable',SHA,'manifest.json','b'*64,'VERSION','c'*64)
-    p=ProtocolIdentity('digr-v5.0','5.0.0-alpha.4',AUTHORITATIVE_REPOSITORY,SHA)
+    manifest,manifest_bytes,version_bytes,_,_=_repository_protocol_fixture()
+    r=RouteReceipt(
+        AUTHORITATIVE_REPOSITORY,'stable',SHA,'manifest.json',hashlib.sha256(manifest_bytes).hexdigest(),
+        'VERSION',hashlib.sha256(version_bytes).hexdigest(),
+    )
+    p=ProtocolIdentity(manifest['protocol'],version_bytes.decode('utf-8').strip(),AUTHORITATIVE_REPOSITORY,SHA)
     return ProtocolAuthority(r,p)
 
 def protocol_load_receipt():
-    return ExecutingProtocolLoadReceipt(
-        1,SHA,'b'*64,'5.0.0-alpha.4','digr-v5.0','bundle',
-        'bundle/EXECUTION_PROTOCOL.json','d'*64,
-        (ProtocolMemberReceipt('entry/DEEP_ITERATION_ENTRY.md','e'*64,1),),
+    _,manifest_bytes,_,paths,files=_repository_protocol_fixture()
+    return receipt_from_individual_files(
+        commit_sha=SHA,manifest_bytes=manifest_bytes,expected_paths=paths,files=files,
+    ).receipt
+
+def persist_enforced_host_receipts(run,*,source_tools=True):
+    """Persist deterministic test evidence for the stable host delivery gate."""
+    if run.parameters is None:
+        raise RuntimeError('resolve parameters before persisting host receipts')
+    invocation=run.startup.invocation.to_dict()
+    route=run.startup.authority.route.to_dict()
+    profile=parameter_profile(run.startup.invocation.parameter_surface)
+    warnings=[
+        item for item in run.parameters.diagnostics
+        if not item.startswith('profile:')
+        and not item.startswith('time-policy:')
+        and not item.startswith('source-policy:')
+    ]
+    preflight={
+        'schema_version':1,'status':'READY',
+        'raw_message_sha256':invocation['raw_message_sha256'],'kind':invocation['kind'],
+        'alias':invocation['alias'],'task_raw':invocation.get('task_raw'),
+        'parameter_surface':invocation.get('parameter_surface'),'profile':profile,
+        'corrections':[],'warnings':warnings,'startup_acquisition_performed':True,
+        'additional_artifact_fetch_required':True,
+        'source_policy':run.parameters.source_policy,'native_message':None,
+        'repository_binding':{
+            'schema_version':1,'route':route,
+            'startup_files':[
+                {'path':route['manifest_path'],'sha256':route['manifest_sha256'],'byte_length':1},
+            ],
+            'attempts':[
+                {
+                    'seq':1,'purpose':'test-pinned-startup','request_url':'https://example.test/pinned',
+                    'source_kind':'github_connector','freshness':'immutable_sha','status':200,
+                    'success':True,'response_sha256':route['manifest_sha256'],
+                    'commit_sha':route['pinned_commit'],'failure':None,
+                },
+            ],
+        },
+    }
+    capability={
+        'mode':'ENFORCED','final_gate':True,'persistent_workspace':True,
+        'monotonic_clock':'CONTINUOUS','repository_transport':True,
+        'source_tools':source_tools,'isolation_max':3,'viewpoint_max':8,'reasons':[],
+    }
+    preflight_sha=run.workspace.write_json(
+        'preflight-receipt.json',preflight,kind='preflight-receipt',
     )
+    capability_sha=run.workspace.write_json(
+        'capability-negotiation.json',capability,kind='capability-negotiation',
+    )
+    return preflight_sha,capability_sha
 
 class FakeClock:
     def __init__(self, start=0, step=100_000_000, provider='test', session='same', boot='boot-test'):

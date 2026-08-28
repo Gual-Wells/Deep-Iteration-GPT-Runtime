@@ -1,4 +1,4 @@
-"""Revisioned source-research workspaces and source-activity binding for Alpha 4."""
+"""Revisioned Berta1 source workspaces and source-activity binding."""
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 from hashlib import sha256

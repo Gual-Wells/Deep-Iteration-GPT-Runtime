@@ -20,6 +20,6 @@ class TestClockJournal(unittest.TestCase):
     def test_reordering_detected_on_load(self):
         with tempfile.TemporaryDirectory() as td:
             p=Path(td)/'clock'; j=ClockJournal('digr-12345678',p); c=FakeClock(); j.append_genesis((c(),c(),c()))
-            lines=p.read_text().splitlines(); p.write_text('\n'.join(reversed(lines))+'\n')
+            lines=p.read_text(encoding='utf-8').splitlines(); p.write_text('\n'.join(reversed(lines))+'\n',encoding='utf-8')
             with self.assertRaises(ValueError): ClockJournal.load('digr-12345678',p)
 if __name__=='__main__': unittest.main()

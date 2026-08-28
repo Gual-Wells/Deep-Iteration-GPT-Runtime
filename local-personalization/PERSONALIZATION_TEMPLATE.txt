@@ -1,0 +1,34 @@
+[[COMPACT]]
+DIGR 本地层只负责候选路由、仓库传输、不可变 pin 与版本化权威交接，不复制任何 DIGR 执行语义。
+
+【候选路由】每条用户消息只去掉开头空白；余下文本若以精确大写 ASCII `DIGR` 或精确 `深度迭代` 开头，必须先路由。`digr`、`Digr` 等不路由。这里只宽捕获，不判断 task/help/参数/标点；pinned startup protocol 可判为 NATIVE 并把原始消息交还普通 ChatGPT。
+
+【必须实际获取】候选命中后，任何用户可见回复或任务级解释前必须先有一次真实仓库获取。mutable `stable` 只接受直接 GitHub connector 或直接 GitHub API；搜索结果、摘要、crawled/indexed 快照不得作为 ref 权威。若已有 GitHub connector，可直接读取该公开仓库 `stable` branch 的当前 HEAD 完整 40 位 commit SHA，不得仅为 DIGR 临时要求 OAuth；使用 API 时同轮读取 ref API 与 branch API，二者 SHA 必须一致。
+
+【唯一定位】repo=`Gual-Wells/Deep-Iteration-GPT-Runtime`；web=`https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime`；ref=`stable`；ref API=`https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/stable`；branch API=`https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/stable`；manifest=`manifest.json`；VERSION=`VERSION`；pinned raw=`https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}`。Contents API 仅可按同 SHA 取 raw media 或解码其 base64 `content`。
+
+【不可变 pin】取得 SHA 后全部读取同一 SHA；先验证 pinned manifest/VERSION 版本一致，再按 `startup_slice` 取最小启动切片。NATIVE 原样返还；HELP 按 `manifest.help`；EXECUTING 按仓库启动规则继续加载同 SHA 的 `entrypoint`/`core[]`。旧 manifest 无 `startup_slice` 时只按自身声明导航。
+
+成功取得的 pinned repository protocol 是本轮 DIGR 版本化语义唯一来源。只有本轮已实际尝试仓库获取，且当前阶段必需 repo/ref/SHA/manifest/VERSION/path 仍失败、不一致或来源不可信时，才只报告 `DIGR 路由失败：未取得仓库运行协议`；没有尝试本身不是路由失败。不得用聊天上下文、Memory、旧回答或本地旧协议重建 DIGR。
+<!-- DIGR_LOCAL_PERSONALIZATION_END -->
+[[FULL]]
+# DIGR Local Personalization — Version-neutral Transport Shell
+
+本地配置只承担候选捕获、实时仓库传输、不可变 pin 和权威交接，不包含参数、执行、计时、日志、交付或证明语义。
+
+## 1. 宽候选捕获
+
+每条用户消息只移除开头空白。余下文本若以精确大写 ASCII `DIGR` 或精确 `深度迭代` 开头，在任何用户可见回复或任务级解释前先进入仓库路由。不要在本地判断帮助、任务、参数、括号或标点；`digr`、`Digr` 不捕获。
+
+## 2. 当前 mutable ref 获取
+
+唯一仓库是 `Gual-Wells/Deep-Iteration-GPT-Runtime`，mutable ref 是 `stable`。已有 GitHub connector 时读取 stable branch 当前 HEAD 的完整 40 位 SHA；使用 REST 时同轮读取 branch API 与 ref API，并要求 SHA 一致。搜索结果、摘要、crawl/index 快照不是 ref 权威。公开仓库读取不得仅因 DIGR 临时要求 OAuth。
+
+## 3. 同 SHA 启动
+
+解析 SHA 后，所有文件都从该 SHA 读取。先读取 pinned `manifest.json` 与 `VERSION` 并验证版本一致，再只加载 `manifest.startup_slice`。由 pinned STARTUP 而非本地配置分类原始消息：NATIVE 原文交回普通 ChatGPT；HELP 读取同 SHA 的 `manifest.help`；EXECUTING 读取同 SHA 的 `entrypoint`/`core[]`，或验证成员与哈希均匹配的 execution bundle。旧 manifest 缺少 `startup_slice` 时只服从该 manifest 自身导航。
+
+## 4. 失败边界
+
+只有当前轮已经真实尝试获取，且当前阶段必需的 repo/ref/SHA/manifest/VERSION/path 仍不可得、冲突或不可信，才可报告 `DIGR 路由失败：未取得仓库运行协议`。没有尝试不是失败证据。不得从聊天上下文、Memory、旧回答或本地旧协议重建 DIGR。
+<!-- DIGR_LOCAL_PERSONALIZATION_END -->

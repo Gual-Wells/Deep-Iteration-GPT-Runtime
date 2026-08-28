@@ -2,11 +2,11 @@
 
 | Condition | SourceDisposition | Actual S required? |
 |---|---|---|
-| Normal DIGR invocation | REQUIRED | yes, at least one |
-| S omitted / S / S() | REQUIRED | yes; numeric minima are semantically completed |
-| S(0,0s,0,0) | REQUIRED | yes; zero minima do not disable source presumption |
-| User explicitly forbids external sources and contract accepts that | WAIVED | no |
-| Closed transformation where external material cannot improve result | WAIVED with reason | no |
-| No usable external channel in host | WAIVED with reason | no |
+| Normal invocation / S omitted (`source=auto`) | task-grounded REQUIRED or WAIVED | only when REQUIRED; WAIVED needs a concrete reason |
+| `source=auto` and external evidence can materially improve correctness | REQUIRED | yes, with evidence-backed source activity |
+| `source=auto` closed transformation where external material is prohibited or genuinely irrelevant | WAIVED with reason | no |
+| `source=required` | REQUIRED | yes; missing source-tool capability blocks enforced startup |
+| `source=off` | WAIVED by explicit policy | no; non-zero S minima are invalid |
+| Legacy-compatible explicit non-zero S minimums | REQUIRED | yes, all frozen minima apply |
 
-WAIVED with non-zero S numeric minimums is contradictory and rejected. SOURCE timing requires active S IDs and uses clock interval union, so parallel source work never double counts t.
+Berta1 never semantically completes omitted S numeric minima. WAIVED with non-zero S minimums is contradictory and rejected. SOURCE timing requires active S IDs and uses clock interval union, so parallel source work never double counts t.

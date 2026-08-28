@@ -1,9 +1,12 @@
-# Formal Active Time and Trusted Clock
+# Formal Active Time
 
-Every EXECUTING run opens a trusted monotonic clock with at least three samples before parameter resolution/U0/task work. Work states remain `MAIN`, `SOURCE`, `D_EXCLUSIVE`, `META`, `IDLE`: T counts MAIN+SOURCE, t counts SOURCE only; exclusive D, META and IDLE do not count.
+ClockJournal is the sole time fact stream. Its state projection yields four non-overlapping user-visible clocks:
 
-Observed duration and hard-verifiable duration are distinct facts. `B=0` / `b=0` makes T/t a soft target rather than a mechanical lower-bound gate. `B=1` / `b=1` upgrades the corresponding target to a hard lower bound and requires continuity evidence for every interval used in the claim. If continuity cannot be proven, hard actual is unknown (`?`) rather than estimated.
+- `T = MAIN + SOURCE`
+- `t = SOURCE`
+- `D_time = D_EXCLUSIVE`
+- `V_time = V_EXCLUSIVE`
 
-Across process/session boundaries Alpha 4 requires same provider plus equal non-empty boot identity even for observed monotonic continuity. Resume does not charge the unknown inter-process gap as task work; it appends a new resume readiness sequence after proving the bridge.
+`META` and `IDLE` count toward none. Repository transport, tool queues, repeated polling and sleeps must be IDLE/META. D and V are excluded from T and from each other. Aggregate D/V durations are wall-time unions. Every completed D and qualified V must bind one positive owned interval; attempted, aborted and unsuccessful D/V intervals remain visible in their time logs even when they do not satisfy count minima.
 
-No sleep, waiting, repeated query, mechanical rewrite or logging may pad T/t. Formal time measures useful active work, not wall-clock occupation. Repository pinning, startup-slice/core loading, META contract setup and other initialization/reliability work remain outside T/t unless they themselves become substantive MAIN/SOURCE task work.
+Hard T/t requires continuous trusted monotonic-clock evidence. Unknown continuity stays unknown. Closing a clock records the observed transition snapshot, so delayed UI or tool return cannot inflate active work. The canonical time group is `T目标/T真实（+D真实时间，+V真实时间）`.

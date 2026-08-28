@@ -8,7 +8,7 @@ L2 uses a temporal packet boundary:
 
 `Main → controlled Input Packet → isolated D context/private D state → Output Packet → Main reintegration`.
 
-The **Input Packet exists and is indexed before isolated execution starts**. The **Output Packet is produced by that execution**, is indexed afterwards and is bound to a D Result revision; it cannot be required before the isolated work has run. Full Main history is not simply handed across. L2 may be exclusive or supported background work; background D time itself is not T/t while foreground Main/SOURCE can continue.
+The **Input Packet exists and is indexed before isolated execution starts**. The **Output Packet is produced by that execution**, is indexed afterwards and is bound to a D Result revision; it cannot be required before the isolated work has run. Full Main history is not simply handed across. Legacy recovery may describe background L2/L3 work, but Berta1 canonical D execution is always one-owner `D_EXCLUSIVE` so its time is auditable and cannot inflate T/t.
 
 L3 preserves the L2 packet boundary and additionally requires independently evidenced agent identity, instructions, execution loop and tool lifecycle.
 

@@ -1,7 +1,13 @@
-"""Persisted run lifecycle for DIGR 5.0 Alpha 4.
+"""Persisted run lifecycle for DIGR 5.0.0-Berta1.
 
 RunPhase constrains lifecycle ordering only. It is not a workflow planner and
 never dictates task strategy.
+
+``FINISHED`` remains readable solely for alpha.4 recovery compatibility.
+Stable.1 runs can claim success only after the crash-safe two-phase delivery
+commit reaches its persisted ``DELIVERED`` phase; an irrecoverably closed run
+whose delivery gates were not met is
+``INCOMPLETE`` and can never render a canonical proof.
 """
 from __future__ import annotations
 from dataclasses import dataclass, asdict
@@ -17,6 +23,9 @@ class RunPhase(str, Enum):
     CONTRACT_FROZEN='CONTRACT_FROZEN'
     EXECUTING='EXECUTING'
     FINALIZING='FINALIZING'
+    DELIVERED='DELIVERED'
+    INCOMPLETE='INCOMPLETE'
+    # Legacy alpha.4 terminal state. New stable.1 code must not create it.
     FINISHED='FINISHED'
     ABORTED='ABORTED'
 
@@ -27,7 +36,12 @@ _ALLOWED = {
     RunPhase.U0_FROZEN: {RunPhase.CONTRACT_FROZEN, RunPhase.ABORTED},
     RunPhase.CONTRACT_FROZEN: {RunPhase.EXECUTING, RunPhase.ABORTED},
     RunPhase.EXECUTING: {RunPhase.FINALIZING, RunPhase.ABORTED},
-    RunPhase.FINALIZING: {RunPhase.FINISHED, RunPhase.ABORTED},
+    RunPhase.FINALIZING: {
+        RunPhase.DELIVERED, RunPhase.INCOMPLETE, RunPhase.ABORTED,
+        RunPhase.FINISHED,
+    },
+    RunPhase.DELIVERED: set(),
+    RunPhase.INCOMPLETE: set(),
     RunPhase.FINISHED: set(),
     RunPhase.ABORTED: set(),
 }
@@ -72,7 +86,11 @@ class RunPhaseStore:
         if phase not in _ALLOWED[cur]: raise RuntimeError(f'illegal run phase transition {cur.value}->{phase.value}')
         return self._save(RunPhaseState(len(self._history),phase,cur,reason))
     def abort(self,reason:str):
-        if self.phase in (RunPhase.FINISHED,RunPhase.ABORTED): raise RuntimeError('terminal run cannot be aborted again')
+        if self.phase in (
+            RunPhase.DELIVERED, RunPhase.INCOMPLETE,
+            RunPhase.FINISHED, RunPhase.ABORTED,
+        ):
+            raise RuntimeError('terminal run cannot be aborted again')
         return self.transition(RunPhase.ABORTED,reason)
     def verify(self)->bool:
         if not self._history:raise ValueError('run phase history missing')

@@ -1,6 +1,7 @@
 import base64
 import json
 import unittest
+from pathlib import Path
 
 from runtime.repository_transport import (
     AcquisitionAttemptReceipt,
@@ -28,38 +29,71 @@ from tests.helpers import FakeClock
 SHA='a'*40
 OTHER='b'*40
 MANIFEST={
-    'version':'5.0.0-alpha.4',
+    'version':'5.0.0-Berta1',
     'protocol':'digr-v5.0',
-    'bootstrap_entry':'bootstrap/BOOTSTRAP.md',
+    'runtime_descriptor':'runtime-descriptor.json',
+    'bootstrap_entry':'entry/STARTUP.md',
     'entrypoint':'entry/DEEP_ITERATION_ENTRY.md',
     'core':['core/00_RESULT_SOVEREIGNTY.md'],
     'help':'entry/HELP.md',
-    'startup_slice':['bootstrap/BOOTSTRAP.md','entry/STARTUP.md'],
+    'startup_slice':['entry/STARTUP.md'],
     'execution_bundle':{
-        'path':'bundle/EXECUTION_PROTOCOL.json','schema':1,
+        'path':'dist/EXECUTION_PROTOCOL.json','schema':1,
         'members':['entry/DEEP_ITERATION_ENTRY.md','core/00_RESULT_SOVEREIGNTY.md'],
     },
 }
 MANIFEST_BYTES=(json.dumps(MANIFEST,separators=(',',':'))+'\n').encode()
-VERSION=b'5.0.0-alpha.4\n'
+VERSION=b'5.0.0-Berta1\n'
 LOGICAL={
     'entry/DEEP_ITERATION_ENTRY.md':b'# entry\n',
     'core/00_RESULT_SOVEREIGNTY.md':b'# core\n',
 }
 BUNDLE_BYTES=(json.dumps({
-    'schema_version':1,'version':'5.0.0-alpha.4','protocol':'digr-v5.0',
+    'schema_version':1,'version':'5.0.0-Berta1','protocol':'digr-v5.0',
     'members':[
         {'path':p,'sha256':__import__('hashlib').sha256(b).hexdigest(),'byte_length':len(b),'content':b.decode()}
         for p,b in LOGICAL.items()
     ],
 },sort_keys=True,separators=(',',':'))+'\n').encode()
+STABLE_MEMBERS=[
+    {'path':p,'sha256':__import__('hashlib').sha256(b).hexdigest(),'byte_length':len(b),'content':b.decode()}
+    for p,b in LOGICAL.items()
+]
+STABLE_BUNDLE_BYTES=(json.dumps({
+    'schema_version':1,'version':'5.0.0-Berta1','protocol':'digr-v5.0',
+    'members':STABLE_MEMBERS,
+},sort_keys=True,separators=(',',':'))+'\n').encode()
+STABLE_HELP_BYTES='# DIGR Help\n\nVerified stable help.\n'.encode()
+STABLE_EXECUTION_SET=[{k:item[k] for k in ('path','sha256','byte_length')} for item in STABLE_MEMBERS]
+STABLE_EXECUTION_SET_BYTES=json.dumps(STABLE_EXECUTION_SET,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
+STABLE_DESCRIPTOR={
+    'schema':'digr-runtime-descriptor/v1','protocol':'digr-v5.0','version':'5.0.0-Berta1',
+    'minimum_adapter':{
+        'repository':'Gual-Wells/Deep-Iteration-GPT-Runtime','ref':'stable',
+        'descriptor_path':'runtime-descriptor.json',
+    },
+    'artifacts':{'execution_bundle':{
+        'path':'dist/EXECUTION_PROTOCOL.json',
+        'sha256':__import__('hashlib').sha256(STABLE_BUNDLE_BYTES).hexdigest(),
+        'byte_length':len(STABLE_BUNDLE_BYTES),'member_count':len(STABLE_MEMBERS),
+        'execution_set_sha256':__import__('hashlib').sha256(STABLE_EXECUTION_SET_BYTES).hexdigest(),
+    },'help':{
+        'path':'dist/HELP.zh-CN.md','sha256':__import__('hashlib').sha256(STABLE_HELP_BYTES).hexdigest(),
+        'byte_length':len(STABLE_HELP_BYTES),'media_type':'text/markdown; charset=utf-8',
+    }},
+}
+STABLE_DESCRIPTOR_BYTES=(json.dumps(STABLE_DESCRIPTOR,separators=(',',':'))+'\n').encode()
 FILES={
     'manifest.json':MANIFEST_BYTES,
     'VERSION':VERSION,
     'bootstrap/BOOTSTRAP.md':b'# boot\n',
     'entry/STARTUP.md':b'# startup\n',
+    'entry/HELP.md':STABLE_HELP_BYTES,
     **LOGICAL,
     'bundle/EXECUTION_PROTOCOL.json':BUNDLE_BYTES,
+    'runtime-descriptor.json':STABLE_DESCRIPTOR_BYTES,
+    'dist/EXECUTION_PROTOCOL.json':STABLE_BUNDLE_BYTES,
+    'dist/HELP.zh-CN.md':STABLE_HELP_BYTES,
 }
 
 
@@ -103,12 +137,38 @@ class FakeFetcher:
 
 
 class TestRepositoryTransport(unittest.TestCase):
+    def test_real_release_files_complete_stable_execution_acquisition(self):
+        root=Path(__file__).resolve().parents[1]
+        prefix=f'https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/'
+        class RealReleaseFetcher(FakeFetcher):
+            def __init__(self):
+                super().__init__(source_kind='github_connector')
+            def __call__(self,req):
+                if req.url.startswith(prefix):
+                    self.requests.append(req)
+                    rel=req.url[len(prefix):]
+                    return TransportResponse(
+                        req.url,200,(root/rel).read_bytes(),self.source_kind,FRESHNESS_IMMUTABLE,
+                    )
+                return super().__call__(req)
+        fetcher=RealReleaseFetcher();stable=RepositoryTransportSession(fetcher).acquire_stable_execution('DIGR：诗创作')
+        manifest=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
+        expected=(manifest['entrypoint'],*manifest['core'])
+        self.assertEqual(stable.protocol.receipt.member_paths,expected)
+        self.assertEqual(len(stable.protocol.files),len(expected))
+        self.assertEqual(
+            [request.purpose for request in fetcher.requests],
+            ['stable_branch_primary_r1','pinned:manifest.json','pinned:VERSION',
+             'pinned:entry/STARTUP.md','pinned:runtime-descriptor.json',
+             'pinned:dist/EXECUTION_PROTOCOL.json'],
+        )
+
     def test_actual_acquisition_precedes_startup(self):
         f=FakeFetcher(); s=RepositoryTransportSession(f)
-        bundle=s.acquire_startup('DIGR/help')
+        bundle=s.acquire_startup('DIGR：x')
         self.assertEqual(bundle.resolution.commit_sha,SHA)
         self.assertEqual(bundle.version_bytes,VERSION)
-        self.assertEqual(tuple(p for p,_ in bundle.startup_files),('bootstrap/BOOTSTRAP.md','entry/STARTUP.md'))
+        self.assertEqual(tuple(p for p,_ in bundle.startup_files),('entry/STARTUP.md',))
         self.assertEqual([r.purpose for r in bundle.attempts[:2]],['stable_branch_primary_r1','stable_ref_corroboration_r1'])
         self.assertTrue(all(r.success for r in bundle.attempts))
         self.assertTrue(route_failure_permitted(bundle.attempts))
@@ -123,7 +183,7 @@ class TestRepositoryTransport(unittest.TestCase):
     def test_search_or_index_transport_is_rejected(self):
         s=RepositoryTransportSession(FakeFetcher(source_kind='search_index'))
         with self.assertRaises(RouteAcquisitionError) as cm:
-            s.acquire_startup('DIGR/help')
+            s.acquire_startup('DIGR：x')
         self.assertTrue(route_failure_permitted(cm.exception.receipts))
         self.assertEqual(cm.exception.receipts[0].purpose,'stable_branch_primary_r1')
         self.assertFalse(cm.exception.receipts[0].success)
@@ -138,7 +198,7 @@ class TestRepositoryTransport(unittest.TestCase):
                     raise AssertionError('connector mode must not require Git-ref endpoint')
                 return super().__call__(req)
         f=ConnectorFetcher();s=RepositoryTransportSession(f)
-        b=s.acquire_startup('DIGR/help')
+        b=s.acquire_startup('DIGR：x')
         self.assertEqual(b.resolution.commit_sha,SHA)
         self.assertEqual(b.resolution.source_url,AUTHORITATIVE_BRANCH_API_URL)
         self.assertEqual(b.attempts[0].purpose,'stable_branch_primary_r1')
@@ -160,13 +220,13 @@ class TestRepositoryTransport(unittest.TestCase):
         self.assertEqual(protocol.receipt.source_mode,'bundle')
         self.assertEqual(protocol.receipt.member_paths,('entry/DEEP_ITERATION_ENTRY.md','core/00_RESULT_SOVEREIGNTY.md'))
         self.assertEqual(len(after),1)
-        self.assertIn('/bundle/EXECUTION_PROTOCOL.json',after[0].url)
+        self.assertIn('/dist/EXECUTION_PROTOCOL.json',after[0].url)
 
     def test_execution_bundle_corruption_fails_closed(self):
         class Corrupt(FakeFetcher):
             def __call__(self,req):
                 r=super().__call__(req)
-                if req.url.endswith('/bundle/EXECUTION_PROTOCOL.json'):
+                if req.url.endswith('/dist/EXECUTION_PROTOCOL.json'):
                     bad=json.loads(r.body.decode());bad['members'][0]['content']='tampered\n'
                     return TransportResponse(req.url,200,json.dumps(bad).encode(),self.source_kind,r.freshness)
                 return r
@@ -192,7 +252,7 @@ class TestRepositoryTransport(unittest.TestCase):
     def test_standard_post_genesis_bridge_aborts_when_bundle_cannot_load(self):
         class BrokenBundle(FakeFetcher):
             def __call__(self,req):
-                if 'bundle/EXECUTION_PROTOCOL.json' in req.url:
+                if 'dist/EXECUTION_PROTOCOL.json' in req.url:
                     self.requests.append(req)
                     freshness=FRESHNESS_IMMUTABLE
                     return TransportResponse(req.url,503,b'',self.source_kind,freshness)
@@ -212,7 +272,7 @@ class TestRepositoryTransport(unittest.TestCase):
     def test_raw_failure_falls_back_to_contents_raw_contract(self):
         f=FakeFetcher(raw_fail_paths={'manifest.json'})
         s=RepositoryTransportSession(f)
-        b=s.acquire_startup('DIGR/help')
+        b=s.acquire_startup('DIGR：x')
         self.assertEqual(b.manifest_bytes,MANIFEST_BYTES)
         purposes=[r.purpose for r in b.attempts]
         self.assertIn('pinned-fallback:manifest.json',purposes)
@@ -244,7 +304,7 @@ class TestRepositoryTransport(unittest.TestCase):
                 return response
         sess=RepositoryTransportSession(BadVersion())
         with self.assertRaises(RouteAcquisitionError) as cm:
-            sess.acquire_startup('DIGR/help')
+            sess.acquire_startup('DIGR：x')
         self.assertEqual(cm.exception.receipts[-1].purpose,'pinned_route_metadata_validation')
         self.assertTrue(route_failure_permitted(cm.exception.receipts))
 
@@ -252,6 +312,32 @@ class TestRepositoryTransport(unittest.TestCase):
         f=FakeFetcher(); s=RepositoryTransportSession(f)
         with self.assertRaises(ValueError): s.acquire_startup('ordinary chat')
         self.assertEqual(f.requests,[])
+
+    def test_every_candidate_acquires_before_pinned_classification(self):
+        for message in ('DIGR/help','DIGR讨论','DIGRAPH','DIGR：'):
+            f=FakeFetcher(source_kind='github_connector'); s=RepositoryTransportSession(f)
+            startup=s.acquire_startup(message)
+            self.assertEqual(len(f.requests),4,message)
+            self.assertEqual(
+                [r.purpose for r in f.requests],
+                ['stable_branch_primary_r1','pinned:manifest.json','pinned:VERSION','pinned:entry/STARTUP.md'],
+            )
+            self.assertEqual(startup.raw_message_sha256,__import__('hashlib').sha256(message.encode()).hexdigest())
+
+    def test_pinned_startup_cannot_classify_different_message(self):
+        startup=RepositoryTransportSession(FakeFetcher(source_kind='github_connector')).acquire_startup('DIGRAPH')
+        with self.assertRaisesRegex(ValueError,'different raw message'):
+            startup.classify('DIGR是什么？')
+
+    def test_direct_native_candidate_uses_branch_ref_consensus_before_classification(self):
+        f=FakeFetcher();startup=RepositoryTransportSession(f).acquire_startup('DIGRAPH')
+        self.assertEqual(startup.classify('DIGRAPH').kind.value,'NATIVE')
+        self.assertEqual(len(f.requests),5)
+        self.assertEqual(
+            [r.purpose for r in f.requests],
+            ['stable_branch_primary_r1','stable_ref_corroboration_r1',
+             'pinned:manifest.json','pinned:VERSION','pinned:entry/STARTUP.md'],
+        )
 
     def test_pinned_raw_urls_are_immutable_sha_urls(self):
         self.assertEqual(

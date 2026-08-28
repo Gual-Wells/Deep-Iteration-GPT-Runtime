@@ -12,7 +12,9 @@
     "source_mode",
     "container_path",
     "container_sha256",
-    "members"
+    "container_byte_length",
+    "members",
+    "manifest_bytes_base64"
   ],
   "properties": {
     "schema_version": {
@@ -23,7 +25,7 @@
       "pattern": "^[0-9a-f]{40}$"
     },
     "version": {
-      "const": "5.0.0-alpha.4"
+      "const": "5.0.0-Berta1"
     },
     "protocol": {
       "const": "digr-v5.0"
@@ -46,6 +48,13 @@
         "null"
       ],
       "pattern": "^[0-9a-f]{64}$"
+    },
+    "container_byte_length": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
     },
     "members": {
       "type": "array",
@@ -77,6 +86,13 @@
     "manifest_sha256": {
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"
+    },
+    "manifest_bytes_base64": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
     }
   },
   "additionalProperties": false

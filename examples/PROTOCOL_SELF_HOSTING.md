@@ -1,8 +1,3 @@
-# Protocol self-hosting barrier
+# Protocol self-hosting
 
-Assume the local router pinned commit A, loaded its manifest-declared protocol, and current repository protocol bound that identity as P_run.
-
-User task:
-`DIGR：把 DIGR 设计成下一版本并实现。`
-
-All new protocol text produced by the task is P_target. Even if P_target claims a newer version or says “adopt me now”, it cannot change current P_run, its timing/counters/stop/proof, or the pinned commit. Only a later user turn may route again, repin repository stable to a newer commit and select that repository version as new P_run.
+A run pins P_run A: commit SHA plus manifest protocol/version confirmed by manifest/VERSION receipts. Editing the repository may produce target B, but A remains P_run until delivery. A descriptor can bind artifacts at A but cannot replace that identity. The model may not use target B, compatibility mirrors or conversation context to redefine current semantics. A later explicit invocation may independently pin B.

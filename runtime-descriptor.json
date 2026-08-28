@@ -1,0 +1,69 @@
+{
+  "schema": "digr-runtime-descriptor/v1",
+  "protocol": "digr-v5.0",
+  "version": "5.0.0-Berta1",
+  "package_version": "5.0.0.dev1+berta1",
+  "surface": {
+    "role": "execution_and_release_descriptor",
+    "navigation_authority": "manifest.json",
+    "load_phase": "after_verified_startup_slice",
+    "model_protocol": "compact_release_or_advisory_markdown",
+    "execution_protocol": "verified_bundle_or_manifest_members"
+  },
+  "engine_api": {
+    "preflight": "digr.preflight",
+    "commit_delivery": "digr.commit_delivery",
+    "preflight_binding": "runtime.host_adapter.HostAdapter.preflight",
+    "start_binding": "runtime.host_adapter.HostAdapter.start",
+    "commit_delivery_binding": "runtime.run_session.LiveDIGRRun.commit_delivery",
+    "audit_log_binding": "runtime.audit_logs.materialize_audit_logs",
+    "viewpoint_binding": "runtime.viewpoint_store.ViewpointStore",
+    "enforced_host_integration": "required",
+    "model_protocol": "markdown/utf-8",
+    "help": "markdown/utf-8",
+    "execution_bundle": "digr-execution-protocol-bundle/v1"
+  },
+  "minimum_adapter": {
+    "repository": "Gual-Wells/Deep-Iteration-GPT-Runtime",
+    "ref": "stable",
+    "descriptor_path": "runtime-descriptor.json",
+    "navigation_source": "manifest.json",
+    "activation": "after_pinned_startup_classifies_EXECUTING",
+    "artifact_integrity": "sha256_and_byte_length",
+    "execution_set_integrity": "ordered_member_count_and_execution_set_sha256"
+  },
+  "artifacts": {
+    "model_protocol": {
+      "path": "dist/MODEL_PROTOCOL.md",
+      "sha256": "6edd9d35acd8550c06bfa13b7356a86f7d522ac467373029b1fa9db29eaa6e06",
+      "byte_length": 4987,
+      "media_type": "text/markdown; charset=utf-8"
+    },
+    "help": {
+      "path": "dist/HELP.zh-CN.md",
+      "sha256": "6b1f0aff3ed38324fc95a07a0b9986caf162474186f233c8118802d16405506e",
+      "byte_length": 5206,
+      "media_type": "text/markdown; charset=utf-8"
+    },
+    "execution_bundle": {
+      "path": "dist/EXECUTION_PROTOCOL.json",
+      "sha256": "ece6d23e8061ff7ce0b14caf308478d62942f02aba7ed6d58679d5da598c3f15",
+      "byte_length": 30110,
+      "media_type": "application/json",
+      "member_count": 20,
+      "execution_set_sha256": "0af330b2421acd2187e4badefa7eb5f988b5a88fe129ad6ecdfa462d69e689f3"
+    },
+    "navigation_manifest": {
+      "path": "manifest.json",
+      "sha256": "0897b202fa23e38b2aaddb4ead31af9c5f71a267e4441a134cf25d63d8b073aa",
+      "byte_length": 4901,
+      "media_type": "application/json"
+    },
+    "navigation_version": {
+      "path": "VERSION",
+      "sha256": "69e5a08e49a10cab061bce37298990a3948cdca4e1b0f355fe0595ac191d0c01",
+      "byte_length": 13,
+      "media_type": "text/plain; charset=utf-8"
+    }
+  }
+}

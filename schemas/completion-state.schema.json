@@ -1,11 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/completion-state.schema.json",
-  "title": "DIGR 5.0 Alpha 4 Completion State",
+  "title": "DIGR 5.0.0-Berta1 Completion State",
   "type": "object",
   "required": [
     "gaps",
-    "assessment_revisions"
+    "assessment_revisions",
+    "structured_revisions"
   ],
   "properties": {
     "gaps": {
@@ -19,6 +20,24 @@
       "items": {
         "type": "string",
         "minLength": 1
+      }
+    },
+    "structured_revisions": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 4,
+        "maxItems": 4,
+        "items": {
+          "type": "object",
+          "required": ["criterion", "satisfied", "rationale"],
+          "properties": {
+            "criterion": {"enum": ["objective_coverage", "evidence_integrity", "adversarial_resilience", "residual_risk"]},
+            "satisfied": {"type": "boolean"},
+            "rationale": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        }
       }
     }
   },

@@ -56,7 +56,7 @@ class TestRouting(unittest.TestCase):
         bad=dict(meta);bad['candidate_match']='lstrip_prefix; DIGR_ascii_case_insensitive; remainder_unvalidated'
         with self.assertRaises(ValueError):validate_manifest_routing_metadata({'routing':bad})
     def test_current_3_fixture_stays_legacy(self):
-        p=discovery_plan_from_manifest(json.loads((Path(__file__).parent/'fixtures/manifest-3.0.json').read_text())); self.assertTrue(p.legacy_manifest); self.assertEqual(p.entrypoint,'entry/DEEP_ITERATION_ENTRY.md')
+        p=discovery_plan_from_manifest(json.loads((Path(__file__).parent/'fixtures/manifest-3.0.json').read_text(encoding='utf-8'))); self.assertTrue(p.legacy_manifest); self.assertEqual(p.entrypoint,'entry/DEEP_ITERATION_ENTRY.md')
     def test_manifest_paths_safe(self):
         with self.assertRaises(ValueError): discovery_plan_from_manifest({'entrypoint':'../x','core':['core/a']})
         with self.assertRaises(ValueError): discovery_plan_from_manifest({'entrypoint':'entry/x','core':[]})

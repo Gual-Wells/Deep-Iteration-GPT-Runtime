@@ -1,8 +1,8 @@
-"""Typed DIGR 5.0 Alpha 4 Effective Contract.
+"""Typed DIGR 5.0.0-Berta1 Effective Contract.
 
 The Effective Contract freezes contract commitments, never an execution
-strategy. Count/D fields are minima; T/t are B/b-governed timing targets. Missing semantic values have already been completed by the native
-model/host before this deterministic record is created.
+strategy. Count/D fields are minima; T/t are B/b-governed timing targets. All
+fields have already been resolved and frozen before this record is created.
 """
 from __future__ import annotations
 from dataclasses import dataclass, asdict
@@ -44,15 +44,21 @@ class EffectiveContract:
     source_disposition: SourceDisposition = SourceDisposition.REQUIRED
     source_waiver_reason: str | None = None
     L_mismatch_blocks_delivery: bool = False
+    V_o: int = 0
 
     def __post_init__(self):
         require_nonnegative_int('N', self.N)
         require_finite_nonnegative_number('T_seconds', self.T_seconds)
         require_nonnegative_int('R', self.R)
         require_binary('B', self.B)
+        if self.B == 1 and self.T_seconds <= 0:
+            raise ValueError('B=1 requires a positive T_seconds hard minimum')
         if not isinstance(self.S, SourceContract):
             raise TypeError('S must be SourceContract')
+        if self.S.b == 1 and self.S.t_seconds <= 0:
+            raise ValueError('S.b=1 requires a positive S.t_seconds hard minimum')
         require_nonnegative_int('D_s', self.D_s)
+        require_nonnegative_int('V_o', self.V_o)
         require_isolation_level('L_e', self.L_e)
         if not isinstance(self.source_disposition, SourceDisposition):
             object.__setattr__(self, 'source_disposition', SourceDisposition(self.source_disposition))
@@ -81,10 +87,19 @@ class EffectiveContract:
         return self.D_s > 0
 
     @property
+    def V_minimum_positive(self) -> bool:
+        """V(0) is a zero lower bound, never a disabled switch."""
+        return self.V_o > 0
+
+    @property
     def hard_timing_required(self) -> bool:
         return self.B == 1 or self.S.b == 1
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d['source_disposition'] = self.source_disposition.value
+        # Public contract order is D, V, L even though V is appended to the
+        # dataclass for positional compatibility with stable.1 integrations.
+        d = {k:v for k,v in d.items() if k not in ('D_s','V_o','L_e')}
+        d.update({'D_s':self.D_s,'V_o':self.V_o,'L_e':self.L_e})
         return d

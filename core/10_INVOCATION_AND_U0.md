@@ -1,14 +1,7 @@
-# Invocation Surface and U0
+# Invocation and U0
 
-The local router broadly captures only after leading whitespace when the message begins with exact uppercase ASCII `DIGR` or exact `深度迭代`. Lower/mixed-case `digr`, `Digr`, etc. are ordinary native messages.
+Berta1 uses broad local candidate capture before pinned repository startup. After lstrip, every exact-uppercase `DIGR` or exact `深度迭代` prefix is fetched and handed to pinned `entry/STARTUP.md`; the local shell does not classify help, task, parameter, punctuation, NATIVE or INVALID. Pinned STARTUP returns discussion and prefix collisions such as `DIGRAPH` as NATIVE with the untouched original message. Lower/mixed-case English is not captured.
 
-Pinned repository startup then returns exactly one surface state:
+For pinned-classified EXECUTING, U0 is the HostAdapter's immutable binding to exact `task_raw` bytes and their digest. A model never reconstructs or paraphrases U0. Task interpretations, hypotheses and decompositions belong in revisable StrategyState. U0, explicit user hard constraints and pinned manifest/version/protocol identity remain frozen for the run.
 
-- `EXECUTING`: `DIGR：task`, `DIGR(...):task`, and Chinese alias equivalents with non-empty task;
-- `HELP`: exact `DIGR/help` or `深度迭代/help` after outer whitespace;
-- `NATIVE`: broad captures that are discussion rather than invocation, e.g. `DIGR是什么？`, `DIGR(R=3)这种格式怎么样？`;
-- `INVALID`: a clear invocation attempt whose invocation shell is broken, e.g. empty task after colon or an unfinished parameter group containing the task separator.
-
-Only `EXECUTING` creates Run Genesis. Parameter ambiguity belongs *inside* the born run and is resolved only after clock genesis plus verified full-protocol readiness. If parameter resolution is AMBIGUOUS/INVALID, abort before U0/task analysis.
-
-For an executing run, `U0` is the faithful task text/intention frozen once, bound to the original message digest. Header punctuation normalization must never mutate the task body. Later strategy revisions cannot edit U0.
+Without an enforceable HostAdapter, execution is ADVISORY (`DIGR~`) and cannot claim receipts or canonical proof.

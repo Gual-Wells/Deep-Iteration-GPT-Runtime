@@ -1,6 +1,6 @@
-# Source Evolution — Presumed Required
+# Source Evolution — Automatic Evidence Decision
 
-Normal executing DIGR work has `SourceDisposition=REQUIRED` and a real source strategy. `SourceDisposition=WAIVED` is allowed only for a concrete U0/host reason (for example a closed transformation where external material is prohibited or genuinely irrelevant). Omitted S, `S()`, or zero numeric S minima are not waivers. External source is broad: web, official docs, repositories/code, user files, datasets, papers, community material, tool/test outputs or any information not solely from model prior.
+Berta1 uses `source=auto`. The model chooses real source work when evidence can materially improve correctness, or records `SourceDisposition=WAIVED` with a concrete, task-grounded reason (for example a closed transformation where external material is prohibited or genuinely irrelevant). External source is broad: web, official docs, repositories/code, user files, datasets, papers, community material, tool/test outputs or any information not solely from model prior.
 
 ## What counts as an actual S
 

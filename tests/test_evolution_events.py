@@ -20,10 +20,10 @@ class TestEvolutionEvents(unittest.TestCase):
         x=self.append(log,EvolutionKind.SOURCE_EVOLUTION,scope='S:S1',source_id='S1',source_revision=0); self.assertEqual((x.source_id,x.source_revision),('S1',0))
     def test_persisted_lines_hash_chain(self):
         with tempfile.TemporaryDirectory() as td:
-            p=Path(td)/'events';log=EvolutionEventLog(p);self.append(log);self.assertTrue(p.read_text().strip());self.assertTrue(EvolutionEventLog.load(p).verify())
+            p=Path(td)/'events';log=EvolutionEventLog(p);self.append(log);self.assertTrue(p.read_text(encoding='utf-8').strip());self.assertTrue(EvolutionEventLog.load(p).verify())
     def test_tamper_detected(self):
         with tempfile.TemporaryDirectory() as td:
             import json
-            p=Path(td)/'events';log=EvolutionEventLog(p);self.append(log);d=json.loads(p.read_text());d['result']='tamper';p.write_text(json.dumps(d)+'\n')
+            p=Path(td)/'events';log=EvolutionEventLog(p);self.append(log);d=json.loads(p.read_text(encoding='utf-8'));d['result']='tamper';p.write_text(json.dumps(d)+'\n',encoding='utf-8')
             with self.assertRaises(ValueError):EvolutionEventLog.load(p)
 if __name__=='__main__':unittest.main()

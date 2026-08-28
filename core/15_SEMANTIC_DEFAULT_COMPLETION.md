@@ -1,25 +1,7 @@
-# 15 — Semantic Default Completion
+# Stable Profile — No Semantic Parameter Completion
 
-5.0 将所有调用统一为“用户显式参数 + 模型语义补全”。
+Berta1 does not ask the model to fill missing numeric parameters. `digr.preflight` applies a deterministic profile and explicit parser overlays before Genesis. The resulting parameter receipt is persisted exactly; the model may not lower, shift, remap or “improve” it.
 
-设用户显式参数为 E、缺失参数为 M：
+The standard profile fixes N=2, R=1, T=0 with no time requirement, source=auto, D=0, V=0 and L1. Actual N/R/source/D/V work may exceed minima when result quality warrants. `D(0)` and `V(0)` are zero minima, never disable switches. `source=auto` may select real source work or an evidence-backed WAIVED disposition.
 
-`EffectiveContract = Complete_native(U0, E, M)`
-
-## Fixed defaults
-只有三个直接缺省值：
-- `B = 0`（soft）
-- `b = 0`（soft）
-- `L(1)`（语义隔离）
-
-其余缺失的 `N/T/R/n/t/r/s` 必须由 ChatGPT 根据 U0 与**所有已给出的参数**联合判断，不允许固定 workload table、难度等级查表、正则 parser 或 deterministic helper 代替模型语义校准。
-
-## Relative completion
-补全是 `P(M | U0, E)`，不是各参数独立默认。例如用户只给 `B=1` 时，模型仍需生成与任务相称的非退化 T；生成后的 T 与用户给定值具有同等合同地位，并成为 hard lower bound。`b=1` + missing t 同理。
-
-显式 `T>0` 但 B 缺失时，B 先固定缺省为 0，因此 T 是 frozen soft target，而不是机械时间下限；显式 `t>0` 但 b 缺失同理。
-
-`D=0` / 语义补全得到 `s=0` 只表示 completed D 的最低要求为零，不关闭 D 机制。若模型认为非局部干预能实质改善结果，actual D 仍可大于目标。
-
-## Contract freeze
-Semantic Completion 是执行前的 calibration，不计 N，也不属于正式 T/t 时间。形成 Effective Contract 后将其冻结：计数/D 字段冻结为最低承诺，T/t 冻结为由 B/b 决定 soft/hard 的时间目标。执行发现更多复杂性时让 actual 超过最低值或 soft target，而不是反复漂移合同。
+Semantic judgment remains responsible for strategy, candidate quality, source choice and whether further work materially improves the result—not for inventing contract numbers.

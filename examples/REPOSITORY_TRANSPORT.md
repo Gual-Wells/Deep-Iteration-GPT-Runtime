@@ -1,40 +1,14 @@
-# Repository transport example
+# Stable pinned-manifest transport
 
-For a candidate `DIGR/help` or executing invocation, Alpha 4 has two admissible mutable-ref modes.
-
-Connected GitHub connector:
+Connector candidate startup:
 
 ```text
-stable_branch_primary_r1   connector repository branch `stable`
-                           → current full 40-char HEAD SHA
-pinned:manifest.json       same SHA
-pinned:VERSION             same SHA
-pinned:<startup path>      same SHA
+1. connector/direct REST stable branch HEAD → full SHA
+2. pinned manifest.json + pinned VERSION → require version agreement
+3. pinned manifest.startup_slice (Berta1: entry/STARTUP.md)
+4. pinned STARTUP classifies the untouched original message
 ```
 
-Direct REST client:
+Direct REST performs both current branch and Git-ref reads in the same bounded attempt and requires identical full SHAs; the legacy `paranoid` argument cannot weaken or strengthen this invariant. Search/index/crawl material is never ref authority.
 
-```text
-stable_branch_primary_r1       GET api.github.com/.../branches/stable
-stable_ref_corroboration_r1    GET api.github.com/.../git/ref/heads/stable
-                               require same full 40-char SHA
-                               (one bounded r2 re-observation if a live push races the pair)
-pinned:manifest.json           GET raw.githubusercontent.com/.../{SHA}/manifest.json
-pinned:VERSION                 GET raw.githubusercontent.com/.../{SHA}/VERSION
-                               require manifest.version == VERSION
-pinned:<startup path>          GET raw.githubusercontent.com/.../{SHA}/...
-```
-
-After the startup slice classifies an EXECUTING invocation and Clock Genesis succeeds, the current Alpha 4 manifest declares:
-
-```text
-pinned:bundle/EXECUTION_PROTOCOL.json
-    → exactly entrypoint + 17 core logical members
-    → verify order, length and SHA-256 for every member
-    → ExecutingProtocolLoadReceipt
-    → only then parameter resolution
-```
-
-Thus a connector EXECUTING startup uses 5 repository acquisitions before Clock Genesis and 1 post-genesis execution-bundle acquisition, rather than 18 separate entrypoint/core reads. This changes physical transport only; logical protocol authority remains the manifest-declared source files.
-
-Every acquisition produces a receipt. Search snippets/indexed snapshots never substitute for mutable-ref authority. If raw pinned retrieval fails, Contents API fallback must yield raw file bytes or be base64-decoded before validation. Mandatory execution-protocol load failure after genesis aborts the born run.
+After classification, HELP fetches same-SHA `manifest.help`. EXECUTING resolves deterministic parameters and capabilities; READY then fetches the manifest-navigated descriptor and verified execution bundle before Genesis. NATIVE/INVALID/correction need no additional artifact fetch, but their startup acquisition has already occurred.

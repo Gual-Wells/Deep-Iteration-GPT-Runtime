@@ -30,6 +30,7 @@ def build_run_brief(run) -> dict:
         'candidate_revision':candidate.revision if candidate else None,
         'active_source_ids':active_sources,
         'D_completed':run.dictator.completed_count,
+        'V_qualified':len(run.viewpoints.qualified),
         'blocking_gap_ids':gaps,
         'key_evidence_refs':evidence[-24:],
         'latest_meaningful_event_refs':latest_events,

@@ -1,40 +1,35 @@
-# Migration from 4.1.1 to 5.0.0 Alpha 4
+# Migration from 4.1.1 and 5.0 Alphas to 5.0.0-Berta1
 
-Alpha 4 is the current 5.0 pre-final integration baseline. Alpha 2 supplied the corrected execution/state mother-base; Alpha 3 hardened repository transport; Alpha 4 uses live black-box evidence to correct connector routing, D/L lower-bound semantics, timing terminology and canonical user presentation.
+Berta1 retains the 5.0 Native Assist execution model and makes pinned manifest/VERSION plus a self-contained startup slice the handoff boundary.
 
-## Stable conceptual commitments
+## Startup migration
 
-- local personalization is a thin routing/authority transport layer, not a copy of versioned DIGR execution semantics;
-- each routed turn resolves `stable` to one immutable commit and binds manifest/VERSION/startup/core reads to that same commit;
-- P_run, U0, explicit user hard constraints and the Effective Contract are frozen for the run; Strategy/Candidate/Source/D working state remains revisable;
-- Result Sovereignty, semantic completion, Formal Active Time, trusted monotonic clock facts, `?` for unverifiable actuals, compact proof, deterministic releases and non-sticky activation remain foundational;
-- deterministic runtime validates integrity/lifecycle/evidence and does not choose the model's intellectual strategy.
+Adapters MUST broadly capture exact-uppercase candidate prefixes, resolve `stable` to an immutable 40-hex commit, read pinned `manifest.json` and `VERSION`, require version agreement, and load the entire manifest-declared startup slice before classification.
 
-## Transport evolution
+`manifest.json` is navigation authority and `VERSION` is its pinned version check. The manifest-declared runtime descriptor describes and integrity-binds generated execution/release artifacts after startup; it does not replace navigation.
 
-Alpha 3 proved that “no acquisition attempt” cannot be treated as repository failure and introduced direct provenance + immutable pinning. Alpha 4 further distinguishes host capabilities: an already-connected GitHub repository connector may resolve the public `stable` branch HEAD directly; a genuine REST client performs branch/ref consensus. Search/crawl/index representations remain inadmissible mutable-ref authority.
+Replace Alpha 4 startup reads as follows:
 
-## Parameter and timing semantics
+| Alpha 4 | Berta1 |
+|---|---|
+| broad router + manifest/VERSION authority | broad router + pinned manifest/VERSION authority retained and made explicit |
+| multi-file startup slice | sole self-contained `entry/STARTUP.md` slice |
+| `entry/HELP.md` fetch | `dist/HELP.zh-CN.md` |
+| logical entry/core transport | `dist/MODEL_PROTOCOL.md` + verified `dist/EXECUTION_PROTOCOL.json` |
+| hand-maintained personalization variants | one template with deterministic generated variants |
 
-Header punctuation normalization, typed T/t and unique-or-fail mapping remain. Fixed defaults are B=0, b=0 and L1; missing N/T/R/n/t/r/s are semantically completed from U0 + explicit parameters.
+## Invocation and contract continuity
 
-Alpha 4 clarifies the contract categories:
+Berta1 replaces Alpha-era model completion with deterministic preflight after pinned STARTUP classifies EXECUTING. The standard profile is N2/R1/no-time/source-auto/D0/L1. `min=<duration>` is hard and `target=<duration>` is soft; explicit overlays are parser-owned and unique-or-fail.
 
-- N/R/n/r/D are lower bounds;
-- T/t are frozen time targets;
-- B/b=0 makes the corresponding target soft;
-- B/b=1 upgrades it to a hard lower bound requiring trusted timing evidence.
+## D(0) correction
 
-## Source, D and L
+Any adapter, schema or prompt that interprets `D(0)` as “D disabled” must be changed. Zero means only that no completed D is mechanically required. Native intelligence may still invoke a quality-driven D, `D_actual` may exceed zero, and L conformance becomes applicable when a D actually completes.
 
-Normal execution still defaults SourceDisposition to REQUIRED unless a concrete U0/host reason records a waiver. S numeric zeros do not disable source presumption.
+## Delivery migration
 
-D is a revisioned intervention lifecycle with proposal, Decree, execution/result evidence and MAIN reintegration. `D(0)` means no completed D is required; it does not prohibit D. Actual D may exceed target. L_target/L_cap/L_actual remain distinct, and completed-D L applicability follows actual execution rather than the D minimum.
+New Berta1 runs terminate as `DELIVERED` or `INCOMPLETE`; `ABORTED` remains the failure terminal. `FINISHED` is accepted only while recovering Alpha 4 workspaces. A run that closes `INCOMPLETE` cannot render a canonical proof as though delivery gates passed.
 
-## Recovery and proof
+## Packaging migration
 
-Workspace v2, RunPhase, artifact index and recovery integrity remain. Resume still requires a fresh trusted same-provider/equal-nonempty-boot bridge. Canonical proof continues to be compact; Alpha 4 explicitly forbids raw fractional/nanosecond leakage in visible actual duration and requires hard-unverified time to render as `?`.
-
-## Intermediate pre-release note
-
-Alpha 1 established the Native Assist/clock-journal substrate. Alpha 2 corrected execution integration. Alpha 3 hardened host transport. Alpha 4 is a narrow correction pass driven by successful live connector operation and subsequent black-box execution findings rather than a new execution architecture.
+Run `python tools/build_release.py --prepare-only` after editing protocol, Help or personalization sources. The deterministic builder regenerates all dist and configuration artifacts. Package automation must exclude `__pycache__`, bytecode and test-tool caches. The root standalone personalization is byte-identical to compact/FREE_GO and every generated configuration ends with `<!-- DIGR_LOCAL_PERSONALIZATION_END -->`.

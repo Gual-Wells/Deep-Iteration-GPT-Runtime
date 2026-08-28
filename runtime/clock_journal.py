@@ -142,13 +142,14 @@ class ClockJournal:
         }
         digest = sha256(_canonical_bytes(payload)).hexdigest()
         item = ClockJournalEvent(seq, self.run_id, event, snapshot, state, prev_hash, digest)
-        self._events.append(item)
         if self.path is not None:
             line = _canonical_bytes(item.to_dict()) + b'\n'
             with self.path.open('ab') as f:
                 f.write(line)
                 f.flush()
                 os.fsync(f.fileno())
+        # Memory becomes authoritative only after durable append succeeds.
+        self._events.append(item)
         return item
 
     def append_genesis(self, samples) -> None:

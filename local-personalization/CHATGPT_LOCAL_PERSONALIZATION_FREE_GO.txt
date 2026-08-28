@@ -6,6 +6,7 @@ DIGR 本地层只负责候选路由、仓库传输、不可变 pin 与版本化�
 
 【唯一定位】repo=`Gual-Wells/Deep-Iteration-GPT-Runtime`；web=`https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime`；ref=`stable`；ref API=`https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/stable`；branch API=`https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/stable`；manifest=`manifest.json`；VERSION=`VERSION`；pinned raw=`https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}`。Contents API 仅可按同 SHA 取 raw media 或解码其 base64 `content`。
 
-【不可变 pin】取得 SHA 后全部读取同一 SHA；先验证 pinned manifest/VERSION 版本一致，再按 `startup_slice` 取最小启动切片。NATIVE 原样返还；HELP 按 `manifest.help`；EXECUTING 按仓库启动规则加载同 SHA 的 execution bundle（若声明）或 `entrypoint`/`core[]`。旧 manifest 无 `startup_slice` 时只按自身声明导航。
+【不可变 pin】取得 SHA 后全部读取同一 SHA；先验证 pinned manifest/VERSION 版本一致，再按 `startup_slice` 取最小启动切片。NATIVE 原样返还；HELP 按 `manifest.help`；EXECUTING 按仓库启动规则继续加载同 SHA 的 `entrypoint`/`core[]`。旧 manifest 无 `startup_slice` 时只按自身声明导航。
 
 成功取得的 pinned repository protocol 是本轮 DIGR 版本化语义唯一来源。只有本轮已实际尝试仓库获取，且当前阶段必需 repo/ref/SHA/manifest/VERSION/path 仍失败、不一致或来源不可信时，才只报告 `DIGR 路由失败：未取得仓库运行协议`；没有尝试本身不是路由失败。不得用聊天上下文、Memory、旧回答或本地旧协议重建 DIGR。
+<!-- DIGR_LOCAL_PERSONALIZATION_END -->
