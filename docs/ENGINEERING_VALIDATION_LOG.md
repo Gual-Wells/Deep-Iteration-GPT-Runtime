@@ -1,16 +1,15 @@
-# Engineering Validation Log — DIGR 5.0.0-Berta1
+# Engineering Validation Log — Berta2
 
-Acceptance requires:
+The release gate verifies:
 
-1. broad local candidate capture followed by actual pinned startup acquisition before NATIVE/HELP/INVALID/EXECUTING classification;
-2. deterministic standard profile and explicit legacy warning;
-3. manifest/VERSION navigation authority, complete sole STARTUP slice, and later descriptor artifact hash/length checks;
-4. ordered execution-set digest agreement with runtime verification;
-5. Berta1 parameter resolution is complete before Genesis, bound exactly once by enforced host preflight, and never re-parsed by the live run;
-6. the descriptor exposes concrete Python reference bindings while explicitly requiring a real host integration for ENFORCED claims;
-7. compact single-source model protocol and byte-exact generated personalization variants;
-8. D(0) zero-minimum semantics;
-9. two-phase fail-closed DELIVERED/INCOMPLETE behavior, recovery and proof gating;
-10. standard-library repository validation, focused/full unit tests, cache-free packaging, and a post-test hash/tree recheck of the cold extraction.
+1. pinned manifest/VERSION/startup authority and exact execution set;
+2. adaptive native completion versus explicit standard;
+3. typed-anywhere unique-or-fail parameter mapping and Alpha4 duration compatibility;
+4. execution/attestation separation and capability truthfulness;
+5. exact U0, contract and semantic state bindings;
+6. four clocks, V ledger, D/V logs and all nine audit files;
+7. exact current Candidate primary-payload delivery;
+8. delivery schema v2 terminal semantic/audit digest and terminal mutation seal;
+9. full unit/repository validation plus cold deterministic package validation.
 
-Final ZIP generation and external exports occur only after the source tree is frozen.
+External iOS/Web/Desktop black-box evidence is mandatory before stable promotion and is not represented as completed by this local log.

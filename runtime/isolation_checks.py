@@ -1,4 +1,4 @@
-"""Mechanical evidence and receipts for DIGR Berta1 D isolation levels.
+"""Mechanical evidence and receipts for DIGR Berta2 D isolation levels.
 
 Capability, requested target, and actual implementation are deliberately
 separate.  A host that can support L3 does not thereby claim that a particular

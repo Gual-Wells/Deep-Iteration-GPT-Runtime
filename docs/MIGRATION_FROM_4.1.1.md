@@ -1,6 +1,6 @@
-# Migration from 4.1.1 and 5.0 Alphas to 5.0.0-Berta1
+# Migration from 4.1.1 and 5.0 Alphas to 5.0.0-Berta2
 
-Berta1 retains the 5.0 Native Assist execution model and makes pinned manifest/VERSION plus a self-contained startup slice the handoff boundary.
+Berta2 retains the 5.0 Native Assist execution model and makes pinned manifest/VERSION plus a self-contained startup slice the handoff boundary.
 
 ## Startup migration
 
@@ -10,7 +10,7 @@ Adapters MUST broadly capture exact-uppercase candidate prefixes, resolve `stabl
 
 Replace Alpha 4 startup reads as follows:
 
-| Alpha 4 | Berta1 |
+| Alpha 4 | Berta2 |
 |---|---|
 | broad router + manifest/VERSION authority | broad router + pinned manifest/VERSION authority retained and made explicit |
 | multi-file startup slice | sole self-contained `entry/STARTUP.md` slice |
@@ -20,7 +20,9 @@ Replace Alpha 4 startup reads as follows:
 
 ## Invocation and contract continuity
 
-Berta1 replaces Alpha-era model completion with deterministic preflight after pinned STARTUP classifies EXECUTING. The standard profile is N2/R1/no-time/source-auto/D0/L1. `min=<duration>` is hard and `target=<duration>` is soft; explicit overlays are parser-owned and unique-or-fail.
+Berta2 retains deterministic structural parsing but restores Alpha4 task-aware completion for missing N/T/R/S/D values and extends it to V. No-group calls are adaptive and source-required; fixed N2/T0/R1/S0/D0/V0/L1/source-auto is selected only by explicit `standard`. A lone duration remains soft T. `min=<duration>` is hard and `target=<duration>` is explicitly soft. B/b may request a positive native time completion.
+
+Host evidence and intellectual execution are now separate. Missing host capabilities produce MODEL_NATIVE plus NONE/PARTIAL attestation instead of cancelling DIGR execution. Only canonical delivery requires verified host enforcement.
 
 ## D(0) correction
 
@@ -28,7 +30,7 @@ Any adapter, schema or prompt that interprets `D(0)` as “D disabled” must be
 
 ## Delivery migration
 
-New Berta1 runs terminate as `DELIVERED` or `INCOMPLETE`; `ABORTED` remains the failure terminal. `FINISHED` is accepted only while recovering Alpha 4 workspaces. A run that closes `INCOMPLETE` cannot render a canonical proof as though delivery gates passed.
+Canonical-host Berta2 runs terminate as `DELIVERED` or `INCOMPLETE`; `ABORTED` remains the failure terminal. `FINISHED` is accepted only while recovering Alpha 4 workspaces. Delivery schema v2 binds terminal semantic/audit state and a final mutation seal. MODEL_NATIVE execution returns a noncanonical report/log set with unavailable actuals marked `?`.
 
 ## Packaging migration
 

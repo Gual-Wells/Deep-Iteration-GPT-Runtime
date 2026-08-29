@@ -1,4 +1,4 @@
-"""Persisted run lifecycle for DIGR 5.0.0-Berta1.
+"""Persisted run lifecycle for DIGR 5.0.0-Berta2.
 
 RunPhase constrains lifecycle ordering only. It is not a workflow planner and
 never dictates task strategy.

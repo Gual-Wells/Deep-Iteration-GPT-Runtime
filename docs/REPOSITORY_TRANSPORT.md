@@ -1,4 +1,4 @@
-# Repository Transport — Berta1
+# Repository Transport — Berta2
 
 Transport starts for every broad candidate whose lstripped message begins with exact uppercase `DIGR` or exact `深度迭代`; surface classification happens only after pinned startup is loaded.
 

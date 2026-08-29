@@ -1,11 +1,11 @@
-# Stable personalization fresh-chat smoke test
+# Berta2 personalization fresh-chat smoke test
 
-1. `digr：任务` and ordinary non-candidates stay native and perform no DIGR repository acquisition.
-2. `DIGR是什么？` first pins current `stable`, verifies pinned manifest/VERSION/STARTUP, then returns NATIVE with the exact original message.
-3. `DIGRAPH` follows the same acquisition-first path before pinned STARTUP returns NATIVE.
-4. `DIGR：` and `DIGR(1：任务` acquire the same startup slice before returning INVALID/correction and create no run.
-5. `DIGR/help` acquires startup, then fetches the same-SHA `manifest.help` artifact and creates no run.
-6. `DIGR：任务` acquires startup before `digr.preflight`; only READY then fetches descriptor/execution artifacts and may proceed to Genesis.
-7. Every preflight receipt records completed startup acquisition separately from whether additional artifact fetches are required.
-8. Without HostAdapter enforcement, output is `DIGR~` ADVISORY and has no canonical proof.
-9. Truncate the local configuration before its sentinel; installation validation must reject it.
+1. `digr：任务` and ordinary non-candidates stay native and make no DIGR acquisition.
+2. `DIGR是什么？` and `DIGRAPH` first pin stable/manifest/VERSION/STARTUP, then return untouched NATIVE.
+3. malformed/empty EXECUTING surfaces acquire startup, return correction and create no run.
+4. `DIGR/help` acquires startup, fetches same-SHA manifest.help and creates no run.
+5. `DIGR：任务` reaches adaptive native completion; `DIGR(standard)：任务` reaches fixed standard.
+6. `DIGR(B=1)：任务`, `DIGR(S(b=1))：任务` and policy+V combinations remain executable.
+7. Without native HostAdapter, full MODEL_NATIVE work still returns result, targets/actuals, attestation and TOTAL/N/T/R/B/S/D/V/L logs; unavailable facts are `?`, not fabricated.
+8. With canonical host evidence, exact Candidate primary bytes deliver and terminal mutation is sealed.
+9. A local configuration truncated before its sentinel must be rejected.

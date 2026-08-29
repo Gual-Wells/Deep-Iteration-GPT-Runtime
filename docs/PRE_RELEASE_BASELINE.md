@@ -1,7 +1,7 @@
-# 5.0.0-Berta1 Release Baseline
+# 5.0.0-Berta2 Candidate Baseline
 
-Berta1 is the pinned-manifest stable integration baseline. Alpha releases remain historical evidence, not current authority.
+Berta2 is a repair/integration candidate. It is not the mutable-stable authority merely because its local tests and package validation pass.
 
-Change discipline is behavior first, then descriptor, model source, host runtime, schemas, docs, examples and tests converge. Generated dist/configuration artifacts must be rebuilt from their single sources. No prompt-only workaround or remembered result counts as validation.
+Change discipline is behavior first, then runtime, protocol sources, schemas, descriptor, docs, examples and tests converge. Generated artifacts are rebuilt from single sources. Release acceptance for this ZIP includes deterministic build, cold extraction, hash verification and cache exclusion.
 
-Release acceptance includes deterministic double build, cold extraction, hash verification, cache exclusion and byte-equality checks for standalone personalization exports.
+Promotion to `stable` additionally requires review after fresh target-client black-box evidence. Until then, Berta2 must remain explicitly identified as a candidate.

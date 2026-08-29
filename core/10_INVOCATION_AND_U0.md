@@ -1,7 +1,9 @@
 # Invocation and U0
 
-Berta1 uses broad local candidate capture before pinned repository startup. After lstrip, every exact-uppercase `DIGR` or exact `深度迭代` prefix is fetched and handed to pinned `entry/STARTUP.md`; the local shell does not classify help, task, parameter, punctuation, NATIVE or INVALID. Pinned STARTUP returns discussion and prefix collisions such as `DIGRAPH` as NATIVE with the untouched original message. Lower/mixed-case English is not captured.
+The local shell broadly captures exact uppercase `DIGR` or exact `深度迭代` after removing leading whitespace, performs real repository acquisition, and hands the untouched message to pinned STARTUP. It does not classify help, parameters, punctuation, NATIVE or INVALID. Lower/mixed-case English is not captured.
 
-For pinned-classified EXECUTING, U0 is the HostAdapter's immutable binding to exact `task_raw` bytes and their digest. A model never reconstructs or paraphrases U0. Task interpretations, hypotheses and decompositions belong in revisable StrategyState. U0, explicit user hard constraints and pinned manifest/version/protocol identity remain frozen for the run.
+Pinned STARTUP classifies EXECUTING and preserves exact `task_raw`. Structural parameter parsing may reject malformed/ambiguous syntax before a run; full protocol loading and native task-scale completion precede U0/contract freeze.
 
-Without an enforceable HostAdapter, execution is ADVISORY (`DIGR~`) and cannot claim receipts or canonical proof.
+U0 is the immutable exact task bytes and digest. A model never paraphrases or replaces U0 as the authoritative commitment. Interpretations, hypotheses and decompositions belong in revisable StrategyState.
+
+Host absence affects only attestation. MODEL_NATIVE execution still follows the full pinned protocol and reports unavailable actuals honestly.

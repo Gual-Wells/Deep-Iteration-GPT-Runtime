@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare and cold-validate deterministic DIGR 5.0.0-Berta1 artifacts.
+"""Prepare and cold-validate deterministic DIGR 5.0.0-Berta2 artifacts.
 
 Standard-library only.  The builder rejects symlinks/path traversal, tests the
 source before cache cleanup, regenerates FILE_TREE/SHA256SUMS, writes a sorted
@@ -136,7 +136,7 @@ def sha256(path: Path) -> str:
 
 
 def execution_set_sha256(members: list[dict]) -> str:
-    """Hash ordered execution member receipts using the Berta1 canonical form."""
+    """Hash ordered execution member receipts using the Berta2 canonical form."""
     canonical = json.dumps(
         [
             {'path': item['path'], 'sha256': item['sha256'], 'byte_length': item['byte_length']}
@@ -223,7 +223,9 @@ def _load_release_metadata(root: Path) -> tuple[dict, dict]:
         'preflight_binding': 'runtime.host_adapter.HostAdapter.preflight',
         'start_binding': 'runtime.host_adapter.HostAdapter.start',
         'commit_delivery_binding': 'runtime.run_session.LiveDIGRRun.commit_delivery',
-        'enforced_host_integration': 'required',
+        'enforced_host_integration': 'required_for_canonical_attestation',
+        'execution_without_host': 'MODEL_NATIVE',
+        'canonical_attestation': 'requires_verified_host_enforcement',
     }
     if (not isinstance(engine_api, dict)
             or any(engine_api.get(key) != value for key, value in required_api_values.items())):

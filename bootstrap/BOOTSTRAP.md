@@ -1,6 +1,6 @@
 # DIGR 5.0 Bootstrap Architecture Note (Non-startup)
 
-This file is explanatory only. Berta1 declares `entry/STARTUP.md` as both `bootstrap_entry` and the sole `startup_slice` member so classification and startup navigation cannot drift across files.
+This file is explanatory only. Berta2 declares `entry/STARTUP.md` as both `bootstrap_entry` and the sole `startup_slice` member so classification and startup navigation cannot drift across files.
 
 The local shell performs only broad candidate capture and repository transport. Every message whose lstripped text begins with exact uppercase ASCII `DIGR` or exact `深度迭代` reaches this repository path before semantic classification.
 

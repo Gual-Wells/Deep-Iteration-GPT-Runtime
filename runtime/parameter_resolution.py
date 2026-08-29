@@ -1,16 +1,17 @@
-"""Deterministic parameter-format resolution for DIGR 5.0 stable.1.
+"""Structural parsing and native completion for DIGR 5.0.0-Berta2.
 
 This module is deliberately *not* a workload planner.  It resolves only the
 structural part of an already-routed EXECUTING invocation:
 
 * full-width/ASCII punctuation in the invocation header is canonicalized;
 * canonical relative parameter order is enforced;
-* explicit labels and S/D/L markers are anchors;
+* explicit labels and S/D/V/L markers are anchors;
 * a bare numeric token can never become T/t;
 * positional values are accepted only when a single legal mapping exists.
 
-Richer natural-language understanding may classify/normalize a token before it
-is passed here, but the final mapping is deterministic and unique-or-fail.
+The parser never invents workload values. Missing task-scale values remain
+``None`` until a model-owned native completion is supplied. Deterministic code
+then validates that completion without choosing it.
 """
 from __future__ import annotations
 from dataclasses import dataclass, asdict
@@ -27,7 +28,7 @@ _PUNCT = str.maketrans({'（':'(', '）':')', '，':',', '：':':'})
 _INT = re.compile(r'^\s*\d+\s*$')
 _LABEL = re.compile(r'^\s*([A-Za-z]+)\s*=\s*(.*?)\s*$')
 _MARKER = re.compile(r'^\s*([SDVL])(?:\((.*)\))?\s*$', re.S)
-_PROFILE = re.compile(r'^\s*profile\s*=\s*(standard|标准)\s*$', re.I)
+_PROFILE = re.compile(r'^\s*profile\s*=\s*(adaptive|standard|自适应|标准)\s*$', re.I)
 _TIME_POLICY = re.compile(r'^\s*(min|target)\s*=\s*(.*?)\s*$', re.I)
 _SOURCE_POLICY = re.compile(r'^\s*source\s*=\s*(auto|required|off)\s*$', re.I)
 
@@ -70,8 +71,8 @@ class ParameterResolution:
     L_e: int = 1
     normalized_surface: str | None = None
     diagnostics: tuple[str, ...] = ()
-    source_policy: str = 'auto'
-    V_o: int = 0
+    source_policy: str = 'required'
+    V_o: int | None = None
 
     def __post_init__(self):
         if not isinstance(self.status, ResolutionStatus):
@@ -92,17 +93,20 @@ class ParameterResolution:
             raise ValueError('source_policy must be auto/required/off')
         object.__setattr__(self,'source_policy',policy)
 
-    def require_stable_ready(self) -> None:
-        """Reject unresolved numeric freedom at the Berta1 execution gate."""
-        if self.status is not ResolutionStatus.RESOLVED:
-            raise ValueError('stable READY parameters must be RESOLVED')
+    @property
+    def missing_parameters(self) -> tuple[str, ...]:
         values = {
             'N': self.N, 'T_seconds': self.T_seconds, 'R': self.R,
             'S.n': self.S.n, 'S.t_seconds': self.S.t_seconds, 'S.r': self.S.r,
-            'D_s': self.D_s,
-            'V_o': self.V_o,
+            'D_s': self.D_s, 'V_o': self.V_o,
         }
-        missing = [name for name, value in values.items() if value is None]
+        return tuple(name for name, value in values.items() if value is None)
+
+    def require_stable_ready(self) -> None:
+        """Reject unresolved native-completion freedom at the execution gate."""
+        if self.status is not ResolutionStatus.RESOLVED:
+            raise ValueError('stable READY parameters must be RESOLVED')
+        missing = list(self.missing_parameters)
         if missing:
             raise ValueError('stable READY parameters are not concrete: ' + ', '.join(missing))
         if self.B == 1 and self.T_seconds <= 0:
@@ -127,7 +131,7 @@ class ParameterResolution:
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> 'ParameterResolution':
         sd=d.get('S') or {}
-        return cls(ResolutionStatus(d['status']),d.get('N'),d.get('T_seconds'),d.get('R'),d.get('B',0),SourceParameterResolution(sd.get('n'),sd.get('t_seconds'),sd.get('r'),sd.get('b',0)),d.get('D_s'),d.get('L_e',1),d.get('normalized_surface'),tuple(d.get('diagnostics',[])),d.get('source_policy','auto'),d.get('V_o',0))
+        return cls(ResolutionStatus(d['status']),d.get('N'),d.get('T_seconds'),d.get('R'),d.get('B',0),SourceParameterResolution(sd.get('n'),sd.get('t_seconds'),sd.get('r'),sd.get('b',0)),d.get('D_s'),d.get('L_e',1),d.get('normalized_surface'),tuple(d.get('diagnostics',[])),d.get('source_policy','required'),d.get('V_o'))
 
 
 def normalize_header_surface(text: str) -> str:
@@ -491,7 +495,7 @@ def _standard_result(
     diagnostics: tuple[str, ...] = (),
     source_policy: str = 'auto',
 ) -> ParameterResolution:
-    """Apply the stable.1 standard profile without inventing source work.
+    """Apply the explicit fixed standard profile.
 
     Source selection remains ``auto`` at the semantic layer. Numeric S minima
     default to concrete zeroes; REQUIRED versus WAIVED is a separate semantic
@@ -518,7 +522,7 @@ def _standard_result(
         normalized_surface=normalized_surface if normalized_surface is not None else base.normalized_surface,
         diagnostics=tuple(base.diagnostics) + tuple(diagnostics),
         source_policy=source_policy,
-        V_o=base.V_o,
+        V_o=0 if base.V_o is None else base.V_o,
     )
     try:
         result.require_stable_ready()
@@ -532,27 +536,137 @@ def _standard_result(
     return result
 
 
+def _adaptive_result(
+    *, overlay: ParameterResolution | None = None,
+    T_seconds: float | None = None,
+    B: int | None = None,
+    normalized_surface: str | None = None,
+    diagnostics: tuple[str, ...] = (),
+    source_policy: str = 'required',
+) -> ParameterResolution:
+    """Preserve structural values while leaving task-scale choices to the model."""
+    base = overlay or ParameterResolution(ResolutionStatus.RESOLVED)
+    source = base.S
+    if source_policy == 'off':
+        source = SourceParameterResolution(
+            0 if source.n is None else source.n,
+            0.0 if source.t_seconds is None else source.t_seconds,
+            0 if source.r is None else source.r,
+            source.b,
+        )
+    return ParameterResolution(
+        ResolutionStatus.RESOLVED,
+        N=base.N,
+        T_seconds=base.T_seconds if T_seconds is None else T_seconds,
+        R=base.R,
+        B=base.B if B is None else B,
+        S=source,
+        D_s=base.D_s,
+        L_e=base.L_e,
+        normalized_surface=normalized_surface if normalized_surface is not None else base.normalized_surface,
+        diagnostics=tuple(base.diagnostics) + tuple(diagnostics),
+        source_policy=source_policy,
+        V_o=base.V_o,
+    )
+
+
+def complete_native_parameters(
+    structural: ParameterResolution,
+    completion: Mapping[str, Any],
+) -> ParameterResolution:
+    """Validate model-selected task-scale values without selecting them.
+
+    ``completion`` may use top-level ``N``, ``T_seconds``/``T``, ``R``,
+    ``D_s``/``D`` and ``V_o``/``V`` plus either a nested ``S`` mapping or flat
+    ``n``, ``t_seconds``/``t`` and ``r``. Explicit structural values may be
+    repeated only when byte-for-byte equal after numeric normalization.
+    """
+    if not isinstance(structural, ParameterResolution) or structural.status is not ResolutionStatus.RESOLVED:
+        raise ValueError('native completion requires a structurally resolved parameter surface')
+    if not isinstance(completion, Mapping):
+        raise TypeError('native completion must be a mapping')
+    allowed={'N','T_seconds','T','R','D_s','D','V_o','V','S','n','t_seconds','t','r'}
+    unknown=sorted(str(k) for k in completion if k not in allowed)
+    if unknown:
+        raise ValueError('unknown native completion field(s): ' + ', '.join(unknown))
+    nested=completion.get('S',{})
+    if not isinstance(nested,Mapping):
+        raise TypeError('native completion S must be a mapping')
+    nested_unknown=sorted(str(k) for k in nested if k not in {'n','t_seconds','t','r'})
+    if nested_unknown:
+        raise ValueError('unknown native completion S field(s): ' + ', '.join(nested_unknown))
+
+    def one(*names):
+        values=[]
+        for name in names:
+            if name in completion:values.append((name,completion[name]))
+            if name in nested:values.append((f'S.{name}',nested[name]))
+        if len(values)>1:
+            first=values[0][1]
+            if any(value!=first for _,value in values[1:]):
+                raise ValueError('conflicting native completion aliases: ' + ', '.join(name for name,_ in values))
+        return values[0][1] if values else None
+
+    proposed={
+        'N':one('N'),'T_seconds':one('T_seconds','T'),'R':one('R'),
+        'D_s':one('D_s','D'),'V_o':one('V_o','V'),
+        'S.n':one('n'),'S.t_seconds':one('t_seconds','t'),'S.r':one('r'),
+    }
+    for name,value in tuple(proposed.items()):
+        if value is None:continue
+        if name in {'T_seconds','S.t_seconds'}:
+            if isinstance(value,str):
+                parsed=_duration(value)
+                if parsed is None:raise ValueError(f'native completion {name} requires duration semantics')
+                proposed[name]=parsed
+            else:
+                proposed[name]=require_finite_nonnegative_number(f'native completion {name}',value)
+        else:
+            proposed[name]=require_nonnegative_int(f'native completion {name}',value)
+    existing={
+        'N':structural.N,'T_seconds':structural.T_seconds,'R':structural.R,
+        'D_s':structural.D_s,'V_o':structural.V_o,
+        'S.n':structural.S.n,'S.t_seconds':structural.S.t_seconds,'S.r':structural.S.r,
+    }
+    for name,value in existing.items():
+        supplied=proposed[name]
+        if value is not None and supplied is not None and value!=supplied:
+            raise ValueError(f'native completion cannot override explicit {name}')
+    merged={name:(existing[name] if existing[name] is not None else proposed[name]) for name in existing}
+    missing=[name for name,value in merged.items() if value is None]
+    if missing:
+        raise ValueError('native completion is missing: ' + ', '.join(missing))
+    source=SourceParameterResolution(merged['S.n'],merged['S.t_seconds'],merged['S.r'],structural.S.b)
+    result=ParameterResolution(
+        ResolutionStatus.RESOLVED,
+        N=merged['N'],T_seconds=merged['T_seconds'],R=merged['R'],B=structural.B,
+        S=source,D_s=merged['D_s'],L_e=structural.L_e,
+        normalized_surface=structural.normalized_surface,
+        diagnostics=tuple(structural.diagnostics)+('completion:native',),
+        source_policy=structural.source_policy,V_o=merged['V_o'],
+    )
+    result.require_stable_ready()
+    if result.source_policy=='off' and any((result.S.n,result.S.t_seconds,result.S.r,result.S.b)):
+        raise ValueError('source=off requires zero completed S values')
+    return result
+
+
 def parameter_profile(surface: str | None) -> str:
-    """Return the deterministic stable.1 profile selected by a surface."""
+    """Describe which structural grammar/profile selected the invocation."""
     try:
         inner = _strip_outer_group(surface)
         tokens = _split_top(inner)
     except ValueError:
         return 'invalid'
-    if not tokens:
-        return 'standard'
-    if _uses_berta_surface(tokens):
-        return 'berta1'
-    if len(tokens) == 1 and (
-        tokens[0].strip().lower() in {'standard', '标准'}
-        or _PROFILE.fullmatch(tokens[0])
-        or _TIME_POLICY.fullmatch(tokens[0])
-        or _SOURCE_POLICY.fullmatch(tokens[0])
-        or _duration(tokens[0]) is not None
-    ):
-        return 'standard'
-    if any(_PROFILE.fullmatch(token) or _TIME_POLICY.fullmatch(token) or _SOURCE_POLICY.fullmatch(token) for token in tokens):
-        return 'standard'
+    if not tokens:return 'adaptive'
+    for token in tokens:
+        m=_PROFILE.fullmatch(token)
+        if m:
+            return 'standard' if m.group(1).lower() in {'standard','标准'} else 'adaptive'
+    if len(tokens)==1 and tokens[0].strip().lower() in {'standard','标准'}:return 'standard'
+    remaining=[t for t in tokens if not (_TIME_POLICY.fullmatch(t) or _SOURCE_POLICY.fullmatch(t))]
+    if _uses_berta_surface(remaining):return 'berta2'
+    if not remaining:return 'adaptive'
     return 'legacy-alpha4'
 
 
@@ -698,32 +812,25 @@ def _resolve_berta_parameter_surface(
             status=ResolutionStatus.AMBIGUOUS
         return ParameterResolution(status,normalized_surface=normalized,diagnostics=(why,))
     values=unique[0]
-    src=SourceParameterResolution(source.get('n',0),source.get('t',0.0),source.get('r',0),source.get('b',0))
+    src=SourceParameterResolution(source.get('n'),source.get('t'),source.get('r'),source.get('b',0))
     result=ParameterResolution(
         ResolutionStatus.RESOLVED,
-        N=values.get('N',2),T_seconds=values.get('T',0.0),R=values.get('R',1),B=values.get('B',0),
-        S=src,D_s=values.get('D_s',0),L_e=values.get('L_e',1),
-        normalized_surface=normalized,diagnostics=('profile:berta1','typed-anywhere:unique'),
-        source_policy='auto',V_o=values.get('V_o',0),
+        N=values.get('N'),T_seconds=values.get('T'),R=values.get('R'),B=values.get('B',0),
+        S=src,D_s=values.get('D_s'),L_e=values.get('L_e',1),
+        normalized_surface=normalized,diagnostics=('profile:berta2','typed-anywhere:unique'),
+        source_policy='required',V_o=values.get('V_o'),
     )
-    try:result.require_stable_ready()
-    except ValueError as exc:
-        return ParameterResolution(ResolutionStatus.INVALID,normalized_surface=normalized,diagnostics=result.diagnostics+(str(exc),))
     return result
 
 
 def resolve_stable_parameter_surface(surface: str | None, semantic_normalizations: Mapping[str,str] | None=None) -> ParameterResolution:
-    """Resolve stable.1 profiles, with Alpha 4 as the sole legacy fallback.
+    """Resolve Berta2 structure while preserving Alpha4 invocation meaning.
 
-    Stable forms are deliberately small:
-
-    * no parameters or ``standard`` -> N=2, R=1, T=0 soft, D=0, L=1;
-    * one bare duration or ``min=<duration>`` -> hard time minimum;
-    * ``target=<duration>`` -> soft time target.
-
-    All other surfaces are passed through the Alpha 4 unique-or-fail parser.
-    Legacy ``T``/``B`` remains accepted but is explicitly diagnosed. A hard
-    policy with zero time is rejected during this local preflight parser.
+    Omitted task-scale values stay unresolved for native semantic completion.
+    The fixed N2/R1/no-time profile is selected only by explicit ``standard``
+    or ``profile=standard``. A lone duration remains Alpha4 soft T; only
+    ``min=`` creates a hard minimum. Policy tokens are removed before Berta2
+    typed-anywhere dispatch so they compose with V and flat nested labels.
     """
     try:
         inner = _strip_outer_group(surface)
@@ -736,34 +843,33 @@ def resolve_stable_parameter_surface(surface: str | None, semantic_normalization
             diagnostics=(str(exc),),
         )
 
-    if _uses_berta_surface(tokens):
-        return _resolve_berta_parameter_surface(surface,semantic_normalizations)
+    # Legacy shorthand remains accepted, but selecting the fixed profile is
+    # explicit. ``adaptive`` may be written explicitly for clarity.
+    bare_profile=None
+    if len(tokens)==1 and tokens[0].strip().lower() in {'standard','标准','adaptive','自适应'}:
+        bare_profile=tokens[0].strip().lower();tokens=[]
 
-    if not tokens:
-        return _standard_result(normalized_surface=normalized, diagnostics=('profile:standard',))
-
-    if len(tokens) == 1 and tokens[0].strip().lower() in {'standard', '标准'}:
-        return _standard_result(normalized_surface=normalized, diagnostics=('profile:standard',))
-
-    stable_policy: tuple[str, float] | None = None
+    time_policy: tuple[str, float] | None = None
     remaining: list[str] = []
-    saw_profile = False
-    source_policy = 'auto'
+    profile_name: str | None = None
+    source_policy: str | None = None
     saw_source_policy = False
     for token in tokens:
-        if _PROFILE.fullmatch(token):
-            if saw_profile:
+        profile=_PROFILE.fullmatch(token)
+        if profile:
+            if profile_name is not None:
                 return ParameterResolution(ResolutionStatus.INVALID, normalized_surface=normalized, diagnostics=('duplicate profile selector',))
-            saw_profile = True
+            value=profile.group(1).lower()
+            profile_name='standard' if value in {'standard','标准'} else 'adaptive'
             continue
         policy = _TIME_POLICY.fullmatch(token)
         if policy:
-            if stable_policy is not None:
+            if time_policy is not None:
                 return ParameterResolution(ResolutionStatus.INVALID, normalized_surface=normalized, diagnostics=('multiple min/target time policies',))
             seconds = _duration(policy.group(2), semantic_normalizations)
             if seconds is None:
                 return ParameterResolution(ResolutionStatus.INVALID, normalized_surface=normalized, diagnostics=(f'{policy.group(1).lower()} requires explicit duration semantics',))
-            stable_policy = (policy.group(1).lower(), seconds)
+            time_policy = (policy.group(1).lower(), seconds)
             continue
         source = _SOURCE_POLICY.fullmatch(token)
         if source:
@@ -774,49 +880,47 @@ def resolve_stable_parameter_surface(surface: str | None, semantic_normalization
             continue
         remaining.append(token)
 
-    # A lone duration is the compact hard-minimum spelling in stable.1.
-    if not saw_profile and stable_policy is None and not saw_source_policy and len(tokens) == 1:
-        seconds = _duration(tokens[0], semantic_normalizations)
-        if seconds is not None:
-            if seconds == 0:
-                return ParameterResolution(ResolutionStatus.INVALID, normalized_surface=normalized, diagnostics=('hard time minimum must be greater than zero',))
-            return _standard_result(T_seconds=seconds, B=1, normalized_surface=normalized, diagnostics=('profile:standard', 'time-policy:min'))
+    if bare_profile is not None:
+        profile_name='standard' if bare_profile in {'standard','标准'} else 'adaptive'
 
-    if saw_profile or stable_policy is not None or saw_source_policy:
-        legacy_surface = '(' + ','.join(remaining) + ')'
-        overlay = resolve_alpha4_parameter_surface(legacy_surface, semantic_normalizations)
-        if overlay.status is not ResolutionStatus.RESOLVED:
-            return ParameterResolution(overlay.status, normalized_surface=normalized, diagnostics=overlay.diagnostics)
-        if overlay.T_seconds is not None or overlay.B != 0:
-            return ParameterResolution(ResolutionStatus.INVALID, normalized_surface=normalized, diagnostics=('min/target cannot be combined with legacy T/B',))
-        if source_policy=='off' and any(x not in (None,0,0.0) for x in (overlay.S.n,overlay.S.t_seconds,overlay.S.r,overlay.S.b)):
-            return ParameterResolution(ResolutionStatus.INVALID, normalized_surface=normalized, diagnostics=('source=off requires zero S parameters',))
-        policy_name, seconds = stable_policy or ('target', 0.0)
-        hard = 1 if policy_name == 'min' else 0
-        if hard and seconds == 0:
-            return ParameterResolution(ResolutionStatus.INVALID, normalized_surface=normalized, diagnostics=('hard time minimum must be greater than zero',))
+    structural_surface='(' + ','.join(remaining) + ')'
+    if _uses_berta_surface(remaining):
+        overlay=_resolve_berta_parameter_surface(structural_surface,semantic_normalizations)
+    else:
+        overlay=resolve_alpha4_parameter_surface(structural_surface,semantic_normalizations)
+    if overlay.status is not ResolutionStatus.RESOLVED:
+        return ParameterResolution(overlay.status,normalized_surface=normalized,diagnostics=overlay.diagnostics)
+
+    if time_policy is not None and (overlay.T_seconds is not None or overlay.B!=0):
+        return ParameterResolution(ResolutionStatus.INVALID,normalized_surface=normalized,diagnostics=('min/target cannot be combined with explicit T/B',))
+    policy_name,seconds=(time_policy if time_policy is not None else (None,None))
+    hard=1 if policy_name=='min' else (0 if policy_name=='target' else overlay.B)
+    if hard==1 and seconds==0:
+        return ParameterResolution(ResolutionStatus.INVALID,normalized_surface=normalized,diagnostics=('hard time minimum must be greater than zero',))
+    chosen_source=source_policy or ('auto' if profile_name=='standard' else 'required')
+    if chosen_source=='off' and any(x not in (None,0,0.0) for x in (overlay.S.n,overlay.S.t_seconds,overlay.S.r,overlay.S.b)):
+        return ParameterResolution(ResolutionStatus.INVALID,normalized_surface=normalized,diagnostics=('source=off requires zero S parameters',))
+
+    diagnostics=[]
+    if profile_name=='standard':diagnostics.append('profile:standard')
+    elif _uses_berta_surface(remaining):diagnostics.append('profile:berta2')
+    elif remaining:diagnostics.append('profile:legacy-alpha4')
+    else:diagnostics.append('profile:adaptive')
+    if remaining and not _uses_berta_surface(remaining) and (overlay.T_seconds is not None or overlay.B!=0):
+        diagnostics.append('legacy T/B accepted; bare duration remains soft; prefer min= for hard or target= for explicit soft')
+    if policy_name is not None:diagnostics.append(f'time-policy:{policy_name}')
+    diagnostics.append(f'source-policy:{chosen_source}')
+
+    if profile_name=='standard':
         return _standard_result(
-            T_seconds=seconds, B=hard, overlay=overlay,
-            normalized_surface=normalized,
-            diagnostics=('profile:standard', f'time-policy:{policy_name}',f'source-policy:{source_policy}'),
-            source_policy=source_policy,
+            T_seconds=0.0 if seconds is None else seconds,B=hard,
+            overlay=overlay,normalized_surface=normalized,
+            diagnostics=tuple(diagnostics),source_policy=chosen_source,
         )
-
-    legacy = resolve_alpha4_parameter_surface(surface, semantic_normalizations)
-    if legacy.status is not ResolutionStatus.RESOLVED:
-        return legacy
-    warnings = ['profile:legacy-alpha4']
-    # T/B compatibility is deliberately visible instead of silently becoming
-    # the preferred stable.1 spelling.
-    if legacy.T_seconds is not None or legacy.B != 0:
-        warnings.append('legacy T/B accepted; prefer min=<duration> or target=<duration>')
-    return _standard_result(
-        T_seconds=0.0 if legacy.T_seconds is None else legacy.T_seconds,
-        B=legacy.B,
-        overlay=legacy,
-        normalized_surface=legacy.normalized_surface,
-        diagnostics=tuple(warnings),
-        source_policy='auto',
+    return _adaptive_result(
+        overlay=overlay,T_seconds=seconds,B=hard,
+        normalized_surface=normalized,diagnostics=tuple(diagnostics),
+        source_policy=chosen_source,
     )
 
 

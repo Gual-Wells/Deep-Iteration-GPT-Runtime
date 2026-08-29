@@ -1,4 +1,4 @@
-"""Immutable repository-delegated protocol authority for DIGR 5.0.0-Berta1."""
+"""Immutable repository-delegated protocol authority for DIGR 5.0.0-Berta2."""
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 from typing import Any

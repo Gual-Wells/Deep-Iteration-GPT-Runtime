@@ -1,8 +1,8 @@
-# DIGR 5.0.0-Berta1 帮助
+# DIGR 5.0.0-Berta2 帮助
 
-DIGR 是显式调用、单条消息内生效的高投入执行模式；不会自动延续到下一轮。
+DIGR 是显式调用、仅对本条任务生效的高投入执行模式，不会自动延续到下一轮。
 
-## 1. 宽捕获与 pinned STARTUP 分类
+## 1. 调用与仓库路由
 
 ```text
 DIGR/help
@@ -12,58 +12,76 @@ DIGR(<参数>)：<非空任务>
 深度迭代：<非空任务>
 ```
 
-`DIGR` 必须精确大写。本地层对 lstrip 后以 exact `DIGR`/`深度迭代` 开头的消息一律先真实获取仓库，不在本地判断 help、task、括号、标点、NATIVE 或 INVALID。取得 pinned manifest/VERSION 和 STARTUP 后，exact `/help` 才是 HELP；可配平可选参数组 + 冒号 + 非空任务是 EXECUTING；`DIGR是什么`、`DIGR 协议...`、`DIGRAPH` 由 pinned STARTUP 判为 NATIVE 并把完整原文交回普通 ChatGPT。`digr`、`Digr` 不捕获。空任务或坏括号返回修正提示，不建立 Run。
+英文别名必须精确大写。本地层只做宽候选捕获和仓库传输：命中后先取得当前 `stable` 的完整 SHA，再从同一 SHA 校验 manifest/VERSION 并加载完整 startup slice；它不在本地猜测 help、task、参数或标点。Pinned STARTUP 才分类 NATIVE/HELP/INVALID/EXECUTING。`digr`、`Digr` 不捕获；`DIGR是什么`、`DIGRAPH` 会在真实获取后作为 NATIVE 交回普通 ChatGPT。
 
-## 2. HostAdapter 与执行等级
+## 2. 两条执行路径
 
-仓库 STARTUP 分类 EXECUTING 后，使用 `digr.preflight` 做参数解析与能力协商；最终交付使用 `digr.commit_delivery`。模型不得伪造或自行认证 receipt。
+DIGR 的执行与证明是两个维度：
 
-若宿主缺少这些工具，只能提供标记为 `DIGR~` 的 ADVISORY 输出，需说明未执行的约束，不得附 canonical proof。HELP 不建立任务时钟。
+- `MODEL_NATIVE`：没有原生 HostAdapter 也完整运行协议；不能观测或机器证明的 actual 写 `?`，不得伪造 receipt。
+- `HOST_ENFORCED`：宿主真实提供仓库绑定、持久工作区、适用时钟和最终输出闸门，可进一步取得 `PARTIAL` 或 `CANONICAL` attestation。
 
-## 3. Berta1 standard profile
+缺少宿主能力只降低相关证明，不得把任务降成“不执行的提示词模式”。语义 V 是模型原生认知机制，不受 `viewpoint_max=0` 阻断。单次不中断任务可使用可信 session-only monotonic clock；跨 session 的连续性必须另行证明。
 
-公开参数顺序为 `N,T,R,B,S(n,t,r,b),D(s),V(o),L(e)`；默认值是 N2、R1、T0、B0、source-auto、S(0,0,0,0)、D0、V0、L1。显式类型标签允许乱序；平铺 `n/t/r/b/s/o/e` 可直接表示内部参数；删去显式项后，其余无标签参数必须仍有唯一解释，否则返回 AMBIGUOUS/INVALID，不猜测。V(0) 与 D(0) 都只是零下限。
+## 3. 参数与自适应补全
 
-V 是持久化远距视角通道：各自拥有私有 VLedger，不进行 V-to-V 通信；只有具备实质事件、语义距离、非冗余说明、Main 价值回传和正 V 时间的通道才计入 actual。Main 始终拥有最终策略与候选权。
-
-四类时间为 `T=MAIN+SOURCE`、`t=SOURCE`、`D=D_EXCLUSIVE`、`V=V_EXCLUSIVE`，IDLE/META 均不计。交付时写出 TOTAL 以及 N/T/R/B/S/D/V/L 各独立本地 NDJSON 日志；本版本不要求 MCP、UI、PWA、远端桥或后端。
-
-无参数、`standard`、`标准` 或 `profile=standard` 使用确定性合同：
+公开顺序是：
 
 ```text
-N=2, R=1, T=0（无时间要求）, source=auto, D=0, L=1
+N,T,R,B,S(n,t,r,b),D(s),V(o),L(e)
 ```
 
-模型不会补全、左移或猜测参数。裸时间或 `min=<duration>` 表示 hard time minimum；`target=<duration>` 表示 soft target；时间必须带单位，0 的 hard minimum 无效。旧位置参数若能唯一解析，会自动按 `legacy-alpha4` 兼容路径处理并产生可见警告，无需 profile token。
+普通 `DIGR：任务`、空参数组、`adaptive`/`自适应` 使用自适应模式：确定性解析器只映射语法，模型依据精确 U0、任务规模和可用环境一次性补全缺失的 N/T/R/S/D/V；默认来源政策为 `source=required`。只有显式 `standard`/`标准`/`profile=standard` 才固定：
 
-## 4. N、R 与 Candidate
+```text
+N=2,T=0,R=1,B=0,S(0,0,0,0),D(0),V(0),L(1),source=auto
+```
 
-N 只计实质改变方案、表示、证据结论或验证方法的 MAIN evolution；机械改写不计。R 必须已有 Candidate，再把它送回整个解决过程挑战任务理解、假设、策略、来源、工具路线和验证。挑战后保留原 Candidate 可以，但必须有实质证据。
+显式值绝不允许补全阶段修改。`B=1` 或 `S(b=1)` 可以不同时给 T/t，此时由模型选择与任务相称的正值；硬时间不能为 0。
 
-达到最低次数只打开停止资格；若继续工作仍能明显改善结果，应继续。
+裸 duration 保留 Alpha4 语义，是 soft T（B=0）。`target=15min` 明确表示 soft；`min=15min` 才表示 hard。`source=auto|required|off` 可显式指定；`off` 强制 S 数值为 0。
 
-## 5. source=auto
+显式类型标签可以乱序，`n/t/r/b/s/o/e` 可直接表示 S/D/V/L 内部参数，不必写包装括号。删去显式项后，无标签值必须仍然只有一种合法的类型与相对顺序解释；重复、无解或多解均返回错误/候选，不猜测。
 
-模型根据任务决定外部来源是否能提高正确性，优先使用高价值、可靠、适当时为一手的来源。只有能证明来源无关、被用户禁止或宿主不可用时，才可记录 `WAIVED`；“模型已经知道”不是 waiver。
+## 4. N、R、Candidate 与停止
 
-## 6. D(0) 与 L
+N 只计实质改变方案、表示、验证方法或证据结论的演化。MAIN 先建立可修订 Strategy；只有出现有意义的结果时才建立 Candidate，不为凑 R 过早制造半成品。R 必须已有 Candidate，再把它送回整个解决过程挑战任务理解、假设、策略、来源、工具路线和验证；保留原 Candidate 也必须有实质挑战证据。
 
-`D(0)` 仅表示没有必须完成的 D 下限，绝不关闭 D。若非局部挑战能改善结果，模型仍可执行 D，actual 可大于 0。D 必须经过 proposal、Decree、执行与 MAIN reintegration。
+达到最低值只打开停止资格。仍有高价值改进时应继续；停止还需评估目标覆盖、证据完整性、对抗韧性和剩余风险。
 
-L1/L2/L3 是隔离等级目标。宿主能力不能自动升级为 `L_actual`；实际等级必须绑定具体 intervention receipt。没有 completed D 时，L actual 可保持未知。
+## 5. S、D、V、L
 
-## 7. 时间
+自适应默认来源为 REQUIRED。显式 `source=auto` 才允许依据任务给出有理由的 REQUIRED/WAIVED 选择；“模型已经知道”不是 waiver。`source=off` 是用户明确关闭。
 
-Standard profile 没有时间要求。显式 hard minimum 需要连续可信单调时钟；能力不足时 preflight 必须阻断或如实降级。只计实质 MAIN/SOURCE 工作；等待、sleep、工具排队、META、日志、机械改写和 exclusive D 不计时，也不得填充时间。
+`D(0)` 与 `V(0)` 都只是零下限。D 经 proposal、Decree、执行、结果与 MAIN reintegration；D+/D−/Dx 是内部不透明方向，不增加公开参数。V 是持久远距视角：每个 V 有私有 ledger、语义距离与非冗余证据，不进行 V-to-V 通信，Main 保有最终决策权。
 
-## 8. Manifest 导航与启动
+L1/L2/L3 是 D 的隔离目标；实际等级必须绑定具体 intervention evidence，不能由宿主 capability 自动升级。Berta2 的 canonical host runtime 目前使用 D_EXCLUSIVE；background D 的独立并发计时仍列为后续接口扩展，不伪装成已实现。
 
-所有宽捕获候选都先访问仓库。已有 connector 可读取 current `stable` branch HEAD；direct REST 必须同轮读取 branch 与 Git-ref 并要求完整 SHA 一致。取得 SHA 后先读取 pinned `manifest.json` 与 `VERSION` 并验证版本一致，再完整加载 manifest 的唯一 `startup_slice`。只有 pinned STARTUP 能分类 NATIVE/HELP/INVALID/EXECUTING。
+## 6. 四时钟
 
-`manifest.json` 是导航权威。其声明的 runtime descriptor 仅描述并校验生成的执行/发布 artifact；每个所用 artifact 仍须按 `sha256`、`byte_length` 和 `media_type` 校验，但 descriptor 不能替代 manifest/STARTUP 导航。
+```text
+T = MAIN + SOURCE
+t = SOURCE
+D真实时间 = D_EXCLUSIVE
+V真实时间 = V_EXCLUSIVE
+```
 
-## 9. 交付与证明
+META、IDLE 不计，D/V 不污染 T/t，等待和 sleep 不填充时间。推荐返回：
 
-最终结果必须以 exact bytes、media type 和 current Candidate binding 调用 `digr.commit_delivery`。交付是两阶段、fail-closed、可恢复的提交：先准备并验证 payload/summary/proof/envelope，再转入 `DELIVERED`；中途失败保持非成功。只有 verified `DELIVERED` 才能输出 canonical proof。交付门未满足时关闭为 `INCOMPLETE`。
+```text
+T目标/T真实（+D真实时间，+V真实时间）
+```
 
-正常回答不泄露隐藏推理、内部日志或工作区细节。
+不可观测或不可信的实际值写 `?`。
+
+## 7. 日志与交付
+
+每次执行返回或持久化 `TOTAL` 总日志，以及 N、T、R、B、S、D、V、L 独立日志。它们记录面向用户的行为、阶段、证据引用、计数与时间摘要；成功和不成功的 D/V 都保留，其所有已观测专属时间进入 D/V 时间汇总。日志不泄露隐藏推理。
+
+有 canonical host 时，最终 exact bytes 必须等于 current Candidate 的首要 content-addressed payload。交付还绑定 terminal semantic/audit digest、summary、proof、envelope，并在 DELIVERED/INCOMPLETE/ABORTED 后封印工作区；任何终态修改均拒绝。只有验证后的 DELIVERED 才是 canonical proof。
+
+MODEL_NATIVE 路径仍返回完整作品、参数目标/实际报告、attestation level 和九类日志，但必须标明哪些 actual 是自报、可观测或未知，不得冒充 canonical。
+
+## 8. 发布身份
+
+5.0.0-Berta2 是 Berta 系列候选，不是 stable。代码/Schema/ZIP 自洽验证是包发布门；将其推进 mutable `stable` 之前，还必须补做真实 ChatGPT iOS/Web/Desktop 的同任务 black-box 回归并保存原始证据。

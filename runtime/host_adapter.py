@@ -1,7 +1,7 @@
-"""Thin stable.1 host adapter: broad local capture, then pinned preflight."""
+"""Berta2 host adapter: pinned routing plus optional canonical attestation."""
 from __future__ import annotations
 
-from dataclasses import dataclass,field
+from dataclasses import dataclass,field,replace
 from enum import Enum
 import os
 from pathlib import Path
@@ -18,7 +18,7 @@ from .execution_protocol import ExecutionProtocolBundle
 from .invocation_surface import InvocationKind
 from .parameter_resolution import (
     ParameterResolution, ResolutionStatus, parameter_profile,
-    resolve_stable_parameter_surface,
+    complete_native_parameters,resolve_stable_parameter_surface,
 )
 from .protocol_authority import authority_from_route_bytes
 from .repository_transport import (
@@ -30,6 +30,7 @@ from .routing import candidate_route_key
 
 class PreflightStatus(str, Enum):
     READY = 'READY'
+    NEEDS_COMPLETION = 'NEEDS_COMPLETION'
     NATIVE = 'NATIVE'
     HELP = 'HELP'
     INVALID = 'INVALID'
@@ -74,9 +75,9 @@ class PreflightReceipt:
             raise ValueError('candidate preflight requires completed pinned startup acquisition')
         if type(self.additional_artifact_fetch_required) is not bool:
             raise TypeError('additional_artifact_fetch_required must be bool')
-        expected_additional_fetch = self.status in (PreflightStatus.READY,PreflightStatus.HELP)
+        expected_additional_fetch = self.status in (PreflightStatus.READY,PreflightStatus.NEEDS_COMPLETION,PreflightStatus.HELP)
         if self.additional_artifact_fetch_required != expected_additional_fetch:
-            raise ValueError('only READY/HELP preflight requires post-classification artifact fetches')
+            raise ValueError('only READY/NEEDS_COMPLETION/HELP preflight requires post-classification artifact fetches')
         if self.source_policy not in (None,'auto','required','off'):
             raise ValueError('source_policy must be auto/required/off when present')
         if not isinstance(self.repository_binding,StartupRouteBinding):
@@ -169,23 +170,18 @@ def preflight_invocation(
         item for item in parameters.diagnostics
         if not item.startswith('profile:') and not item.startswith('time-policy:') and not item.startswith('source-policy:')
     )
+    if parameters.missing_parameters:
+        return PreflightReceipt(
+            status=PreflightStatus.NEEDS_COMPLETION,profile=profile,
+            corrections=(),warnings=warnings + (
+                'native semantic completion required: ' + ', '.join(parameters.missing_parameters),
+            ),additional_artifact_fetch_required=True,source_policy=parameters.source_policy,
+            parameters=parameters,**common,
+        )
     negotiation=None
     if capabilities is not None:
         negotiation = negotiate_capabilities(capabilities, parameters)
-        if negotiation.mode is CapabilityMode.PROMPT_ONLY:
-            return PreflightReceipt(
-                status=PreflightStatus.UNSUPPORTED, profile=profile,
-                corrections=negotiation.reasons, warnings=warnings,
-                additional_artifact_fetch_required=False, source_policy=parameters.source_policy,
-                parameters=parameters,capability=negotiation,**common,
-            )
-        if negotiation.mode is CapabilityMode.ADVISORY:
-            return PreflightReceipt(
-                status=PreflightStatus.ADVISORY, profile=profile,
-                corrections=(), warnings=warnings + negotiation.reasons,
-                additional_artifact_fetch_required=False, source_policy=parameters.source_policy,
-                parameters=parameters,capability=negotiation,**common,
-            )
+        warnings=warnings+negotiation.reasons
     return PreflightReceipt(
         status=PreflightStatus.READY, profile=profile,
         corrections=(), warnings=warnings, additional_artifact_fetch_required=True,
@@ -214,7 +210,7 @@ class HostStartResult:
 
 
 class HostAdapter:
-    """Host boundary which requires explicit, enforceable capabilities."""
+    """Host evidence boundary; capability gaps never forbid native execution."""
     def __init__(self, transport: RepositoryTransportSession, capabilities: HostCapabilities):
         if not isinstance(transport, RepositoryTransportSession):
             raise TypeError('transport must be RepositoryTransportSession')
@@ -238,11 +234,14 @@ class HostAdapter:
         snapshot_fn: Callable[[], ClockSnapshot] = snapshot,
         run_id: str | None = None,
         semantic_normalizations: Mapping[str, str] | None = None,
+        native_completion: Mapping[str,Any] | Callable[[ParameterResolution,str],Mapping[str,Any]] | None = None,
     ) -> HostStartResult:
         receipt = self.preflight(message, semantic_normalizations=semantic_normalizations)
         if receipt is None:
             raise ValueError('message is not a DIGR candidate')
-        if receipt.status is not PreflightStatus.READY:
+        if receipt.status not in (PreflightStatus.READY,PreflightStatus.NEEDS_COMPLETION):
+            raise PreflightBlockedError(receipt)
+        if receipt.status is PreflightStatus.NEEDS_COMPLETION and native_completion is None:
             raise PreflightBlockedError(receipt)
 
         routing_startup=receipt.startup
@@ -256,20 +255,14 @@ class HostAdapter:
             routing_startup.version_bytes,
         )
         # Descriptor, version/protocol identity, bundle, member hashes and
-        # parameter uniqueness are all verified before Genesis.  Build the
+        # parameter structure are verified before Genesis.  Build the
         # initial workspace below a private staging parent, then publish the
         # protocol-ready/parameter-bound run with one same-filesystem rename.
         # A crash before that rename cannot expose a half-born canonical run.
         from .run_session import LiveDIGRRun
-        resolved=receipt.parameters
-        if resolved is None or resolved.status is not ResolutionStatus.RESOLVED:
-            raise RuntimeError('READY preflight lacks resolved stable parameters')
-        resolved.require_stable_ready()
-        capability=receipt.capability
-        if capability is None:
-            capability=negotiate_capabilities(self.capabilities,resolved)
-        if capability.mode is not CapabilityMode.ENFORCED:
-            raise PreflightBlockedError(receipt)
+        structural=receipt.parameters
+        if structural is None or structural.status is not ResolutionStatus.RESOLVED:
+            raise RuntimeError('execution preflight lacks structurally resolved parameters')
 
         parent=(Path(workspace_parent) if workspace_parent is not None
                 else Path(tempfile.gettempdir())/'.digr-runs').resolve()
@@ -285,8 +278,21 @@ class HostAdapter:
                 authority,message,stage_parent,snapshot_fn,run_id,
             )
             self.transport.bind_execution_protocol_for_run(run,protocol)
-            # Stable parameters were already resolved before Genesis. Persist
-            # the exact receipt instead of invoking the legacy parser again.
+            resolved=structural
+            if structural.missing_parameters:
+                supplied=(native_completion(structural,receipt.task_raw or '')
+                          if callable(native_completion) else native_completion)
+                if supplied is None:raise RuntimeError('native semantic completion was not supplied')
+                resolved=complete_native_parameters(structural,supplied)
+            resolved.require_stable_ready()
+            capability=negotiate_capabilities(self.capabilities,resolved)
+            receipt=replace(
+                receipt,status=PreflightStatus.READY,parameters=resolved,capability=capability,
+                warnings=tuple(receipt.warnings)+tuple(capability.reasons),
+            )
+            # Native task-scale completion happens after the execution protocol
+            # is bound, then the one exact completed receipt is persisted. The
+            # live run never reparses or silently defaults it.
             run.workspace.write_json(
                 'preflight-receipt.json',receipt.to_dict(),kind='preflight-receipt',
             )

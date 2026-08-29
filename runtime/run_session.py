@@ -1,11 +1,11 @@
-"""DIGR 5.0.0-Berta1 Native Assist run session.
+"""DIGR 5.0.0-Berta2 Native Assist run session.
 
 The session is a reliability exoskeleton. It freezes authority/U0/minimum
 commitments and binds timing/evidence/state, while leaving task strategy and
 next-action choice to the native model.
 """
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass,replace
 from hashlib import sha256
 from pathlib import Path
 import shutil,tempfile,uuid,json
@@ -19,7 +19,7 @@ from .delivery import (
     DELIVERY_ENVELOPE_PATH,DELIVERY_PAYLOAD_PATH,DELIVERY_PROOF_PATH,
     DELIVERY_SCHEMA_VERSION,DELIVERY_SUMMARY_PATH,DeliveryEnvelope,
     DeliveryGateError,HostDeliveryAuthorityError,verify_delivery_artifacts,
-    verify_enforced_host_delivery_authority,
+    verify_enforced_host_delivery_authority,terminal_state_sha256,
 )
 from .d_intervention import DInterventionStore,ReintegrationReceipt
 from .effective_contract import EffectiveContract,SourceContract,SourceDisposition
@@ -79,7 +79,7 @@ def _load_startup(d)->TaskStartupReceipt:
 def _load_contract(d)->EffectiveContract:
     s=d['S'];return EffectiveContract(d['N'],d['T_seconds'],d['R'],d['B'],SourceContract(s['n'],s['t_seconds'],s['r'],s['b']),d['D_s'],d['L_e'],SourceDisposition(d.get('source_disposition','REQUIRED')),d.get('source_waiver_reason'),d.get('L_mismatch_blocks_delivery',False),d.get('V_o',0))
 
-_PREFLIGHT_VERSIONS={'5.0.0-Berta1','5.0.0-Berta1'}
+_PREFLIGHT_VERSIONS={'5.0.0-stable.1','5.0.0-Berta1','5.0.0-Berta2'}
 
 class LiveDIGRRun:
     def __init__(self,run_id,startup,workspace,journal,snapshot_fn,*,restoring=False):
@@ -129,6 +129,8 @@ class LiveDIGRRun:
         obj=cls(run_id,startup,ws,journal,snapshot_fn,restoring=True)
         if ws.path('parameter-resolution.json').is_file():
             obj.parameters=ParameterResolution.from_dict(ws.read_json('parameter-resolution.json'))
+            if startup.authority.P_run.version=='5.0.0-stable.1' and obj.parameters.V_o is None:
+                obj.parameters=replace(obj.parameters,V_o=0)
             if startup.authority.P_run.version in _PREFLIGHT_VERSIONS:
                 obj.parameters.require_stable_ready()
         if ws.path('U0.json').is_file():obj.U0=U0Receipt.from_dict(ws.read_json('U0.json'))
@@ -140,7 +142,11 @@ class LiveDIGRRun:
         obj._reindex_journals()
         if obj.contract is not None:
             intervals=derive_work_intervals(journal.events)
-            obj.ledger=FormalTimeLedger.resume_from_intervals(startup,intervals,journal.events[-1].snapshot,hard_T=obj.contract.B==1,hard_t=obj.contract.S.b==1)
+            obj.ledger=FormalTimeLedger.resume_from_intervals(
+                startup,intervals,journal.events[-1].snapshot,
+                hard_T=obj.contract.B==1,hard_t=obj.contract.S.b==1,
+                finished=phase.phase is RunPhase.FINALIZING,
+            )
         obj.refresh_brief();return obj
 
     def _reindex_journals(self):
@@ -193,6 +199,10 @@ class LiveDIGRRun:
             # The authoritative terminal transition has already been persisted.
             # A derived brief failure cannot undo it.
             pass
+        if not self.workspace.terminal_sealed:
+            self.workspace.seal_terminal(
+                phase='ABORTED',binding_sha256=sha256(terminal_reason.encode('utf-8')).hexdigest(),
+            )
         return {'phase':'ABORTED','reason':terminal_reason,'clock_evidence_error':clock_error}
 
     def resolve_parameters(self,semantic_normalizations=None)->ParameterResolution:
@@ -207,9 +217,9 @@ class LiveDIGRRun:
         self.refresh_brief();return r
 
     def bind_preflight_parameters(self,resolved:ParameterResolution)->ParameterResolution:
-        """Bind the one Berta1 parameter receipt resolved before Genesis."""
+        """Bind the one completed preflight/native parameter receipt."""
         if self.startup.authority.P_run.version not in _PREFLIGHT_VERSIONS:
-            raise RuntimeError('preflight parameter binding is a Berta1 path')
+            raise RuntimeError('preflight parameter binding is not supported by this pinned version')
         if self.phase.phase is not RunPhase.GENESIS:
             raise RuntimeError('stable preflight parameters may be bound only once at GENESIS')
         if self.protocol_load is None:
@@ -335,6 +345,10 @@ class LiveDIGRRun:
         out=self.viewpoints.qualify(viewpoint_id,result,semantic_distance,nonredundant=nonredundant);self.refresh_brief();return out
 
     def discard_viewpoint(self,viewpoint_id:str,reason:str):
+        if self.phase.phase is not RunPhase.EXECUTING:
+            raise RuntimeError('V discard requires EXECUTING phase')
+        if self.ledger is None or self.ledger.foreground_state is not WorkState.MAIN:
+            raise RuntimeError('V discard is a Main decision and requires MAIN state')
         out=self.viewpoints.discard(viewpoint_id,reason);self.refresh_brief();return out
 
     def transition(self,state:WorkState,at:ClockSnapshot,*,active_source_ids:Iterable[str]=(),active_d_ids:Iterable[str]=(),active_v_ids:Iterable[str]=()):
@@ -458,8 +472,8 @@ class LiveDIGRRun:
         item=self.dictator.latest(intervention_id);iso=self.dictator.isolation(item.isolation_receipt_id)
         if self.ledger is None:raise RuntimeError('D execution requires formal work state')
         state=self.ledger.foreground_state
-        if self.startup.authority.P_run.version=='5.0.0-Berta1' and (iso.mode!='exclusive' or state is not WorkState.D_EXCLUSIVE):
-            raise RuntimeError('Berta1 canonical D requires one owned D_EXCLUSIVE interval')
+        if self.startup.authority.P_run.version=='5.0.0-Berta2' and (iso.mode!='exclusive' or state is not WorkState.D_EXCLUSIVE):
+            raise RuntimeError('Berta2 canonical D requires one owned D_EXCLUSIVE interval')
         if iso.mode=='exclusive' and state is not WorkState.D_EXCLUSIVE:
             raise RuntimeError('exclusive D execution requires D_EXCLUSIVE work state')
         if iso.mode=='background' and state not in (WorkState.MAIN,WorkState.SOURCE):
@@ -525,7 +539,7 @@ class LiveDIGRRun:
         failures.extend(stop.unmet_requirements)
         failures.extend(self.completion.delivery_failures)
         # Structured completion is the preferred Berta evidence shape. The
-        # legacy semantic assessment remains accepted during Berta1 migration;
+        # legacy semantic assessment remains accepted during Berta2 migration;
         # readiness is disclosed in the final summary instead of silently
         # converting old prose into four affirmative claims.
         if not self.candidates.has_state:failures.append('FINAL_CANDIDATE_MISSING')
@@ -537,11 +551,14 @@ class LiveDIGRRun:
         return tuple(failures)
 
     def _candidate_payload_binding(self,candidate:CandidateSnapshot,payload_sha256:str)->str|None:
-        for rel in candidate.artifact_refs:
-            if not rel.startswith('state/candidate-payloads/'):continue
-            record=self.workspace.require_indexed_artifact(rel,kind='candidate-payload')
-            if record.sha256==payload_sha256:return rel
-        return None
+        # save_candidate_bytes defines artifact_refs[0] as the candidate's
+        # primary content-addressed payload. Extra refs are evidence/context and
+        # can never substitute an older candidate's bytes at delivery.
+        if not candidate.artifact_refs:return None
+        rel=candidate.artifact_refs[0]
+        if not rel.startswith('state/candidate-payloads/'):return None
+        record=self.workspace.require_indexed_artifact(rel,kind='candidate-payload')
+        return rel if record.sha256==payload_sha256 else None
 
     def _summary_for_delivery(self,actual,stop,final_binding,audit_logs=None):
         prov=ActualsProvenance()
@@ -567,9 +584,13 @@ class LiveDIGRRun:
             'blocking_open_gaps':len(self.completion.blocking_open),
             'delivery_ready':False,
         }
-        self.workspace.write_json('final/incomplete-summary.json',payload,kind='incomplete-summary')
+        summary_sha=self.workspace.write_json('final/incomplete-summary.json',payload,kind='incomplete-summary')
         self.phase.transition(RunPhase.INCOMPLETE,'delivery gates unmet: ' + ','.join(values))
-        self.refresh_brief()
+        try:
+            self.refresh_brief()
+        finally:
+            if not self.workspace.terminal_sealed:
+                self.workspace.seal_terminal(phase='INCOMPLETE',binding_sha256=summary_sha)
 
     def commit_delivery(self,final_bytes:bytes,*,media_type:str='text/markdown',candidate_revision:int|None=None)->DeliveryEnvelope:
         """Two-phase, crash-safe commit of the exact bytes a host may deliver.
@@ -609,21 +630,23 @@ class LiveDIGRRun:
             raise DeliveryGateError(unmet)
         assert candidate is not None and candidate_payload_path is not None
         host_authority=verify_enforced_host_delivery_authority(self.workspace)
+        actual=self.actuals();stop=self.stop_check()
+        from .audit_logs import materialize_audit_logs
+        audit_logs=materialize_audit_logs(self,actual)
+        state_sha=terminal_state_sha256(self.workspace)
         final_binding={
             'payload_sha256':payload_sha,'payload_byte_length':len(raw),
             'media_type':media_type,'candidate_revision':candidate.revision,
             'candidate_digest':candidate.digest,'candidate_payload_path':candidate_payload_path,
+            'terminal_state_sha256':state_sha,
             **host_authority.binding,
         }
-        actual=self.actuals();stop=self.stop_check()
-        from .audit_logs import materialize_audit_logs
-        audit_logs=materialize_audit_logs(self,actual)
         summary=self._summary_for_delivery(actual,stop,final_binding,audit_logs)
         from .proof import proof_data_from_contract_actuals
         proof_data=proof_data_from_contract_actuals(self.contract,actual)
         proof_document={
             'schema_version':1,'run_id':self.run_id,'status':'DELIVERED',
-            'delivery':final_binding,'proof':proof_data.to_dict_berta() if self.startup.authority.P_run.version=='5.0.0-Berta1' else proof_data.to_dict(),
+            'delivery':final_binding,'proof':proof_data.to_dict_berta() if self.startup.authority.P_run.version=='5.0.0-Berta2' else proof_data.to_dict(),
         }
         persisted_payload_sha=self.workspace.atomic_write_bytes(DELIVERY_PAYLOAD_PATH,raw)
         self.workspace.index_existing(DELIVERY_PAYLOAD_PATH,kind='final-delivery-payload',expected_digest=persisted_payload_sha)
@@ -632,7 +655,7 @@ class LiveDIGRRun:
         envelope=DeliveryEnvelope(
             DELIVERY_SCHEMA_VERSION,self.run_id,'DELIVERED',DELIVERY_PAYLOAD_PATH,
             payload_sha,len(raw),media_type,candidate.revision,candidate.digest,
-            candidate_payload_path,
+            candidate_payload_path,state_sha,
             host_authority.preflight_receipt_path,host_authority.preflight_receipt_sha256,
             host_authority.capability_negotiation_path,host_authority.capability_negotiation_sha256,
             DELIVERY_SUMMARY_PATH,summary_sha,DELIVERY_PROOF_PATH,proof_sha,
@@ -640,7 +663,13 @@ class LiveDIGRRun:
         self.workspace.write_json(DELIVERY_ENVELOPE_PATH,envelope.to_dict(),kind='delivery-envelope')
         verify_delivery_artifacts(self.workspace,envelope)
         self.phase.transition(RunPhase.DELIVERED,'exact final bytes and delivery evidence committed')
-        self.delivery=envelope;self.refresh_brief();return envelope
+        self.delivery=envelope
+        try:
+            self.refresh_brief()
+        finally:
+            if not self.workspace.terminal_sealed:
+                self.workspace.seal_terminal(phase='DELIVERED',binding_sha256=envelope.digest)
+        return envelope
 
     def write_run_summary(self,final_bytes:bytes|None=None,*,media_type:str='text/markdown',candidate_revision:int|None=None):
         """Compatibility facade; stable callers must supply exact final bytes."""
@@ -665,12 +694,13 @@ class LiveDIGRRun:
         verify_delivery_artifacts(self.workspace,envelope)
         if (not self.candidates.has_state or self.candidates.current.revision!=envelope.candidate_revision
                 or self.candidates.current.digest!=envelope.candidate_digest
-                or envelope.candidate_payload_path not in self.candidates.current.artifact_refs):
+                or not self.candidates.current.artifact_refs
+                or envelope.candidate_payload_path!=self.candidates.current.artifact_refs[0]):
             raise ValueError('delivery envelope candidate binding drift')
         from .proof import proof_data_from_contract_actuals,render_canonical_proof
         expected=proof_data_from_contract_actuals(self.contract,self.actuals())
         stored=self.workspace.read_json(DELIVERY_PROOF_PATH)
-        expected_proof=expected.to_dict_berta() if self.startup.authority.P_run.version=='5.0.0-Berta1' else expected.to_dict()
+        expected_proof=expected.to_dict_berta() if self.startup.authority.P_run.version=='5.0.0-Berta2' else expected.to_dict()
         if stored!={'schema_version':1,'run_id':self.run_id,'status':'DELIVERED','delivery':envelope.final_binding,'proof':expected_proof}:
             raise ValueError('stable proof document drift')
         return render_canonical_proof(

@@ -1,11 +1,7 @@
-# Run Session Architecture — Berta1
+# Run Session Architecture
 
-The local layer first broad-captures a candidate, resolves current `stable`, verifies same-SHA manifest/VERSION and loads the manifest-declared STARTUP slice. Pinned STARTUP then classifies the untouched message. EXECUTING preflight resolves deterministic parameters and capabilities; READY fetches and verifies the manifest-navigated descriptor and execution bundle before Clock Genesis. Genesis persists the exact resolved preflight receipt; no second parameter parser runs inside the born session.
+The local layer broad-captures a candidate, resolves current stable, verifies same-SHA manifest/VERSION and loads startup. Pinned STARTUP classifies the untouched message. Structural preflight maps parameters and verifies the execution artifact set before a staged Clock Genesis is published.
 
-The receipt distinguishes `startup_acquisition_performed=true` for every candidate from `additional_artifact_fetch_required`, which is true only for READY/HELP continuation. NATIVE/INVALID/correction therefore never means “zero repository acquisition.”
+After protocol binding, native completion fills missing task-scale values once. The completed receipt, exact U0 and Effective Contract are frozen in that order; the live run never reparses or applies a workload table.
 
-RunPhase is `GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → DELIVERED | INCOMPLETE`, with ABORTED from nonterminal states. Legacy FINISHED is recovery-readable only.
-
-U0 binds exact task bytes/hash. Strategy, Candidate, sources, D and completion remain revisioned working state. Delivery uses a two-phase fail-closed commit: prepare and verify exact final bytes, media type, current Candidate, summary, stable proof and envelope, then transition to DELIVERED. Interruption before transition remains non-success and recoverable; any unmet gate closes INCOMPLETE and forbids canonical proof.
-
-Recovery verifies artifact indexes, descriptor/bundle identity, revision histories, clock facts and delivery hashes before trusting persisted state.
+Execution proceeds through Strategy, meaningful Candidate, N/R/S/D/V and Completion. Canonical host delivery is two-phase and exact-byte-bound, then seals terminal state. MODEL_NATIVE follows the same intellectual protocol without claiming unavailable receipts. Recovery validates indexes, semantic cross-bindings and clock continuity before resuming nonterminal work.

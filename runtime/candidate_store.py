@@ -1,4 +1,4 @@
-"""Revisioned candidate-result snapshots for DIGR 5.0.0-Berta1.
+"""Revisioned candidate-result snapshots for DIGR 5.0.0-Berta2.
 
 Candidate snapshots provide an external anchor for whole-process R re-entry
 without storing hidden chain-of-thought.

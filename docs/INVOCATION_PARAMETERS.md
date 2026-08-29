@@ -1,15 +1,9 @@
-# Invocation and Parameters — Berta1
+# Invocation Parameters
 
-The local shell broadly captures every lstripped message beginning with exact uppercase `DIGR` or exact `深度迭代` and performs live pinned startup acquisition first. Only pinned `entry/STARTUP.md` classifies HELP, EXECUTING, NATIVE or INVALID.
+Public order is `N,T,R,B,S(n,t,r,b),D(s),V(o),L(e)`.
 
-The deterministic standard profile is N=2, R=1, T=0/no-time, source=auto, D=0, V=0 and L1. Public order is `N,T,R,B,S(n,t,r,b),D(s),V(o),L(e)`. It is selected by no parameter list, `standard`, `标准` or `profile=standard`.
+No group, empty group, `adaptive` or `profile=adaptive` leaves missing task-scale values for one native completion and defaults source policy to required. Only explicit `standard`/标准/`profile=standard` selects fixed N2/T0/R1/S0/D0/V0/L1/source-auto.
 
-Clearly typed labels may ignore default order. Flat `n/t/r/b` map into S, `s`/`D` into D, `o`/`V` into V, and `e`/`L` into L. After those anchors are removed, remaining bare parameters must have exactly one type-and-order mapping. Duplicate definitions are invalid; multiple remaining mappings are AMBIGUOUS and list candidate slots.
+Typed labels may move. Flat `n,t,r,b,s,o,e` name S/D/V/L internals directly. Remove typed items, then map remaining bare tokens by type and relative order only when exactly one mapping exists. Duplicates, no solution and multiple solutions fail visibly.
 
-- one duration or `min=<duration>`: hard time minimum;
-- `target=<duration>`: soft time target;
-- explicit supported overlays: parser/profile-owned;
-- bare counts and malformed groups: unique-or-fail correction;
-- legacy Alpha 4 positional format: automatic unique-or-fail compatibility path with a visible warning; no profile token is required.
-
-All resolution and capability checks occur after pinned STARTUP classified EXECUTING and before Clock Genesis. The model does not complete missing numbers.
+A bare duration is soft T with B=0. `target=` is explicit soft and `min=` hard. B=1 or S(b=1) may leave time absent for positive native completion. Explicit values cannot be changed. Source policy `required|auto|off` composes with all V forms; off forces zero S values.

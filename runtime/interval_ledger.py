@@ -51,12 +51,12 @@ class FormalTimeLedger:
         self._last_event=startup.clock.probe; self._intervals:list[WorkInterval]=[]; self._finished=False
 
     @classmethod
-    def resume_from_intervals(cls,startup:TaskStartupReceipt,intervals,last_snapshot:ClockSnapshot,*,hard_T:bool=False,hard_t:bool=False):
+    def resume_from_intervals(cls,startup:TaskStartupReceipt,intervals,last_snapshot:ClockSnapshot,*,hard_T:bool=False,hard_t:bool=False,finished:bool=False):
         obj=cls(startup,hard_T=hard_T,hard_t=hard_t)
         vals=list(intervals)
         if any(not isinstance(x,WorkInterval) for x in vals): raise TypeError('all resumed intervals must be WorkInterval')
         if not isinstance(last_snapshot,ClockSnapshot): raise TypeError('last_snapshot must be ClockSnapshot')
-        obj._intervals=vals; obj._state=None; obj._start=None; obj._last_event=last_snapshot; obj._finished=False
+        obj._intervals=vals; obj._state=None; obj._start=None; obj._last_event=last_snapshot; obj._finished=require_bool('finished',finished)
         return obj
 
     @property

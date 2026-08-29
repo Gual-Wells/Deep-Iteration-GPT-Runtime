@@ -1,9 +1,11 @@
 # Run Session, Lifecycle, Workspace and Recovery
 
-Berta1 performs broad candidate transport, verifies pinned manifest/VERSION and loads pinned STARTUP before classification. EXECUTING then resolves parameters, negotiates capability and verifies required execution artifacts before Genesis. Clock Genesis creates the workspace only after those gates succeed, and the exact preflight parameters are persisted without re-resolution.
+Berta2 acquires pinned STARTUP before classification. For EXECUTING, it structurally validates parameters and verifies the exact execution set before publishing a born run. Clock Genesis and protocol binding precede native completion of missing values; the one completed receipt is then persisted, followed by exact U0 and Effective Contract.
 
-The lifecycle is `GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → DELIVERED | INCOMPLETE`; `ABORTED` is reachable from nonterminal phases. `FINISHED` is readable only for legacy recovery and MUST NOT be created by Berta1.
+Lifecycle is `GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → DELIVERED | INCOMPLETE`; ABORTED is terminal. FINISHED is legacy-read-only.
 
-`DELIVERED` means exact final bytes, media type, current Candidate binding, summary, proof data and envelope completed a two-phase fail-closed preparation/verification commit. A pre-transition crash remains non-success and is recoverable. `INCOMPLETE` is closed with explicit unmet gates and cannot render canonical proof.
+Workspace stores authority, exact task binding, completed parameters, execution/attestation facts, clock evidence, revisioned strategy/candidate/source/D/V/completion state, audit logs and delivery artifacts. Recovery verifies indexed bytes plus semantic cross-bindings.
 
-Workspace artifacts record pinned authority, exact task binding, parameters, capabilities, clock facts, revisioned strategy/candidate/source/D/V/completion state, evidence, local audit logs and delivery. Recovery verifies artifact digests and lifecycle history. Host persistence mechanisms never choose intellectual strategy.
+Berta2 canonical terminal states carry a final mutation seal. DELIVERED also binds a digest of semantic state and audit records, excluding self-referential terminal wrappers. All workspace API mutations are rejected after the seal. Read-only recovery recognizes earlier preflight version families but never silently upgrades their proof format.
+
+Host persistence records facts; it does not choose task strategy. MODEL_NATIVE can execute without this workspace, but must label unavailable receipts/actuals non-canonical.

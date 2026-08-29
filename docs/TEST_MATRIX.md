@@ -1,18 +1,18 @@
-# DIGR 5.0.0-Berta1 Test Matrix
+# DIGR 5.0.0-Berta2 Test Matrix
 
 Coverage includes:
 
-1. broad candidate capture and actual pinned STARTUP acquisition before HELP/EXECUTING/NATIVE/INVALID classification;
-2. standard profile N2/R1/no-time/source-auto/D0/L1 and explicit min/target parsing;
-3. concrete Berta1 parameter receipts, hard-time positivity, and single pre-Genesis host binding without a second live-run parser;
-4. capability ENFORCED/ADVISORY/PROMPT_ONLY negotiation, including source-tool and continuous-clock requirements;
-5. connector current stable HEAD or mandatory same-attempt direct branch+Git-ref consensus, then manifest/VERSION/startup-slice acquisition;
-6. exact manifest execution members plus descriptor artifact hash/length/media-type validation;
-7. bundle byte length, member count and canonical ordered execution-set digest;
-8. descriptor logical API names mapped to concrete Python reference bindings, with ENFORCED host integration required;
-9. exact U0/task binding and immutable contract;
-10. substantive Candidate-backed N/R/source/D evidence;
-11. `D(0)` permits optional quality-driven D;
-12. DELIVERED/INCOMPLETE terminal transitions and canonical-proof denial outside DELIVERED;
-13. deterministic model/Help/personalization generation with terminal sentinel;
-14. cache-free, path-safe, reproducible packaging, cold validation, and post-test cold-tree hash revalidation.
+1. live pinned STARTUP acquisition before all candidate classifications;
+2. adaptive no-group completion and explicit fixed standard;
+3. Alpha4 soft bare duration, explicit min/target, B/b positive native completion;
+4. typed-anywhere V and flat nested labels, duplicate/ambiguity failures and policy composition;
+5. MODEL_NATIVE execution despite capability gaps, independent attestation levels, session-only clocks and semantic V;
+6. connector HEAD or direct branch/ref consensus plus immutable same-SHA reads;
+7. exact execution bundle order/hash/length and descriptor bindings;
+8. exact U0 and immutable completed contract;
+9. meaningful Candidate, substantive N/R/source/D/V evidence and four-clock projections;
+10. exact current Candidate primary-payload delivery, terminal semantic/audit digest and terminal seal;
+11. TOTAL plus N/T/R/B/S/D/V/L logs and recovery;
+12. deterministic generated artifacts, cache-free path-safe ZIP and cold validation.
+
+Fresh iOS/Web/Desktop black-box runs are required for stable promotion but remain an external, evidence-preserving gate rather than a unit-test claim.

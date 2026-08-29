@@ -1,6 +1,6 @@
 [project]
 name = "deep-iteration-gpt-runtime"
-version = "5.0.0.dev1+berta1"
+version = "5.0.0.dev2+berta2"
 description = "A pinned-manifest native-intelligence assist runtime with deterministic protocol distribution and audit support."
 requires-python = ">=3.10"
 license = "MIT"

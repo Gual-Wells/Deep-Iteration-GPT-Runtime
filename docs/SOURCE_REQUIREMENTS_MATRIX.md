@@ -1,12 +1,11 @@
-# Source Requirement Matrix
+# Source Requirements Matrix
 
-| Condition | SourceDisposition | Actual S required? |
+| Invocation policy | Contract disposition | Host canonical requirement |
 |---|---|---|
-| Normal invocation / S omitted (`source=auto`) | task-grounded REQUIRED or WAIVED | only when REQUIRED; WAIVED needs a concrete reason |
-| `source=auto` and external evidence can materially improve correctness | REQUIRED | yes, with evidence-backed source activity |
-| `source=auto` closed transformation where external material is prohibited or genuinely irrelevant | WAIVED with reason | no |
-| `source=required` | REQUIRED | yes; missing source-tool capability blocks enforced startup |
-| `source=off` | WAIVED by explicit policy | no; non-zero S minima are invalid |
-| Legacy-compatible explicit non-zero S minimums | REQUIRED | yes, all frozen minima apply |
+| adaptive default / S omitted | REQUIRED | source tools plus timed/evidenced source work |
+| explicit `source=required` | REQUIRED | source tools plus timed/evidenced source work |
+| explicit `source=auto`, evidence materially helps | REQUIRED | source tools plus timed/evidenced source work |
+| explicit `source=auto`, closed/forbidden/irrelevant external material | WAIVED with concrete reason | no source tool claim |
+| explicit `source=off` | WAIVED and S all zero | no source work |
 
-Berta1 never semantically completes omitted S numeric minima. WAIVED with non-zero S minimums is contradictory and rejected. SOURCE timing requires active S IDs and uses clock interval union, so parallel source work never double counts t.
+MODEL_NATIVE still performs the best source work available. Missing source tools lower attestation and must be disclosed; they do not cancel the task. “The model already knows” is not a valid auto waiver.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Live public-GitHub smoke check for the Berta1 transport boundary."""
+"""Live public-GitHub smoke check for the Berta2 transport boundary."""
 from __future__ import annotations
 import json
 from pathlib import Path

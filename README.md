@@ -1,67 +1,57 @@
-# Deep Iteration GPT Runtime (DIGR) 5.0.0-Berta1
+# Deep Iteration GPT Runtime (DIGR) 5.0.0-Berta2
 
 **Status:** Berta-series integration candidate; not a stable release.
 
-DIGR is a reliability exoskeleton around native model intelligence. An explicitly invoked high-investment task receives immutable protocol identity, early trusted timing, frozen U0/contract commitments, revisable strategy/source/candidate state, disruptive interventions, evidence, persistence and recovery.
+DIGR is a pinned-protocol reliability exoskeleton around native model intelligence. Berta2 repairs the two central Berta1 regressions: host proof is no longer execution permission, and no-parameter invocations are task-adaptive again.
 
-## Berta1 contract
+## Authority and distribution
 
-The local shell broadly captures exact-uppercase `DIGR`/`深度迭代` prefixes and performs live transport before classification. An existing connector reads the current `stable` branch HEAD; direct REST reads branch and Git-ref in the same attempt and requires matching full SHAs. At that SHA, `manifest.json` is the navigation authority: its version must equal pinned `VERSION`, and its sole startup slice is the self-contained `entry/STARTUP.md`.
+The local configuration only captures exact-uppercase `DIGR`/`深度迭代` candidates and transports repository authority. It resolves current `stable` to a full SHA, verifies pinned `manifest.json` against pinned `VERSION`, then loads the manifest startup slice. Only pinned STARTUP classifies NATIVE/HELP/INVALID/EXECUTING. The untouched task and all later reads remain pinned to one SHA.
 
-The protocol version is `5.0.0-Berta1`; Python packaging uses the PEP 440 mapping `5.0.0.dev1+berta1`, recorded as descriptor `package_version`. `runtime-descriptor.json` is loaded only through manifest navigation as an execution/release artifact description, never as the first read or a replacement for manifest navigation.
+`manifest.json` is navigation authority. `runtime-descriptor.json` is loaded later and integrity-binds generated model protocol, Help and execution bundle. It cannot replace manifest navigation.
 
-The runtime descriptor integrity-binds three deterministic distribution artifacts:
+## Berta2 behavior
 
-- `dist/MODEL_PROTOCOL.md`: compact model protocol generated from one author source;
-- `dist/HELP.zh-CN.md`: generated canonical Chinese help;
-- `dist/EXECUTION_PROTOCOL.json`: generated member-order, byte-length and SHA-256 bundle.
+Public parameters are `N,T,R,B,S(n,t,r,b),D(s),V(o),L(e)`. Typed labels may move when remaining bare values keep one unique interpretation; flat `n/t/r/b/s/o/e` are accepted. Conflicts and ambiguity fail visibly.
 
-The logical source files remain reviewable under `bootstrap/`, `entry/` and `core/`. Generation changes transport shape, not semantics.
+No group is adaptive and source-required by default. Native intelligence fills missing task-scale N/T/R/S/D/V values once after the full pinned protocol is available. Only explicit `standard` selects fixed N2/T0/R1/S0/D0/V0/L1/source-auto. A lone duration remains Alpha4 soft T; `min=` is hard and `target=` soft. `B=1`/`S(b=1)` can request positive native T/t completion.
 
-## Berta1 additions: V, four clocks and local logs
+V is a persistent distant-view channel with private ledger, semantic distance, nonredundancy and Main sovereignty. D keeps one public surface while D+/D−/Dx remain opaque native directions. D(0)/V(0) are zero minima, not off switches. Candidate is created only after meaningful output exists.
 
-The public parameter order is `N,T,R,B,S(n,t,r,b),D(s),V(o),L(e)`. Clearly typed labels may be reordered; remaining unlabeled values must still have one unique mapping. Flat `n/t/r/b/s/o/e` labels are supported. D(0) and V(0) are zero minima, not off switches.
+Clock projections are `T=MAIN+SOURCE`, `t=SOURCE`, `D=D_EXCLUSIVE`, `V=V_EXCLUSIVE`. Recommended reporting is `T目标/T真实（+D真实时间，+V真实时间）`; unknown facts are `?`.
 
-V is a persistent isolated viewpoint channel with a private VLedger, semantic-distance and nonredundancy evidence, positive owned time, and no V-to-V communication. Main remains sovereign. D internally uses opaque D+/D−/Dx mechanisms while its public syntax remains D.
+## Execution versus attestation
 
-The four clock projections are `T=MAIN+SOURCE`, `t=SOURCE`, `D_time=D_EXCLUSIVE`, and `V_time=V_EXCLUSIVE`; META/IDLE count nowhere. Canonical presentation groups them as `T目标/T真实（+D真实时间，+V真实时间）`.
+Berta2 separates:
 
-The standard profile is N2/R1/no-time/source-auto/D0/V0/L1. Explicit `min=<duration>` is a hard lower bound and `target=<duration>` is soft.
+- `ExecutionMode=MODEL_NATIVE|HOST_ENFORCED`;
+- `AttestationLevel=NONE|PARTIAL|CANONICAL`.
 
-Berta1 closes new runs as `DELIVERED` or `INCOMPLETE`. Delivery writes local `TOTAL` plus independent N/T/R/B/S/D/V/L NDJSON audit logs. MCP, dynamic UI, PWA, remote bridge and backend code are deliberately absent. An incomplete run cannot claim a canonical proof.
+Missing native host integration never prevents full DIGR execution. It only prevents claims that require unavailable clocks, persistence, tools or final-output interposition. A session-only monotonic clock can support one uninterrupted task; semantic V is not blocked by a host viewpoint count.
 
-## Host integration and client boundary
+The Python HostAdapter is a reference enforcement/attestation implementation, not an automatically installed ChatGPT tool, MCP server or plugin. Canonical host delivery binds exact current Candidate primary bytes, summary, proof, audit logs and a terminal semantic-state digest, then seals DELIVERED/INCOMPLETE/ABORTED workspaces against further API mutation.
 
-`digr.preflight` and `digr.commit_delivery` are logical protocol API names. In this package they map to `runtime.host_adapter.HostAdapter.preflight` / `.start` and `runtime.run_session.LiveDIGRRun.commit_delivery`. The package does not install a ChatGPT tool, MCP server, plugin, or native iOS/Web/Desktop host binding.
+## Logs and UI scope
 
-Local personalization can enforce candidate routing and repository handoff only to the extent supported by the client. Without a host integration that actually exposes the Python-equivalent preflight, persistent workspace, trusted continuous clock and final-output interposer, execution is `DIGR~` ADVISORY and cannot claim mechanical actuals or canonical proof. Therefore identical personalization text alone cannot guarantee identical enforced behavior across ChatGPT clients.
+Berta2 contains no MCP, dynamic UI, PWA, remote bridge or backend service. Each execution returns or persists TOTAL plus independent N/T/R/B/S/D/V/L behavior logs. Successful and unsuccessful D/V work is retained; observed D/V owned time is aggregated. Logs expose decisions and evidence summaries, not hidden chain-of-thought.
 
-## Local personalization
+## Local configuration
 
-`local-personalization/PERSONALIZATION_TEMPLATE.txt` is the single editable source for compact, FREE_GO, expanded and root standalone configurations. Generated configurations end with `<!-- DIGR_LOCAL_PERSONALIZATION_END -->` so truncated copies fail visibly.
-
-Prepare generated artifacts without creating a ZIP:
+`local-personalization/PERSONALIZATION_TEMPLATE.txt` is the only editable local-shell source. Generated compact, FREE_GO and root standalone files are byte-identical and end in `<!-- DIGR_LOCAL_PERSONALIZATION_END -->`.
 
 ```bash
 python tools/build_release.py --prepare-only
 ```
 
-## Validation and release
+## Validation and packaging
 
 ```bash
 python -m unittest discover -s tests -p 'test_*.py'
 python tests/validate_repo.py
-```
-
-The optional schema test dependency is declared as `test`; repository structural validation remains standard-library-only.
-
-To build a deterministic release after validation:
-
-```bash
 python tools/build_release.py \
-  --output ../Deep-Iteration-GPT-Runtime-5.0.0-Berta1.zip \
-  --personalization-output ../DIGR-5.0.0-Berta1-CHATGPT-LOCAL-PERSONALIZATION.txt \
-  --full-personalization-output ../DIGR-5.0.0-Berta1-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
+  --output ../Deep-Iteration-GPT-Runtime-5.0.0-Berta2.zip \
+  --personalization-output ../DIGR-5.0.0-Berta2-CHATGPT-LOCAL-PERSONALIZATION.txt \
+  --full-personalization-output ../DIGR-5.0.0-Berta2-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
 ```
 
-The builder regenerates descriptor-declared artifacts, rejects symlinks/path traversal/cross-platform collisions, excludes Python and test caches, fixes ZIP timestamps, verifies hashes after cold extraction and reruns validation. DEFLATE byte reproducibility is guaranteed only within the same Python/zlib build environment.
+The builder regenerates derived artifacts, rejects cache/symlink/path hazards, fixes ZIP timestamps, cold-extracts, revalidates and checks hashes. Promotion to mutable `stable` additionally requires fresh iOS/Web/Desktop black-box evidence; this candidate package does not claim that external gate has run.

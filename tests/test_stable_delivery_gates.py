@@ -25,7 +25,7 @@ from tests.helpers import (
 )
 
 SHA='a'*40
-VERSION='5.0.0-Berta1'
+VERSION='5.0.0-Berta2'
 PATHS=('entry/E.md','core/A.md')
 FILES=(('entry/E.md',b'# entry\n'),('core/A.md',b'# core\n'))
 MANIFEST={
@@ -221,6 +221,25 @@ class TestStableDeliveryGates(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'S.b=1 requires'):
             EffectiveContract(0,0,0,0,SourceContract(0,0,0,1),0,1,SourceDisposition.REQUIRED)
 
+    def test_session_only_clock_is_canonical_only_without_resume(self):
+        with tempfile.TemporaryDirectory() as td:
+            run,_=self.prepare(td,candidate_bytes=b'one session')
+            capability=run.workspace.read_json('capability-negotiation.json')
+            capability['monotonic_clock']='SESSION_ONLY'
+            run.workspace.write_json('capability-negotiation.json',capability,kind='capability-negotiation')
+            run.commit_delivery(b'one session')
+            self.assertEqual(run.phase.phase,RunPhase.DELIVERED)
+        with tempfile.TemporaryDirectory() as td:
+            run,_=self.prepare(td,candidate_bytes=b'resumed')
+            capability=run.workspace.read_json('capability-negotiation.json')
+            capability['monotonic_clock']='SESSION_ONLY'
+            run.workspace.write_json('capability-negotiation.json',capability,kind='capability-negotiation')
+            resumed=LiveDIGRRun.resume(run.workspace.root,run.run_id,FakeClock(start=10_000_000_000,session='next',boot='boot-test'))
+            with self.assertRaises(DeliveryGateError) as cm:
+                resumed.commit_delivery(b'resumed')
+            self.assertIn('SESSION_ONLY_CLOCK_RESUMED',cm.exception.unmet)
+            self.assertEqual(resumed.phase.phase,RunPhase.INCOMPLETE)
+
     def test_exact_payload_and_candidate_are_bound_before_canonical_proof(self):
         with tempfile.TemporaryDirectory() as td:
             payload='最终作品：潮汐把月光折成一封信。'.encode()
@@ -228,6 +247,10 @@ class TestStableDeliveryGates(unittest.TestCase):
             with self.assertRaises(DeliveryGateError):run.render_proof()
             envelope=run.commit_delivery(payload,media_type='text/plain; charset=utf-8')
             self.assertEqual(run.phase.phase,RunPhase.DELIVERED)
+            self.assertEqual(envelope.schema_version,2)
+            self.assertRegex(envelope.terminal_state_sha256,r'^[0-9a-f]{64}$')
+            self.assertTrue(run.workspace.terminal_sealed)
+            self.assertEqual(run.workspace.read_json('state/terminal-seal.json')['binding_sha256'],envelope.digest)
             self.assertEqual(envelope.payload_sha256,hashlib.sha256(payload).hexdigest())
             self.assertEqual(run.workspace.path(envelope.payload_path).read_bytes(),payload)
             self.assertEqual(envelope.candidate_revision,run.candidates.current.revision)
@@ -246,6 +269,21 @@ class TestStableDeliveryGates(unittest.TestCase):
             self.assertEqual(run.commit_delivery(payload,media_type='text/plain; charset=utf-8'),envelope)
             with self.assertRaises(ValueError):run.commit_delivery(b'different',media_type='text/plain; charset=utf-8')
 
+    def test_old_candidate_payload_cannot_be_delivered_as_current_candidate(self):
+        with tempfile.TemporaryDirectory() as td:
+            contract=EffectiveContract(0,0,0,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed task')
+            message=stable_invocation_for_contract(contract);clock=FakeClock()
+            run=LiveDIGRRun.start(authority(),message,Path(td),clock,run_id='digr-current-candidate')
+            run.bind_protocol_load(protocol_bundle().receipt);run.bind_preflight_parameters(stable_preflight_parameters(message))
+            persist_enforced_host_receipts(run);run.freeze_u0('x');run.freeze_contract(contract)
+            run.transition(WorkState.MAIN,clock());run.save_strategy(StrategyState(0,'task model','route'))
+            old=run.save_candidate_bytes(b'OLD',summary='old')
+            run.save_candidate_bytes(b'NEW',summary='new',artifact_refs=old.artifact_refs)
+            run.completion.assess('done');run.finish_time(clock())
+            with self.assertRaises(DeliveryGateError) as cm:run.commit_delivery(b'OLD')
+            self.assertIn('FINAL_PAYLOAD_NOT_BOUND_TO_CANDIDATE',cm.exception.unmet)
+            self.assertEqual(run.phase.phase,RunPhase.INCOMPLETE)
+
     def test_payload_tamper_invalidates_delivery_and_proof(self):
         with tempfile.TemporaryDirectory() as td:
             run,_=self.prepare(td,candidate_bytes=b'exact payload');run.commit_delivery(b'exact payload')
@@ -258,14 +296,9 @@ class TestStableDeliveryGates(unittest.TestCase):
             run,_=self.prepare(td,candidate_bytes=b'exact payload');envelope=run.commit_delivery(b'exact payload')
             summary=run.workspace.read_json(envelope.run_summary_path)
             summary['delivery_ready']=False
-            summary_sha=run.workspace.write_json(envelope.run_summary_path,summary,kind='run-summary')
-            forged=envelope.to_dict();forged['run_summary_sha256']=summary_sha
-            forged=DeliveryEnvelope.from_dict(forged)
-            run.workspace.write_json('final/delivery-envelope.json',forged.to_dict(),kind='delivery-envelope')
-            run.delivery=forged
-            self.assertFalse(run.delivery_ready())
-            with self.assertRaisesRegex(ValueError,'run summary does not describe'):
-                run.render_proof()
+            with self.assertRaisesRegex(RuntimeError,'terminal workspace is sealed'):
+                run.workspace.write_json(envelope.run_summary_path,summary,kind='run-summary')
+            self.assertTrue(run.delivery_ready())
 
     def test_recovery_rejects_deleted_or_tampered_host_receipts(self):
         with tempfile.TemporaryDirectory() as td:
@@ -275,34 +308,18 @@ class TestStableDeliveryGates(unittest.TestCase):
                 verify_run_workspace(run.workspace.root,run.run_id)
         with tempfile.TemporaryDirectory() as td:
             run,_=self.prepare(td);run.commit_delivery(b'payload')
-            preflight=run.workspace.read_json('preflight-receipt.json')
-            preflight['warnings']=['tampered after delivery']
-            run.workspace.write_json('preflight-receipt.json',preflight,kind='preflight-receipt')
-            with self.assertRaisesRegex(ValueError,'host authority binding drift'):
-                verify_run_workspace(run.workspace.root,run.run_id)
+            preflight=run.workspace.read_json('preflight-receipt.json');preflight['warnings']=['tampered after delivery']
+            with self.assertRaisesRegex(RuntimeError,'terminal workspace is sealed'):
+                run.workspace.write_json('preflight-receipt.json',preflight,kind='preflight-receipt')
 
     def test_coordinated_capability_downgrade_cannot_forge_delivery(self):
         with tempfile.TemporaryDirectory() as td:
             run,_=self.prepare(td);envelope=run.commit_delivery(b'payload')
             capability=run.workspace.read_json('capability-negotiation.json')
             capability['mode']='ADVISORY';capability['reasons']=['downgraded after delivery']
-            capability_sha=run.workspace.write_json(
-                'capability-negotiation.json',capability,kind='capability-negotiation',
-            )
-            summary=run.workspace.read_json(envelope.run_summary_path)
-            summary['final']['capability_negotiation_sha256']=capability_sha
-            summary_sha=run.workspace.write_json(envelope.run_summary_path,summary,kind='run-summary')
-            proof=run.workspace.read_json(envelope.stable_proof_path)
-            proof['delivery']['capability_negotiation_sha256']=capability_sha
-            proof_sha=run.workspace.write_json(envelope.stable_proof_path,proof,kind='stable-proof')
-            forged=envelope.to_dict()
-            forged['capability_negotiation_sha256']=capability_sha
-            forged['run_summary_sha256']=summary_sha;forged['stable_proof_sha256']=proof_sha
-            run.workspace.write_json(
-                'final/delivery-envelope.json',forged,kind='delivery-envelope',
-            )
-            with self.assertRaisesRegex(ValueError,'cannot enforce canonical final delivery'):
-                verify_run_workspace(run.workspace.root,run.run_id)
+            with self.assertRaisesRegex(RuntimeError,'terminal workspace is sealed'):
+                run.workspace.write_json('capability-negotiation.json',capability,kind='capability-negotiation')
+            self.assertTrue(verify_run_workspace(run.workspace.root,run.run_id)['integrity_ok'])
 
     def test_summary_only_candidate_cannot_bind_final_payload(self):
         with tempfile.TemporaryDirectory() as td:

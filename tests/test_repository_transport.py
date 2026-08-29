@@ -29,7 +29,7 @@ from tests.helpers import FakeClock
 SHA='a'*40
 OTHER='b'*40
 MANIFEST={
-    'version':'5.0.0-Berta1',
+    'version':'5.0.0-Berta2',
     'protocol':'digr-v5.0',
     'runtime_descriptor':'runtime-descriptor.json',
     'bootstrap_entry':'entry/STARTUP.md',
@@ -43,13 +43,13 @@ MANIFEST={
     },
 }
 MANIFEST_BYTES=(json.dumps(MANIFEST,separators=(',',':'))+'\n').encode()
-VERSION=b'5.0.0-Berta1\n'
+VERSION=b'5.0.0-Berta2\n'
 LOGICAL={
     'entry/DEEP_ITERATION_ENTRY.md':b'# entry\n',
     'core/00_RESULT_SOVEREIGNTY.md':b'# core\n',
 }
 BUNDLE_BYTES=(json.dumps({
-    'schema_version':1,'version':'5.0.0-Berta1','protocol':'digr-v5.0',
+    'schema_version':1,'version':'5.0.0-Berta2','protocol':'digr-v5.0',
     'members':[
         {'path':p,'sha256':__import__('hashlib').sha256(b).hexdigest(),'byte_length':len(b),'content':b.decode()}
         for p,b in LOGICAL.items()
@@ -60,14 +60,14 @@ STABLE_MEMBERS=[
     for p,b in LOGICAL.items()
 ]
 STABLE_BUNDLE_BYTES=(json.dumps({
-    'schema_version':1,'version':'5.0.0-Berta1','protocol':'digr-v5.0',
+    'schema_version':1,'version':'5.0.0-Berta2','protocol':'digr-v5.0',
     'members':STABLE_MEMBERS,
 },sort_keys=True,separators=(',',':'))+'\n').encode()
 STABLE_HELP_BYTES='# DIGR Help\n\nVerified stable help.\n'.encode()
 STABLE_EXECUTION_SET=[{k:item[k] for k in ('path','sha256','byte_length')} for item in STABLE_MEMBERS]
 STABLE_EXECUTION_SET_BYTES=json.dumps(STABLE_EXECUTION_SET,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
 STABLE_DESCRIPTOR={
-    'schema':'digr-runtime-descriptor/v1','protocol':'digr-v5.0','version':'5.0.0-Berta1',
+    'schema':'digr-runtime-descriptor/v1','protocol':'digr-v5.0','version':'5.0.0-Berta2',
     'minimum_adapter':{
         'repository':'Gual-Wells/Deep-Iteration-GPT-Runtime','ref':'stable',
         'descriptor_path':'runtime-descriptor.json',

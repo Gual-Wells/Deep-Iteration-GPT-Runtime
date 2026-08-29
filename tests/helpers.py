@@ -5,7 +5,7 @@ from runtime.clock_probe import ClockSnapshot
 from runtime.protocol_authority import ProtocolIdentity,ProtocolAuthority
 from runtime.routing import RouteReceipt,AUTHORITATIVE_REPOSITORY
 from runtime.invocation_surface import classify_surface
-from runtime.parameter_resolution import parameter_profile,resolve_stable_parameter_surface
+from runtime.parameter_resolution import complete_native_parameters,parameter_profile,resolve_stable_parameter_surface
 from runtime.task_startup import start_task
 from runtime.execution_protocol import receipt_from_individual_files
 
@@ -13,19 +13,33 @@ SHA='a'*40
 ROOT=Path(__file__).resolve().parents[1]
 
 def stable_invocation_for_contract(contract,task='x'):
-    """Create an explicit Berta1 test surface with no semantic completion."""
+    """Create an explicit Berta2 test surface with no semantic completion."""
     seconds=lambda value:format(float(value),'.15g')+'s'
     s=contract.S
+    source_policy='required' if getattr(contract.source_disposition,'value',contract.source_disposition)=='REQUIRED' else 'off'
     return (
-        f'DIGR(N={contract.N},T={seconds(contract.T_seconds)},R={contract.R},B={contract.B},'
+        f'DIGR(source={source_policy},N={contract.N},T={seconds(contract.T_seconds)},R={contract.R},B={contract.B},'
         f'S(n={s.n},t={seconds(s.t_seconds)},r={s.r},b={s.b}),'
-        f'D({contract.D_s}),L({contract.L_e}))：{task}'
+        f'D({contract.D_s}),V({getattr(contract,"V_o",0)}),L({contract.L_e}))：{task}'
     )
 
 def stable_preflight_parameters(message):
-    """Resolve the exact Berta1 parameter receipt before a low-level test run."""
+    """Resolve the exact Berta2 parameter receipt before a low-level test run."""
     surface=classify_surface(message)
     result=resolve_stable_parameter_surface(surface.parameter_surface)
+    if result.missing_parameters:
+        defaults={
+            'N':2,'T_seconds':1 if result.B==1 else 0,'R':1,
+            'S.n':0,'S.t_seconds':1 if result.S.b==1 else 0,'S.r':0,
+            'D_s':0,'V_o':0,
+        }
+        completion={}
+        source={}
+        for name in result.missing_parameters:
+            if name.startswith('S.'):source[name[2:]]=defaults[name]
+            else:completion[name]=defaults[name]
+        if source:completion['S']=source
+        result=complete_native_parameters(result,completion)
     result.require_stable_ready()
     return result
 
@@ -89,7 +103,8 @@ def persist_enforced_host_receipts(run,*,source_tools=True):
         },
     }
     capability={
-        'mode':'ENFORCED','final_gate':True,'persistent_workspace':True,
+        'mode':'ENFORCED','execution_mode':'HOST_ENFORCED','attestation_level':'CANONICAL',
+        'final_gate':True,'persistent_workspace':True,
         'monotonic_clock':'CONTINUOUS','repository_transport':True,
         'source_tools':source_tools,'isolation_max':3,'viewpoint_max':8,'reasons':[],
     }

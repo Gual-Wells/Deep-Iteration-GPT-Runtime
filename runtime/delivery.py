@@ -1,4 +1,4 @@
-"""Deterministic stable.1 final-delivery binding.
+"""Deterministic Berta2 final-delivery and attestation binding.
 
 The runtime uses a crash-safe two-phase commit: it may prepare payload,
 summary, proof, and envelope artifacts while FINALIZING, but only the later
@@ -15,13 +15,17 @@ from typing import Any,Mapping
 from .validation import require_nonempty_text,require_nonnegative_int
 from .workspace import RunWorkspace,canonical_json_bytes,sha256_bytes
 
-DELIVERY_SCHEMA_VERSION=1
+DELIVERY_SCHEMA_VERSION=2
 DELIVERY_PAYLOAD_PATH='final/delivery.bin'
 DELIVERY_SUMMARY_PATH='final/run-summary.json'
 DELIVERY_PROOF_PATH='final/stable-proof.json'
 DELIVERY_ENVELOPE_PATH='final/delivery-envelope.json'
 PREFLIGHT_RECEIPT_PATH='preflight-receipt.json'
 CAPABILITY_NEGOTIATION_PATH='capability-negotiation.json'
+_TERMINAL_DIGEST_EXCLUDED={
+    'state/artifact-index.json','state/run-phase.json','state/run-brief.json',
+    'state/terminal-seal.json',
+}
 
 
 def _digest(name:str,value:object)->str:
@@ -29,6 +33,17 @@ def _digest(name:str,value:object)->str:
     if len(text)!=64 or any(c not in '0123456789abcdef' for c in text):
         raise ValueError(f'{name} must be 64 lowercase hex')
     return text
+
+
+def terminal_state_sha256(workspace:RunWorkspace)->str:
+    """Bind semantic state and audit logs while excluding terminal wrappers."""
+    rows=[]
+    for rec in workspace.artifact_records():
+        if (rec.path in _TERMINAL_DIGEST_EXCLUDED or rec.path.startswith('final/')
+                or rec.path.startswith('state/run-phase-r')):
+            continue
+        rows.append(rec.to_dict())
+    return sha256_bytes(canonical_json_bytes(rows))
 
 
 class DeliveryGateError(RuntimeError):
@@ -132,23 +147,54 @@ def verify_enforced_host_delivery_authority(workspace:RunWorkspace)->HostDeliver
     required_keys={
         'mode','final_gate','persistent_workspace','monotonic_clock',
         'repository_transport','source_tools','isolation_max','viewpoint_max','reasons',
+        'execution_mode','attestation_level',
     }
-    if set(capability)!=required_keys:
+    legacy_keys=required_keys-{'execution_mode','attestation_level'}
+    stable1_keys=legacy_keys-{'viewpoint_max'}
+    keys=set(capability)
+    version=authority.get('P_run',{}).get('version')
+    if keys==required_keys:
+        if (capability.get('mode')!='ENFORCED'
+                or capability.get('execution_mode')!='HOST_ENFORCED'
+                or capability.get('attestation_level')!='CANONICAL'
+                or capability.get('final_gate') is not True
+                or capability.get('persistent_workspace') is not True
+                or capability.get('repository_transport') is not True
+                or capability.get('monotonic_clock') not in ('CONTINUOUS','SESSION_ONLY')):
+            _host_authority_error('CANONICAL_DELIVERY_NOT_ENFORCED','host cannot enforce canonical final delivery')
+    elif version!='5.0.0-Berta2' and keys in (legacy_keys,stable1_keys):
+        # Read-only recovery of stable.1/Berta1 workspaces retains the exact
+        # authority shape those pinned runtimes emitted. New Berta2 delivery
+        # always persists the stronger execution/attestation dimensions.
+        if (capability.get('mode')!='ENFORCED'
+                or capability.get('final_gate') is not True
+                or capability.get('persistent_workspace') is not True
+                or capability.get('repository_transport') is not True
+                or capability.get('monotonic_clock')!='CONTINUOUS'):
+            _host_authority_error('CANONICAL_DELIVERY_NOT_ENFORCED','legacy host evidence is not canonical')
+    else:
         _host_authority_error('CAPABILITY_NEGOTIATION_INVALID','capability negotiation has an unexpected shape')
-    if (capability.get('mode')!='ENFORCED' or capability.get('final_gate') is not True
-            or capability.get('persistent_workspace') is not True
-            or capability.get('repository_transport') is not True
-            or capability.get('monotonic_clock')!='CONTINUOUS'):
-        _host_authority_error('CANONICAL_DELIVERY_NOT_ENFORCED','host cannot enforce canonical final delivery')
     if (type(capability.get('source_tools')) is not bool
             or not isinstance(capability.get('isolation_max'),int)
             or isinstance(capability.get('isolation_max'),bool)
             or capability['isolation_max'] not in (1,2,3)
-            or not isinstance(capability.get('viewpoint_max'),int)
-            or isinstance(capability.get('viewpoint_max'),bool)
-            or capability['viewpoint_max']<0
+            or ('viewpoint_max' in capability and (
+                not isinstance(capability.get('viewpoint_max'),int)
+                or isinstance(capability.get('viewpoint_max'),bool)
+                or capability['viewpoint_max']<0))
             or capability.get('reasons')!=[]):
         _host_authority_error('CAPABILITY_NEGOTIATION_INVALID','ENFORCED capability facts are malformed')
+    if capability.get('monotonic_clock')=='SESSION_ONLY':
+        # SESSION_ONLY is truthful for one uninterrupted task, not a promise
+        # that a process/session boundary can be canonically bridged.
+        try:
+            from .clock_journal import ClockJournal
+            journal=ClockJournal.load(workspace.run_id,workspace.path('time/clock.journal.ndjson'))
+            journal.verify(False)
+        except (OSError,TypeError,ValueError) as exc:
+            _host_authority_error('SESSION_CLOCK_EVIDENCE_INVALID','session-only clock journal is unavailable',exc)
+        if any(event.event=='RESUME_READY' for event in journal.events):
+            _host_authority_error('SESSION_ONLY_CLOCK_RESUMED','session-only clock cannot canonically attest a resumed run')
     return HostDeliveryAuthority(
         PREFLIGHT_RECEIPT_PATH,preflight_rec.sha256,
         CAPABILITY_NEGOTIATION_PATH,capability_rec.sha256,capability['source_tools'],
@@ -167,6 +213,7 @@ class DeliveryEnvelope:
     candidate_revision:int
     candidate_digest:str
     candidate_payload_path:str
+    terminal_state_sha256:str|None
     preflight_receipt_path:str
     preflight_receipt_sha256:str
     capability_negotiation_path:str
@@ -177,7 +224,7 @@ class DeliveryEnvelope:
     stable_proof_sha256:str
 
     def __post_init__(self):
-        if self.schema_version!=DELIVERY_SCHEMA_VERSION:raise ValueError('unsupported delivery envelope schema')
+        if self.schema_version not in (1,DELIVERY_SCHEMA_VERSION):raise ValueError('unsupported delivery envelope schema')
         object.__setattr__(self,'run_id',require_nonempty_text('run_id',self.run_id))
         if self.status!='DELIVERED':raise ValueError('delivery envelope status must be DELIVERED')
         if self.payload_path!=DELIVERY_PAYLOAD_PATH:raise ValueError('unexpected delivery payload path')
@@ -191,6 +238,10 @@ class DeliveryEnvelope:
         object.__setattr__(self,'preflight_receipt_sha256',_digest('preflight_receipt_sha256',self.preflight_receipt_sha256))
         object.__setattr__(self,'capability_negotiation_sha256',_digest('capability_negotiation_sha256',self.capability_negotiation_sha256))
         object.__setattr__(self,'candidate_digest',_digest('candidate_digest',self.candidate_digest))
+        if self.schema_version==DELIVERY_SCHEMA_VERSION:
+            object.__setattr__(self,'terminal_state_sha256',_digest('terminal_state_sha256',self.terminal_state_sha256))
+        elif self.terminal_state_sha256 is not None:
+            raise ValueError('delivery schema v1 cannot carry terminal_state_sha256')
         candidate_path=require_nonempty_text('candidate_payload_path',self.candidate_payload_path)
         expected_candidate_path=f'state/candidate-payloads/{self.payload_sha256}.bin'
         if candidate_path!=expected_candidate_path:
@@ -201,14 +252,17 @@ class DeliveryEnvelope:
         require_nonnegative_int('candidate_revision',self.candidate_revision)
         object.__setattr__(self,'media_type',require_nonempty_text('media_type',self.media_type))
 
-    def to_dict(self)->dict[str,Any]:return asdict(self)
+    def to_dict(self)->dict[str,Any]:
+        data=asdict(self)
+        if self.schema_version==1:data.pop('terminal_state_sha256',None)
+        return data
 
     @classmethod
     def from_dict(cls,d:Mapping[str,Any])->'DeliveryEnvelope':
         return cls(
             d['schema_version'],d['run_id'],d['status'],d['payload_path'],
             d['payload_sha256'],d['payload_byte_length'],d['media_type'],
-            d['candidate_revision'],d['candidate_digest'],d['candidate_payload_path'],
+            d['candidate_revision'],d['candidate_digest'],d['candidate_payload_path'],d.get('terminal_state_sha256'),
             d['preflight_receipt_path'],d['preflight_receipt_sha256'],
             d['capability_negotiation_path'],d['capability_negotiation_sha256'],
             d['run_summary_path'],d['run_summary_sha256'],d['stable_proof_path'],d['stable_proof_sha256'],
@@ -219,7 +273,7 @@ class DeliveryEnvelope:
 
     @property
     def final_binding(self)->dict[str,Any]:
-        return {
+        data={
             'payload_sha256':self.payload_sha256,
             'payload_byte_length':self.payload_byte_length,
             'media_type':self.media_type,
@@ -231,6 +285,9 @@ class DeliveryEnvelope:
             'capability_negotiation_path':self.capability_negotiation_path,
             'capability_negotiation_sha256':self.capability_negotiation_sha256,
         }
+        if self.terminal_state_sha256 is not None:
+            data['terminal_state_sha256']=self.terminal_state_sha256
+        return data
 
     def verify_payload(self,payload:bytes)->bool:
         if not isinstance(payload,(bytes,bytearray)):raise TypeError('delivery payload must be bytes')
@@ -261,6 +318,9 @@ def verify_delivery_artifacts(workspace:RunWorkspace,envelope:DeliveryEnvelope)-
         raise ValueError('indexed delivery payload digest disagrees with envelope')
     if candidate_rec.sha256!=envelope.payload_sha256:
         raise ValueError('candidate payload is not the exact delivered payload')
+    if (envelope.schema_version==DELIVERY_SCHEMA_VERSION
+            and terminal_state_sha256(workspace)!=envelope.terminal_state_sha256):
+        raise ValueError('terminal semantic state/audit digest drift')
     if summary_rec.sha256!=envelope.run_summary_sha256:
         raise ValueError('indexed run summary digest disagrees with envelope')
     if proof_rec.sha256!=envelope.stable_proof_sha256:

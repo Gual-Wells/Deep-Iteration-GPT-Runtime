@@ -1,15 +1,15 @@
-# Parameter Format and Deterministic Resolution
+# Parameter Format and Resolution
 
-After pinned STARTUP classifies EXECUTING, `digr.preflight` resolves the preserved parameter surface before Run Genesis. The public order is:
+Public order:
 
 ```text
 N < T < R < B < S(n,t,r,b) < D(s) < V(o) < L(e)
 ```
 
-The Berta1 standard profile is `N=2, T=0/no-time, R=1, B=0, source=auto, S(0,0,0,0), D(0), V(0), L(1)`. Both `D(0)` and `V(0)` are zero lower bounds, not disable switches.
+Deterministic code resolves structure; native intelligence chooses only missing task-scale values. No group, empty group, `adaptive` or `profile=adaptive` leaves missing N/T/R/S/D/V for one task-aware completion and defaults source policy to `required`. Only explicit `standard` fixes `N=2,T=0,R=1,B=0,S(0,0,0,0),D(0),V(0),L(1),source=auto`.
 
-Explicitly typed parameters may appear outside canonical order. Flat nested labels are valid without wrapper syntax: `n,t,r,b` identify S; `s` or `D` identify D(s); `o` or `V` identify V(o); `e` or `L` identify L(e). `S(...)`, `D(...)`, `V(...)`, and `L(...)` remain canonical spellings.
+Typed labels may appear outside canonical order. Flat `n,t,r,b` identify S; `s`/D identify D(s); `o`/V identify V(o); `e`/L identify L(e). Wrapper forms remain canonical. D(0) and V(0) are zero lower bounds, never disable switches.
 
-After typed values are removed, every unlabeled value is mapped only against remaining slots by type and relative order. Parentheses must balance, durations must carry units, duplicates are invalid even when equal, and the mapping must have exactly one solution. No solution returns INVALID; multiple solutions return AMBIGUOUS with candidate slots. The model cannot guess or repair silently.
+After typed values are removed, bare values are mapped only to remaining slots by type and relative order. Parentheses balance, duration tokens carry units, and duplicate definitions fail even when equal. No mapping is INVALID; multiple mappings are AMBIGUOUS with candidates. Never guess.
 
-A lone duration or `min=<duration>` creates a hard T minimum; `target=<duration>` creates a soft target. Legacy alpha4/stable.1 forms remain accepted only when uniquely resolvable and are visibly diagnosed as compatibility input.
+A lone duration preserves Alpha4 soft-T meaning (B=0). `target=<duration>` is explicit soft; `min=<duration>` is hard. Explicit `B=1` or `S(b=1)` may omit T/t; native completion must then choose a positive value. Source policy tokens compose with V and typed labels. Explicit values cannot be overridden by completion.

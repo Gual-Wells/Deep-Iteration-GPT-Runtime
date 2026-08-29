@@ -1,6 +1,6 @@
-"""Deterministic reliability helpers for DIGR 5.0.0-Berta1.
+"""Deterministic reliability helpers for DIGR 5.0.0-Berta2.
 
 These helpers externalize routing, timing, state, evidence and recovery without
 becoming a task-planning controller.
 """
-__version__ = "5.0.0-Berta1"
+__version__ = "5.0.0-Berta2"

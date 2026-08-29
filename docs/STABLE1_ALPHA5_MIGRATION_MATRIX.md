@@ -1,6 +1,6 @@
-# Stable.1 / Alpha5-r3 / Berta1 Migration Matrix
+# Stable.1 / Alpha5-r3 / Berta2 Migration Matrix
 
-| Area | Stable.1 base | Alpha5-r3 signal | Berta1 decision |
+| Area | Stable.1 base | Alpha5-r3 signal | Berta2 decision |
 |---|---|---|---|
 | Repository authority | Strong pinned manifest, ref/branch consensus | Retained | Retain unchanged; no cache may bypass live mutable-ref resolution |
 | Final bytes | Exact Candidate binding, two-phase fail-closed delivery | Weaker/incomplete in branch comparison | Stable.1 wins |
@@ -11,7 +11,7 @@
 | Completion | Free-text assessment plus gaps | Structured completion proposal | Add four structured criteria with migration compatibility |
 | Objective/frontier | Native Strategy/Candidate | ObjectiveEnvelope/frontier ideas | Keep lightweight objective/Strategy; do not force frontier overhead |
 | Logs | Internal workspace evidence | UI/bridge proposals | Local TOTAL + N/T/R/B/S/D/V/L only |
-| MCP/UI/backend | None | Proposed future path | Explicitly excluded in Berta1 |
+| MCP/UI/backend | None | Proposed future path | Explicitly excluded in Berta2 |
 | Host/model executability | Capability negotiation | M0/C* concern | Capability facts and caps, no hardcoded model brand/tier |
 
 ## Deferred

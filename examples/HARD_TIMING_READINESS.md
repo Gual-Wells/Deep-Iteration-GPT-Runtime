@@ -1,3 +1,5 @@
-# Stable hard timing readiness
+# Hard timing and attestation
 
-`DIGR(min=10min)：任务` first completes pinned startup acquisition, then resolves to the standard profile plus a ten-minute hard minimum. Continuous monotonic-clock capability is required before descriptor/bundle continuation and Genesis. Without it, preflight returns unsupported rather than creating a run with unverifiable hard time.
+`DIGR(min=10min)：任务` fixes a ten-minute hard T while other task-scale values remain adaptive.
+
+A trustworthy session-only monotonic clock may attest one uninterrupted task. If no clock exists, MODEL_NATIVE execution still proceeds, but T actual is `?`/unattested and canonical hard-time proof is unavailable. Capability gaps are proof gaps, not task-execution denial.

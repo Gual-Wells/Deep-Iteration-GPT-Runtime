@@ -1,7 +1,7 @@
 from __future__ import annotations
 import ast,hashlib,json,re
 from pathlib import Path,PurePosixPath
-ROOT=Path(__file__).resolve().parents[1];VERSION='5.0.0-Berta1';PACKAGE_VERSION='5.0.0.dev1+berta1';HEX64=re.compile(r'^[0-9a-f]{64}$')
+ROOT=Path(__file__).resolve().parents[1];VERSION='5.0.0-Berta2';PACKAGE_VERSION='5.0.0.dev2+berta2';HEX64=re.compile(r'^[0-9a-f]{64}$')
 def fail(message):print('FAIL:',message);raise SystemExit(1)
 def read(rel):return (ROOT/rel).read_text(encoding='utf-8')
 def digest(data):return hashlib.sha256(data).hexdigest()
@@ -23,7 +23,7 @@ def main():
     if d.get('surface',{}).get('navigation_authority')!='manifest.json' or d.get('surface',{}).get('load_phase')!='after_verified_startup_slice':fail('descriptor navigation role')
     adapter=d.get('minimum_adapter',{});expected_adapter={'repository':'Gual-Wells/Deep-Iteration-GPT-Runtime','ref':'stable','descriptor_path':'runtime-descriptor.json','navigation_source':'manifest.json','activation':'after_pinned_startup_classifies_EXECUTING','artifact_integrity':'sha256_and_byte_length','execution_set_integrity':'ordered_member_count_and_execution_set_sha256'}
     if any(adapter.get(k)!=v for k,v in expected_adapter.items()):fail('descriptor minimum adapter locator/integrity')
-    api=d.get('engine_api',{});expected_api={'preflight':'digr.preflight','commit_delivery':'digr.commit_delivery','preflight_binding':'runtime.host_adapter.HostAdapter.preflight','start_binding':'runtime.host_adapter.HostAdapter.start','commit_delivery_binding':'runtime.run_session.LiveDIGRRun.commit_delivery','enforced_host_integration':'required'}
+    api=d.get('engine_api',{});expected_api={'preflight':'digr.preflight','commit_delivery':'digr.commit_delivery','preflight_binding':'runtime.host_adapter.HostAdapter.preflight','start_binding':'runtime.host_adapter.HostAdapter.start','commit_delivery_binding':'runtime.run_session.LiveDIGRRun.commit_delivery','enforced_host_integration':'required_for_canonical_attestation','execution_without_host':'MODEL_NATIVE','canonical_attestation':'requires_verified_host_enforcement'}
     if any(api.get(k)!=v for k,v in expected_api.items()):fail('descriptor logical/Python API binding')
     if f'version = "{PACKAGE_VERSION}"' not in read('pyproject.toml'):fail('PEP 440 package version mapping')
     for retired in ('defaults','parameters','time_states','policies','philosophy','release','routing'):
@@ -72,5 +72,5 @@ def main():
         if not p.is_file() or '__pycache__' in p.parts:continue
         if p.suffix.lower() not in {'.py','.md','.txt','.json','.toml'} and p.name!='VERSION':continue
         if b'\r' in p.read_bytes():fail(f'CR line ending {p.relative_to(ROOT)}')
-    print('DIGR 5.0.0-Berta1 pinned-manifest repository: OK')
+    print('DIGR 5.0.0-Berta2 pinned-manifest repository: OK')
 if __name__=='__main__':main()

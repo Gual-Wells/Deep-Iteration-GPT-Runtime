@@ -1,4 +1,4 @@
-"""Mechanical DIGR 5.0.0-Berta1 contract-minimum checks.
+"""Mechanical DIGR 5.0.0-Berta2 contract-minimum checks.
 
 This layer checks frozen mechanical contract gates against evidence-backed
 actuals. Count/D minima and B/b-governed timing gates are distinct; this layer

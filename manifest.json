@@ -2,7 +2,7 @@
   "runtime_descriptor": "runtime-descriptor.json",
   "navigation_authority": true,
   "protocol": "digr-v5.0",
-  "version": "5.0.0-Berta1",
+  "version": "5.0.0-Berta2",
   "bootstrap_entry": "entry/STARTUP.md",
   "startup_slice": [
     "entry/STARTUP.md"
@@ -101,16 +101,16 @@
     "routing": 4,
     "repository_transport": 3,
     "invocation_surface": 2,
-    "parameter_resolution": 2,
-    "run_session": 5,
-    "workspace": 2,
+    "parameter_resolution": 3,
+    "run_session": 6,
+    "workspace": 3,
     "clock_journal": 2,
     "event_receipt": 2,
     "execution_bundle": 1,
     "execution_protocol_load": 1,
-    "capabilities": 1,
-    "host_adapter": 1,
-    "delivery": 2,
+    "capabilities": 2,
+    "host_adapter": 2,
+    "delivery": 3,
     "viewpoint": 1,
     "audit_logs": 1
   },
@@ -134,5 +134,6 @@
     ,"viewpoint_ledger": "schemas/viewpoint-ledger.schema.json"
     ,"exclusive_activity": "schemas/exclusive-activity.schema.json"
     ,"audit_log_event": "schemas/audit-log-event.schema.json"
+    ,"terminal_seal": "schemas/terminal-seal.schema.json"
   }
 }

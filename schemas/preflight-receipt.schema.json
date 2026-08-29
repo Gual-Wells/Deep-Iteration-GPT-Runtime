@@ -1,18 +1,18 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/preflight-receipt.schema.json",
-  "title": "DIGR 5.0 stable.1 Local Preflight Receipt",
+  "title": "DIGR 5.0 Berta2 Pinned Structural Preflight Receipt",
   "type": "object",
   "required": ["schema_version", "status", "raw_message_sha256", "kind", "alias", "task_raw", "parameter_surface", "profile", "source_policy", "corrections", "warnings", "startup_acquisition_performed", "additional_artifact_fetch_required", "repository_binding", "native_message"],
   "properties": {
     "schema_version": {"const": 1},
-    "status": {"enum": ["READY", "NATIVE", "HELP", "INVALID", "NEEDS_CORRECTION", "ADVISORY", "UNSUPPORTED"]},
+    "status": {"enum": ["READY", "NEEDS_COMPLETION", "NATIVE", "HELP", "INVALID", "NEEDS_CORRECTION", "ADVISORY", "UNSUPPORTED"]},
     "raw_message_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "kind": {"enum": ["EXECUTING", "HELP", "NATIVE", "INVALID"]},
     "alias": {"enum": ["DIGR", "深度迭代"]},
     "task_raw": {"type": ["string", "null"]},
     "parameter_surface": {"type": ["string", "null"]},
-    "profile": {"enum": ["standard", "berta1", "legacy-alpha4", "invalid", null]},
+    "profile": {"enum": ["adaptive", "standard", "berta2", "legacy-alpha4", "invalid", null]},
     "source_policy": {"enum": ["auto", "required", "off", null]},
     "corrections": {"type": "array", "items": {"type": "string", "minLength": 1}},
     "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}},
@@ -75,11 +75,11 @@
     }
   },
   "allOf": [
-    {"if": {"properties": {"status": {"const": "READY"}}}, "then": {"properties": {"additional_artifact_fetch_required": {"const": true}, "kind": {"const": "EXECUTING"}}}},
+    {"if": {"properties": {"status": {"enum": ["READY", "NEEDS_COMPLETION"]}}}, "then": {"properties": {"additional_artifact_fetch_required": {"const": true}, "kind": {"const": "EXECUTING"}}}},
     {"if": {"properties": {"status": {"const": "HELP"}}}, "then": {"properties": {"additional_artifact_fetch_required": {"const": true}, "kind": {"const": "HELP"}}}},
     {"if": {"properties": {"status": {"enum": ["NATIVE", "INVALID", "NEEDS_CORRECTION", "ADVISORY", "UNSUPPORTED"]}}}, "then": {"properties": {"additional_artifact_fetch_required": {"const": false}}}},
     {"if": {"properties": {"status": {"const": "NATIVE"}}}, "then": {"properties": {"native_message": {"type": "string"}}}},
-    {"if": {"properties": {"status": {"enum": ["READY", "HELP", "INVALID", "NEEDS_CORRECTION", "ADVISORY", "UNSUPPORTED"]}}}, "then": {"properties": {"native_message": {"const": null}}}}
+    {"if": {"properties": {"status": {"enum": ["READY", "NEEDS_COMPLETION", "HELP", "INVALID", "NEEDS_CORRECTION", "ADVISORY", "UNSUPPORTED"]}}}, "then": {"properties": {"native_message": {"const": null}}}}
   ],
   "additionalProperties": false
 }

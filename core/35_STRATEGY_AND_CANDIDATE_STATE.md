@@ -1,9 +1,7 @@
-# Mutable Strategy and Candidate State
+# Strategy and Candidate State
 
-**Freeze commitments, never freeze strategy.** P_run, U0, user hard constraints and Effective Contract commitments are frozen; count/D/V fields are minima while T/t are B/b-governed targets; task representation, decomposition, Strategy, assumptions, source/validation/tool routes, Candidate and D/V choices remain working state.
+StrategyState is revisable task memory: current model, route, alternatives, source plan, validation plan, tool plan, assumptions, failures and rationale. Strategy Genesis is substantive MAIN work, never frozen into U0.
 
-After Contract freeze, substantive task work enters MAIN. Strategy Genesis forms the current task model, primary/alternative routes, source strategy, validation strategy, tool strategy, assumptions and risks. Because this is real task work it counts toward T and may naturally qualify as N when it is a meaningful evolution.
+CandidateSnapshot begins only when a meaningful partial or final result exists. Do not create a placeholder Candidate merely to make R countable. Each revision binds its own content-addressed primary payload as artifact_refs[0]; later auxiliary refs cannot substitute an older payload at delivery.
 
-Strategy snapshots are revisioned and non-authoritative. N, R, source evidence, D reintegration, failed tests and new counterexamples may rewrite the entire strategy. A StrategyState must not contain scheduler fields such as `next_step`, `score` or `priority`; the runtime never decides what the model should think next.
-
-Candidate snapshots externalize the current result at revision boundaries without storing hidden chain-of-thought. They bind summary, artifact/evidence refs, producer and digest. Candidate is what R re-enters; Strategy is how the model currently intends to work; EST is compact continuing memory. These stores reference rather than duplicate one another where possible.
+Main owns Candidate changes. N may create or revise it. R requires candidate-before plus whole-process challenge and candidate-after or evidenced retention. D/V return compact consequences to Main and cannot directly seize final selection.

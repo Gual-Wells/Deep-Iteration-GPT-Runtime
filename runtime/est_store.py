@@ -1,4 +1,4 @@
-"""Lightweight revisioned Evolution State Tree memory for DIGR 5.0.0-Berta1.
+"""Lightweight revisioned Evolution State Tree memory for DIGR 5.0.0-Berta2.
 
 EST is a compact working-memory index, not a search algorithm and not a second
 source of truth for Strategy/Candidate.  It references their revisions instead

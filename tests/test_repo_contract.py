@@ -8,10 +8,10 @@ class TestRepoContract(unittest.TestCase):
         d=json.loads((ROOT/'runtime-descriptor.json').read_text(encoding='utf-8'));m=json.loads((ROOT/'manifest.json').read_text(encoding='utf-8'))
         self.assertTrue(m['navigation_authority']);self.assertNotIn('compatibility_mirror',m)
         self.assertEqual(m['bootstrap_entry'],'entry/STARTUP.md');self.assertEqual(m['startup_slice'],['entry/STARTUP.md'])
-        self.assertEqual((ROOT/'VERSION').read_text(encoding='utf-8').strip(),m['version']);self.assertEqual(d['version'],m['version']);self.assertEqual(d['package_version'],'5.0.0.dev1+berta1')
+        self.assertEqual((ROOT/'VERSION').read_text(encoding='utf-8').strip(),m['version']);self.assertEqual(d['version'],m['version']);self.assertEqual(d['package_version'],'5.0.0.dev2+berta2')
         self.assertEqual(d['surface']['navigation_authority'],'manifest.json');self.assertEqual(d['surface']['load_phase'],'after_verified_startup_slice')
         adapter=d['minimum_adapter'];self.assertEqual(adapter['repository'],'Gual-Wells/Deep-Iteration-GPT-Runtime');self.assertEqual(adapter['ref'],'stable');self.assertEqual(adapter['descriptor_path'],'runtime-descriptor.json')
-        api=d['engine_api'];self.assertEqual(api['preflight_binding'],'runtime.host_adapter.HostAdapter.preflight');self.assertEqual(api['start_binding'],'runtime.host_adapter.HostAdapter.start');self.assertEqual(api['commit_delivery_binding'],'runtime.run_session.LiveDIGRRun.commit_delivery');self.assertEqual(api['enforced_host_integration'],'required')
+        api=d['engine_api'];self.assertEqual(api['preflight_binding'],'runtime.host_adapter.HostAdapter.preflight');self.assertEqual(api['start_binding'],'runtime.host_adapter.HostAdapter.start');self.assertEqual(api['commit_delivery_binding'],'runtime.run_session.LiveDIGRRun.commit_delivery');self.assertEqual(api['enforced_host_integration'],'required_for_canonical_attestation');self.assertEqual(api['execution_without_host'],'MODEL_NATIVE')
     def test_descriptor_artifact_integrity(self):
         d=json.loads((ROOT/'runtime-descriptor.json').read_text(encoding='utf-8'))
         for item in d['artifacts'].values():

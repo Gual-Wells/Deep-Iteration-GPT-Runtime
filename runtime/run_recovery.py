@@ -1,4 +1,4 @@
-"""Comprehensive DIGR 5.0.0-Berta1 workspace verification and recovery.
+"""Comprehensive DIGR 5.0.0-Berta2 workspace verification and recovery.
 
 Verification proves persisted structure and cross-store bindings.  It deliberately
 separates *workspace integrity* from *future clock continuity*: LiveDIGRRun.resume
@@ -6,6 +6,7 @@ must establish a fresh, same-boot monotonic bridge before a nonterminal run may
 continue.
 """
 from __future__ import annotations
+from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
 
@@ -29,10 +30,11 @@ from .interval_ledger import WorkState
 from .run_brief import verify_run_brief
 from .run_lifecycle import RunPhase, RunPhaseStore
 from .proof import proof_data_from_contract_actuals
+from .parameter_resolution import ParameterResolution
 from .source_workspace import SourceActivityLog, SourceWorkspaceRegistry
 from .stop_checks import ContractActuals, check_mechanical_minima
 from .strategy_store import StrategyStore
-from .workspace import RunWorkspace, validate_run_id
+from .workspace import RunWorkspace,TERMINAL_SEAL_PATH,validate_run_id
 from .exclusive_activity import ExclusiveActivityLog
 from .viewpoint_store import ViewpointStore
 
@@ -108,6 +110,8 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         raise ValueError('startup/invocation mismatch')
     if startup.get('authority')!=authority:
         raise ValueError('startup/authority mismatch')
+    version=authority.get('P_run',{}).get('version')
+    preflight_versions={'5.0.0-stable.1','5.0.0-Berta1','5.0.0-Berta2'}
 
     u0=None
     if ws.path('U0.json').is_file():
@@ -116,6 +120,8 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
             raise ValueError('U0 digest mismatch')
         if u0.get('source_message_sha256')!=invocation.get('raw_message_sha256'):
             raise ValueError('U0 source-message binding mismatch')
+        if version in preflight_versions and u0.get('text')!=invocation.get('task_raw'):
+            raise ValueError('preflight-version U0 is not exact task_raw')
 
     phase=RunPhaseStore.load(ws)
     phase_requires={
@@ -139,6 +145,16 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
     for rel in phase_requires.get(phase.phase,()):
         if not ws.path(rel).is_file():
             raise ValueError(f'phase {phase.phase.value} missing {rel}')
+    terminal_seal=None
+    if phase.phase in (RunPhase.DELIVERED,RunPhase.INCOMPLETE,RunPhase.ABORTED):
+        if ws.path(TERMINAL_SEAL_PATH).is_file():
+            ws.require_indexed_artifact(TERMINAL_SEAL_PATH,kind='terminal-seal')
+            terminal_seal=ws.read_json(TERMINAL_SEAL_PATH)
+            if (terminal_seal.get('schema_version')!=1 or terminal_seal.get('run_id')!=run_id
+                    or terminal_seal.get('phase')!=phase.phase.value):
+                raise ValueError('terminal mutation seal identity/phase drift')
+        elif version=='5.0.0-Berta2':
+            raise ValueError('Berta2 terminal run lacks mutation seal')
 
     if ws.path('protocol-load.json').is_file():
         pl=ExecutingProtocolLoadReceipt.from_dict(ws.read_json('protocol-load.json'))
@@ -151,6 +167,28 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
 
     contract_raw=ws.read_json('contract.json') if ws.path('contract.json').is_file() else None
     contract=_load_contract(contract_raw) if contract_raw is not None else None
+    parameters=None
+    if ws.path('parameter-resolution.json').is_file():
+        parameters=ParameterResolution.from_dict(ws.read_json('parameter-resolution.json'))
+        if version=='5.0.0-stable.1' and parameters.V_o is None:
+            parameters=replace(parameters,V_o=0)
+        if version in preflight_versions:
+            parameters.require_stable_ready()
+    if parameters is not None and contract is not None:
+        checks=(('N',parameters.N,contract.N),('T_seconds',parameters.T_seconds,contract.T_seconds),
+                ('R',parameters.R,contract.R),('D_s',parameters.D_s,contract.D_s),('V_o',parameters.V_o,contract.V_o),
+                ('S.n',parameters.S.n,contract.S.n),('S.t_seconds',parameters.S.t_seconds,contract.S.t_seconds),
+                ('S.r',parameters.S.r,contract.S.r))
+        for name,expected,actual in checks:
+            if expected is not None and expected!=actual:
+                raise ValueError(f'contract changes resolved parameter {name}')
+        if (parameters.B!=contract.B or parameters.S.b!=contract.S.b or parameters.L_e!=contract.L_e):
+            raise ValueError('contract changes fixed B/b/L parameter')
+        if parameters.source_policy=='required' and contract.source_disposition is not SourceDisposition.REQUIRED:
+            raise ValueError('source=required contract disposition drift')
+        if parameters.source_policy=='off' and (contract.source_disposition is not SourceDisposition.WAIVED
+                or any((contract.S.n,contract.S.t_seconds,contract.S.r,contract.S.b))):
+            raise ValueError('source=off contract disposition/value drift')
 
     journal=ClockJournal.load(run_id,ws.path('time/clock.journal.ndjson'))
     journal.verify(False)
@@ -268,8 +306,8 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
                 raise ValueError('exclusive D execution is not bound to D_EXCLUSIVE state')
             if iso.mode=='background' and ce.state not in (WorkState.MAIN,WorkState.SOURCE):
                 raise ValueError('background D execution is not bound to MAIN/SOURCE state')
-            if authority.get('P_run',{}).get('version')=='5.0.0-Berta1' and (iso.mode!='exclusive' or ce.state is not WorkState.D_EXCLUSIVE):
-                raise ValueError('Berta1 D execution lacks owned D_EXCLUSIVE time')
+            if authority.get('P_run',{}).get('version')=='5.0.0-Berta2' and (iso.mode!='exclusive' or ce.state is not WorkState.D_EXCLUSIVE):
+                raise ValueError('Berta2 D execution lacks owned D_EXCLUSIVE time')
 
         for result in item.results:
             if iso.L_actual is not None and iso.L_actual>=2:
@@ -329,13 +367,16 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
             raise ValueError('DELIVERED run has no candidate')
         envelope=DeliveryEnvelope.from_dict(ws.read_json(DELIVERY_ENVELOPE_PATH))
         verify_delivery_artifacts(ws,envelope)
+        if terminal_seal is not None and terminal_seal.get('binding_sha256')!=envelope.digest:
+            raise ValueError('DELIVERED terminal seal does not bind delivery envelope')
         host_authority=verify_enforced_host_delivery_authority(ws)
         if contract.source_required and not host_authority.source_tools:
             raise ValueError('DELIVERED run required source tools unavailable')
         candidate=candidates.current
         if (candidate.revision!=envelope.candidate_revision
                 or candidate.digest!=envelope.candidate_digest
-                or envelope.candidate_payload_path not in candidate.artifact_refs):
+                or not candidate.artifact_refs
+                or envelope.candidate_payload_path!=candidate.artifact_refs[0]):
             raise ValueError('DELIVERED candidate/envelope binding mismatch')
         candidate_record=ws.require_indexed_artifact(
             envelope.candidate_payload_path,kind='candidate-payload',
@@ -375,7 +416,7 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         expected_proof={
             'schema_version':1,'run_id':run_id,'status':'DELIVERED',
             'delivery':envelope.final_binding,
-            'proof':(proof_data_from_contract_actuals(contract,actual).to_dict_berta() if authority.get('P_run',{}).get('version')=='5.0.0-Berta1' else proof_data_from_contract_actuals(contract,actual).to_dict()),
+            'proof':(proof_data_from_contract_actuals(contract,actual).to_dict_berta() if authority.get('P_run',{}).get('version')=='5.0.0-Berta2' else proof_data_from_contract_actuals(contract,actual).to_dict()),
         }
         if ws.read_json(DELIVERY_PROOF_PATH)!=expected_proof:
             raise ValueError('stable proof semantic drift')
@@ -391,6 +432,10 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         actual=_derived_actuals(events,sources,activity,dstore,intervals,viewpoints,d_activity,v_activity)
         stop=check_mechanical_minima(contract,actual)
         summary=ws.read_json('final/incomplete-summary.json')
+        if terminal_seal is not None:
+            summary_rec=ws.require_indexed_artifact('final/incomplete-summary.json',kind='incomplete-summary')
+            if terminal_seal.get('binding_sha256')!=summary_rec.sha256:
+                raise ValueError('INCOMPLETE terminal seal does not bind incomplete summary')
         if (summary.get('run_id')!=run_id or summary.get('phase')!='INCOMPLETE'
                 or summary.get('delivery_ready') is not False
                 or summary.get('mechanical_minima_satisfied')!=stop.minima_satisfied
@@ -403,7 +448,8 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         derived=list(stop.unmet_requirements)+list(completion.delivery_failures)
         if not candidates.has_state:
             derived.append('FINAL_CANDIDATE_MISSING')
-        elif not any(x.startswith('state/candidate-payloads/') for x in candidates.current.artifact_refs):
+        elif (not candidates.current.artifact_refs
+                or not candidates.current.artifact_refs[0].startswith('state/candidate-payloads/')):
             derived.append('FINAL_PAYLOAD_NOT_BOUND_TO_CANDIDATE')
         missing=[x for x in derived if x not in unmet]
         if missing:

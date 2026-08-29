@@ -1,4 +1,4 @@
-"""Isolated persistent viewpoint channels for DIGR 5.0.0-Berta1."""
+"""Isolated persistent viewpoint channels for DIGR 5.0.0-Berta2."""
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass

@@ -20,7 +20,7 @@ class TestStableTransport(unittest.TestCase):
         f=FakeFetcher(source_kind='github_connector');session=RepositoryTransportSession(f)
         stable=session.acquire_stable_execution('DIGR：x')
         self.assertEqual(len(f.requests),6)
-        self.assertEqual(stable.startup.descriptor['version'],'5.0.0-Berta1')
+        self.assertEqual(stable.startup.descriptor['version'],'5.0.0-Berta2')
         self.assertEqual(stable.startup.route_receipt.manifest_path,'manifest.json')
         self.assertEqual(stable.protocol.receipt.manifest_sha256,stable.startup.route_receipt.manifest_sha256)
         self.assertEqual(stable.protocol.receipt.source_mode,'bundle')

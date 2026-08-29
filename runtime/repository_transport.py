@@ -1,4 +1,4 @@
-"""Host-facing repository transport for DIGR 5.0.0-Berta1.
+"""Host-facing repository transport for DIGR 5.0.0-Berta2.
 
 The transport bridges the version-neutral broad candidate router to pinned
 manifest/VERSION/startup bytes without moving DIGR execution semantics into
@@ -60,9 +60,9 @@ from .routing import (
 
 CONTENTS_RAW_ACCEPT = 'application/vnd.github.raw+json'
 GITHUB_JSON_ACCEPT = 'application/vnd.github+json'
-USER_AGENT = 'Deep-Iteration-GPT-Runtime/5.0.0-Berta1'
+USER_AGENT = 'Deep-Iteration-GPT-Runtime/5.0.0-Berta2'
 STABLE_DESCRIPTOR_SCHEMA = 'digr-runtime-descriptor/v1'
-STABLE_VERSION = '5.0.0-Berta1'
+STABLE_VERSION = '5.0.0-Berta2'
 STABLE_PROTOCOL = 'digr-v5.0'
 
 LIVE_SOURCE_KINDS = frozenset({'direct_https', 'github_connector'})
@@ -268,7 +268,7 @@ class UrllibDirectFetcher:
 
     Mutable-ref requests ask intermediaries to revalidate instead of serving a
     search/index snapshot. This cannot make an external CDN mathematically
-    instantaneous, so Berta1 requires current branch and independent Git-ref
+    instantaneous, so Berta2 requires current branch and independent Git-ref
     observations to agree before direct REST accepts the pin.
     """
     def __init__(self, timeout: float = 15.0):

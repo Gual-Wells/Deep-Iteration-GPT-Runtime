@@ -1,4 +1,4 @@
-"""Revisioned semantic completion/open-gap memory for DIGR 5.0.0-Berta1."""
+"""Revisioned semantic completion/open-gap memory for DIGR 5.0.0-Berta2."""
 from __future__ import annotations
 from dataclasses import dataclass,asdict
 from .validation import require_nonempty_text,require_bool,require_nonnegative_int

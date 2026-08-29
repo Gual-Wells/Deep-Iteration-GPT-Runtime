@@ -27,8 +27,10 @@ def materialize_audit_logs(run,actual)->dict[str,dict[str,Any]]:
         logs['D'].append(_line('D',item.status,item.to_dict()))
     logs['D'].append(_line('D','TIME',{'target':contract.D_s,'actual':actual.D_s,'actual_seconds':actual.D_actual_seconds,'time_verified':actual.D_time_verified}))
     for item in run.viewpoints.states:
-        compact=item.to_dict();compact.pop('result',None)
-        logs['V'].append(_line('V',item.status,compact))
+        # V's compact result is user-facing semantic output, not private
+        # chain-of-thought. Keep it beside behavior/finding evidence just as D
+        # keeps its recorded outcomes.
+        logs['V'].append(_line('V',item.status,item.to_dict()))
     logs['V'].append(_line('V','TIME',{'target':contract.V_o,'actual':actual.V_o,'actual_seconds':actual.V_actual_seconds,'time_verified':actual.V_time_verified}))
     logs['L'].append(_line('L','ISOLATION',{'target':contract.L_e,'actual':actual.L_e,'mismatch_blocks_delivery':contract.L_mismatch_blocks_delivery}))
     # N/R zero-actual runs still get an explicit audit fact.

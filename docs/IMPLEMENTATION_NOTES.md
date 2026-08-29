@@ -1,17 +1,13 @@
-# Berta1 Implementation Notes
+# Berta2 Implementation Notes
 
-Berta1 converts the pre-stable repository protocol into a pinned-manifest host contract. Broad local capture triggers live acquisition; only the pinned STARTUP classifies the surface. Deterministic profiles remove model-completed contract numbers, and capability negotiation distinguishes ENFORCED from ADVISORY/PROMPT_ONLY execution.
+Broad local capture triggers live acquisition; only pinned STARTUP classifies. Structural parsing is deterministic and may run before Genesis to reject malformed/ambiguous input. The full execution set is then bound, Clock Genesis starts, native intelligence fills missing task-scale values once, and the completed receipt is persisted before U0/contract freeze.
 
-The release builder derives compact model protocol, Chinese Help, full execution bundle and all personalization variants. Descriptor artifact hashes, lengths, bundle member count and ordered execution-set digest are rewritten atomically.
+`HostAdapter.preflight/start` and `LiveDIGRRun.commit_delivery` are reference host bindings, not automatically registered ChatGPT tools. Capability negotiation returns both execution mode and attestation level. Lack of host capabilities does not block model-native intellectual execution; it only denies unsupported canonical claims.
 
-The generated compact model protocol is a release/advisory artifact, not a promised runtime fetch. Manifest entry/core or their verified bundle remain executable sources. Stable delivery requires exact-byte Candidate binding and closes as DELIVERED or INCOMPLETE.
+The host runtime is an evidence exoskeleton. Strategy/Candidate/EST/Source/D/V/Completion are revisioned; wrappers validate references and state transitions, not intellectual quality. Candidate primary payload is artifact_refs[0]. Delivery schema v2 binds terminal semantic/audit state. The terminal seal makes the public workspace API immutable after DELIVERED/INCOMPLETE/ABORTED.
 
-The symbolic APIs `digr.preflight` and `digr.commit_delivery` map to `HostAdapter.preflight` / `HostAdapter.start` and `LiveDIGRRun.commit_delivery`. They are not automatically registered as ChatGPT client tools. A text-only personalization installation is therefore ADVISORY unless an external client/host binding supplies the declared capabilities and calls these boundaries.
+`runtime/routing.py`, `runtime/repository_transport.py`, `runtime/invocation_surface.py` and `runtime/parameter_resolution.py` form the deterministic boundary. None of these chooses task strategy. Semantic APIs replace raw `.events.append()` access. Wrappers validate references, not intellectual quality.
 
-## Runtime separation and persistence
+Strategy/Candidate/EST/Source/D/Completion stores remain revisioned, with V as an additional private ledger. Source work is bound to formal SOURCE intervals through the source-activity log. Isolation facts describe available evidence; isolation receipts bind what a specific D actually used.
 
-`runtime/routing.py`, `runtime/repository_transport.py`, `runtime/invocation_surface.py`, and `runtime/parameter_resolution.py` form the deterministic host boundary. None of these chooses task strategy. Intellectual choices stay with the model while host code enforces transport, parsing, immutable bindings, state and evidence integrity.
-
-Callers use thin semantic methods instead of raw `.events.append()`. Wrappers validate references, not intellectual quality. Strategy/Candidate/EST/Source/D/Completion stores are revisioned; source work is tied to formal SOURCE intervals and a source-activity binding. Isolation facts are capability evidence, while isolation receipts bind what an individual intervention actually used.
-
-Recovery verifies hashes, indexes and state chains, but integrity alone is not time continuity. Continuous-time claims still require supported monotonic-provider and boot/session evidence.
+Generated compact model protocol, Chinese Help, execution bundle and personalization variants have single author sources. Descriptor hashes/lengths/member digests are rewritten atomically. Recovery verifies indexes and semantic cross-bindings, but integrity alone is not time continuity; cross-session time still requires an explicit clock bridge.

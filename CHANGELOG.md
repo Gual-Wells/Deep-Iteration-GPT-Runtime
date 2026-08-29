@@ -1,22 +1,31 @@
 # Changelog
 
-## 5.0.0-Berta1 — V, four-clock and local-audit integration candidate
+## 5.0.0-Berta2 — V, four-clock and local-audit integration candidate
 
-Berta1 is based on stable.1 and selectively absorbs alpha5-r3 reliability mechanisms. It is intentionally a Berta-series candidate, not a formal stable release.
+Berta2 is based on stable.1 and selectively absorbs alpha5-r3 reliability mechanisms. It is intentionally a Berta-series candidate, not a formal stable release.
 
+- restores no-group adaptive native task-scale completion; fixed N2/T0/R1/S0/D0/V0/L1 now requires explicit `standard`;
+- separates `ExecutionMode` from `AttestationLevel`, so missing HostAdapter proof never cancels model-native DIGR execution;
+- restores Alpha4 soft bare-duration meaning and accepts B/b flags with positive native T/t completion;
+- defaults adaptive source policy to REQUIRED while retaining explicit `source=auto|required|off`;
 - public parameters are `N,T,R,B,S,D,V,L`; V(o) is a persistent, qualified, semantically distant viewpoint minimum between D and L;
 - typed parameters may be reordered, flat nested labels are supported, duplicates fail, and remaining unlabeled values are unique-or-fail with candidate diagnostics;
+- policy tokens now compose with V and typed-anywhere syntax;
 - V channels have private revisioned VLedgers, no V-to-V API, positive owned V_EXCLUSIVE time and Main-sovereign reintegration;
+- semantic V is model-native and is not blocked by host `viewpoint_max`;
 - ClockJournal projects T, t, D and V clocks; D/V are excluded from T, and IDLE/META count nowhere;
+- session-only monotonic clocks may attest a single uninterrupted task;
 - D retains one public mechanism while internally supporting opaque D+, D− and Dx/D⊥ semantic directions;
 - completion can record four structured criteria while preserving migration compatibility with stable.1 assessments;
 - delivery emits content-addressed TOTAL and independent N/T/R/B/S/D/V/L local NDJSON logs;
 - MCP, dynamic UI, PWA, remote bridge and backend implementation branches are absent;
-- ClockJournal appends are durable before in-memory publication; stable.1 exact-candidate and two-phase fail-closed delivery remain intact.
+- current Candidate delivery accepts only its own primary payload; extra old artifact refs cannot substitute it;
+- delivery schema v2 binds terminal semantic/audit state, and a terminal seal rejects post-delivery V/state mutation;
+- ClockJournal appends remain durable before in-memory publication; two-phase fail-closed delivery remains intact.
 
 ## Inherited stable.1 pinned-manifest foundation
 
-Berta1 preserves the validated 5.0 execution foundation while making the pinned navigation boundary explicit.
+Berta2 preserves the validated 5.0 execution foundation while making the pinned navigation boundary explicit.
 
 ### Authority and distribution
 

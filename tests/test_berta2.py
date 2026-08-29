@@ -10,7 +10,7 @@ from runtime.strategy_store import StrategyState
 from tests.helpers import authority,FakeClock,persist_enforced_host_receipts,protocol_load_receipt,stable_preflight_parameters
 
 
-class TestBerta1(unittest.TestCase):
+class TestBerta2(unittest.TestCase):
     def test_canonical_and_flat_typed_parameters(self):
         canonical=resolve_stable_parameter_surface('(3,5min,2,1,S(1,30s,1,0),D(2),V(4),L(3))')
         self.assertEqual(canonical.status,ResolutionStatus.RESOLVED)
@@ -27,16 +27,17 @@ class TestBerta1(unittest.TestCase):
         self.assertIn('candidates:',ambiguous.reason)
 
     def test_v_clock_qualification_logs_proof_and_recovery(self):
-        message='DIGR(N=0,T=0s,R=0,B=0,S(0,0s,0,0),D(0),V(1),L(1)):task'
+        message='DIGR(source=off,N=0,T=0s,R=0,B=0,S(0,0s,0,0),D(0),V(1),L(1)):task'
         parameters=stable_preflight_parameters(message)
         contract=EffectiveContract(0,0,0,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed local task',False,1)
         with tempfile.TemporaryDirectory() as td:
-            clock=FakeClock();run=LiveDIGRRun.start(authority(),message,Path(td),clock,run_id='digr-berta100')
+            clock=FakeClock();run=LiveDIGRRun.start(authority(),message,Path(td),clock,run_id='digr-berta200')
             run.bind_protocol_load(protocol_load_receipt());run.bind_preflight_parameters(parameters)
             persist_enforced_host_receipts(run);run.freeze_u0();run.freeze_contract(contract)
             run.transition(WorkState.MAIN,clock());run.save_strategy(StrategyState(0,'model','route'))
             run.save_candidate_bytes(b'final',summary='final')
             run.open_viewpoint('V1','an orthogonal domain model')
+            run.open_viewpoint('V2','an unresolved alternate model')
             run.transition(WorkState.V_EXCLUSIVE,clock(),active_v_ids=('V1',))
             run.record_viewpoint_event('V1','transfer a distant invariant','found a useful boundary')
             run.transition(WorkState.MAIN,clock())
@@ -50,10 +51,21 @@ class TestBerta1(unittest.TestCase):
             run.finish_time(clock());actual=run.actuals()
             self.assertEqual(actual.V_o,1);self.assertGreater(actual.V_actual_seconds,0);self.assertTrue(actual.V_time_verified)
             run.commit_delivery(b'final',media_type='text/plain')
+            with self.assertRaisesRegex(RuntimeError,'V discard requires EXECUTING'):
+                run.discard_viewpoint('V2','must not mutate terminal ledger')
+            self.assertEqual(run.viewpoints.get('V2').status,'OPEN')
             proof=run.render_proof();self.assertIn('V（1）/V（1）',proof);self.assertIn('（+',proof)
             for name in ('TOTAL','N','T','R','B','S','D','V','L'):
                 self.assertTrue(run.workspace.path(f'logs/{name}.ndjson').is_file())
             self.assertTrue(verify_run_workspace(run.workspace.root,run.run_id)['integrity_ok'])
+
+    def test_policy_tokens_compose_with_v(self):
+        profile=resolve_stable_parameter_surface('(profile=standard,V(1))')
+        hard=resolve_stable_parameter_surface('(min=10min,V(1))')
+        off=resolve_stable_parameter_surface('(source=off,V(1))')
+        self.assertEqual((profile.status,profile.V_o,profile.N),(ResolutionStatus.RESOLVED,1,2))
+        self.assertEqual((hard.status,hard.V_o,hard.T_seconds,hard.B),(ResolutionStatus.RESOLVED,1,600,1))
+        self.assertEqual((off.status,off.V_o,off.source_policy),(ResolutionStatus.RESOLVED,1,'off'))
 
 
 if __name__=='__main__':unittest.main()

@@ -1,4 +1,4 @@
-"""Safe explicit run-workspace storage for DIGR 5.0.0-Berta1.
+"""Safe explicit run-workspace storage for DIGR 5.0.0-Berta2.
 
 The workspace is a persistence substrate, not a decision engine. Its integrity
 index lets recovery detect revision/hash drift between stores.
@@ -21,8 +21,9 @@ REQUIRED_GENESIS_FILES = (
     'authority.json','invocation.json','startup.json','time/clock.journal.ndjson',
     'state/artifact-index.json','state/run-phase.json',
 )
-STATE_DIRECTORIES = ('time','sources','dictator','evidence','final','state')
+STATE_DIRECTORIES = ('time','sources','dictator','viewpoints','logs','evidence','final','state')
 _INDEX_PATH = 'state/artifact-index.json'
+TERMINAL_SEAL_PATH = 'state/terminal-seal.json'
 
 
 def validate_run_id(run_id: str) -> str:
@@ -99,7 +100,11 @@ class RunWorkspace:
             raise ValueError('workspace path escape')
         return out
 
-    def atomic_write_bytes(self, rel: str, data: bytes) -> str:
+    def _assert_mutable(self,rel:str)->None:
+        if self.path(TERMINAL_SEAL_PATH).is_file():
+            raise RuntimeError(f'terminal workspace is sealed; mutation rejected: {rel}')
+
+    def _atomic_write_bytes_unchecked(self,rel:str,data:bytes)->str:
         if not isinstance(data, (bytes, bytearray)):
             raise TypeError('data must be bytes')
         dest = self.path(rel)
@@ -112,6 +117,10 @@ class RunWorkspace:
         finally:
             if os.path.exists(tmp): os.unlink(tmp)
         return sha256_bytes(bytes(data))
+
+    def atomic_write_bytes(self, rel: str, data: bytes) -> str:
+        self._assert_mutable(rel)
+        return self._atomic_write_bytes_unchecked(rel,data)
 
     def write_json(self, rel: str, value: Any, *, kind: str='json', revision: int | None=None, last_event_ref: str | None=None) -> str:
         digest=self.atomic_write_bytes(rel, canonical_json_bytes(value))
@@ -146,9 +155,10 @@ class RunWorkspace:
 
     def _write_index(self, mapping: dict[str, dict[str, Any]]) -> None:
         payload={'schema_version':1,'run_id':self.run_id,'artifacts':[mapping[k] for k in sorted(mapping)]}
-        self.atomic_write_bytes(_INDEX_PATH, canonical_json_bytes(payload))
+        self._atomic_write_bytes_unchecked(_INDEX_PATH, canonical_json_bytes(payload))
 
     def index_existing(self, rel: str, *, kind: str, revision: int | None=None, last_event_ref: str | None=None, expected_digest: str | None=None) -> ArtifactRecord:
+        self._assert_mutable(rel)
         rel=require_nonempty_text('artifact path',rel)
         kind=require_nonempty_text('artifact kind',kind)
         if revision is not None: require_nonnegative_int('revision',revision)
@@ -160,6 +170,29 @@ class RunWorkspace:
             raise ValueError('artifact digest changed before indexing')
         rec=ArtifactRecord(rel,digest,kind,revision,last_event_ref)
         items=self._load_index(); items[rel]=rec.to_dict(); self._write_index(items)
+        return rec
+
+    @property
+    def terminal_sealed(self)->bool:
+        return self.path(TERMINAL_SEAL_PATH).is_file()
+
+    def seal_terminal(self,*,phase:str,binding_sha256:str)->ArtifactRecord:
+        """Persist the final API mutation barrier after all terminal artifacts."""
+        if self.terminal_sealed:raise RuntimeError('terminal workspace is already sealed')
+        phase=require_nonempty_text('terminal phase',phase)
+        if phase not in ('DELIVERED','INCOMPLETE','ABORTED'):
+            raise ValueError('only terminal phases may seal a workspace')
+        binding_sha256=require_nonempty_text('binding_sha256',binding_sha256).lower()
+        if len(binding_sha256)!=64 or any(ch not in '0123456789abcdef' for ch in binding_sha256):
+            raise ValueError('binding_sha256 must be 64 lowercase hex')
+        payload={'schema_version':1,'run_id':self.run_id,'phase':phase,'binding_sha256':binding_sha256}
+        data=canonical_json_bytes(payload)
+        # Write and index as one final mutation. _write_index deliberately uses
+        # the unchecked primitive so the just-created seal can index itself.
+        digest=self._atomic_write_bytes_unchecked(TERMINAL_SEAL_PATH,data)
+        items=self._load_index()
+        rec=ArtifactRecord(TERMINAL_SEAL_PATH,digest,'terminal-seal')
+        items[TERMINAL_SEAL_PATH]=rec.to_dict();self._write_index(items)
         return rec
 
     def artifact_records(self) -> tuple[ArtifactRecord,...]:

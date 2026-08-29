@@ -25,7 +25,7 @@
           "minLength": 1
         },
         "version": {
-          "const": "5.0.0-Berta1"
+          "const": "5.0.0-Berta2"
         },
         "repository_full_name": {
           "const": "Gual-Wells/Deep-Iteration-GPT-Runtime"

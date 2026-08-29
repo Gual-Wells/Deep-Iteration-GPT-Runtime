@@ -1,7 +1,7 @@
-# Clock Reliability — Berta1
+# Clock Reliability
 
-The standard profile has no T/t time requirement. Hard time exists only through explicit `min=<duration>` and requires continuous trusted monotonic-clock capability during local preflight. `target=<duration>` is soft. ClockJournal projects `T=MAIN+SOURCE`, `t=SOURCE`, `D=D_EXCLUSIVE`, and `V=V_EXCLUSIVE`; META/IDLE count nowhere and D/V never inflate T.
+Adaptive completion may select soft or hard T/t. A lone duration and `target=` are soft; only `min=` or B/b=1 is hard. B/b without explicit time requires native positive completion.
 
-Clock Genesis happens after parameter/capability preflight and descriptor artifact verification, immediately before workspace creation. Only substantive MAIN/SOURCE intervals count. META, transport, waiting, polling, journaling, mechanical rewriting and exclusive D never pad time.
+ClockJournal projects T=MAIN+SOURCE, t=SOURCE, D=D_EXCLUSIVE and V=V_EXCLUSIVE. META/IDLE count nowhere; waiting and sleep never pad time. A trusted session-only monotonic clock can attest one uninterrupted execution. Resume or cross-session claims require provider/boot continuity evidence.
 
-Cross-session continuity requires matching provider and non-empty boot identity. Unknown continuity stays unknown; proof never estimates or rounds actual time upward.
+Capability absence does not stop MODEL_NATIVE work. It changes affected actuals to unknown/unattested and prevents canonical time proof. D/V timing in the canonical host path is exclusive; concurrent background D remains deferred until it has an independent noncontaminating ledger.

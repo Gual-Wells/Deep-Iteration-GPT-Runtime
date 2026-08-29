@@ -1,7 +1,7 @@
-# Stable Profile — No Semantic Parameter Completion
+# Adaptive Native Parameter Completion
 
-Berta1 does not ask the model to fill missing numeric parameters. `digr.preflight` applies a deterministic profile and explicit parser overlays before Genesis. The resulting parameter receipt is persisted exactly; the model may not lower, shift, remap or “improve” it.
+Berta2 restores Alpha4's responsibility boundary. Deterministic helpers map syntax, defaults for B/b/L, explicit policies and ambiguity; they do not impose one workload on unrelated tasks. Native intelligence completes every missing task-scale N/T/R/n/t/r/D/V value once from exact U0, task complexity, available environment and user constraints.
 
-The standard profile fixes N=2, R=1, T=0 with no time requirement, source=auto, D=0, V=0 and L1. Actual N/R/source/D/V work may exceed minima when result quality warrants. `D(0)` and `V(0)` are zero minima, never disable switches. `source=auto` may select real source work or an evidence-backed WAIVED disposition.
+Completion happens only after the pinned execution set is available. It must be internally coherent, proportionate and non-degenerate when B/b is hard. It cannot overwrite an explicit value, remap positional meaning, weaken a hard policy or leave a missing field. The completed receipt is persisted before U0 and Effective Contract freeze.
 
-Semantic judgment remains responsible for strategy, candidate quality, source choice and whether further work materially improves the result—not for inventing contract numbers.
+Explicit `standard` remains a deterministic escape hatch: N2/T0/R1/S0/D0/V0/L1/source-auto. It is not the no-parameter default. Actual work may exceed minima when quality warrants; D(0)/V(0) are not off switches.

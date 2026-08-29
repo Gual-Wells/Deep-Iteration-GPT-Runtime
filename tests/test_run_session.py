@@ -35,9 +35,10 @@ class TestRunSession(unittest.TestCase):
         run.completion.assess('quality complete');run.finish_time(c());return run,c
     def test_genesis_precedes_parameter_u0_contract(self):
         with tempfile.TemporaryDirectory() as td:
-            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR：任务',Path(td),c,run_id='digr-12345678');self.assertEqual(run.phase.phase,RunPhase.GENESIS);self.assertGreaterEqual(len(run.clock_journal.events),3)
+            message='DIGR(profile=standard,source=off)：任务'
+            c=FakeClock();run=LiveDIGRRun.start(authority(),message,Path(td),c,run_id='digr-12345678');self.assertEqual(run.phase.phase,RunPhase.GENESIS);self.assertGreaterEqual(len(run.clock_journal.events),3)
             with self.assertRaises(RuntimeError):run.freeze_u0('任务')
-            run.bind_protocol_load(protocol_load_receipt());run.bind_preflight_parameters(stable_preflight_parameters('DIGR:task'));run.freeze_u0();run.freeze_contract(EffectiveContract(2,0,1,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed transformation'))
+            run.bind_protocol_load(protocol_load_receipt());run.bind_preflight_parameters(stable_preflight_parameters(message));run.freeze_u0();run.freeze_contract(EffectiveContract(2,0,1,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed transformation'))
             self.assertEqual(run.phase.phase,RunPhase.CONTRACT_FROZEN)
     def test_parameter_resolution_requires_verified_protocol_load_receipt(self):
         with tempfile.TemporaryDirectory() as td:
@@ -157,7 +158,7 @@ class TestRunSession(unittest.TestCase):
             run.save_strategy(StrategyState(0,'m','r'));run.save_candidate_bytes(b'final',summary='final');run.completion.assess('ready');run.finish_time(c());self.assertTrue(run.delivery_ready())
     def test_u0_contract_single_freeze(self):
         with tempfile.TemporaryDirectory() as td:
-            message='DIGR:x';resolved=stable_preflight_parameters(message)
+            message='DIGR(profile=standard,source=off):x';resolved=stable_preflight_parameters(message)
             c=FakeClock();run=LiveDIGRRun.start(authority(),message,Path(td),c,run_id='digr-12345678');run.bind_protocol_load(protocol_load_receipt());run.bind_preflight_parameters(resolved);run.freeze_u0()
             with self.assertRaises(RuntimeError):run.freeze_u0('y')
             k=EffectiveContract(2,0,1,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed');run.freeze_contract(k)
@@ -198,9 +199,9 @@ class TestRunSession(unittest.TestCase):
 
     def test_final_summary_semantic_tamper_rejected_after_reindex(self):
         with tempfile.TemporaryDirectory() as td:
-            run,c=self.complete_run(td);run.write_run_summary(b'candidate result');rel='final/run-summary.json';d=run.workspace.read_json(rel);d['delivery_ready']=not d['delivery_ready'];run.workspace.write_json(rel,d,kind='run-summary')
-            with self.assertRaisesRegex(ValueError,'run summary.*(drift|disagrees|describe)'):
-                verify_run_workspace(run.workspace.root,run.run_id)
+            run,c=self.complete_run(td);run.write_run_summary(b'candidate result');rel='final/run-summary.json';d=run.workspace.read_json(rel);d['delivery_ready']=not d['delivery_ready']
+            with self.assertRaisesRegex(RuntimeError,'terminal workspace is sealed'):
+                run.workspace.write_json(rel,d,kind='run-summary')
 
     def test_reintegration_clock_binding_is_semantically_verified(self):
         with tempfile.TemporaryDirectory() as td:
@@ -208,10 +209,8 @@ class TestRunSession(unittest.TestCase):
             d_exclusive=next(e.record_hash for e in run.clock_journal.events if e.event=='STATE' and e.state is WorkState.D_EXCLUSIVE)
             d['reintegration']['clock_event_ref']=d_exclusive
             rev=item.state_revision
-            run.workspace.write_json(f'dictator/D1-r{rev:04d}.json',d,kind='d-intervention',revision=rev)
-            run.workspace.write_json('dictator/D1.json',d,kind='d-intervention-latest',revision=rev)
-            with self.assertRaisesRegex(ValueError,'reintegration must bind MAIN'):
-                verify_run_workspace(run.workspace.root,run.run_id)
+            with self.assertRaisesRegex(RuntimeError,'terminal workspace is sealed'):
+                run.workspace.write_json(f'dictator/D1-r{rev:04d}.json',d,kind='d-intervention',revision=rev)
 
     def test_artifact_tamper_detected(self):
         with tempfile.TemporaryDirectory() as td:

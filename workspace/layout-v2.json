@@ -54,6 +54,7 @@
     "evidence/index.json": "schemas/evidence-index.schema.json",
     "state/gaps/*-r*.json": "schemas/completion-gap.schema.json",
     "state/completion.json": "schemas/completion-state.schema.json",
+    "state/terminal-seal.json": "schemas/terminal-seal.schema.json",
     "final/delivery.bin": "binary",
     "final/run-summary.json": "schemas/run-summary.schema.json",
     "final/stable-proof.json": "schemas/stable-proof.schema.json",

@@ -1,4 +1,4 @@
-"""Typed DIGR 5.0.0-Berta1 Effective Contract.
+"""Typed DIGR 5.0.0-Berta2 Effective Contract.
 
 The Effective Contract freezes contract commitments, never an execution
 strategy. Count/D fields are minima; T/t are B/b-governed timing targets. All

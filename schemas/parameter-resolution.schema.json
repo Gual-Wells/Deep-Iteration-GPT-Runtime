@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/parameter-resolution.schema.json",
-  "title": "DIGR 5.0 Stable Parameter Resolution",
+  "title": "DIGR 5.0 Berta2 Structural or Completed Parameter Resolution",
   "type": "object",
   "required": [
     "status",
@@ -99,7 +99,7 @@
       "minimum": 0
     },
     "V_o": {
-      "type": "integer",
+      "type": ["integer", "null"],
       "minimum": 0
     },
     "L_e": {
@@ -125,40 +125,5 @@
       "enum": ["auto", "required", "off"]
     }
   },
-  "allOf": [
-    {
-      "if": {"properties": {"status": {"const": "RESOLVED"}}},
-      "then": {
-        "properties": {
-          "N": {"type": "integer", "minimum": 0},
-          "T_seconds": {"type": "number", "minimum": 0},
-          "R": {"type": "integer", "minimum": 0},
-          "D_s": {"type": "integer", "minimum": 0},
-          "V_o": {"type": "integer", "minimum": 0},
-          "S": {
-            "properties": {
-              "n": {"type": "integer", "minimum": 0},
-              "t_seconds": {"type": "number", "minimum": 0},
-              "r": {"type": "integer", "minimum": 0}
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {"properties": {"status": {"const": "RESOLVED"}, "B": {"const": 1}}, "required": ["status", "B"]},
-      "then": {"properties": {"T_seconds": {"type": "number", "exclusiveMinimum": 0}}}
-    },
-    {
-      "if": {
-        "properties": {
-          "status": {"const": "RESOLVED"},
-          "S": {"properties": {"b": {"const": 1}}, "required": ["b"]}
-        },
-        "required": ["status", "S"]
-      },
-      "then": {"properties": {"S": {"properties": {"t_seconds": {"type": "number", "exclusiveMinimum": 0}}}}}
-    }
-  ],
   "additionalProperties": false
 }

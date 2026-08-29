@@ -1,15 +1,11 @@
 # Local Personalization Guide
 
-The local configuration is a version-neutral transport shell generated from `local-personalization/PERSONALIZATION_TEMPLATE.txt`. It contains no DIGR invocation, parameter, execution, delivery or proof semantics.
+The local configuration is a version-neutral transport shell generated from `local-personalization/PERSONALIZATION_TEMPLATE.txt`. It contains no invocation, parameter, execution, delivery or proof semantics.
 
-Local routing removes leading whitespace only. Every remainder beginning with exact uppercase ASCII `DIGR` or exact `深度迭代` is broadly captured and must perform real repository acquisition before any user-visible reply or task explanation. `digr` and `Digr` are not captured. The local shell must not inspect help, task, parameters, parentheses or punctuation and must not return NATIVE/INVALID itself.
+It removes leading whitespace only; candidates are broadly captured when the remainder starts with exact uppercase ASCII `DIGR` or exact `深度迭代`. The local layer must not inspect help, task, parameters, parentheses or punctuation and must not return NATIVE/INVALID itself. Every candidate performs real repository acquisition before user-visible reply. Resolve `Gual-Wells/Deep-Iteration-GPT-Runtime:stable` to a full SHA: an existing connector reads current branch HEAD; direct REST requires branch and Git-ref agreement. Search/index/crawl data is never ref authority.
 
-Resolve `Gual-Wells/Deep-Iteration-GPT-Runtime:stable` to a full commit SHA. An existing connector reads the current stable branch HEAD. Direct REST reads both branch and Git-ref endpoints in the same attempt and requires identical SHAs. Search/index/crawl material is never ref authority.
+At the SHA, verify pinned `manifest.json`/`VERSION`, then load the complete `startup_slice`. Pinned STARTUP classifies the untouched message; NATIVE returns it to ordinary ChatGPT, while HELP/EXECUTING follow manifest navigation. Runtime descriptor is later metadata, not authority.
 
-At that SHA, read pinned `manifest.json` and `VERSION` first and require version agreement. Load the entire `startup_slice`; Berta1 uses only self-contained `entry/STARTUP.md`. Pinned STARTUP classifies the untouched original message: NATIVE returns it to ordinary ChatGPT, HELP follows `manifest.help`, and EXECUTING follows `entrypoint`/`core[]` or their exact verified bundle. The runtime descriptor is a later execution/release description, not navigation authority.
+The configuration does not install a native HostAdapter. That no longer means the DIGR task is downgraded: pinned execution semantics run MODEL_NATIVE, while actuals requiring unavailable host evidence are `?` and attestation is NONE/PARTIAL. Only canonical delivery needs native persistence, clocks and final-output interposition. Client behavior may still differ, so stable promotion requires cross-client black-box evidence.
 
-This configuration does not itself install a native iOS/Web/Desktop HostAdapter. If the client cannot expose the logical `digr.preflight` and `digr.commit_delivery` boundaries with persistent state, trusted clock and final-output interposition, the task must be labeled `DIGR~` ADVISORY with no canonical proof. Client behavior may differ even with identical text configuration; only a real host binding can make ENFORCED behavior portable.
-
-Only a real attempt followed by a missing, conflicting or untrusted required repo/ref/SHA/manifest/VERSION/path supports `DIGR 路由失败：未取得仓库运行协议`. No attempt is not route-failure evidence.
-
-Run `python tools/build_release.py --prepare-only` after editing the template. Compact, FREE_GO and root standalone outputs must be byte-identical; all generated configurations end with the truncation sentinel.
+Only a real failed/conflicting/untrusted required acquisition supports `DIGR 路由失败：未取得仓库运行协议`. No attempt is not route-failure evidence. Run `python tools/build_release.py --prepare-only` after template edits; compact, FREE_GO and root standalone outputs are byte-identical and sentinel-terminated.

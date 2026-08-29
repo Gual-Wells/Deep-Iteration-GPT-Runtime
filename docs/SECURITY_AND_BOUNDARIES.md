@@ -1,6 +1,6 @@
 # Security, Authority and Intelligence Boundaries
 
-Repository pinning prevents context from redefining protocol semantics. Berta1 treats transport provenance as part of the trust boundary: search snippets, crawled/indexed pages and Memory cannot be relabeled as a live mutable-ref observation. An existing connector reads the current stable branch HEAD. Direct REST requires same-attempt branch and Git-ref observations with identical full SHAs.
+Repository pinning prevents context from redefining protocol semantics. Berta2 treats transport provenance as part of the trust boundary: search snippets, crawled/indexed pages and Memory cannot be relabeled as a live mutable-ref observation. An existing connector reads the current stable branch HEAD. Direct REST requires same-attempt branch and Git-ref observations with identical full SHAs.
 
 The transport adapter requests cache revalidation for mutable reads. Direct endpoint disagreement fails closed rather than selecting whichever observation appears newer. Pinned manifest/VERSION agreement and complete startup-slice loading precede semantic classification.
 

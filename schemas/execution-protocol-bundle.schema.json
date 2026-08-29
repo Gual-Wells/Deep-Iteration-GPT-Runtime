@@ -6,7 +6,7 @@
   "required": ["schema_version", "version", "protocol", "members"],
   "properties": {
     "schema_version": {"const": 1},
-    "version": {"const": "5.0.0-Berta1"},
+    "version": {"const": "5.0.0-Berta2"},
     "protocol": {"const": "digr-v5.0"},
     "members": {
       "type": "array",

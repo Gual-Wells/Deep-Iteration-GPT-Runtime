@@ -1,4 +1,4 @@
-"""Revisioned, non-authoritative Strategy State for DIGR 5.0.0-Berta1.
+"""Revisioned, non-authoritative Strategy State for DIGR 5.0.0-Berta2.
 
 A strategy snapshot records the model's current working approach. It never
 contains a scheduler field such as next_step/score/priority and never gains the
