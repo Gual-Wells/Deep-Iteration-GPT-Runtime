@@ -37,6 +37,21 @@
     "B": 0,
     "b": 0,
     "L_e": 1,
+    "all_omitted_contract": {
+      "N": 3,
+      "T_seconds": 180,
+      "R": 5,
+      "B": 1,
+      "S": {
+        "n": 3,
+        "t_seconds": 60,
+        "r": 5,
+        "b": 1
+      },
+      "D_s": 3,
+      "L_e": 1
+    },
+    "all_omitted_precedence": "canonical_contract_before_partial_defaults",
     "semantic_completion": [
       "N",
       "T",
@@ -146,6 +161,7 @@
     "preserve_original_task": true,
     "preserve_native_capabilities": true,
     "semantic_default_completion": true,
+    "all_omitted_uses_canonical_contract": true,
     "effective_contract_freeze": true,
     "no_algorithmic_tree_controller": true,
     "est_is_working_state_memory_only": true,

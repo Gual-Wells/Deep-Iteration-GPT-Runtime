@@ -8,7 +8,7 @@ Keep `P_run`, raw-message binding, U0 and the frozen Effective Contract immutabl
 
 ## META before substantive work
 
-After genesis, resolve the parameter header using `core/11_PARAMETER_FORMAT_AND_RESOLUTION.md`. AMBIGUOUS/INVALID aborts before U0. If RESOLVED, freeze faithful U0; semantically complete missing N/T/R/n/t/r/s according to task scale; determine SourceDisposition and host isolation capability; freeze the Effective Contract with count/D minima and B/b-governed timing targets. META must not pre-solve the task or freeze a detailed strategy.
+After genesis, resolve the parameter header using `core/11_PARAMETER_FORMAT_AND_RESOLUTION.md`. AMBIGUOUS/INVALID aborts before U0. If RESOLVED, freeze faithful U0. If the invocation parameter surface is wholly omitted—`DIGR：task`, `DIGR()：task`, or Chinese-alias equivalents with no parameter token or S/D/L marker—instantiate the canonical all-omitted contract `DIGR(3,3min,5,1,S(3,1min,5,1),D(3),L(1))`. Otherwise apply the fixed partial defaults and semantically complete remaining N/T/R/n/t/r/s from U0 plus all explicit parameters. Then determine SourceDisposition and host isolation capability, and freeze the Effective Contract with count/D minima and B/b-governed timing targets. META must not pre-solve the task or freeze a detailed strategy.
 
 ## MAIN begins with revisable strategy
 
