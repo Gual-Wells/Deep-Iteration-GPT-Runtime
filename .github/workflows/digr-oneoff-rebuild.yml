@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - digr-defaults-build-20260916
+  pull_request:
+    branches:
+      - stable
 
 permissions:
   contents: write
