@@ -1,6 +1,6 @@
 # Repository transport
 
-Alpha 4 keeps repository transport outside DIGR execution semantics and makes transport mode explicit.
+Alpha 5 retains repository transport outside DIGR execution semantics and keeps transport mode explicit.
 
 ## Admissible mutable-ref sources
 
@@ -16,7 +16,7 @@ After stable resolves to one SHA, every later resource is read at that exact SHA
 
 The first immutable stage remains deliberately small: `manifest.json`, `VERSION`, then `startup_slice`. This preserves cheap NATIVE/HELP/INVALID classification and keeps Clock Genesis at the same early boundary.
 
-For EXECUTING, Alpha 4 separates **logical protocol modularity** from **physical transport count**. The repository continues to maintain one entrypoint and 17 core source files, but the release builder deterministically generates `bundle/EXECUTION_PROTOCOL.json`. After Clock Genesis the host fetches this single pinned bundle, verifies that it contains exactly the manifest-declared entrypoint/core members in order with matching byte lengths and SHA-256 digests, and persists an `ExecutingProtocolLoadReceipt`. Parameter resolution cannot start without that receipt.
+For EXECUTING, Alpha 5 retains the separation between **logical protocol modularity** and **physical transport count**. The repository continues to maintain one entrypoint and 17 core source files, but the release builder deterministically generates `bundle/EXECUTION_PROTOCOL.json`. After Clock Genesis the host fetches this single pinned bundle, verifies that it contains exactly the manifest-declared entrypoint/core members in order with matching byte lengths and SHA-256 digests, and persists an `ExecutingProtocolLoadReceipt`. Parameter resolution cannot start without that receipt.
 
 Older staged manifests without an execution bundle remain compatible by loading their entrypoint/core individually and normalizing those verified files into the same receipt shape.
 
