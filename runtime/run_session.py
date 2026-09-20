@@ -1,4 +1,4 @@
-"""DIGR 5.0 Alpha 4 Native Assist run session.
+"""DIGR 5.0 Alpha 5 Native Assist run session.
 
 The session is a reliability exoskeleton. It freezes authority/U0/minimum
 commitments and binds timing/evidence/state, while leaving task strategy and
@@ -87,7 +87,7 @@ class LiveDIGRRun:
     @classmethod
     def start(cls,authority:ProtocolAuthority,message:str,workspace_parent:Path|None=None,snapshot_fn:Callable[[],ClockSnapshot]=snapshot,run_id:str|None=None):
         surface=classify_surface(message)
-        if surface is None or surface.kind is not InvocationKind.EXECUTING:raise RunGenesisError('SURFACE','message is not an executing DIGR 5.0 Alpha4 invocation')
+        if surface is None or surface.kind is not InvocationKind.EXECUTING:raise RunGenesisError('SURFACE','message is not an executing DIGR 5.0 Alpha 5 invocation')
         try: startup=start_task(authority,surface,snapshot_fn)
         except Exception as exc:raise RunGenesisError('CLOCK',str(exc)) from exc
         rid=run_id or ('digr-'+uuid.uuid4().hex);parent=Path(workspace_parent) if workspace_parent is not None else Path(tempfile.gettempdir())/'.digr-runs';ws=None
