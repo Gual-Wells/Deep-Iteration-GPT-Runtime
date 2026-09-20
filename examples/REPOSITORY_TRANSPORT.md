@@ -1,6 +1,6 @@
 # Repository transport example
 
-For a candidate `DIGR/help` or executing invocation, Alpha 4 has two admissible mutable-ref modes.
+For a candidate `DIGR/help` or executing invocation, Alpha 5 has two admissible mutable-ref modes.
 
 Connected GitHub connector:
 
@@ -25,7 +25,7 @@ pinned:VERSION                 GET raw.githubusercontent.com/.../{SHA}/VERSION
 pinned:<startup path>          GET raw.githubusercontent.com/.../{SHA}/...
 ```
 
-After the startup slice classifies an EXECUTING invocation and Clock Genesis succeeds, the current Alpha 4 manifest declares:
+After the startup slice classifies an EXECUTING invocation and Clock Genesis succeeds, the current Alpha 5 manifest declares:
 
 ```text
 pinned:bundle/EXECUTION_PROTOCOL.json
