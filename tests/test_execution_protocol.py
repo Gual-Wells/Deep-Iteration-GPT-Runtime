@@ -6,12 +6,12 @@ SHA='a'*40
 PATHS=('entry/E.md','core/A.md')
 FILES=(('entry/E.md',b'# entry\n'),('core/A.md',b'# core\n'))
 MANIFEST={
-    'version':'5.0.0-alpha.4','protocol':'digr-v5.0','entrypoint':'entry/E.md','core':['core/A.md'],
+    'version':'5.0.0-alpha.5','protocol':'digr-v5.0','entrypoint':'entry/E.md','core':['core/A.md'],
     'execution_bundle':{'path':'bundle/EXECUTION_PROTOCOL.json','schema':1,'members':list(PATHS)},
 }
 MB=(json.dumps(MANIFEST,separators=(',',':'))+'\n').encode()
 def bundle_bytes(files=FILES):
-    obj={'schema_version':1,'version':'5.0.0-alpha.4','protocol':'digr-v5.0','members':[]}
+    obj={'schema_version':1,'version':'5.0.0-alpha.5','protocol':'digr-v5.0','members':[]}
     for p,b in files:
         obj['members'].append({'path':p,'sha256':hashlib.sha256(b).hexdigest(),'byte_length':len(b),'content':b.decode()})
     return (json.dumps(obj,sort_keys=True,separators=(',',':'))+'\n').encode()

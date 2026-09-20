@@ -1,6 +1,6 @@
-# Migration from 4.1.1 to 5.0.0 Alpha 4
+# Migration from 4.1.1 to 5.0.0 Alpha 5
 
-Alpha 4 is the current 5.0 pre-final integration baseline. Alpha 2 supplied the corrected execution/state mother-base; Alpha 3 hardened repository transport; Alpha 4 uses live black-box evidence to correct connector routing, D/L lower-bound semantics, timing terminology and canonical user presentation.
+Alpha 5 is the current 5.0 pre-final integration baseline and retains the Alpha 4 architecture. Alpha 2 supplied the corrected execution/state mother-base; Alpha 3 hardened repository transport; Alpha 4 uses live black-box evidence to correct connector routing, D/L lower-bound semantics, timing terminology and canonical user presentation.
 
 ## Stable conceptual commitments
 
@@ -16,7 +16,9 @@ Alpha 3 proved that “no acquisition attempt” cannot be treated as repository
 
 ## Parameter and timing semantics
 
-Header punctuation normalization, typed T/t and unique-or-fail mapping remain. Fixed defaults are B=0, b=0 and L1; missing N/T/R/n/t/r/s are semantically completed from U0 + explicit parameters.
+Header punctuation normalization, typed T/t and unique-or-fail mapping remain. Fixed defaults are B=1, b=1 and L1; missing N/T/R/n/t/r/s are semantically completed from U0 + explicit parameters.
+
+Alpha 5 changes the omitted timing-policy defaults to hard; explicit B=0/b=0 still selects soft timing.
 
 Alpha 4 clarifies the contract categories:
 

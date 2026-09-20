@@ -9,7 +9,7 @@ class TestSchemas(unittest.TestCase):
         for p in S.glob('*.json'):
             d=load(p.name);self.assertEqual(d['$schema'],'https://json-schema.org/draft/2020-12/schema');self.assertTrue(d['$id'].endswith('/'+p.name));Draft202012Validator.check_schema(d)
     def test_manifest_alpha4_interfaces(self):
-        d=load('manifest.schema.json');self.assertEqual(d['properties']['version']['const'],'5.0.0-alpha.4');self.assertEqual(d['properties']['protocol']['const'],'digr-v5.0')
+        d=load('manifest.schema.json');self.assertEqual(d['properties']['version']['const'],'5.0.0-alpha.5');self.assertEqual(d['properties']['protocol']['const'],'digr-v5.0')
         expect={'routing_schema':4,'repository_transport_schema':3,'invocation_surface_schema':2,'parameter_resolution_schema':1,'run_session_schema':4,'workspace_schema':2,'clock_journal_schema':1,'event_receipt_schema':2}
         for k,v in expect.items():self.assertIn(k,d['required']);self.assertEqual(d['properties'][k]['const'],v)
         self.assertIn('startup_slice',d['required']);self.assertEqual(d['properties']['workspace_spec']['const'],'workspace/layout-v2.json')

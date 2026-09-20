@@ -8,8 +8,8 @@
 
 ## Fixed defaults
 只有三个直接缺省值：
-- `B = 0`（soft）
-- `b = 0`（soft）
+- `B = 1`（hard）
+- `b = 1`（hard）
 - `L(1)`（语义隔离）
 
 其余缺失的 `N/T/R/n/t/r/s` 必须由 ChatGPT 根据 U0 与**所有已给出的参数**联合判断，不允许固定 workload table、难度等级查表、正则 parser 或 deterministic helper 代替模型语义校准。
@@ -17,7 +17,7 @@
 ## Relative completion
 补全是 `P(M | U0, E)`，不是各参数独立默认。例如用户只给 `B=1` 时，模型仍需生成与任务相称的非退化 T；生成后的 T 与用户给定值具有同等合同地位，并成为 hard lower bound。`b=1` + missing t 同理。
 
-显式 `T>0` 但 B 缺失时，B 先固定缺省为 0，因此 T 是 frozen soft target，而不是机械时间下限；显式 `t>0` 但 b 缺失同理。
+显式 `T>0` 但 B 缺失时，B 先固定缺省为 1，因此 T 是 frozen hard lower bound；显式 `t>0` 但 b 缺失同理。若需要 soft target，必须显式给出 `B=0` / `b=0`。
 
 `D=0` / 语义补全得到 `s=0` 只表示 completed D 的最低要求为零，不关闭 D 机制。若模型认为非局部干预能实质改善结果，actual D 仍可大于目标。
 

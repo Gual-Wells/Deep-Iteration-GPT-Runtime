@@ -1,8 +1,12 @@
-# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.4
+# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.5
 
 **Status:** black-box corrected integration baseline intended to converge toward DIGR 5.0 final.
 
 DIGR 5.0 is a reliability exoskeleton around native model intelligence. It does not replace the model with a planner/search controller. An explicitly invoked high-investment task receives pinned protocol authority, early trusted timing, immutable U0/contract commitments, revisable strategy/source/candidate state, disruptive interventions, evidence, persistence and recovery.
+
+## Alpha 5 hard-default timing change
+
+Alpha 5 is a narrow semantic-default release over the Alpha 4 black-box corrected architecture. Omitted `B` and `b` now resolve to `1`, so semantically completed or explicitly supplied T/t targets are hard lower bounds by default. Soft timing remains available by explicitly selecting `B=0` and/or `b=0`.
 
 ## Why Alpha 4 exists
 
@@ -87,9 +91,9 @@ Deterministic release:
 
 ```bash
 python tools/build_release.py \
-  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.4.zip \
-  --personalization-output ../DIGR-5.0.0-alpha.4-CHATGPT-LOCAL-PERSONALIZATION.txt \
-  --full-personalization-output ../DIGR-5.0.0-alpha.4-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
+  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.5.zip \
+  --personalization-output ../DIGR-5.0.0-alpha.5-CHATGPT-LOCAL-PERSONALIZATION.txt \
+  --full-personalization-output ../DIGR-5.0.0-alpha.5-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
 ```
 
 The builder regenerates release metadata, rejects cross-platform path collisions/symlinks/traversal/cache artifacts, cold-extracts the ZIP, verifies all hashes and reruns the full suite + repository validator.

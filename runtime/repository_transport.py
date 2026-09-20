@@ -1,8 +1,8 @@
-"""Host-facing repository transport for DIGR 5.0.0-alpha.4.
+"""Host-facing repository transport for DIGR 5.0.0-alpha.5.
 
 Alpha 2 deliberately kept ``runtime.routing`` free of network I/O, but the
 production personalization path then had no executable bridge between a route
-obligation and the bytes consumed by the deterministic verifier.  Alpha 4
+obligation and the bytes consumed by the deterministic verifier.  Alpha 5
 closes that boundary without moving DIGR execution semantics into the local
 layer.
 
@@ -58,7 +58,7 @@ from .routing import (
 
 CONTENTS_RAW_ACCEPT = 'application/vnd.github.raw+json'
 GITHUB_JSON_ACCEPT = 'application/vnd.github+json'
-USER_AGENT = 'Deep-Iteration-GPT-Runtime/5.0.0-alpha.4'
+USER_AGENT = 'Deep-Iteration-GPT-Runtime/5.0.0-alpha.5'
 
 LIVE_SOURCE_KINDS = frozenset({'direct_https', 'github_connector'})
 FRESHNESS_LIVE_DIRECT = 'live_direct'
@@ -203,7 +203,7 @@ class UrllibDirectFetcher:
 
     Mutable-ref requests ask intermediaries to revalidate instead of serving a
     search/index snapshot.  This cannot make an external CDN mathematically
-    instantaneous, so Alpha 4 also corroborates ``stable`` with the independent
+    instantaneous, so Alpha 5 also corroborates ``stable`` with the independent
     Branches endpoint before accepting the pin.
     """
     def __init__(self, timeout: float = 15.0):

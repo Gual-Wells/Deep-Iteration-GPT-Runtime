@@ -1,4 +1,4 @@
-# DIGR 5.0 Alpha 4 — Minimal Startup Slice
+# DIGR 5.0 Alpha 5 — Minimal Startup Slice
 
 This file is deliberately small enough to load before the full protocol. It defines only repository-surface classification and the clock-genesis / full-protocol-ready boundary for the already pinned `P_run`.
 

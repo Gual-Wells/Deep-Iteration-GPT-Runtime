@@ -13,10 +13,10 @@ class TestPersonalization(unittest.TestCase):
             self.assertIn(x,self.text)
         self.assertIn('DIGR 路由失败：未取得仓库运行协议',self.text)
     def test_no_versioned_execution_copy(self):
-        for token in ('monotonic','LiveDIGRRun','P_target','B=0','b=0','L(1)','Mature Gambit','Formal Active','proof'):
+        for token in ('monotonic','LiveDIGRRun','P_target','B=0','b=0','B=1','b=1','L(1)','Mature Gambit','Formal Active','proof'):
             self.assertNotIn(token,self.text)
     def test_full_explains_transport_boundary(self):
         for x in ('Expanded Routing/Transport Reference','Candidate routing is an obligation','Mutable-ref provenance','Immutable pinned content','Staged authority handoff','Failure evidence','NATIVE'):
             self.assertIn(x,self.full)
-        self.assertNotIn('B=0',self.full)
+        self.assertNotIn('B=0',self.full); self.assertNotIn('B=1',self.full)
 if __name__=='__main__':unittest.main()

@@ -1,6 +1,8 @@
-# Alpha 4 Implementation Notes
+# Alpha 5 Implementation Notes
 
-Alpha 4 is a black-box integration correction release over the Alpha 3 transport-hardened baseline.
+Alpha 5 is a narrow hard-default timing correction over the Alpha 4 black-box integration baseline.
+
+The only contract-policy change in Alpha 5 is the omitted timing-policy default: deterministic parameter resolution now supplies `B=1` and `b=1`. Explicit `B=0` / `b=0` retains the Alpha 4 soft-target behavior. The underlying soft/hard stop mechanics are unchanged.
 
 ## Repository transport
 

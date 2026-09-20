@@ -1,4 +1,4 @@
-# DIGR 5.0 Alpha 4 Test Matrix
+# DIGR 5.0 Alpha 5 Test Matrix
 
 The suite covers protocol invariants plus live black-box defects observed through Alpha 3 deployment.
 
@@ -18,7 +18,7 @@ The suite covers protocol invariants plus live black-box defects observed throug
 
 ## Parameter, contract and timing integrity
 
-12. deterministic fixed defaults B=0/b=0/L1 precede semantic completion;
+12. deterministic fixed defaults B=1/b=1/L1 precede semantic completion;
 13. typed T/t, unique-or-fail mapping, legal empty S/D/L markers and ordered D/L tail;
 14. explicit values cannot be overwritten by semantic completion;
 15. SourceDisposition is independent of S numeric minima;

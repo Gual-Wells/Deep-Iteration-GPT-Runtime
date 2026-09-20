@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 class TestRepoContract(unittest.TestCase):
     def test_version_manifest_and_corrected_interfaces(self):
-        self.assertEqual((ROOT/'VERSION').read_text().strip(),'5.0.0-alpha.4');m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['version'],'5.0.0-alpha.4');self.assertEqual(m['protocol'],'digr-v5.0');self.assertEqual(m['workspace_spec'],'workspace/layout-v2.json');self.assertEqual(m['clock_journal_schema'],1);self.assertEqual((m['routing_schema'],m['repository_transport_schema'],m['run_session_schema'],m['workspace_schema'],m['event_receipt_schema']),(4,3,4,2,2));self.assertEqual(m['invocation_surface_schema'],2);self.assertEqual(m['parameter_resolution_schema'],1)
+        self.assertEqual((ROOT/'VERSION').read_text().strip(),'5.0.0-alpha.5');m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['version'],'5.0.0-alpha.5');self.assertEqual(m['protocol'],'digr-v5.0');self.assertEqual(m['workspace_spec'],'workspace/layout-v2.json');self.assertEqual(m['clock_journal_schema'],1);self.assertEqual((m['routing_schema'],m['repository_transport_schema'],m['run_session_schema'],m['workspace_schema'],m['event_receipt_schema']),(4,3,4,2,2));self.assertEqual(m['invocation_surface_schema'],2);self.assertEqual(m['parameter_resolution_schema'],1)
     def test_two_stage_startup_is_manifested(self):
         m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['startup_slice'],['bootstrap/BOOTSTRAP.md','entry/STARTUP.md']);self.assertEqual(m['execution_bundle']['path'],'bundle/EXECUTION_PROTOCOL.json');self.assertEqual(m['execution_bundle']['members'],[m['entrypoint'],*m['core']]);t=(ROOT/'entry/STARTUP.md').read_text();self.assertIn('NATIVE | HELP | INVALID | EXECUTING',t);self.assertIn('before parameter resolution, U0 or substantive task work',t);self.assertIn('ExecutingProtocolLoadReceipt',t);self.assertIn('aborts the born run',t)
     def test_run_lifecycle_is_reliability_not_planner(self):
@@ -27,7 +27,7 @@ class TestRepoContract(unittest.TestCase):
         t=(ROOT/'entry/HELP.md').read_text();
         for x in ('## 1. 调用与路由','## 2. 参数解析顺序与缺省规则','## 3. 参数参考','## 4. Effective Contract 与来源策略','## 5. N / R / D / L','## 6. 时间与停止','## 7. 执行链与启动成本','## 8. 输出与 canonical proof','## 9. 版本与权威'):
             self.assertIn(x,t)
-        for x in ('`B=0`、`b=0`、`L(1)`','SourceDisposition','`REQUIRED`','`D(0)`','soft target','hard lower bound','actual duration 向下取整到完整秒','NATIVE'):
+        for x in ('`B=1`、`b=1`、`L(1)`','SourceDisposition','`REQUIRED`','`D(0)`','soft target','hard lower bound','actual duration 向下取整到完整秒','NATIVE'):
             self.assertIn(x,t)
     def test_pre_release_baseline_documented(self):
         t=(ROOT/'docs/PRE_RELEASE_BASELINE.md').read_text();self.assertIn('corrected integration baseline',t.lower());self.assertIn('mother-base',t);self.assertIn('Change discipline',t);self.assertIn('clock-journal',t)

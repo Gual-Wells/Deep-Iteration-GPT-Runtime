@@ -1,4 +1,4 @@
-"""Deterministic parameter-format resolution for DIGR 5.0 Alpha 4.
+"""Deterministic parameter-format resolution for DIGR 5.0 Alpha 5.
 
 This module is deliberately *not* a workload planner.  It resolves only the
 structural part of an already-routed EXECUTING invocation:
@@ -37,7 +37,7 @@ class SourceParameterResolution:
     n: int | None = None
     t_seconds: float | None = None
     r: int | None = None
-    b: int = 0
+    b: int = 1
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -49,7 +49,7 @@ class ParameterResolution:
     N: int | None = None
     T_seconds: float | None = None
     R: int | None = None
-    B: int = 0
+    B: int = 1
     S: SourceParameterResolution = SourceParameterResolution()
     D_s: int | None = None
     L_e: int = 1
@@ -85,7 +85,7 @@ class ParameterResolution:
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> 'ParameterResolution':
         sd=d.get('S') or {}
-        return cls(ResolutionStatus(d['status']),d.get('N'),d.get('T_seconds'),d.get('R'),d.get('B',0),SourceParameterResolution(sd.get('n'),sd.get('t_seconds'),sd.get('r'),sd.get('b',0)),d.get('D_s'),d.get('L_e',1),d.get('normalized_surface'),tuple(d.get('diagnostics',[])))
+        return cls(ResolutionStatus(d['status']),d.get('N'),d.get('T_seconds'),d.get('R'),d.get('B',1),SourceParameterResolution(sd.get('n'),sd.get('t_seconds'),sd.get('r'),sd.get('b',1)),d.get('D_s'),d.get('L_e',1),d.get('normalized_surface'),tuple(d.get('diagnostics',[])))
 
 
 def normalize_header_surface(text: str) -> str:
@@ -178,7 +178,7 @@ def _resolve_positional(tokens: list[str], *, source: bool=False, semantic_norma
     if len(tokens) > 4:
         return 'INVALID', None
     if not tokens:
-        return 'RESOLVED', {binary: 0}
+        return 'RESOLVED', {binary: 1}
     candidates: list[dict[str, Any]] = []
     if len(tokens) == 4:
         param_sets = [base + [binary]]
@@ -188,7 +188,7 @@ def _resolve_positional(tokens: list[str], *, source: bool=False, semantic_norma
         from itertools import combinations
         param_sets = [list(c) for c in combinations(base, len(tokens))]
     for params in param_sets:
-        values: dict[str, Any] = {binary: 0}
+        values: dict[str, Any] = {binary: 1}
         ok = True
         for p, tok in zip(params, tokens):
             good, v = _token_fits(p, tok, semantic_normalizations)
@@ -255,14 +255,14 @@ def _resolve_segment_with_labels(tokens: list[str], *, source: bool=False, seman
     candidates=[]
     def walk(i,last_idx,used,vals):
         if i==len(parsed):
-            out=dict(vals);out.setdefault(binary,0);candidates.append(out);return
+            out=dict(vals);out.setdefault(binary,1);candidates.append(out);return
         tok,lab=parsed[i]
         if lab is not None:
             p,v=lab;idx=base.index(p)
             if idx<=last_idx or p in used:return
             walk(i+1,idx,used|{p},{**vals,p:v});return
         # In a partially labeled segment B/b is never inferred positionally;
-        # it is a fixed default unless explicitly labeled.
+        # it is the fixed hard default unless explicitly labeled.
         for idx,p in enumerate(base):
             if idx<=last_idx or p in used or p==binary:continue
             good,v=_token_fits(p,tok,semantic_normalizations)
@@ -404,7 +404,7 @@ def resolve_parameter_surface(surface: str | None, semantic_normalizations: Mapp
 
     # Optional S marker is the first tail item only. Its nested values are the
     # only place where n/t/r/b positional values live.
-    svals={'b':0}
+    svals={'b':1}
     if tail_tokens:
         mark=_parse_marker(tail_tokens[0])
         if mark is not None and mark[0]=='S':
@@ -425,13 +425,13 @@ def resolve_parameter_surface(surface: str | None, semantic_normalizations: Mapp
     if dl_status is not ResolutionStatus.RESOLVED:
         return ParameterResolution(dl_status, normalized_surface=normalized, diagnostics=((dlwhy or 'D/L tail mapping failed'),))
 
-    S=SourceParameterResolution(n=svals.get('n'),t_seconds=svals.get('t'),r=svals.get('r'),b=svals.get('b',0))
+    S=SourceParameterResolution(n=svals.get('n'),t_seconds=svals.get('t'),r=svals.get('r'),b=svals.get('b',1))
     used=[]
     if semantic_normalizations:
         for raw,canon in semantic_normalizations.items():
             if raw in inner:used.append(f'semantic-normalization:{raw}=>{canon}')
     return ParameterResolution(
         ResolutionStatus.RESOLVED,
-        N=mvals.get('N'),T_seconds=mvals.get('T'),R=mvals.get('R'),B=mvals.get('B',0),
+        N=mvals.get('N'),T_seconds=mvals.get('T'),R=mvals.get('R'),B=mvals.get('B',1),
         S=S,D_s=D_s,L_e=L_e,normalized_surface=normalized,diagnostics=tuple(used),
     )

@@ -28,7 +28,7 @@ from tests.helpers import FakeClock
 SHA='a'*40
 OTHER='b'*40
 MANIFEST={
-    'version':'5.0.0-alpha.4',
+    'version':'5.0.0-alpha.5',
     'protocol':'digr-v5.0',
     'bootstrap_entry':'bootstrap/BOOTSTRAP.md',
     'entrypoint':'entry/DEEP_ITERATION_ENTRY.md',
@@ -41,13 +41,13 @@ MANIFEST={
     },
 }
 MANIFEST_BYTES=(json.dumps(MANIFEST,separators=(',',':'))+'\n').encode()
-VERSION=b'5.0.0-alpha.4\n'
+VERSION=b'5.0.0-alpha.5\n'
 LOGICAL={
     'entry/DEEP_ITERATION_ENTRY.md':b'# entry\n',
     'core/00_RESULT_SOVEREIGNTY.md':b'# core\n',
 }
 BUNDLE_BYTES=(json.dumps({
-    'schema_version':1,'version':'5.0.0-alpha.4','protocol':'digr-v5.0',
+    'schema_version':1,'version':'5.0.0-alpha.5','protocol':'digr-v5.0',
     'members':[
         {'path':p,'sha256':__import__('hashlib').sha256(b).hexdigest(),'byte_length':len(b),'content':b.decode()}
         for p,b in LOGICAL.items()

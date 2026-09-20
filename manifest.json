@@ -1,7 +1,7 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
-  "version": "5.0.0-alpha.4",
+  "version": "5.0.0-alpha.5",
   "protocol": "digr-v5.0",
   "language": "zh-CN",
   "philosophy": {
@@ -34,8 +34,8 @@
     "auto_mode_exists": false
   },
   "defaults": {
-    "B": 0,
-    "b": 0,
+    "B": 1,
+    "b": 1,
     "L_e": 1,
     "semantic_completion": [
       "N",
@@ -265,8 +265,8 @@
   "release": {
     "channel": "alpha",
     "baseline_target": "5.0.0",
-    "status": "black-box corrected integration baseline intended to converge toward DIGR 5.0 final",
-    "compatibility_intent": "Alpha 4 preserves its black-box corrected semantics while hardening post-genesis execution-protocol loading: connector/direct-REST authority remains unchanged; the manifest-declared entrypoint/core protocol is transported as one deterministic immutable bundle with a verified load receipt, and parameter resolution cannot begin without that receipt.",
+    "status": "hard-default timing correction baseline intended to converge toward DIGR 5.0 final",
+    "compatibility_intent": "Alpha 5 preserves the Alpha 4 black-box corrected authority/clock/state/transport architecture while changing omitted B/b fixed defaults from 0 (soft) to 1 (hard); explicit B=0/b=0 remains the opt-in soft timing policy.",
     "frozen_interfaces": [
       "invocation_surface_schema",
       "parameter_resolution_schema",
@@ -282,13 +282,14 @@
       "timing target semantics",
       "canonical proof/help presentation",
       "execution bundle transport",
-      "post-genesis protocol-load barrier"
+      "post-genesis protocol-load barrier",
+      "B/b fixed-default timing policy"
     ],
     "allowed_pre_final_evolution": [
       "bug fixes",
       "documentation",
       "tests",
-      "measured performance work that preserves Alpha 4 authority, clock, contract and execution semantics"
+      "measured performance work that preserves Alpha 5 authority, clock, contract and execution semantics"
     ]
   },
   "workspace_spec": "workspace/layout-v2.json",

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-VERSION='5.0.0-alpha.4'
+VERSION='5.0.0-alpha.5'
 INTERFACES={
     'routing_schema':4,
     'repository_transport_schema':3,
@@ -60,9 +60,9 @@ def main() -> None:
         'mutable_ref_policy':'connector_branch_head_or_direct_rest_branch_ref_consensus; search_index_forbidden; attempt_required_before_failure',
     }
     for k,v in expected_routing.items():
-        if routing.get(k)!=v:fail(f'Alpha4 routing transport metadata {k}')
+        if routing.get(k)!=v:fail(f'Alpha5 routing transport metadata {k}')
     for k in ('route_requires_actual_acquisition_attempt','route_failure_requires_acquisition_evidence','mutable_ref_search_index_forbidden','mutable_ref_direct_live_provenance_required','mutable_ref_ref_branch_consensus_when_using_rest','pinned_raw_sha_content_is_cache_safe','contents_api_wrapper_must_be_raw_or_decoded','repository_transport_is_host_bridge_not_execution_semantics','D_zero_means_no_minimum_not_disabled','L_applicability_follows_actual_D','timing_targets_soft_when_policy_zero','timing_targets_hard_lower_bounds_when_policy_one','canonical_proof_actual_durations_floor_to_whole_seconds','executing_protocol_bundle_preserves_logical_modularity','executing_protocol_load_receipt_required_before_parameter_resolution','post_genesis_protocol_load_failure_aborts_born_run','execution_bundle_is_immutable_sha_pinned'):
-        if m.get('policies',{}).get(k) is not True:fail(f'Alpha4 policy {k}')
+        if m.get('policies',{}).get(k) is not True:fail(f'Alpha5 policy {k}')
     for retired in ('D_zero_disables','D_zero_makes_L_nonblocking'):
         if retired in m.get('policies',{}):fail(f'retired Alpha3 D policy still present: {retired}')
 
@@ -122,17 +122,17 @@ def main() -> None:
         'DIGR 路由失败：未取得仓库运行协议',
     ):
         if token not in text:fail(f'router missing {token}')
-    for bad in ('monotonic','LiveDIGRRun','P_target','B=0','b=0','L(1)','Mature Gambit','Formal Active','proof'):
+    for bad in ('monotonic','LiveDIGRRun','P_target','B=0','b=0','B=1','b=1','L(1)','Mature Gambit','Formal Active','proof'):
         if bad in text:fail(f'compact router duplicates versioned execution semantics: {bad}')
     for token in ('Expanded Routing/Transport Reference','Candidate routing is an obligation','Mutable-ref provenance','Immutable pinned content','Staged authority handoff','Failure evidence','NATIVE'):
         if token not in full_text:fail(f'full router reference missing {token}')
-    if 'B=0' in full_text:fail('full local reference copies versioned execution defaults')
+    if any(x in full_text for x in ('B=0','b=0','B=1','b=1')):fail('full local reference copies versioned execution defaults')
 
     help_text=read_text('entry/HELP.md')
     for token in ('## 1. 调用与路由','## 2. 参数解析顺序与缺省规则','## 3. 参数参考','## 4. Effective Contract 与来源策略','## 5. N / R / D / L','## 6. 时间与停止','## 7. 执行链与启动成本','## 8. 输出与 canonical proof','## 9. 版本与权威'):
         if token not in help_text:fail(f'help missing section {token}')
-    for token in ('`B=0`、`b=0`、`L(1)`','`REQUIRED`','`D(0)`','soft target','hard lower bound','actual duration 向下取整到完整秒','ExecutingProtocolLoadReceipt','NATIVE'):
-        if token not in help_text:fail(f'help missing Alpha4 user-level rule {token}')
+    for token in ('`B=1`、`b=1`、`L(1)`','`REQUIRED`','`D(0)`','soft target','hard lower bound','actual duration 向下取整到完整秒','ExecutingProtocolLoadReceipt','NATIVE'):
+        if token not in help_text:fail(f'help missing Alpha5 user-level rule {token}')
 
     # The release claims Python >=3.10, so every Python file must parse under
     # that grammar rather than only under the builder's current interpreter.
@@ -153,7 +153,7 @@ def main() -> None:
 
     for rel in (
         'docs/PRE_RELEASE_BASELINE.md','docs/CLOCK_RELIABILITY.md','docs/RUN_SESSION_ARCHITECTURE.md',
-        'docs/MIGRATION_FROM_4.1.1.md','docs/PROTOCOL_SPEC_5.0.0-alpha.4.md','docs/TEST_MATRIX.md',
+        'docs/MIGRATION_FROM_4.1.1.md','docs/PROTOCOL_SPEC_5.0.0-alpha.5.md','docs/TEST_MATRIX.md',
         'docs/ENGINEERING_VALIDATION_LOG.md','docs/REPOSITORY_TRANSPORT.md',
     ):
         if not (ROOT/rel).is_file():fail(f'missing release documentation {rel}')
@@ -164,7 +164,7 @@ def main() -> None:
         fail('stale case-insensitive router example')
 
     for rel in ('runtime/repository_transport.py','runtime/execution_protocol.py','schemas/repository-transport-attempt.schema.json','schemas/execution-protocol-bundle.schema.json','schemas/executing-protocol-load.schema.json','tools/smoke_repository_transport.py','examples/REPOSITORY_TRANSPORT.md'):
-        if not (ROOT/rel).is_file():fail(f'missing Alpha4 transport artifact {rel}')
+        if not (ROOT/rel).is_file():fail(f'missing Alpha5 transport artifact {rel}')
     rt=read_text('runtime/repository_transport.py')
     for token in ('AcquisitionAttemptReceipt','route_failure_permitted','stable_branch_primary','stable_ref_corroboration','github_connector','acquire_execution_protocol','load_execution_protocol_for_run','application/vnd.github.raw+json','Cache-Control'):
         if token not in rt:fail(f'transport implementation missing {token}')
@@ -183,6 +183,6 @@ def main() -> None:
         if token not in rs:fail(f'run-session protocol-load barrier missing {token}')
     if 'dictator_enabled' in read_text('runtime/effective_contract.py'):fail('retired D enable/disable helper remains')
 
-    print('DIGR 5.0.0-alpha.4 black-box corrected integration baseline: OK')
+    print('DIGR 5.0.0-alpha.5 black-box corrected integration baseline: OK')
 
 if __name__=='__main__':main()

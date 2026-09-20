@@ -1,4 +1,4 @@
-# DIGR 5.0.0-alpha.4 — Deep Iteration Entry
+# DIGR 5.0.0-alpha.5 — Deep Iteration Entry
 
 This entrypoint is semantically available only after an EXECUTING surface has crossed trusted Clock Genesis and the complete pinned entrypoint/core set has been verified under the same `P_run` (normally through the manifest-declared execution bundle). The bundle is transport-only; these logical files remain the protocol authority. The full protocol never retroactively moves the clock boundary.
 
