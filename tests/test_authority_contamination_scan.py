@@ -10,7 +10,7 @@ class TestAuthorityContaminationScan(unittest.TestCase):
         start=(ROOT/'entry/STARTUP.md').read_text();router=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION.txt').read_text()
         self.assertIn('Run Genesis',start);self.assertIn('monotonic',start)
         self.assertNotIn('monotonic',router.lower());self.assertNotIn('Run Genesis',router)
-        self.assertIn('读取到 startup 指令不是完成执行',router);self.assertIn('真实实现',router)
+        self.assertIn('读取到 startup 指令不是完成执行',router);self.assertIn('实际实现',router)
     def test_transparent_index_is_pinned_structural_lens_and_not_execution(self):
         t=(ROOT/'bootstrap/INDEX.md').read_text()
         for x in ('Structure-closed, intelligence-open','not versioned execution semantics','deterministic_helpers[]','does **not** execute it','must not begin the user\'s task'):self.assertIn(x,t)
