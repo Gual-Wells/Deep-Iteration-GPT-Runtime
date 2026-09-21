@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 class TestRepoContract(unittest.TestCase):
     def test_version_manifest_and_corrected_interfaces(self):
-        self.assertEqual((ROOT/'VERSION').read_text().strip(),'5.0.0-alpha.6');m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['version'],'5.0.0-alpha.5');self.assertEqual(m['protocol'],'digr-v5.0');self.assertEqual(m['workspace_spec'],'workspace/layout-v2.json');self.assertEqual(m['clock_journal_schema'],1);self.assertEqual((m['routing_schema'],m['repository_transport_schema'],m['run_session_schema'],m['workspace_schema'],m['event_receipt_schema']),(4,3,4,2,2));self.assertEqual(m['invocation_surface_schema'],2);self.assertEqual(m['parameter_resolution_schema'],1);self.assertEqual((m['execution_commitment_schema'],m['execution_attempt_schema'],m['runtime_distribution_schema']),(1,1,1))
+        self.assertEqual((ROOT/'VERSION').read_text().strip(),'5.0.0-alpha.6');m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['version'],'5.0.0-alpha.6');self.assertEqual(m['protocol'],'digr-v5.0');self.assertEqual(m['workspace_spec'],'workspace/layout-v2.json');self.assertEqual(m['clock_journal_schema'],1);self.assertEqual((m['routing_schema'],m['repository_transport_schema'],m['run_session_schema'],m['workspace_schema'],m['event_receipt_schema']),(4,3,4,2,2));self.assertEqual(m['invocation_surface_schema'],2);self.assertEqual(m['parameter_resolution_schema'],1);self.assertEqual((m['execution_commitment_schema'],m['execution_attempt_schema'],m['runtime_distribution_schema']),(1,1,1))
     def test_indexed_staged_startup_is_manifested(self):
         m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['bootstrap_index'],'bootstrap/INDEX.md');self.assertEqual(m['startup_slice'],['bootstrap/INDEX.md','bootstrap/BOOTSTRAP.md','entry/STARTUP.md']);self.assertEqual(m['startup_slice'][0],m['bootstrap_index']);self.assertEqual(m['execution_bundle']['path'],'bundle/EXECUTION_PROTOCOL.json');self.assertEqual(m['execution_bundle']['members'],[m['entrypoint'],*m['core']]);t=(ROOT/'entry/STARTUP.md').read_text();self.assertIn('NATIVE | HELP | INVALID | EXECUTING',t);self.assertIn('before parameter resolution, U0 or substantive task work',t);self.assertIn('ExecutingProtocolLoadReceipt',t);self.assertIn('aborts the born run',t)
     def test_transparent_machine_index_is_structural_first_path(self):
@@ -44,7 +44,7 @@ class TestRepoContract(unittest.TestCase):
         self.assertIn('runtime/execution_integrity.py',m['deterministic_helpers'])
         self.assertIn('core/13_IMPLEMENTATION_EXECUTION_INTEGRITY.md',m['core'])
         t=(ROOT/'core/13_IMPLEMENTATION_EXECUTION_INTEGRITY.md').read_text()
-        for x in ('Drift inoculation','Component interrogation gate','Semantic equivalence','Implementation delivery'):
+        for x in ('Drift inoculation','Component interrogation gate','semantic equivalence','Implementation delivery'):
             self.assertIn(x,t)
 
     def test_removed_alpha1_overlap_artifacts(self):
