@@ -1,6 +1,6 @@
 # DIGR 5.0.0-alpha.5 Protocol Specification Index
 
-Normative execution semantics are the pinned `entry/DEEP_ITERATION_ENTRY.md` plus manifest `core[]`. Minimal pre-full-load behavior is the manifest `startup_slice`. `entry/HELP.md` is the canonical zh-CN user reference and does not itself start a task run.
+Normative execution semantics are the pinned `entry/DEEP_ITERATION_ENTRY.md` plus manifest `core[]`. Before startup interpretation, the manifest-declared `bootstrap_index` is loaded as a structural transparency map; it is explicitly non-semantic authority. Minimal pre-full-load behavior then follows the ordered `startup_slice`. `entry/HELP.md` is the canonical zh-CN user reference and does not itself start a task run.
 
 Alpha 5 preserves the Alpha 4 authority/clock/state/transport architecture and changes one fixed semantic default: omitted `B` and `b` now resolve to `1` (hard). Explicit `B=0` / `b=0` remains the opt-in soft timing policy. The inherited Alpha 4 correction set remains:
 
