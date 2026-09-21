@@ -6,6 +6,7 @@ README.md
 SHA256SUMS.txt
 VERSION
 bootstrap/BOOTSTRAP.md
+bootstrap/INDEX.md
 bundle/EXECUTION_PROTOCOL.json
 core/00_RESULT_SOVEREIGNTY.md
 core/05_TASK_COMMITMENT.md
