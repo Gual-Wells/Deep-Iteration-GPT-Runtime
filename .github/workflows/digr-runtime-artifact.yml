@@ -22,9 +22,18 @@ jobs:
           python-version: '3.11'
       - name: Install test dependency
         run: python -m pip install 'jsonschema>=4'
-      - name: Rebuild release metadata and cold-validate
+      - name: Rebuild release metadata and cold-validate in isolated copy
         run: |
+          rm -rf /tmp/digr-release-work
+          mkdir -p /tmp/digr-release-work
+          tar --exclude=.git -cf - . | tar -xf - -C /tmp/digr-release-work
+          cd /tmp/digr-release-work
           python tools/build_release.py --output "/tmp/Deep-Iteration-GPT-Runtime-${GITHUB_SHA}.zip"
+      - name: Import validated generated metadata
+        run: |
+          cp /tmp/digr-release-work/bundle/EXECUTION_PROTOCOL.json bundle/EXECUTION_PROTOCOL.json
+          cp /tmp/digr-release-work/FILE_TREE.txt FILE_TREE.txt
+          cp /tmp/digr-release-work/SHA256SUMS.txt SHA256SUMS.txt
       - name: Build exact-commit runtime artifact
         run: |
           mkdir -p dist
