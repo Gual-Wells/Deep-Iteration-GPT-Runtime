@@ -1,0 +1,39 @@
+name: DIGR runtime artifact
+
+on:
+  push:
+    branches:
+      - stable
+      - alpha6-execution-integrity
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Unit tests
+        run: python -m unittest discover -s tests -q
+      - name: Repository validator
+        run: python tests/validate_repo.py
+      - name: Build exact-commit runtime artifact
+        run: |
+          mkdir -p dist
+          python tools/build_runtime_artifact.py \
+            --commit-sha "${GITHUB_SHA}" \
+            --output "dist/DIGR-RUNTIME-${GITHUB_SHA}.zip"
+      - name: Upload runtime artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: digr-runtime-${{ github.sha }}
+          path: dist/DIGR-RUNTIME-${{ github.sha }}.zip
+          if-no-files-found: error
+          retention-days: 90
