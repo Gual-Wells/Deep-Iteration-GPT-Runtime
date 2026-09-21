@@ -20,12 +20,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install test dependency
+        run: python -m pip install 'jsonschema>=4'
       - name: Rebuild release metadata and cold-validate
         run: |
-          mkdir -p dist
-          python tools/build_release.py --output "dist/Deep-Iteration-GPT-Runtime-${GITHUB_SHA}.zip"
+          python tools/build_release.py --output "/tmp/Deep-Iteration-GPT-Runtime-${GITHUB_SHA}.zip"
       - name: Build exact-commit runtime artifact
         run: |
+          mkdir -p dist
           python tools/build_runtime_artifact.py \
             --commit-sha "${GITHUB_SHA}" \
             --output "dist/DIGR-RUNTIME-${GITHUB_SHA}.zip"
