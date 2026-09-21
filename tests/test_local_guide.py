@@ -4,9 +4,12 @@ ROOT=Path(__file__).resolve().parents[1]
 class TestLocalGuide(unittest.TestCase):
     @classmethod
     def setUpClass(cls):cls.t=(ROOT/'docs/LOCAL_PERSONALIZATION_GUIDE.md').read_text()
-    def test_router_is_exact_uppercase_and_thin(self):
-        for x in ('exact-uppercase `DIGR`','exact `深度迭代`','version-neutral','pins `stable`','manifest/VERSION','bootstrap index before the remaining startup slice','NATIVE','Local text must never copy N/T/R/S/D/L/time/proof semantics'):self.assertIn(x,self.t)
-    def test_broad_capture_is_not_takeover(self):self.assertIn('Broad capture is not takeover',self.t)
+    def test_router_is_plus_only_exact_and_version_neutral(self):
+        for x in ('Plus','Free/Go compatibility is intentionally not maintained','exact-uppercase `DIGR`','exact `深度迭代`','version-neutral','Local text must never copy N/T/R/S/D/L/time/stop/proof semantics'):self.assertIn(x,self.t)
+    def test_task_work_firewall(self):
+        for x in ('Pre-task execution firewall','Reading, understanding, quoting or summarizing startup is not execution','EXECUTING classification is not task-work readiness','must be actually performed'):self.assertIn(x,self.t)
+    def test_transport_fallbacks(self):
+        for x in ('new OAuth/connector','Contents API','JSON/base64 wrapper'):self.assertIn(x,self.t)
     def test_index_is_structural_not_semantic(self):
-        for x in ('first structural lens','implemented','truth sources','does **not** copy versioned DIGR execution semantics'):self.assertIn(x,self.t)
+        for x in ('first structural lens','implemented helpers','truth sources','without defining versioned DIGR execution semantics'):self.assertIn(x,self.t)
 if __name__=='__main__':unittest.main()
