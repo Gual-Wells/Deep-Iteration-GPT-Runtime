@@ -1,44 +1,93 @@
-# DIGR 5.0-compatible Local Personalization — Expanded Routing / Transparency Reference
+# DIGR Plus Local Personalization — Expanded Routing / Transparency / Execution-Firewall Reference
 
-This is the expanded explanation of the version-neutral local Router Transport Contract. Direct-copy text is `CHATGPT_LOCAL_PERSONALIZATION.txt`. Neither file defines versioned DIGR execution semantics.
+The direct-copy text is `CHATGPT_LOCAL_PERSONALIZATION.txt`. It targets ChatGPT Plus-class custom-instruction capacity and intentionally does not preserve Free/Go compatibility. It remains version-neutral: it controls routing, repository acquisition, structural transparency and the handoff into repository-defined execution, but it does not copy versioned N/T/R/S/D/L/time/stop/proof semantics.
 
 ## 1. Candidate routing is an obligation
-For every user message, remove leading whitespace only. Exact uppercase ASCII `DIGR` or exact `深度迭代` triggers routing before task-level interpretation. Lower/mixed-case English does not. The local layer intentionally ignores the remainder; the pinned startup protocol later decides NATIVE/HELP/INVALID/EXECUTING.
 
-A candidate match requires an **actual repository acquisition action before any user-visible reply**. “I probably cannot fetch it”, remembered repository state, or merely having the fixed failure string available is not an acquisition attempt.
+After removing leading whitespace only, exact uppercase ASCII `DIGR` or exact `深度迭代` is a route candidate. Lower/mixed-case English is native. The local layer must not interpret the remainder as task/help/parameters before pinned repository startup does so.
 
-## 2. Mutable-ref provenance and immutable pin
+A candidate route is therefore a state transition into repository acquisition, not a hint to “answer in DIGR style”.
+
+## 2. Task-work firewall
+
+The router has a persistent pre-task firewall.
+
+From candidate capture until pinned repository startup and its delegated authority actually permit substantive task work, all model reasoning and tool use is restricted to:
+
+- repository transport and immutable pinning;
+- manifest/VERSION binding;
+- transparent-machine INDEX loading;
+- startup/surface classification;
+- actual runtime/protocol setup required by the pinned repository.
+
+The user's substantive task is outside that allowed set.
+
+**Reading startup is not executing startup.** Understanding, quoting or summarizing an instruction such as “create”, “call”, “persist”, “verify” or “cross a barrier” does not satisfy it. When the pinned repository declares an implemented helper/runtime/workspace/state transition, the host/model must perform the actual operation through an available execution channel. Conceptual simulation, “I know this is required”, or silently continuing with ordinary ChatGPT work is non-conforming.
+
+For EXECUTING, seeing the label `EXECUTING` is also not task-work readiness. The task firewall remains closed until the pinned startup / later pinned protocol has actually crossed every prerequisite it defines before substantive work. If setup cannot be completed, use the repository-defined failure path; never downgrade silently into a native answer.
+
+A higher-priority product rule may require a short progress update before acquisition completes. Such an update may report only routing/startup status and must not contain substantive task analysis.
+
+This firewall directly guards the regression where the host successfully acquired INDEX + STARTUP, read the startup command requiring a real run, then nevertheless began the user's comparison task without creating the run.
+
+## 3. Mutable-ref provenance
+
 Repository: `Gual-Wells/Deep-Iteration-GPT-Runtime`; discovery ref: `stable`.
 
-The only mutable step is `stable → full commit SHA`. Search-engine results, snippets, crawled/indexed GitHub snapshots, conversation text and Memory are inadmissible ref authority. An already-connected GitHub repository connector may resolve the current public `stable` branch HEAD directly. A genuine direct REST client reads both branch and Git-ref resources and requires the same full SHA.
+Before any task-level explanation/result, a real repository acquisition must occur.
 
-After pinning, every later read for the turn uses that exact SHA. Bind pinned `manifest.json` + `VERSION` and require version equality.
+Admissible mutable-ref authority:
 
-## 3. Transparent machine index comes first
-If the pinned manifest declares `bootstrap_index`, load that path **before interpreting the startup/runtime structure** and before the remaining startup slice. The index is a structural transparency lens: it identifies what protocol files, executable helpers, workspace/state objects, schemas and truth sources already exist, and separates deterministic reliability machinery from native model intelligence.
+1. an already-connected GitHub repository connector reading the current public `stable` branch HEAD as a full 40-hex commit SHA;
+2. a genuine direct GitHub REST client reading both the Branches and Git-ref endpoints in the same route attempt and requiring the same full SHA.
 
-The local layer must not invent the machine from general Agent/runtime/host conventions before this index is read. In particular, a repository-declared helper is an actual execution facility when the pinned protocol calls for it; it is not automatically a metaphor, conceptual simulation, external daemon, mount, attachment or service.
+Search/crawl/index/snippet representations, conversation text and Memory are not mutable-ref authority.
 
-The index itself is not semantic authority. It must not copy or override versioned parameter, timing, stop, D/L or proof rules. Those remain in the pinned startup/entry/core protocol.
+A public DIGR bootstrap must not require the user to establish a new GitHub OAuth/connector solely to read the repository.
 
-## 4. Ordered authority handoff
-The current navigation contract is:
+## 4. Immutable content transport
 
-`stable → SHA → manifest/VERSION → manifest.bootstrap_index → remaining startup_slice → repository surface`
+After `stable → SHA`, every repository read for that turn is pinned to the same SHA.
 
-The pinned index tells the host/model how the machine is assembled and where each truth lives. The remaining startup slice then performs repository-defined classification. NATIVE returns the untouched original message. HELP loads `manifest.help`. EXECUTING follows the repository startup rules and only then loads the same-SHA execution transport declared by the manifest: a declared execution bundle when present, otherwise the logical `entrypoint` / `core[]` files.
+Bind pinned `manifest.json` + `VERSION` and require identity consistency.
 
-A bundle is transport aggregation only; its verified members remain the logical entrypoint/core authority. Legacy manifests without `bootstrap_index` follow their own declared navigation and are never retrofitted with newer structure.
+Canonical immutable content transport is:
 
-## 5. Operating boundary
-The intended host posture is **structure-closed, intelligence-open**:
+`https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}`
 
-- repository structure, object identity, persistence, references and executable reliability helpers are discovered from the pinned repository;
-- task representation, decomposition, research/validation strategy and substantive reasoning remain native-model responsibilities under the loaded protocol;
-- implemented reliability machinery must not be replaced by model self-report;
-- deterministic support must not be promoted into a planner that chooses what the model should think next.
+If raw transport is unavailable, the GitHub Contents API is an allowed same-SHA fallback only when the host either requests raw media or decodes the normal JSON file object's base64 `content` into the actual file bytes. Passing wrapper JSON as manifest/VERSION/startup bytes is invalid.
 
-## 6. Failure evidence
-The fixed route-failure response is permitted only after this turn has at least one real repository acquisition attempt and the currently mandatory repository/ref/SHA/manifest/VERSION/index/startup path still fails, conflicts or has inadmissible provenance. Skipping acquisition or skipping the declared index is router execution failure, not repository failure.
+## 5. Transparent machine index
 
-Once the pinned repository protocol is acquired, it is the sole source of versioned DIGR semantics for that turn, subject to higher-priority instructions and current hard user constraints. Conversation context, Memory, previous answers and target versions cannot reconstruct or override those semantics.
+If the manifest declares `bootstrap_index`, load it as the first repository-side structural path. If it is also `startup_slice[0]`, do not fetch/interpret it twice; continue with the remaining startup paths.
+
+INDEX establishes the machine model before startup interpretation:
+
+- protocol/code/helpers/workspace/state/schema objects are real repository objects;
+- truth-source ownership is explicit;
+- deterministic reliability support is distinct from native model intelligence;
+- repository-declared helpers are actual facilities, not metaphors;
+- no undeclared external runtime/daemon/mount/attachment/service may be invented.
+
+INDEX is structural authority only, never versioned execution-semantic authority.
+
+## 6. Surface handoff
+
+After actual pinned startup processing:
+
+- NATIVE — return the untouched original message to ordinary ChatGPT; no DIGR run.
+- HELP — follow `manifest.help`.
+- INVALID — return only the pinned startup's invocation-structure diagnostic.
+- EXECUTING — immediately perform every required startup action and barrier in repository order. If the pinned startup requires same-SHA execution-bundle or `entrypoint/core[]` loading, helper calls, workspace/state/receipt creation or further readiness barriers, those are operations, not documentation.
+
+Only once the pinned authority chain actually permits substantive task work may the user's task begin.
+
+Legacy pinned manifests follow their own declared navigation. The local router does not retrofit current startup semantics into them.
+
+## 7. Authority and failure
+
+The successfully loaded pinned repository protocol is the sole source of versioned DIGR semantics for the turn. Context, Memory, prior answers, other commits, local old protocol copies or a self-hosting target may later inform task evidence only where the pinned protocol allows; none can redefine DIGR semantics.
+
+The fixed route-failure response is allowed only after a real canonical acquisition attempt and a mandatory current-stage repository/ref/SHA/manifest/VERSION/index/startup/path resource still fails, conflicts or has inadmissible provenance. No acquisition attempt is a router defect, not repository failure.
+
+Once P_run exists, a failure to establish the repository-defined startup/runtime is a startup failure governed by P_run. It must not be rewritten as route failure or silently converted into an ordinary task answer.

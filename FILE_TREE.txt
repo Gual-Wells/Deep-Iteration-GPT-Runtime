@@ -72,7 +72,6 @@ examples/ROUTE_FAILURE.md
 examples/ROUTING_LEGACY_3_0.md
 examples/RUN_GENESIS.md
 local-personalization/CHATGPT_LOCAL_PERSONALIZATION.txt
-local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FREE_GO.txt
 local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FULL.txt
 local-personalization/README.md
 manifest.json

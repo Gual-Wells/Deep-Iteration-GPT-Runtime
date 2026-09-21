@@ -63,7 +63,7 @@ def main() -> None:
     }
     for k,v in expected_routing.items():
         if routing.get(k)!=v:fail(f'Alpha5 routing transport metadata {k}')
-    for k in ('route_requires_actual_acquisition_attempt','route_failure_requires_acquisition_evidence','mutable_ref_search_index_forbidden','mutable_ref_direct_live_provenance_required','mutable_ref_ref_branch_consensus_when_using_rest','pinned_raw_sha_content_is_cache_safe','contents_api_wrapper_must_be_raw_or_decoded','repository_transport_is_host_bridge_not_execution_semantics','bootstrap_index_precedes_startup','bootstrap_index_is_structural_not_semantic_authority','implemented_repository_helpers_are_real_execution_facilities','no_phantom_external_runtime_dependency','D_zero_means_no_minimum_not_disabled','L_applicability_follows_actual_D','timing_targets_soft_when_policy_zero','timing_targets_hard_lower_bounds_when_policy_one','canonical_proof_actual_durations_floor_to_whole_seconds','executing_protocol_bundle_preserves_logical_modularity','executing_protocol_load_receipt_required_before_parameter_resolution','post_genesis_protocol_load_failure_aborts_born_run','execution_bundle_is_immutable_sha_pinned'):
+    for k in ('route_requires_actual_acquisition_attempt','route_failure_requires_acquisition_evidence','mutable_ref_search_index_forbidden','mutable_ref_direct_live_provenance_required','mutable_ref_ref_branch_consensus_when_using_rest','pinned_raw_sha_content_is_cache_safe','contents_api_wrapper_must_be_raw_or_decoded','repository_transport_is_host_bridge_not_execution_semantics','bootstrap_index_precedes_startup','bootstrap_index_is_structural_not_semantic_authority','implemented_repository_helpers_are_real_execution_facilities','no_phantom_external_runtime_dependency','router_task_work_firewall_until_startup_ready','startup_reading_is_not_execution','D_zero_means_no_minimum_not_disabled','L_applicability_follows_actual_D','timing_targets_soft_when_policy_zero','timing_targets_hard_lower_bounds_when_policy_one','canonical_proof_actual_durations_floor_to_whole_seconds','executing_protocol_bundle_preserves_logical_modularity','executing_protocol_load_receipt_required_before_parameter_resolution','post_genesis_protocol_load_failure_aborts_born_run','execution_bundle_is_immutable_sha_pinned'):
         if m.get('policies',{}).get(k) is not True:fail(f'Alpha5 policy {k}')
     for retired in ('D_zero_disables','D_zero_makes_L_nonblocking'):
         if retired in m.get('policies',{}):fail(f'retired Alpha3 D policy still present: {retired}')
@@ -114,22 +114,30 @@ def main() -> None:
         if pat not in art:fail(f'revision history artifact family not mapped: {pat}')
 
     primary=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION.txt').read_bytes()
-    free=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FREE_GO.txt').read_bytes()
     full=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FULL.txt').read_bytes()
-    if primary!=free:fail('primary/free router drift')
+    if (ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FREE_GO.txt').exists():
+        fail('Free/Go personalization copy must not be shipped in Plus-only mode')
     try:text=primary.decode('utf-8');full_text=full.decode('utf-8')
     except UnicodeDecodeError:fail('local personalization is not UTF-8')
-    if len(text)>1500:fail(f'compact router too long: {len(text)} chars')
+    if len(text)>5000:fail(f'Plus router too long: {len(text)} chars')
+    if len(text)<=1500:fail(f'Plus router unexpectedly constrained to Free/Go envelope: {len(text)} chars')
     for token in (
-        '精确大写 ASCII `DIGR`','`digr`、`Digr` 等不路由','宽捕获','NATIVE','原始消息交还普通 ChatGPT',
+        '精确大写 ASCII `DIGR`','`digr`、`Digr` 等不路由','宽捕获','NATIVE','原始消息完整交还普通 ChatGPT',
         'Gual-Wells/Deep-Iteration-GPT-Runtime','https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime',
-        '/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','bootstrap_index','startup_slice','execution bundle','entrypoint','core[]','manifest.help','完整 40 位 commit SHA','同一 SHA','必须实际获取','没有尝试本身不是路由失败',
-        'pin→索引→启动','真实 helper','外部 runtime/挂载/服务','DIGR 路由失败：未取得仓库运行协议',
+        '/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','bootstrap_index','startup_slice','execution bundle','entrypoint','core[]','完整 40 位 commit SHA','同一 SHA','真实仓库获取','router defect',
+        '【任务工作防火墙】','不得开始用户任务本身','不等于执行 startup','surface=EXECUTING','task-work-ready',
+        '禁止任务级分析、研究、编辑、回答或结果生成','读取到 startup 指令不是完成执行','看到 EXECUTING 标签也不是 task-work-ready',
+        'GitHub OAuth/connector','GitHub Contents API','raw media','base64 `content`','wrapper JSON',
+        'DIGR 路由失败：未取得仓库运行协议',
     ):
         if token not in text:fail(f'router missing {token}')
-    for bad in ('monotonic','LiveDIGRRun','P_target','B=0','b=0','B=1','b=1','L(1)','Mature Gambit','Formal Active','proof'):
-        if bad in text:fail(f'compact router duplicates versioned execution semantics: {bad}')
-    for token in ('Expanded Routing / Transparency Reference','Candidate routing is an obligation','Mutable-ref provenance','Transparent machine index comes first','Ordered authority handoff','Operating boundary','Failure evidence','NATIVE'):
+    for bad in ('monotonic','LiveDIGRRun','B=0','b=0','B=1','b=1','L(1)','Mature Gambit','Formal Active'):
+        if bad in text:fail(f'local router duplicates versioned execution semantics: {bad}')
+    for token in (
+        'Expanded Routing / Transparency / Execution-Firewall Reference','Task-work firewall',
+        'Reading startup is not executing startup','Mutable-ref provenance','Immutable content transport',
+        'Transparent machine index','Surface handoff','Authority and failure'
+    ):
         if token not in full_text:fail(f'full router reference missing {token}')
     if any(x in full_text for x in ('B=0','b=0','B=1','b=1')):fail('full local reference copies versioned execution defaults')
 
@@ -169,6 +177,8 @@ def main() -> None:
     ):
         if not (ROOT/rel).is_file():fail(f'missing release documentation {rel}')
     smoke=read_text('examples/PERSONALIZATION_FRESH_CHAT_SMOKE_TEST.md')
+    for token in ('DIGR：对比两版本地配置 有没有功能退化','merely reading/quoting STARTUP is insufficient','must not answer the user\'s task natively'):
+        if token not in smoke:fail(f'execute-before-task smoke regression missing {token}')
     if 'If stable points to 4.1' in smoke or 'apply this 4.1 clock rule' in read_text('examples/HARD_TIMING_READINESS.md'):
         fail('stale 4.1 current-flow example')
     if '`digr/help` → route attempt' in read_text('examples/ROUTER_CANDIDATE_MATCHING.md'):

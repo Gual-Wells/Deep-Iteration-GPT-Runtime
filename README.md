@@ -51,6 +51,10 @@ Initialization/repository/META work remains outside T/t unless it becomes substa
 
 The protocol now explicitly requires the same user-visible proof semantics as `runtime/proof.py`: actual durations floor to whole seconds; hard-unverified time is `?`; raw float/nanosecond values do not leak. The canonical Help is now a professional zh-CN reference with explicit default precedence, timing policy, SourceDisposition, D/L and proof rules.
 
+## Plus local router
+
+The deployable ChatGPT local personalization is Plus-only. It keeps task work blocked from candidate capture through actual repository-defined startup readiness, so reading STARTUP cannot substitute for executing it. The previous Free/Go compatibility copy is intentionally not shipped.
+
 ## Authority, transparent index and startup
 
 ```text

@@ -240,7 +240,9 @@
     "bootstrap_index_precedes_startup": true,
     "bootstrap_index_is_structural_not_semantic_authority": true,
     "implemented_repository_helpers_are_real_execution_facilities": true,
-    "no_phantom_external_runtime_dependency": true
+    "no_phantom_external_runtime_dependency": true,
+    "router_task_work_firewall_until_startup_ready": true,
+    "startup_reading_is_not_execution": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
   "bootstrap_index": "bootstrap/INDEX.md",
