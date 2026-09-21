@@ -243,6 +243,12 @@
     "no_phantom_external_runtime_dependency": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
+  "bootstrap_index": "bootstrap/INDEX.md",
+  "startup_slice": [
+    "bootstrap/INDEX.md",
+    "bootstrap/BOOTSTRAP.md",
+    "entry/STARTUP.md"
+  ],
   "routing_schema": 4,
   "routing": {
     "candidate_route_keys": [
@@ -297,11 +303,6 @@
     ]
   },
   "workspace_spec": "workspace/layout-v2.json",
-  "startup_slice": [
-    "bootstrap/INDEX.md",
-    "bootstrap/BOOTSTRAP.md",
-    "entry/STARTUP.md"
-  ],
   "invocation_surface_schema": 2,
   "parameter_resolution_schema": 1,
   "repository_transport_schema": 3,
@@ -330,6 +331,5 @@
       "core/77_ISOLATION_LEVELS.md",
       "core/80_STOP_AND_PROOF.md"
     ]
-  },
-  "bootstrap_index": "bootstrap/INDEX.md"
+  }
 }
