@@ -139,8 +139,9 @@ class TestRunSession(unittest.TestCase):
             run,c=self.complete_run(td);a=run.actuals();self.assertEqual((a.N,a.R,a.S_count,a.n_min,a.r_min,a.D_s,a.L_e),(1,1,1,1,1,1,1));self.assertTrue(run.stop_check().minima_satisfied);self.assertTrue(run.delivery_ready());summary=run.write_run_summary();self.assertTrue(summary['delivery_ready']);self.assertEqual(run.phase.phase,RunPhase.FINISHED);self.assertTrue(run.render_proof().startswith('DIGR（'));report=verify_run_workspace(run.workspace.root,run.run_id);self.assertTrue(report['integrity_ok'])
     def test_finish_requires_main_and_strategy(self):
         with tempfile.TemporaryDirectory() as td:
-            contract=EffectiveContract(0,0,0,1,SourceContract(0,0,0,1),0,1,SourceDisposition.WAIVED,'closed')
-            run,c=self.bootstrap(td,'DIGR：x',contract)
+            # This test isolates the lifecycle/strategy gate, so timing policy is made explicitly soft.
+            contract=EffectiveContract(0,0,0,0,SourceContract(0,0,0,0),0,1,SourceDisposition.WAIVED,'closed')
+            run,c=self.bootstrap(td,'DIGR(0,0s,0,0,S(0,0s,0,0))：x',contract)
             with self.assertRaises(RuntimeError):run.finish_time(c())
             run.transition(WorkState.MAIN,c())
             with self.assertRaises(RuntimeError):run.finish_time(c())
