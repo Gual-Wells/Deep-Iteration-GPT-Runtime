@@ -4,6 +4,8 @@
 
 Alpha 5 is a narrow semantic-default correction over Alpha 4. Omitted `B` and `b` now resolve to `1` rather than `0`, so T/t are hard lower bounds by default once their values are explicitly supplied or semantically completed. Explicit `B=0` / `b=0` remains the supported opt-in soft timing policy. Alpha 4 authority, source, D/L, clock, workspace and transport architecture is otherwise preserved.
 
+Maintenance cleanup: corrected the stale manifest `D.s` description that still said zero disabled D, and normalized current Alpha 5 authority/runtime/schema/operator-facing labels that were still self-identifying as Alpha 4. Historical Alpha 4 specifications, migration notes and validation records remain unchanged.
+
 ## 5.0.0-alpha.4 — live black-box integration corrections
 
 Alpha 4 follows Alpha 3 after successful live GitHub-connector routing and subsequent full-parameter black-box runs exposed remaining integration defects. It preserves Alpha 3 immutable repository authority, staged startup, trusted clock genesis, workspace/state model and recovery design.

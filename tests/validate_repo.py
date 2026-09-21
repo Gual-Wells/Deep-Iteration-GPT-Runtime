@@ -65,6 +65,9 @@ def main() -> None:
         if m.get('policies',{}).get(k) is not True:fail(f'Alpha5 policy {k}')
     for retired in ('D_zero_disables','D_zero_makes_L_nonblocking'):
         if retired in m.get('policies',{}):fail(f'retired Alpha3 D policy still present: {retired}')
+    d_desc=m.get('parameters',{}).get('D',{}).get('s','')
+    if 'zero_disables_D' in d_desc or 'zero_means_no_minimum_not_disabled' not in d_desc:
+        fail('stale/ambiguous D(0) manifest descriptor')
 
     if m.get('execution_bundle_schema')!=1 or m.get('execution_protocol_load_schema')!=1:fail('execution bundle/load schemas')
     eb=m.get('execution_bundle')

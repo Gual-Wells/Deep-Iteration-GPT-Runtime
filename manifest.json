@@ -59,7 +59,7 @@
       "b": "soft_or_hard_t_policy_0_or_1"
     },
     "D": {
-      "s": "minimum_completed_disruptive_gambit_interventions; zero_disables_D"
+      "s": "minimum_completed_disruptive_gambit_interventions; zero_means_no_minimum_not_disabled"
     },
     "L": {
       "e": "exact_D_isolation_level_1_semantic_2_context_3_agent"

@@ -1,6 +1,6 @@
-# DIGR 5.0 Alpha 4 Architecture
+# DIGR 5.0 Alpha 5 Architecture
 
-Alpha 4 separates five planes. Alpha 2 already separated the execution/state planes; Alpha 4 makes the previously implicit host-transport plane explicit.
+Alpha 5 retains five planes. Alpha 2 separated the execution/state planes; Alpha 4 made the previously implicit host-transport plane explicit.
 
 1. **Host repository transport:** actual direct acquisition → mutable `stable` corroboration → immutable pinned bytes + attempt receipts.
 2. **Transport/authority verification:** candidate route → pinned manifest/VERSION → startup/full protocol discovery.

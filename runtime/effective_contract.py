@@ -1,4 +1,4 @@
-"""Typed DIGR 5.0 Alpha 4 Effective Contract.
+"""Typed DIGR 5.0 Alpha 5 Effective Contract.
 
 The Effective Contract freezes contract commitments, never an execution
 strategy. Count/D fields are minima; T/t are B/b-governed timing targets. Missing semantic values have already been completed by the native
