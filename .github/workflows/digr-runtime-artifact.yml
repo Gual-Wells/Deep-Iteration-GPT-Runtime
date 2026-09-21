@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate-and-package:
@@ -37,6 +37,16 @@ jobs:
           cp bundle/EXECUTION_PROTOCOL.json generated/
           cp FILE_TREE.txt generated/
           cp SHA256SUMS.txt generated/
+      - name: Commit validated generated metadata on Alpha 6 branch
+        if: github.ref_name == 'alpha6-execution-integrity'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bundle/EXECUTION_PROTOCOL.json FILE_TREE.txt SHA256SUMS.txt
+          if ! git diff --cached --quiet; then
+            git commit -m "Alpha 6: synchronize validated release metadata"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
       - name: Upload runtime artifact
         uses: actions/upload-artifact@v4
         with:
