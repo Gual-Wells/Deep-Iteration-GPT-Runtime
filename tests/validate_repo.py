@@ -177,6 +177,8 @@ def main() -> None:
     ):
         if not (ROOT/rel).is_file():fail(f'missing release documentation {rel}')
     smoke=read_text('examples/PERSONALIZATION_FRESH_CHAT_SMOKE_TEST.md')
+    for token in ('DIGR：对比两版本地配置 有没有功能退化','merely reading/quoting STARTUP is insufficient','must not answer the user\'s task natively'):
+        if token not in smoke:fail(f'execute-before-task smoke regression missing {token}')
     if 'If stable points to 4.1' in smoke or 'apply this 4.1 clock rule' in read_text('examples/HARD_TIMING_READINESS.md'):
         fail('stale 4.1 current-flow example')
     if '`digr/help` → route attempt' in read_text('examples/ROUTER_CANDIDATE_MATCHING.md'):
