@@ -4,15 +4,15 @@ Alpha 5 is the current 5.0 pre-final integration baseline and retains the Alpha 
 
 ## Stable conceptual commitments
 
-- local personalization is a thin routing/authority transport layer, not a copy of versioned DIGR execution semantics;
-- each routed turn resolves `stable` to one immutable commit and binds manifest/VERSION/startup/core reads to that same commit;
+- local personalization is a thin routing/authority transport layer, not a copy of versioned DIGR execution semantics; current Alpha 5 additionally follows a pinned structural `bootstrap_index` before startup so implemented machine structure is explicit rather than guessed;
+- each routed turn resolves `stable` to one immutable commit and binds manifest/VERSION/bootstrap-index/startup/core reads to that same commit;
 - P_run, U0, explicit user hard constraints and the Effective Contract are frozen for the run; Strategy/Candidate/Source/D working state remains revisable;
 - Result Sovereignty, semantic completion, Formal Active Time, trusted monotonic clock facts, `?` for unverifiable actuals, compact proof, deterministic releases and non-sticky activation remain foundational;
 - deterministic runtime validates integrity/lifecycle/evidence and does not choose the model's intellectual strategy.
 
 ## Transport evolution
 
-Alpha 3 proved that “no acquisition attempt” cannot be treated as repository failure and introduced direct provenance + immutable pinning. Alpha 4 further distinguishes host capabilities: an already-connected GitHub repository connector may resolve the public `stable` branch HEAD directly; a genuine REST client performs branch/ref consensus. Search/crawl/index representations remain inadmissible mutable-ref authority.
+Alpha 3 proved that “no acquisition attempt” cannot be treated as repository failure and introduced direct provenance + immutable pinning. Alpha 4 further distinguishes host capabilities: an already-connected GitHub repository connector may resolve the public `stable` branch HEAD directly; a genuine REST client performs branch/ref consensus. Search/crawl/index representations remain inadmissible mutable-ref authority. Current Alpha 5 adds a pinned `bootstrap/INDEX.md` structural handoff after manifest/VERSION and before the remaining startup slice; this changes host understanding/navigation, not versioned execution semantics.
 
 ## Parameter and timing semantics
 
