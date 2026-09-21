@@ -1,6 +1,6 @@
-# DIGR 5.0 Alpha 5 Architecture
+# DIGR 5.0 Alpha 6 Architecture
 
-Alpha 5 retains five planes. Alpha 2 separated the execution/state planes; Alpha 4 made the previously implicit host-transport plane explicit.
+Alpha 6 retains five planes and adds an execution-integrity boundary across the first three. Alpha 2 separated the execution/state planes; Alpha 4 made the previously implicit host-transport plane explicit.
 
 1. **Host repository transport:** actual direct acquisition → mutable `stable` corroboration → immutable pinned bytes + attempt receipts.
 2. **Transport/authority verification:** candidate route → pinned manifest/VERSION → transparent machine index → startup/full protocol discovery.
@@ -16,6 +16,12 @@ The first three are deterministic reliability boundaries. Before startup interpr
 - Once pinned, the SHA—not `stable`—is the identity used by all later resource URLs.
 - `AcquisitionAttemptReceipt` proves that routing actually attempted repository transport; it does not by itself prove the route succeeded.
 - Raw immutable SHA content is the primary file transport. Contents API wrapper decoding is an adapter, not a second authority source.
+
+## Execution-integrity boundary
+
+Repository transparency must not collapse operator and implementation roles. For a declared operational component, the model/host first binds exact pinned component identity, exact operation and a concrete compatible executor; it then commits to direct execution and rejects semantic-equivalent substitution/manual receipt construction. An accepted commitment constrains the next relevant action to real delivery/invocation or a concrete failure.
+
+Repository-reading capability and executor capability are independent. A native same-SHA file→executor bridge is preferred. When absent, manifest.runtime_distribution provides a same-commit GitHub Actions artifact. Artifact members are verified against the pinned Git tree before use. This delivery plane is transport-only and cannot redefine P_run.
 
 ## Execution single-truth relationships
 - Strategy owns current execution approach; Candidate owns current result snapshot; EST compresses continuing state and references revisions.
