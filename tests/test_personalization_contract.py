@@ -40,7 +40,9 @@ class TestPersonalization(unittest.TestCase):
             'task-work-ready',
             '禁止任务级分析、研究、编辑、回答或结果生成',
             '读取到 startup 指令不是完成执行',
-            '看到 EXECUTING 标签也不是 task-work-ready'
+            '看到 EXECUTING 标签也不是 task-work-ready',
+            '【执行优先/防穿透】','semantic equivalence ≠ implementation identity',
+            'exact-commit runtime distribution'
         ):
             self.assertIn(x,self.text)
 
@@ -54,8 +56,8 @@ class TestPersonalization(unittest.TestCase):
 
     def test_full_explains_transport_and_execution_boundary(self):
         for x in (
-            'Expanded Routing / Transparency / Execution-Firewall Reference',
-            'Task-work firewall','Reading startup is not executing startup',
+            'Expanded Routing / Transparency / Execution-Integrity Reference',
+            'Task-work firewall','Reading startup is not executing startup','Execute-before-interpret and implementation delivery',
             'Mutable-ref provenance','Immutable content transport',
             'Transparent machine index','Surface handoff','Authority and failure'
         ):
