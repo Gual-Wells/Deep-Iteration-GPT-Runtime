@@ -20,15 +20,15 @@ If the pinned protocol requires a declared helper or runtime step, use the **act
 
 ## 2. Machine topology
 
-**Transport / authority.** `runtime/routing.py`, `repository_transport.py`, `protocol_pin.py`, `protocol_authority.py`, `execution_protocol.py` establish repository acquisition, immutable identity and verified protocol transport.
+**Transport / authority.** `runtime/routing.py`, `runtime/repository_transport.py`, `runtime/protocol_pin.py`, `runtime/protocol_authority.py`, `runtime/execution_protocol.py` establish repository acquisition, immutable identity and verified protocol transport.
 
-**Lifecycle / contract.** `invocation_surface.py`, `clock_probe.py`, `task_startup.py`, `parameter_resolution.py`, `effective_contract.py`, `run_lifecycle.py`, `run_session.py` implement the deterministic execution boundary and persisted lifecycle.
+**Lifecycle / contract.** `runtime/invocation_surface.py`, `runtime/clock_probe.py`, `runtime/task_startup.py`, `runtime/parameter_resolution.py`, `runtime/effective_contract.py`, `runtime/run_lifecycle.py`, `runtime/run_session.py` implement the deterministic execution boundary and persisted lifecycle.
 
 **Native intelligence.** The model owns task representation, decomposition, research/validation/tool strategy, substantive evolution, re-entry challenges and disruptive ideas. The runtime is an exoskeleton, not a planner or scheduler.
 
-**Persistent working state / evidence.** Strategy, Candidate, EST, Source, D, Completion and Evidence are real revisioned stores implemented by `strategy_store.py`, `candidate_store.py`, `est_store.py`, `source_workspace.py`, `d_intervention.py`, `completion_state.py`, `evidence_index.py` and `evolution_events.py`.
+**Persistent working state / evidence.** Strategy, Candidate, EST, Source, D, Completion and Evidence are real revisioned stores implemented by `runtime/strategy_store.py`, `runtime/candidate_store.py`, `runtime/est_store.py`, `runtime/source_workspace.py`, `runtime/d_intervention.py`, `runtime/completion_state.py`, `runtime/evidence_index.py` and `runtime/evolution_events.py`.
 
-**Audit / recovery / output.** `clock_journal.py`, `interval_ledger.py`, `actuals.py`, `isolation_checks.py`, `state_checks.py`, `stop_checks.py`, `run_recovery.py`, `run_brief.py`, `proof.py` and the workspace/schema layer own mechanical facts, integrity, recovery and canonical rendering.
+**Audit / recovery / output.** `runtime/clock_journal.py`, `runtime/interval_ledger.py`, `runtime/actuals.py`, `runtime/isolation_checks.py`, `runtime/state_checks.py`, `runtime/stop_checks.py`, `runtime/run_recovery.py`, `runtime/run_brief.py`, `runtime/proof.py` and the workspace/schema layer own mechanical facts, integrity, recovery and canonical rendering.
 
 ## 3. Truth-source map
 
