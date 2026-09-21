@@ -20,16 +20,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Unit tests
-        run: python -m unittest discover -s tests -q
-      - name: Repository validator
-        run: python tests/validate_repo.py
-      - name: Build exact-commit runtime artifact
+      - name: Rebuild release metadata and cold-validate
         run: |
           mkdir -p dist
+          python tools/build_release.py --output "dist/Deep-Iteration-GPT-Runtime-${GITHUB_SHA}.zip"
+      - name: Build exact-commit runtime artifact
+        run: |
           python tools/build_runtime_artifact.py \
             --commit-sha "${GITHUB_SHA}" \
             --output "dist/DIGR-RUNTIME-${GITHUB_SHA}.zip"
+      - name: Stage generated repository metadata
+        run: |
+          mkdir -p generated
+          cp bundle/EXECUTION_PROTOCOL.json generated/
+          cp FILE_TREE.txt generated/
+          cp SHA256SUMS.txt generated/
       - name: Upload runtime artifact
         uses: actions/upload-artifact@v4
         with:
@@ -37,3 +42,10 @@ jobs:
           path: dist/DIGR-RUNTIME-${{ github.sha }}.zip
           if-no-files-found: error
           retention-days: 90
+      - name: Upload generated release metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: digr-generated-${{ github.sha }}
+          path: generated/
+          if-no-files-found: error
+          retention-days: 30
