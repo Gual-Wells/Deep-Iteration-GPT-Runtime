@@ -1,38 +1,44 @@
-# DIGR 5.0-compatible Local Personalization — Expanded Routing/Transport Reference
+# DIGR 5.0-compatible Local Personalization — Expanded Routing / Transparency Reference
 
-This is the expanded explanation of the version-neutral local Router Transport Contract. Direct-copy text is `CHATGPT_LOCAL_PERSONALIZATION.txt`. Neither file is a copy of versioned DIGR execution semantics.
+This is the expanded explanation of the version-neutral local Router Transport Contract. Direct-copy text is `CHATGPT_LOCAL_PERSONALIZATION.txt`. Neither file defines versioned DIGR execution semantics.
 
 ## 1. Candidate routing is an obligation
 For every user message, remove leading whitespace only. Exact uppercase ASCII `DIGR` or exact `深度迭代` triggers routing before task-level interpretation. Lower/mixed-case English does not. The local layer intentionally ignores the remainder; the pinned startup protocol later decides NATIVE/HELP/INVALID/EXECUTING.
 
-A candidate match requires an **actual repository acquisition action before any user-visible reply**. “I probably cannot fetch it”, an old remembered result, or merely having the fixed failure string available is not an acquisition attempt and cannot justify route failure.
+A candidate match requires an **actual repository acquisition action before any user-visible reply**. “I probably cannot fetch it”, remembered repository state, or merely having the fixed failure string available is not an acquisition attempt.
 
-## 2. Mutable-ref provenance and transport modes
+## 2. Mutable-ref provenance and immutable pin
 Repository: `Gual-Wells/Deep-Iteration-GPT-Runtime`; discovery ref: `stable`.
 
-The only mutable step is `stable → commit SHA`, so it has the strictest freshness requirement. Search-engine results, snippets, crawled/indexed GitHub HTML/API snapshots, cached conversation text and Memory are inadmissible ref authority.
+The only mutable step is `stable → full commit SHA`. Search-engine results, snippets, crawled/indexed GitHub snapshots, conversation text and Memory are inadmissible ref authority. An already-connected GitHub repository connector may resolve the current public `stable` branch HEAD directly. A genuine direct REST client reads both branch and Git-ref resources and requires the same full SHA.
 
-Two direct modes are admissible:
+After pinning, every later read for the turn uses that exact SHA. Bind pinned `manifest.json` + `VERSION` and require version equality.
 
-**Already-connected GitHub repository connector.** If the host already has a GitHub connector, it may resolve the public repository's `stable` branch resource directly and accept the branch's current full 40-hex HEAD SHA. Connector mode does not need to simulate a Git-ref REST endpoint that the product connector may not expose. Do not require or prompt a new GitHub OAuth connection solely to bootstrap this public DIGR repository.
+## 3. Transparent machine index comes first
+If the pinned manifest declares `bootstrap_index`, load that path **before interpreting the startup/runtime structure** and before the remaining startup slice. The index is a structural transparency lens: it identifies what protocol files, executable helpers, workspace/state objects, schemas and truth sources already exist, and separates deterministic reliability machinery from native model intelligence.
 
-**Direct GitHub REST.** When the host has a real direct REST client rather than a search/crawl proxy, observe both:
-- ref API: `https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/stable`
-- branch API: `https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/stable`
+The local layer must not invent the machine from general Agent/runtime/host conventions before this index is read. In particular, a repository-declared helper is an actual execution facility when the pinned protocol calls for it; it is not automatically a metaphor, conceptual simulation, external daemon, mount, attachment or service.
 
-Both direct REST observations must identify the same full 40-hex commit SHA. Disagreement is fail-closed; never choose whichever answer merely looks newer.
+The index itself is not semantic authority. It must not copy or override versioned parameter, timing, stop, D/L or proof rules. Those remain in the pinned startup/entry/core protocol.
 
-## 3. Immutable pinned content
-After the SHA is accepted, every later read for the turn uses that SHA. The canonical immutable file transport is:
+## 4. Ordered authority handoff
+The current navigation contract is:
 
-`https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}`
+`stable → SHA → manifest/VERSION → manifest.bootstrap_index → remaining startup_slice → repository surface`
 
-Caching at this stage is semantically safe when the URL is truly commit-pinned because the referenced Git object is immutable. If a host must use the GitHub Contents API instead, it must request `application/vnd.github.raw+json` or decode the normal JSON file object's base64 `content` field before passing bytes to the route verifier. Passing the wrapper JSON itself as `manifest.json`/`VERSION` is invalid.
+The pinned index tells the host/model how the machine is assembled and where each truth lives. The remaining startup slice then performs repository-defined classification. NATIVE returns the untouched original message. HELP loads `manifest.help`. EXECUTING follows the repository startup rules and only then loads the same-SHA execution transport declared by the manifest: a declared execution bundle when present, otherwise the logical `entrypoint` / `core[]` files.
 
-## 4. Staged authority handoff
-Acquire pinned `manifest.json` and `VERSION`, require version equality, then follow only paths declared by that pinned manifest. If it has `startup_slice`, fetch only that slice first. The pinned repository may return NATIVE, HELP, INVALID or EXECUTING. NATIVE returns the untouched original message; HELP loads `manifest.help`; EXECUTING follows the repository's own startup rules and only then loads the same-SHA execution transport declared by that manifest: a manifest-declared execution bundle when present, otherwise the logical `entrypoint`/`core[]` files. A bundle is transport aggregation only; its verified members remain the manifest-declared entrypoint/core authority. A legacy manifest without `startup_slice` follows its own navigation; the local layer never backports newer semantics into it.
+A bundle is transport aggregation only; its verified members remain the logical entrypoint/core authority. Legacy manifests without `bootstrap_index` follow their own declared navigation and are never retrofitted with newer structure.
 
-## 5. Failure evidence
-The fixed route-failure response is permitted only after this turn has at least one real repository acquisition attempt and the currently mandatory repository/ref/SHA/manifest/VERSION/path acquisition still fails, conflicts or has inadmissible provenance. Skipping acquisition is a router-execution failure, not a repository route failure.
+## 5. Operating boundary
+The intended host posture is **structure-closed, intelligence-open**:
 
-Once the pinned repository startup protocol is acquired, it is the sole source of versioned DIGR semantics for that turn, subject to higher-priority instructions and current hard user constraints. Conversation context, Memory, previous answers and target versions cannot reconstruct or override protocol semantics.
+- repository structure, object identity, persistence, references and executable reliability helpers are discovered from the pinned repository;
+- task representation, decomposition, research/validation strategy and substantive reasoning remain native-model responsibilities under the loaded protocol;
+- implemented reliability machinery must not be replaced by model self-report;
+- deterministic support must not be promoted into a planner that chooses what the model should think next.
+
+## 6. Failure evidence
+The fixed route-failure response is permitted only after this turn has at least one real repository acquisition attempt and the currently mandatory repository/ref/SHA/manifest/VERSION/index/startup path still fails, conflicts or has inadmissible provenance. Skipping acquisition or skipping the declared index is router execution failure, not repository failure.
+
+Once the pinned repository protocol is acquired, it is the sole source of versioned DIGR semantics for that turn, subject to higher-priority instructions and current hard user constraints. Conversation context, Memory, previous answers and target versions cannot reconstruct or override those semantics.
