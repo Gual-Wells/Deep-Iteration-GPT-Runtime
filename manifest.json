@@ -236,7 +236,11 @@
     "executing_protocol_bundle_preserves_logical_modularity": true,
     "executing_protocol_load_receipt_required_before_parameter_resolution": true,
     "post_genesis_protocol_load_failure_aborts_born_run": true,
-    "execution_bundle_is_immutable_sha_pinned": true
+    "execution_bundle_is_immutable_sha_pinned": true,
+    "bootstrap_index_precedes_startup": true,
+    "bootstrap_index_is_structural_not_semantic_authority": true,
+    "implemented_repository_helpers_are_real_execution_facilities": true,
+    "no_phantom_external_runtime_dependency": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
   "routing_schema": 4,
@@ -294,6 +298,7 @@
   },
   "workspace_spec": "workspace/layout-v2.json",
   "startup_slice": [
+    "bootstrap/INDEX.md",
     "bootstrap/BOOTSTRAP.md",
     "entry/STARTUP.md"
   ],
@@ -325,5 +330,6 @@
       "core/77_ISOLATION_LEVELS.md",
       "core/80_STOP_AND_PROOF.md"
     ]
-  }
+  },
+  "bootstrap_index": "bootstrap/INDEX.md"
 }
