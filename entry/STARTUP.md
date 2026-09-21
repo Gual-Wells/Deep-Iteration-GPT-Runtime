@@ -1,6 +1,6 @@
 # DIGR 5.0 Alpha 5 — Minimal Startup Slice
 
-This file is deliberately small enough to load before the full protocol. It defines only repository-surface classification and the clock-genesis / full-protocol-ready boundary for the already pinned `P_run`.
+This file is deliberately small enough to load before the full protocol. It is reached only after the pinned `bootstrap_index` has made the repository machine structure explicit and `bootstrap/BOOTSTRAP.md` has established authority/navigation. It defines only repository-surface classification and the clock-genesis / full-protocol-ready boundary for the already pinned `P_run`.
 
 1. Classify the broad-router capture using the pinned repository surface rules: `NATIVE | HELP | INVALID | EXECUTING`.
 2. `NATIVE`: return the original user message unchanged to native ChatGPT. Do not create a run, U0, contract or proof.
