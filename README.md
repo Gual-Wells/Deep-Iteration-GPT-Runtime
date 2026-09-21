@@ -1,8 +1,16 @@
-# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.5
+# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.6
 
-**Status:** black-box corrected integration baseline intended to converge toward DIGR 5.0 final.
+**Status:** execution-integrity and runtime-delivery baseline intended to converge toward DIGR 5.0 final.
 
 DIGR 5.0 is a reliability exoskeleton around native model intelligence. It does not replace the model with a planner/search controller. An explicitly invoked high-investment task receives pinned protocol authority, early trusted timing, immutable U0/contract commitments, revisable strategy/source/candidate state, disruptive interventions, evidence, persistence and recovery.
+
+## Alpha 6 execution integrity and runtime delivery
+
+Alpha 6 preserves Alpha 5 parameter/timing semantics and fixes two live host integration failures.
+
+First, repository transparency could still turn into **runtime impersonation**: the model saw that an implementation existed, read it, then reproduced equivalent behavior instead of operating the exact component. Alpha 6 adds execute-before-interpret drift inoculation, a concrete component interrogation gate, bounded lightweight re-education, and an execution commitment whose next relevant action must be real delivery/execution or a concrete failure.
+
+Second, repository reading and Python execution may be isolated host capabilities. Alpha 6 adds a same-commit GitHub Actions runtime artifact. If a native same-SHA file→executor bridge is unavailable, the host can download the artifact for exactly P_run, materialize it, verify every helper against the pinned Git tree, and then run the declared implementation. The artifact is transport only; it never replaces repository protocol authority.
 
 ## Alpha 5 hard-default timing change
 
@@ -75,6 +83,12 @@ remaining manifest startup_slice
   ↓
 NATIVE | HELP | INVALID | EXECUTING
                            ↓
+                implementation delivery
+                           ↓
+              component interrogation
+                           ↓
+                direct exact execution
+                           ↓
                        CLOCK GENESIS
                            ↓
               pinned execution bundle
@@ -97,9 +111,9 @@ Deterministic release:
 
 ```bash
 python tools/build_release.py \
-  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.5.zip \
-  --personalization-output ../DIGR-5.0.0-alpha.5-CHATGPT-LOCAL-PERSONALIZATION.txt \
-  --full-personalization-output ../DIGR-5.0.0-alpha.5-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
+  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.6.zip \
+  --personalization-output ../DIGR-5.0.0-alpha.6-CHATGPT-LOCAL-PERSONALIZATION.txt \
+  --full-personalization-output ../DIGR-5.0.0-alpha.6-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
 ```
 
 The builder regenerates release metadata, rejects cross-platform path collisions/symlinks/traversal/cache artifacts, cold-extracts the ZIP, verifies all hashes and reruns the full suite + repository validator.
