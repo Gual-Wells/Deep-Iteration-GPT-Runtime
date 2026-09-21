@@ -8,6 +8,8 @@ Maintenance cleanup: corrected the stale manifest `D.s` description that still s
 
 Bootstrap transparency refinement: added pinned `bootstrap/INDEX.md` as the first repository-side structural path after manifest/VERSION. The local router now performs `pin → bootstrap_index → startup_slice`, so the host/model sees implemented helpers, persistent objects, truth-source ownership and the deterministic-runtime/native-intelligence boundary before interpreting startup. The index is structural only and does not duplicate versioned N/T/R/S/D/L/time/stop/proof semantics.
 
+Plus router execution-firewall correction: a live DIGR invocation successfully acquired INDEX + STARTUP but then began substantive task comparison without actually crossing the EXECUTING startup gates. The local router is therefore retargeted to Plus-only capacity and now keeps a task-work firewall closed from candidate capture until repository-defined startup/protocol readiness is actually satisfied. `read/understand startup != execute startup`; EXECUTING is not itself task-work readiness. The Plus router also restores pre-authority OAuth and Contents/raw/base64 transport safeguards that had been lost during the 1,500-character compression. The Free/Go personalization copy is intentionally removed.
+
 ## 5.0.0-alpha.4 — live black-box integration corrections
 
 Alpha 4 follows Alpha 3 after successful live GitHub-connector routing and subsequent full-parameter black-box runs exposed remaining integration defects. It preserves Alpha 3 immutable repository authority, staged startup, trusted clock genesis, workspace/state model and recovery design.
