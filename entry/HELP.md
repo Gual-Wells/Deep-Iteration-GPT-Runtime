@@ -122,7 +122,8 @@ Formal Active Time 只记录有效主动工作：
 
 ```text
 当前仓库 authority → immutable P_run
-→ startup slice 分类
+→ pinned bootstrap_index 透明结构索引
+→ remaining startup slice 分类
 → trusted Clock Genesis
 → 同 SHA execution bundle / 完整 entrypoint+core 验证
 → ExecutingProtocolLoadReceipt
@@ -135,7 +136,7 @@ Formal Active Time 只记录有效主动工作：
 → 结果 + canonical proof
 ```
 
-仓库 pin、启动切片、完整执行协议验证、参数/合同建立与 META 验证属于高投入模式的启动/可靠性成本，不应为了缩短墙钟时间而绕过；当前版本用一个确定性 execution bundle 聚合传输逻辑上的 entrypoint+core，以减少仓库往返而不减少协议内容。完整协议验证失败会终止已经出生的 Run，且这些启动成本不会被伪装成 T/t 正式任务时间。
+仓库 pin、透明结构索引、启动切片、完整执行协议验证、参数/合同建立与 META 验证属于高投入模式的启动/可靠性成本，不应为了缩短墙钟时间而绕过；当前版本用一个确定性 execution bundle 聚合传输逻辑上的 entrypoint+core，以减少仓库往返而不减少协议内容。完整协议验证失败会终止已经出生的 Run，且这些启动成本不会被伪装成 T/t 正式任务时间。
 
 ## 8. 输出与 canonical proof
 
@@ -153,4 +154,4 @@ DIGR(N_target/N_actual, T_target/T_actual, R_target/R_actual, B,
 
 ## 9. 版本与权威
 
-本帮助属于当前 pinned `P_run` 的用户级参考。具体仓库提交 SHA、manifest/VERSION 一致性与启动路径由本轮 repository authority 负责验证；帮助文本本身不替代版本化执行协议。
+本帮助属于当前 pinned `P_run` 的用户级参考。具体仓库提交 SHA、manifest/VERSION 一致性、bootstrap_index 与启动路径由本轮 repository authority 负责验证；帮助文本本身不替代版本化执行协议。
