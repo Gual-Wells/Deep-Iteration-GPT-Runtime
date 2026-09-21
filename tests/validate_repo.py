@@ -114,22 +114,30 @@ def main() -> None:
         if pat not in art:fail(f'revision history artifact family not mapped: {pat}')
 
     primary=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION.txt').read_bytes()
-    free=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FREE_GO.txt').read_bytes()
     full=(ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FULL.txt').read_bytes()
-    if primary!=free:fail('primary/free router drift')
+    if (ROOT/'local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FREE_GO.txt').exists():
+        fail('Free/Go personalization copy must not be shipped in Plus-only mode')
     try:text=primary.decode('utf-8');full_text=full.decode('utf-8')
     except UnicodeDecodeError:fail('local personalization is not UTF-8')
-    if len(text)>1500:fail(f'compact router too long: {len(text)} chars')
+    if len(text)>5000:fail(f'Plus router too long: {len(text)} chars')
+    if len(text)<=1500:fail(f'Plus router unexpectedly constrained to Free/Go envelope: {len(text)} chars')
     for token in (
-        '精确大写 ASCII `DIGR`','`digr`、`Digr` 等不路由','宽捕获','NATIVE','原始消息交还普通 ChatGPT',
+        '精确大写 ASCII `DIGR`','`digr`、`Digr` 等不路由','宽捕获','NATIVE','原始消息完整交还普通 ChatGPT',
         'Gual-Wells/Deep-Iteration-GPT-Runtime','https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime',
-        '/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','bootstrap_index','startup_slice','execution bundle','entrypoint','core[]','manifest.help','完整 40 位 commit SHA','同一 SHA','必须实际获取','没有尝试本身不是路由失败',
-        'pin→索引→启动','真实 helper','外部 runtime/挂载/服务','DIGR 路由失败：未取得仓库运行协议',
+        '/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','bootstrap_index','startup_slice','execution bundle','entrypoint','core[]','完整 40 位 commit SHA','同一 SHA','真实仓库获取','router defect',
+        '【任务工作防火墙】','不得开始用户任务本身','不等于执行 startup','surface=EXECUTING','task-work-ready',
+        '禁止任务级分析、研究、编辑、回答或结果生成','读取到 startup 指令不是完成执行','看到 EXECUTING 标签也不是 task-work-ready',
+        'GitHub OAuth/connector','GitHub Contents API','raw media','base64 `content`','wrapper JSON',
+        'DIGR 路由失败：未取得仓库运行协议',
     ):
         if token not in text:fail(f'router missing {token}')
-    for bad in ('monotonic','LiveDIGRRun','P_target','B=0','b=0','B=1','b=1','L(1)','Mature Gambit','Formal Active','proof'):
-        if bad in text:fail(f'compact router duplicates versioned execution semantics: {bad}')
-    for token in ('Expanded Routing / Transparency Reference','Candidate routing is an obligation','Mutable-ref provenance','Transparent machine index comes first','Ordered authority handoff','Operating boundary','Failure evidence','NATIVE'):
+    for bad in ('monotonic','LiveDIGRRun','B=0','b=0','B=1','b=1','L(1)','Mature Gambit','Formal Active'):
+        if bad in text:fail(f'local router duplicates versioned execution semantics: {bad}')
+    for token in (
+        'Expanded Routing / Transparency / Execution-Firewall Reference','Task-work firewall',
+        'Reading startup is not executing startup','Mutable-ref provenance','Immutable content transport',
+        'Transparent machine index','Surface handoff','Authority and failure'
+    ):
         if token not in full_text:fail(f'full router reference missing {token}')
     if any(x in full_text for x in ('B=0','b=0','B=1','b=1')):fail('full local reference copies versioned execution defaults')
 
