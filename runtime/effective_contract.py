@@ -1,4 +1,4 @@
-"""Typed DIGR 5.0 Alpha 5 Effective Contract.
+"""Typed DIGR 5.0 Alpha 6 Effective Contract.
 
 The Effective Contract freezes contract commitments, never an execution
 strategy. Count/D fields are minima; T/t are B/b-governed timing targets. Missing semantic values have already been completed by the native
@@ -59,7 +59,7 @@ class EffectiveContract:
         if self.source_disposition is SourceDisposition.WAIVED:
             if self.source_waiver_reason is None:
                 raise ValueError('WAIVED source disposition requires an explicit reason')
-            if self.S.n or self.S.t_seconds or self.S.r or self.S.b:
+            if self.S.n or self.S.t_seconds or self.S.r:
                 raise ValueError('source cannot be WAIVED while S minimums require source work')
             object.__setattr__(self, 'source_waiver_reason', require_nonempty_text('source_waiver_reason', self.source_waiver_reason))
         elif self.source_waiver_reason is not None:

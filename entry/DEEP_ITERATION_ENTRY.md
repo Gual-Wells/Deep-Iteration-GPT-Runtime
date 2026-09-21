@@ -1,10 +1,14 @@
-# DIGR 5.0.0-alpha.5 — Deep Iteration Entry
+# DIGR 5.0.0-alpha.6 — Deep Iteration Entry
 
 This entrypoint is semantically available only after an EXECUTING surface has crossed trusted Clock Genesis and the complete pinned entrypoint/core set has been verified under the same `P_run` (normally through the manifest-declared execution bundle). The bundle is transport-only; these logical files remain the protocol authority. The full protocol never retroactively moves the clock boundary.
 
 ## Authority and immutable commitments
 
 Keep `P_run`, raw-message binding, U0 and the frozen Effective Contract immutable. A self-hosting/repository-edit task may create `P_target`, but it cannot rebind the current run. Higher-priority safety/permission constraints remain in force.
+
+## Implementation execution integrity
+
+core/13_IMPLEMENTATION_EXECUTION_INTEGRITY.md remains active throughout the run. When a required operational component already exists in the pinned repository, the model operates that exact implementation rather than reproducing its behavior. Before use, bind the exact component/operation/executor and reject substitution/manual receipts; after acceptance, proceed directly to actual delivery/execution attempt or concrete failure. A compatibility fallback is legal only when P_run explicitly defines it after a real failed attempt.
 
 ## META before substantive work
 

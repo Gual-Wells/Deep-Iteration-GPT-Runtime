@@ -1,4 +1,4 @@
-# DIGR 5.0.0-alpha.5 帮助
+# DIGR 5.0.0-alpha.6 帮助
 
 DIGR（Deep Iteration GPT Runtime）是显式调用的高投入执行模式。它在单条用户消息内生效，不自动粘连到下一轮；未再次调用时，下一条消息按普通 ChatGPT 处理。
 
@@ -124,6 +124,10 @@ Formal Active Time 只记录有效主动工作：
 当前仓库 authority → immutable P_run
 → pinned bootstrap_index 透明结构索引
 → remaining startup slice 分类
+→ execute-before-interpret 预教育
+→ 现成组件审问 / 执行承诺
+→ identity-preserving runtime delivery（原生桥或 exact-commit artifact）
+→ 直接执行 Genesis 组件
 → trusted Clock Genesis
 → 同 SHA execution bundle / 完整 entrypoint+core 验证
 → ExecutingProtocolLoadReceipt
@@ -137,6 +141,8 @@ Formal Active Time 只记录有效主动工作：
 ```
 
 仓库 pin、透明结构索引、启动切片、完整执行协议验证、参数/合同建立与 META 验证属于高投入模式的启动/可靠性成本，不应为了缩短墙钟时间而绕过；当前版本用一个确定性 execution bundle 聚合传输逻辑上的 entrypoint+core，以减少仓库往返而不减少协议内容。完整协议验证失败会终止已经出生的 Run，且这些启动成本不会被伪装成 T/t 正式任务时间。
+
+Alpha 6 额外区分“看懂实现”和“执行实现”。仓库已有 operational helper 时，语义等价、换语言重写、手工构造 receipt 都不能替代 exact implementation execution。若 repository reader 与 executor 之间没有原生同 SHA 文件桥，使用 manifest.runtime_distribution 声明的同 commit Actions artifact；下载后必须先按 pinned Git tree 验证 deterministic_helpers 成员身份。两种交付路径都失败时属于 implementation-delivery startup failure，不能自行重写 runtime 后继续任务。
 
 ## 8. 输出与 canonical proof
 

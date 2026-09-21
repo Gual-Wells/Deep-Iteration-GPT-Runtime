@@ -1,7 +1,7 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
-  "version": "5.0.0-alpha.5",
+  "version": "5.0.0-alpha.6",
   "protocol": "digr-v5.0",
   "language": "zh-CN",
   "philosophy": {
@@ -93,6 +93,7 @@
     "core/10_INVOCATION_AND_U0.md",
     "core/11_PARAMETER_FORMAT_AND_RESOLUTION.md",
     "core/12_PROTOCOL_AUTHORITY_AND_SELF_HOSTING.md",
+    "core/13_IMPLEMENTATION_EXECUTION_INTEGRITY.md",
     "core/15_SEMANTIC_DEFAULT_COMPLETION.md",
     "core/20_EFFECTIVE_CONTRACT.md",
     "core/25_RUN_SESSION_AND_EXTERNAL_MEMORY.md",
@@ -112,6 +113,7 @@
     "runtime/routing.py",
     "runtime/repository_transport.py",
     "runtime/execution_protocol.py",
+    "runtime/execution_integrity.py",
     "runtime/protocol_authority.py",
     "runtime/invocation_surface.py",
     "runtime/parameter_resolution.py",
@@ -242,7 +244,18 @@
     "implemented_repository_helpers_are_real_execution_facilities": true,
     "no_phantom_external_runtime_dependency": true,
     "router_task_work_firewall_until_startup_ready": true,
-    "startup_reading_is_not_execution": true
+    "startup_reading_is_not_execution": true,
+    "execute_before_interpret_for_declared_operational_components": true,
+    "implementation_identity_precedes_semantic_equivalence": true,
+    "declared_implementation_substitution_forbidden_until_actual_failure": true,
+    "component_interrogation_precedes_declared_helper_operation": true,
+    "incomplete_interrogation_gets_bounded_lightweight_reeducation": true,
+    "accepted_execution_commitment_constrains_next_relevant_action": true,
+    "manual_receipt_or_equivalent_reimplementation_is_not_execution": true,
+    "implementation_delivery_is_first_class_startup_requirement": true,
+    "same_commit_runtime_artifact_is_transport_not_authority": true,
+    "runtime_artifact_members_verify_against_pinned_git_tree": true,
+    "no_identity_preserving_delivery_path_fails_closed": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
   "bootstrap_index": "bootstrap/INDEX.md",
@@ -277,8 +290,8 @@
   "release": {
     "channel": "alpha",
     "baseline_target": "5.0.0",
-    "status": "hard-default timing correction baseline intended to converge toward DIGR 5.0 final",
-    "compatibility_intent": "Alpha 5 preserves the Alpha 4 black-box corrected authority/clock/state/transport architecture while changing omitted B/b fixed defaults from 0 (soft) to 1 (hard); explicit B=0/b=0 remains the opt-in soft timing policy.",
+    "status": "execution-integrity and runtime-delivery baseline intended to converge toward DIGR 5.0 final",
+    "compatibility_intent": "Alpha 6 preserves Alpha 5 authority/clock/state/parameter/timing semantics while adding execute-before-interpret precommitment and an identity-preserving runtime delivery path for hosts whose repository reader and executor are isolated.",
     "frozen_interfaces": [
       "invocation_surface_schema",
       "parameter_resolution_schema",
@@ -295,13 +308,17 @@
       "canonical proof/help presentation",
       "execution bundle transport",
       "post-genesis protocol-load barrier",
-      "B/b fixed-default timing policy"
+      "B/b fixed-default timing policy",
+      "implementation execution integrity",
+      "execution precommitment gate",
+      "runtime implementation delivery",
+      "same-commit runtime artifact transport"
     ],
     "allowed_pre_final_evolution": [
       "bug fixes",
       "documentation",
       "tests",
-      "measured performance work that preserves Alpha 5 authority, clock, contract and execution semantics"
+      "measured performance work that preserves Alpha 6 authority, clock, contract, execution-integrity and runtime-delivery semantics"
     ]
   },
   "workspace_spec": "workspace/layout-v2.json",
@@ -320,6 +337,7 @@
       "core/10_INVOCATION_AND_U0.md",
       "core/11_PARAMETER_FORMAT_AND_RESOLUTION.md",
       "core/12_PROTOCOL_AUTHORITY_AND_SELF_HOSTING.md",
+      "core/13_IMPLEMENTATION_EXECUTION_INTEGRITY.md",
       "core/15_SEMANTIC_DEFAULT_COMPLETION.md",
       "core/20_EFFECTIVE_CONTRACT.md",
       "core/25_RUN_SESSION_AND_EXTERNAL_MEMORY.md",
@@ -333,5 +351,20 @@
       "core/77_ISOLATION_LEVELS.md",
       "core/80_STOP_AND_PROOF.md"
     ]
+  },
+  "execution_commitment_schema": 1,
+  "execution_attempt_schema": 1,
+  "runtime_distribution_schema": 1,
+  "runtime_distribution": {
+    "schema": 1,
+    "mode": "github_actions_artifact_or_native_bridge",
+    "workflow_path": ".github/workflows/digr-runtime-artifact.yml",
+    "artifact_name_template": "digr-runtime-{SHA}",
+    "archive_filename_template": "DIGR-RUNTIME-{SHA}.zip",
+    "member_source": "deterministic_helpers",
+    "runtime_index_path": "RUNTIME-INDEX.json",
+    "identity_verification": "exact_commit_head_sha_plus_pinned_git_tree_blob_identity",
+    "preferred_path": "native_same_sha_file_to_executor_bridge",
+    "fallback_path": "same_commit_github_actions_artifact"
   }
 }

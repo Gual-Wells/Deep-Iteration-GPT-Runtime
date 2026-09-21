@@ -23,7 +23,7 @@
       "pattern": "^[0-9a-f]{40}$"
     },
     "version": {
-      "const": "5.0.0-alpha.5"
+      "const": "5.0.0-alpha.6"
     },
     "protocol": {
       "const": "digr-v5.0"

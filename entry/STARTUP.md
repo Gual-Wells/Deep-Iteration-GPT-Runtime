@@ -1,13 +1,20 @@
-# DIGR 5.0 Alpha 5 — Minimal Startup Slice
+# DIGR 5.0 Alpha 6 — Minimal Startup Slice
 
-This file is deliberately small enough to load before the full protocol. It is reached only after the pinned `bootstrap_index` has made the repository machine structure explicit and `bootstrap/BOOTSTRAP.md` has established authority/navigation. It defines only repository-surface classification and the clock-genesis / full-protocol-ready boundary for the already pinned `P_run`.
+This file is deliberately small enough to load before the full protocol. It is reached only after the pinned bootstrap_index has made the repository machine structure explicit and bootstrap/BOOTSTRAP.md has established authority/navigation. It defines repository-surface classification, implementation-delivery / execution-precommitment gates, Clock Genesis and the full-protocol-ready boundary for the already pinned P_run.
 
-1. Classify the broad-router capture using the pinned repository surface rules: `NATIVE | HELP | INVALID | EXECUTING`.
-2. `NATIVE`: return the original user message unchanged to native ChatGPT. Do not create a run, U0, contract or proof.
-3. `HELP`: load only `manifest.help`; do not create the task clock.
-4. `INVALID`: return a concise invocation-structure diagnostic; do not perform task work.
-5. `EXECUTING`: establish trusted clock readiness immediately (at least three monotonic samples) and create Run Genesis **before parameter resolution, U0 or substantive task work**.
-6. After successful Run Genesis, acquire the full logical `entrypoint + core[]` from the **same pinned commit** in META. If the pinned manifest declares `execution_bundle`, fetch that one immutable bundle and verify that its member list, order, byte lengths and digests exactly cover the manifest-declared entrypoint/core. Otherwise load the logical files individually for compatibility.
-7. Persist an `ExecutingProtocolLoadReceipt` bound to `P_run`. Parameter resolution is forbidden until this receipt exists. Any mandatory full-protocol acquisition or verification failure after genesis aborts the born run; it must not remain a resumable GENESIS or be rewritten as “never started”.
+1. Classify the broad-router capture using the pinned repository surface rules: NATIVE | HELP | INVALID | EXECUTING.
+2. NATIVE: return the original user message unchanged to native ChatGPT. Do not create a run, U0, contract or proof.
+3. HELP: load only manifest.help; do not create the task clock.
+4. INVALID: return a concise invocation-structure diagnostic; do not perform task work.
+5. EXECUTING: before operating any declared runtime component, apply the Alpha 6 execute-before-interpret inoculation. Correct behavior is direct use of the exact pinned implementation; reading/understanding then reimplementing, translating, simulating or manually fabricating an equivalent receipt is not execution.
+6. Resolve an identity-preserving implementation-delivery path. Prefer a native same-SHA repository-file → compatible-executor bridge. If that bridge is unavailable and manifest.runtime_distribution is declared, acquire the exact-commit runtime artifact, require workflow/head SHA == P_run commit, materialize it into the executor, and verify every deterministic_helpers member against the pinned Git tree blob identity/byte length before use. Artifact transport is not semantic authority.
+7. Immediately before the concrete Genesis component is operated, perform the component interrogation gate: identify the exact pinned component and operation, name the concrete compatible executor, commit to direct execution now, and explicitly reject model-written substitution/manual receipt construction. An incomplete or penetrating commitment receives a lightweight correction and is re-interrogated; at most two correction rounds are allowed. Repeated failure aborts startup.
+8. Once the commitment is accepted, the next relevant action must be actual delivery/invocation of that component or recording a concrete delivery/execution failure. Do not insert new semantic analysis, equivalent implementation or task work between commitment and attempt.
+9. Establish trusted clock readiness through the declared implementation (at least three monotonic samples) and create Run Genesis **before parameter resolution, U0 or substantive task work**.
+10. After successful Run Genesis, acquire the full logical entrypoint + core[] from the **same pinned commit** in META. If the pinned manifest declares execution_bundle, fetch that one immutable bundle and verify that its member list, order, byte lengths and digests exactly cover the manifest-declared entrypoint/core. Otherwise load the logical files individually for compatibility.
+11. Persist an ExecutingProtocolLoadReceipt bound to P_run. Parameter resolution is forbidden until this receipt exists. Any mandatory full-protocol acquisition or verification failure after genesis aborts the born run; it must not remain a resumable GENESIS or be rewritten as “never started”.
+12. After full protocol load, the same implementation-execution integrity rule continues wherever a repository-declared operational component is required. The full core defines the detailed gate and fallback semantics.
 
-The startup slice does not define N/T/R/S/D/L semantics beyond the fact that parameter resolution happens only after Clock Genesis **and** verified full-protocol readiness. Full versioned semantics remain the logical pinned entrypoint/core; the bundle is only a transport aggregation of those source files.
+If no native exact-byte bridge exists and the exact-commit runtime artifact cannot be acquired/verified, report a repository-defined **implementation-delivery startup failure**. Never convert that condition into model-written runtime code or an ordinary/native task answer.
+
+The startup slice does not define N/T/R/S/D/L semantics beyond the fact that parameter resolution happens only after Clock Genesis **and** verified full-protocol readiness. Full versioned semantics remain the logical pinned entrypoint/core; transport bundles/artifacts only deliver bytes.

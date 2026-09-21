@@ -1,3 +1,4 @@
+.github/workflows/digr-runtime-artifact.yml
 .gitignore
 CHANGELOG.md
 FILE_TREE.txt
@@ -13,6 +14,7 @@ core/05_TASK_COMMITMENT.md
 core/10_INVOCATION_AND_U0.md
 core/11_PARAMETER_FORMAT_AND_RESOLUTION.md
 core/12_PROTOCOL_AUTHORITY_AND_SELF_HOSTING.md
+core/13_IMPLEMENTATION_EXECUTION_INTEGRITY.md
 core/15_SEMANTIC_DEFAULT_COMPLETION.md
 core/20_EFFECTIVE_CONTRACT.md
 core/25_RUN_SESSION_AND_EXTERNAL_MEMORY.md
@@ -35,6 +37,7 @@ docs/MIGRATION_FROM_4.1.1.md
 docs/PRE_RELEASE_BASELINE.md
 docs/PROTOCOL_SPEC_5.0.0-alpha.4.md
 docs/PROTOCOL_SPEC_5.0.0-alpha.5.md
+docs/PROTOCOL_SPEC_5.0.0-alpha.6.md
 docs/REPOSITORY_TRANSPORT.md
 docs/ROUTING_CONTRACT.md
 docs/RUN_SESSION_ARCHITECTURE.md
@@ -88,6 +91,7 @@ runtime/effective_contract.py
 runtime/est_store.py
 runtime/evidence_index.py
 runtime/evolution_events.py
+runtime/execution_integrity.py
 runtime/execution_protocol.py
 runtime/interval_ledger.py
 runtime/invocation_surface.py
@@ -121,6 +125,8 @@ schemas/est-snapshot.schema.json
 schemas/evidence-index.schema.json
 schemas/evolution-event.schema.json
 schemas/executing-protocol-load.schema.json
+schemas/execution-attempt.schema.json
+schemas/execution-commitment.schema.json
 schemas/execution-protocol-bundle.schema.json
 schemas/invocation-surface.schema.json
 schemas/isolation-facts.schema.json
@@ -155,6 +161,7 @@ tests/test_d_intervention.py
 tests/test_duration.py
 tests/test_effective_contract.py
 tests/test_evolution_events.py
+tests/test_execution_integrity.py
 tests/test_execution_protocol.py
 tests/test_implementation_notes.py
 tests/test_interval_ledger.py
@@ -182,6 +189,7 @@ tests/test_workspace_and_state.py
 tests/test_workspace_schema_conformance.py
 tests/validate_repo.py
 tools/build_release.py
+tools/build_runtime_artifact.py
 tools/smoke_repository_transport.py
 workspace/RUN_WORKSPACE_SPEC.md
 workspace/layout-v2.json

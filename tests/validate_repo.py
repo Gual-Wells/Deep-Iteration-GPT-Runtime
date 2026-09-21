@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-VERSION='5.0.0-alpha.5'
+VERSION='5.0.0-alpha.6'
 INTERFACES={
     'routing_schema':4,
     'repository_transport_schema':3,
@@ -14,6 +14,9 @@ INTERFACES={
     'workspace_schema':2,
     'clock_journal_schema':1,
     'event_receipt_schema':2,
+    'execution_commitment_schema':1,
+    'execution_attempt_schema':1,
+    'runtime_distribution_schema':1,
 }
 
 
@@ -62,9 +65,9 @@ def main() -> None:
         'mutable_ref_policy':'connector_branch_head_or_direct_rest_branch_ref_consensus; search_index_forbidden; attempt_required_before_failure',
     }
     for k,v in expected_routing.items():
-        if routing.get(k)!=v:fail(f'Alpha5 routing transport metadata {k}')
-    for k in ('route_requires_actual_acquisition_attempt','route_failure_requires_acquisition_evidence','mutable_ref_search_index_forbidden','mutable_ref_direct_live_provenance_required','mutable_ref_ref_branch_consensus_when_using_rest','pinned_raw_sha_content_is_cache_safe','contents_api_wrapper_must_be_raw_or_decoded','repository_transport_is_host_bridge_not_execution_semantics','bootstrap_index_precedes_startup','bootstrap_index_is_structural_not_semantic_authority','implemented_repository_helpers_are_real_execution_facilities','no_phantom_external_runtime_dependency','router_task_work_firewall_until_startup_ready','startup_reading_is_not_execution','D_zero_means_no_minimum_not_disabled','L_applicability_follows_actual_D','timing_targets_soft_when_policy_zero','timing_targets_hard_lower_bounds_when_policy_one','canonical_proof_actual_durations_floor_to_whole_seconds','executing_protocol_bundle_preserves_logical_modularity','executing_protocol_load_receipt_required_before_parameter_resolution','post_genesis_protocol_load_failure_aborts_born_run','execution_bundle_is_immutable_sha_pinned'):
-        if m.get('policies',{}).get(k) is not True:fail(f'Alpha5 policy {k}')
+        if routing.get(k)!=v:fail(f'Alpha6 routing transport metadata {k}')
+    for k in ('route_requires_actual_acquisition_attempt','route_failure_requires_acquisition_evidence','mutable_ref_search_index_forbidden','mutable_ref_direct_live_provenance_required','mutable_ref_ref_branch_consensus_when_using_rest','pinned_raw_sha_content_is_cache_safe','contents_api_wrapper_must_be_raw_or_decoded','repository_transport_is_host_bridge_not_execution_semantics','bootstrap_index_precedes_startup','bootstrap_index_is_structural_not_semantic_authority','implemented_repository_helpers_are_real_execution_facilities','no_phantom_external_runtime_dependency','router_task_work_firewall_until_startup_ready','startup_reading_is_not_execution','D_zero_means_no_minimum_not_disabled','L_applicability_follows_actual_D','timing_targets_soft_when_policy_zero','timing_targets_hard_lower_bounds_when_policy_one','canonical_proof_actual_durations_floor_to_whole_seconds','executing_protocol_bundle_preserves_logical_modularity','executing_protocol_load_receipt_required_before_parameter_resolution','post_genesis_protocol_load_failure_aborts_born_run','execution_bundle_is_immutable_sha_pinned','execute_before_interpret_for_declared_operational_components','implementation_identity_precedes_semantic_equivalence','declared_implementation_substitution_forbidden_until_actual_failure','component_interrogation_precedes_declared_helper_operation','incomplete_interrogation_gets_bounded_lightweight_reeducation','accepted_execution_commitment_constrains_next_relevant_action','manual_receipt_or_equivalent_reimplementation_is_not_execution','implementation_delivery_is_first_class_startup_requirement','same_commit_runtime_artifact_is_transport_not_authority','runtime_artifact_members_verify_against_pinned_git_tree','no_identity_preserving_delivery_path_fails_closed'):
+        if m.get('policies',{}).get(k) is not True:fail(f'Alpha6 policy {k}')
     for retired in ('D_zero_disables','D_zero_makes_L_nonblocking'):
         if retired in m.get('policies',{}):fail(f'retired Alpha3 D policy still present: {retired}')
     d_desc=m.get('parameters',{}).get('D',{}).get('s','')
@@ -72,9 +75,12 @@ def main() -> None:
         fail('stale/ambiguous D(0) manifest descriptor')
 
     if m.get('execution_bundle_schema')!=1 or m.get('execution_protocol_load_schema')!=1:fail('execution bundle/load schemas')
+    if m.get('execution_commitment_schema')!=1 or m.get('execution_attempt_schema')!=1 or m.get('runtime_distribution_schema')!=1:fail('Alpha6 execution-integrity/runtime-distribution schemas')
+    rd=m.get('runtime_distribution')
+    if not isinstance(rd,dict) or rd.get('schema')!=1 or rd.get('workflow_path')!='.github/workflows/digr-runtime-artifact.yml' or rd.get('artifact_name_template')!='digr-runtime-{SHA}' or rd.get('member_source')!='deterministic_helpers':fail('Alpha6 runtime distribution metadata')
     eb=m.get('execution_bundle')
     if not isinstance(eb,dict) or eb.get('path')!='bundle/EXECUTION_PROTOCOL.json' or eb.get('schema')!=1 or eb.get('members')!=[m['entrypoint'],*m['core']]:fail('execution bundle metadata')
-    required_paths=[m['bootstrap_index'],m['bootstrap_entry'],*m['startup_slice'],m['entrypoint'],m['help'],m['workspace_spec'],eb['path'],*m['core'],*m['deterministic_helpers']]
+    required_paths=[m['bootstrap_index'],m['bootstrap_entry'],*m['startup_slice'],m['entrypoint'],m['help'],m['workspace_spec'],eb['path'],rd['workflow_path'],*m['core'],*m['deterministic_helpers']]
     for rel in dict.fromkeys(required_paths):
         if not (ROOT/rel).is_file():fail(f'missing manifest path {rel}')
     if len(m['core'])!=len(set(m['core'])):fail('duplicate core path')
@@ -125,7 +131,7 @@ def main() -> None:
         '精确大写 ASCII `DIGR`','`digr`、`Digr` 等不路由','宽捕获','NATIVE','原始消息完整交还普通 ChatGPT',
         'Gual-Wells/Deep-Iteration-GPT-Runtime','https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime',
         '/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','bootstrap_index','startup_slice','execution bundle','entrypoint','core[]','完整 40 位 commit SHA','同一 SHA','真实仓库获取','router defect',
-        '【任务工作防火墙】','不得开始用户任务本身','不等于执行 startup','surface=EXECUTING','task-work-ready',
+        '【任务工作防火墙】','不得开始用户任务本身','不等于执行 startup','surface=EXECUTING','task-work-ready','【执行优先/防穿透】','semantic equivalence ≠ implementation identity',
         '禁止任务级分析、研究、编辑、回答或结果生成','读取到 startup 指令不是完成执行','看到 EXECUTING 标签也不是 task-work-ready',
         'GitHub OAuth/connector','GitHub Contents API','raw media','base64 `content`','wrapper JSON',
         'DIGR 路由失败：未取得仓库运行协议',
@@ -134,7 +140,7 @@ def main() -> None:
     for bad in ('monotonic','LiveDIGRRun','B=0','b=0','B=1','b=1','L(1)','Mature Gambit','Formal Active'):
         if bad in text:fail(f'local router duplicates versioned execution semantics: {bad}')
     for token in (
-        'Expanded Routing / Transparency / Execution-Firewall Reference','Task-work firewall',
+        'Expanded Routing / Transparency / Execution-Integrity Reference','Task-work firewall','Execute-before-interpret and implementation delivery',
         'Reading startup is not executing startup','Mutable-ref provenance','Immutable content transport',
         'Transparent machine index','Surface handoff','Authority and failure'
     ):
@@ -142,7 +148,7 @@ def main() -> None:
     if any(x in full_text for x in ('B=0','b=0','B=1','b=1')):fail('full local reference copies versioned execution defaults')
 
     index_text=read_text(m['bootstrap_index'])
-    for token in ('Reality model','Machine topology','Truth-source map','Structure-closed, intelligence-open','deterministic_helpers[]','workspace_spec','runtime/run_session.py','runtime/run_recovery.py','runtime/actuals.py','not versioned execution semantics'):
+    for token in ('Reality model','Machine topology','Truth-source map','Structure-closed, intelligence-open','deterministic_helpers[]','workspace_spec','runtime/run_session.py','runtime/run_recovery.py','runtime/actuals.py','not versioned execution semantics','Execute-before-interpret inoculation','Implementation delivery reality','Semantic equivalence is not implementation identity'):
         if token not in index_text:fail(f'bootstrap index missing {token}')
     if any(x in index_text for x in ('B=0','b=0','B=1','b=1','L(1)')):
         fail('bootstrap index copies versioned execution defaults')
@@ -151,7 +157,7 @@ def main() -> None:
     for token in ('## 1. 调用与路由','## 2. 参数解析顺序与缺省规则','## 3. 参数参考','## 4. Effective Contract 与来源策略','## 5. N / R / D / L','## 6. 时间与停止','## 7. 执行链与启动成本','## 8. 输出与 canonical proof','## 9. 版本与权威'):
         if token not in help_text:fail(f'help missing section {token}')
     for token in ('`B=1`、`b=1`、`L(1)`','`REQUIRED`','`D(0)`','soft target','hard lower bound','actual duration 向下取整到完整秒','ExecutingProtocolLoadReceipt','NATIVE'):
-        if token not in help_text:fail(f'help missing Alpha5 user-level rule {token}')
+        if token not in help_text:fail(f'help missing Alpha6 user-level rule {token}')
 
     # The release claims Python >=3.10, so every Python file must parse under
     # that grammar rather than only under the builder's current interpreter.
@@ -172,7 +178,7 @@ def main() -> None:
 
     for rel in (
         'docs/PRE_RELEASE_BASELINE.md','docs/CLOCK_RELIABILITY.md','docs/RUN_SESSION_ARCHITECTURE.md',
-        'docs/MIGRATION_FROM_4.1.1.md','docs/PROTOCOL_SPEC_5.0.0-alpha.5.md','docs/TEST_MATRIX.md',
+        'docs/MIGRATION_FROM_4.1.1.md','docs/PROTOCOL_SPEC_5.0.0-alpha.5.md','docs/PROTOCOL_SPEC_5.0.0-alpha.6.md','docs/TEST_MATRIX.md',
         'docs/ENGINEERING_VALIDATION_LOG.md','docs/REPOSITORY_TRANSPORT.md',
     ):
         if not (ROOT/rel).is_file():fail(f'missing release documentation {rel}')
@@ -184,8 +190,8 @@ def main() -> None:
     if '`digr/help` → route attempt' in read_text('examples/ROUTER_CANDIDATE_MATCHING.md'):
         fail('stale case-insensitive router example')
 
-    for rel in ('runtime/repository_transport.py','runtime/execution_protocol.py','schemas/repository-transport-attempt.schema.json','schemas/execution-protocol-bundle.schema.json','schemas/executing-protocol-load.schema.json','tools/smoke_repository_transport.py','examples/REPOSITORY_TRANSPORT.md'):
-        if not (ROOT/rel).is_file():fail(f'missing Alpha5 transport artifact {rel}')
+    for rel in ('runtime/repository_transport.py','runtime/execution_protocol.py','runtime/execution_integrity.py','schemas/repository-transport-attempt.schema.json','schemas/execution-protocol-bundle.schema.json','schemas/executing-protocol-load.schema.json','schemas/execution-commitment.schema.json','schemas/execution-attempt.schema.json','tools/smoke_repository_transport.py','tools/build_runtime_artifact.py','.github/workflows/digr-runtime-artifact.yml','examples/REPOSITORY_TRANSPORT.md'):
+        if not (ROOT/rel).is_file():fail(f'missing Alpha6 transport artifact {rel}')
     rt=read_text('runtime/repository_transport.py')
     for token in ('AcquisitionAttemptReceipt','route_failure_permitted','stable_branch_primary','stable_ref_corroboration','github_connector','acquire_execution_protocol','load_execution_protocol_for_run','application/vnd.github.raw+json','Cache-Control'):
         if token not in rt:fail(f'transport implementation missing {token}')
@@ -204,6 +210,6 @@ def main() -> None:
         if token not in rs:fail(f'run-session protocol-load barrier missing {token}')
     if 'dictator_enabled' in read_text('runtime/effective_contract.py'):fail('retired D enable/disable helper remains')
 
-    print('DIGR 5.0.0-alpha.5 black-box corrected integration baseline: OK')
+    print('DIGR 5.0.0-alpha.6 execution-integrity/runtime-delivery baseline: OK')
 
 if __name__=='__main__':main()

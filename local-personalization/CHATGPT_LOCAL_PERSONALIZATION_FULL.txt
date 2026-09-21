@@ -1,4 +1,4 @@
-# DIGR Plus Local Personalization — Expanded Routing / Transparency / Execution-Firewall Reference
+# DIGR Plus Local Personalization — Expanded Routing / Transparency / Execution-Integrity Reference
 
 The direct-copy text is `CHATGPT_LOCAL_PERSONALIZATION.txt`. It targets ChatGPT Plus-class custom-instruction capacity and intentionally does not preserve Free/Go compatibility. It remains version-neutral: it controls routing, repository acquisition, structural transparency and the handoff into repository-defined execution, but it does not copy versioned N/T/R/S/D/L/time/stop/proof semantics.
 
@@ -71,7 +71,15 @@ INDEX establishes the machine model before startup interpretation:
 
 INDEX is structural authority only, never versioned execution-semantic authority.
 
-## 6. Surface handoff
+## 6. Execute-before-interpret and implementation delivery
+
+Transparent code must remain an implementation object, not become a prompt for the model to impersonate it. Before each repository-declared operational component, the host/model forms a compact structured commitment naming the exact pinned component, operation and concrete executor, choosing direct execution now and rejecting model-written substitution/manual result construction. A generic promise to “follow the protocol” is insufficient.
+
+If the commitment is incomplete or penetrating, apply a short corrective reminder and interrogate again; at most two correction rounds are allowed. Once accepted, the next relevant action is constrained to identity-preserving delivery/invocation or a concrete failure. Reading more code and then reimplementing equivalent behavior is non-conforming.
+
+Repository access and code execution may live in isolated host domains. When a native same-SHA file→executor bridge is unavailable, use manifest-declared runtime_distribution if present: acquire the exact-commit artifact, require workflow/head SHA to equal P_run, materialize it, and verify helper member identities against the pinned Git tree before execution. The artifact is transport only and never protocol authority. If neither path works, fail startup rather than synthesize replacement runtime code.
+
+## 7. Surface handoff
 
 After actual pinned startup processing:
 
@@ -84,7 +92,7 @@ Only once the pinned authority chain actually permits substantive task work may 
 
 Legacy pinned manifests follow their own declared navigation. The local router does not retrofit current startup semantics into them.
 
-## 7. Authority and failure
+## 8. Authority and failure
 
 The successfully loaded pinned repository protocol is the sole source of versioned DIGR semantics for the turn. Context, Memory, prior answers, other commits, local old protocol copies or a self-hosting target may later inform task evidence only where the pinned protocol allows; none can redefine DIGR semantics.
 

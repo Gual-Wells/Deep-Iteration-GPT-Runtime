@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.0.0-alpha.6 — execution integrity and runtime delivery
+
+Alpha 6 preserves Alpha 5's hard-by-default B/b timing semantics and the Alpha 4/5 authority, clock, state and execution-protocol transport architecture. It addresses two live failures that remained possible after Alpha 5.
+
+- **Runtime impersonation:** seeing and understanding a repository helper did not mechanically force the host/model to execute it. Alpha 6 adds execute-before-interpret drift inoculation, concrete component interrogation, at most two lightweight corrective rounds, execution commitment, and a rule that semantic equivalence/manual receipts never satisfy implementation execution.
+- **Implementation delivery gap:** a GitHub connector could read pinned source while the Python/container executor could not receive those bytes or access GitHub. Alpha 6 makes implementation delivery a first-class startup requirement and adds an exact-commit GitHub Actions runtime artifact whose helper members are verified against the pinned Git tree before execution.
+- Added runtime/execution_integrity.py with structured commitment/attempt records and regression tests.
+- Added core/13_IMPLEMENTATION_EXECUTION_INTEGRITY.md, runtime-distribution manifest metadata, an artifact builder, and a permanent artifact workflow.
+- Startup now fails closed when neither a native identity-preserving bridge nor a verified exact-commit artifact is available; bridge failure is never permission to synthesize replacement runtime code.
+
 ## 5.0.0-alpha.5 — hard-by-default timing policy
 
 Alpha 5 is a narrow semantic-default correction over Alpha 4. Omitted `B` and `b` now resolve to `1` rather than `0`, so T/t are hard lower bounds by default once their values are explicitly supplied or semantically completed. Explicit `B=0` / `b=0` remains the supported opt-in soft timing policy. Alpha 4 authority, source, D/L, clock, workspace and transport architecture is otherwise preserved.
