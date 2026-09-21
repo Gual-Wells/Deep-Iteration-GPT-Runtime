@@ -8,9 +8,9 @@ class TestSchemas(unittest.TestCase):
     def test_all_json_load_and_metaschema_valid(self):
         for p in S.glob('*.json'):
             d=load(p.name);self.assertEqual(d['$schema'],'https://json-schema.org/draft/2020-12/schema');self.assertTrue(d['$id'].endswith('/'+p.name));Draft202012Validator.check_schema(d)
-    def test_manifest_alpha4_interfaces(self):
-        d=load('manifest.schema.json');self.assertEqual(d['properties']['version']['const'],'5.0.0-alpha.5');self.assertEqual(d['properties']['protocol']['const'],'digr-v5.0')
-        expect={'routing_schema':4,'repository_transport_schema':3,'invocation_surface_schema':2,'parameter_resolution_schema':1,'run_session_schema':4,'workspace_schema':2,'clock_journal_schema':1,'event_receipt_schema':2}
+    def test_manifest_alpha6_interfaces(self):
+        d=load('manifest.schema.json');self.assertEqual(d['properties']['version']['const'],'5.0.0-alpha.6');self.assertEqual(d['properties']['protocol']['const'],'digr-v5.0')
+        expect={'routing_schema':4,'repository_transport_schema':3,'invocation_surface_schema':2,'parameter_resolution_schema':1,'run_session_schema':4,'workspace_schema':2,'clock_journal_schema':1,'event_receipt_schema':2,'execution_commitment_schema':1,'execution_attempt_schema':1,'runtime_distribution_schema':1}
         for k,v in expect.items():self.assertIn(k,d['required']);self.assertEqual(d['properties'][k]['const'],v)
         self.assertIn('startup_slice',d['required']);self.assertIn('bootstrap_index',d['required']);self.assertEqual(d['properties']['bootstrap_index']['const'],'bootstrap/INDEX.md');self.assertEqual(d['properties']['startup_slice']['const'],['bootstrap/INDEX.md','bootstrap/BOOTSTRAP.md','entry/STARTUP.md']);self.assertEqual(d['properties']['workspace_spec']['const'],'workspace/layout-v2.json')
     def test_manifest_instance_conforms_to_manifest_schema(self):
