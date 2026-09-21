@@ -6,6 +6,8 @@ Alpha 5 is a narrow semantic-default correction over Alpha 4. Omitted `B` and `b
 
 Maintenance cleanup: corrected the stale manifest `D.s` description that still said zero disabled D, and normalized current Alpha 5 authority/runtime/schema/operator-facing labels that were still self-identifying as Alpha 4. Historical Alpha 4 specifications, migration notes and validation records remain unchanged.
 
+Bootstrap transparency refinement: added pinned `bootstrap/INDEX.md` as the first repository-side structural path after manifest/VERSION. The local router now performs `pin → bootstrap_index → startup_slice`, so the host/model sees implemented helpers, persistent objects, truth-source ownership and the deterministic-runtime/native-intelligence boundary before interpreting startup. The index is structural only and does not duplicate versioned N/T/R/S/D/L/time/stop/proof semantics.
+
 ## 5.0.0-alpha.4 — live black-box integration corrections
 
 Alpha 4 follows Alpha 3 after successful live GitHub-connector routing and subsequent full-parameter black-box runs exposed remaining integration defects. It preserves Alpha 3 immutable repository authority, staged startup, trusted clock genesis, workspace/state model and recovery design.
