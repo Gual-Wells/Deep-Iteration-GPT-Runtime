@@ -236,9 +236,9 @@ class DiscoveryPlan:
     def initial_paths(self) -> tuple[str, ...]:
         """Paths the local router must acquire before repository classification.
 
-        Alpha2 manifests declare a minimal startup slice. Older manifests keep
+        Staged manifests declare a minimal startup slice. Older manifests keep
         their historical bootstrap/entry/core loading order so the router does
-        not import Alpha2 startup semantics into an older P_run.
+        not import newer startup semantics into an older P_run.
         """
         if self.startup_slice:
             return self.startup_slice
