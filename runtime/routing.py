@@ -190,6 +190,7 @@ def _digest(name: str, value: object) -> str:
 @dataclass(frozen=True)
 class DiscoveryPlan:
     bootstrap_entry: str | None
+    bootstrap_index: str | None
     entrypoint: str
     core: tuple[str, ...]
     help_path: str | None
@@ -201,6 +202,8 @@ class DiscoveryPlan:
     def __post_init__(self):
         if self.bootstrap_entry is not None:
             object.__setattr__(self, 'bootstrap_entry', validate_repo_path(self.bootstrap_entry))
+        if self.bootstrap_index is not None:
+            object.__setattr__(self, 'bootstrap_index', validate_repo_path(self.bootstrap_index))
         object.__setattr__(self, 'entrypoint', validate_repo_path(self.entrypoint))
         if not isinstance(self.core, tuple) or not self.core:
             raise ValueError('core must be a non-empty tuple')
@@ -275,6 +278,7 @@ class DiscoveryPlan:
     def to_dict(self) -> dict[str, Any]:
         return {
             'bootstrap_entry': self.bootstrap_entry,
+            'bootstrap_index': self.bootstrap_index,
             'entrypoint': self.entrypoint,
             'core': list(self.core),
             'help_path': self.help_path,
@@ -337,6 +341,9 @@ def discovery_plan_from_manifest(manifest: Mapping[str, Any]) -> DiscoveryPlan:
     boot = manifest.get('bootstrap_entry')
     if boot is not None:
         boot = validate_repo_path(boot)
+    index_path = manifest.get('bootstrap_index')
+    if index_path is not None:
+        index_path = validate_repo_path(index_path)
     help_path = manifest.get('help')
     if help_path is not None:
         help_path = validate_repo_path(help_path)
@@ -346,6 +353,11 @@ def discovery_plan_from_manifest(manifest: Mapping[str, Any]) -> DiscoveryPlan:
     startup = tuple(validate_repo_path(x) for x in raw_startup)
     if startup and boot is not None and boot not in startup:
         raise ValueError('bootstrap_entry must be included in startup_slice')
+    if index_path is not None:
+        if not startup:
+            raise ValueError('bootstrap_index requires staged startup')
+        if startup[0] != index_path:
+            raise ValueError('bootstrap_index must be the first startup_slice path')
     bundle_path=None;bundle_schema=None
     bundle=manifest.get('execution_bundle')
     if bundle is not None:
@@ -361,7 +373,17 @@ def discovery_plan_from_manifest(manifest: Mapping[str, Any]) -> DiscoveryPlan:
             raise ValueError('execution_bundle members must exactly match entrypoint/core order')
         if not startup:
             raise ValueError('execution_bundle requires staged startup')
-    return DiscoveryPlan(boot, entry, core, help_path, startup, boot is None, bundle_path, bundle_schema)
+    return DiscoveryPlan(
+        bootstrap_entry=boot,
+        bootstrap_index=index_path,
+        entrypoint=entry,
+        core=core,
+        help_path=help_path,
+        startup_slice=startup,
+        legacy_manifest=boot is None,
+        execution_bundle_path=bundle_path,
+        execution_bundle_schema=bundle_schema,
+    )
 
 
 def load_manifest_for_route(route: RouteReceipt, data: bytes) -> dict[str, Any]:
