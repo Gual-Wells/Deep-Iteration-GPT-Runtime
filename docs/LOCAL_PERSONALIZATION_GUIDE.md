@@ -24,7 +24,7 @@ When repository access and code execution are isolated, follow the pinned manife
 
 ## Structural transparency and handoff
 
-If `bootstrap_index` exists, load it first. When it is also `startup_slice[0]`, read it once and then continue the remaining startup paths. INDEX exposes implemented helpers, workspace/state/schema objects, truth sources and the native-intelligence boundary without defining versioned DIGR execution semantics.
+If `bootstrap_index` exists, load it first as the **first structural lens** over implemented helpers and truth sources. When it is also `startup_slice[0]`, read it once and then continue the remaining startup paths. INDEX exposes implemented helpers, workspace/state/schema objects, truth sources and the native-intelligence boundary without defining versioned DIGR execution semantics.
 
 Broad capture is not takeover: pinned startup may return NATIVE, HELP, INVALID or EXECUTING. NATIVE returns the original message to ordinary ChatGPT. For EXECUTING the task-work firewall remains closed until repository-defined startup/protocol readiness is actually crossed.
 
