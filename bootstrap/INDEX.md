@@ -1,4 +1,4 @@
-# DIGR Transparent Machine Index — Alpha 5
+# DIGR Transparent Machine Index — Alpha 6
 
 This pinned file is the first repository-side structural view after `manifest.json` + `VERSION`. It is a **machine map**, not versioned execution semantics and not user-task work. Its purpose is to make the already-implemented DIGR system transparent before the host/model operates it.
 
@@ -19,6 +19,21 @@ Treat the manifest-declared objects as real repository objects:
 If the pinned protocol requires a declared helper or runtime step, use the **actual implementation** through the host's available execution channel. Do not downgrade implemented code/workspace/state into a conceptual simulation, and do not invent an external runtime, daemon, mount, attachment or service unless the pinned repository explicitly declares one.
 
 Operational directives remain operational after they become transparent. Loading, reading, understanding or summarizing a startup/protocol instruction does **not** execute it. Until the pinned authority chain has actually crossed every readiness gate it defines before substantive task work, the host/model must stay in transport/startup/runtime setup and must not begin the user's task.
+
+### Execute-before-interpret inoculation
+
+A declared operational helper is something to **operate**, not something for the model to impersonate. Before first operational use, distinguish these patterns explicitly:
+
+- correct: exact pinned component → compatible executor → actual invocation → real receipt/result;
+- wrong: read/understand component → rewrite/translate/simulate equivalent behavior → hand-construct the expected receipt/result.
+
+Semantic equivalence is not implementation identity. Understanding code is not evidence that it ran.
+
+Before each declared operational component, form the compact component commitment defined by the pinned protocol: identify the exact component, exact operation and concrete executor; select direct execution now; reject substitution and manual-result construction. If the commitment is incomplete or penetrating, apply only the bounded lightweight re-education defined by the protocol and ask again. Once accepted, the next relevant action must be actual implementation delivery/invocation or a concrete failure.
+
+### Implementation delivery reality
+
+Repository visibility and executor availability are separate capabilities. If the host cannot natively move exact same-SHA files from repository transport into an executor, use manifest.runtime_distribution when declared. Alpha 6's same-commit Actions artifact is a byte-delivery fallback whose members must verify against the pinned Git tree before use. The artifact never becomes protocol authority.
 
 ## 2. Machine topology
 
@@ -52,6 +67,6 @@ Operational directives remain operational after they become transparent. Loading
 
 ## 5. Continue startup
 
-After this index is understood, continue the remaining manifest-declared `startup_slice` in order. For this pinned Alpha 5 structure that means `bootstrap/BOOTSTRAP.md` then `entry/STARTUP.md`.
+After this index is understood, continue the remaining manifest-declared `startup_slice` in order. For this pinned Alpha 6 structure that means `bootstrap/BOOTSTRAP.md` then `entry/STARTUP.md`.
 
 This index has no authority to alter N/T/R/S/D/L, timing, stop or proof semantics. If any wording here conflicts with the pinned manifest/startup/entry/core, the latter wins.
