@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and cold-validate a deterministic DIGR 5.0.0-alpha.4 source ZIP.
+"""Build and cold-validate a deterministic DIGR 5.0.0-alpha.6 source ZIP.
 
 Standard-library only.  The builder rejects symlinks/path traversal, tests the
 source before cache cleanup, regenerates FILE_TREE/SHA256SUMS, writes a sorted
