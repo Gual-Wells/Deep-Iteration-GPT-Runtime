@@ -16,6 +16,7 @@
     "time_states",
     "core",
     "bootstrap_entry",
+    "bootstrap_index",
     "startup_slice",
     "entrypoint",
     "help",
@@ -78,13 +79,11 @@
       "const": "bootstrap/BOOTSTRAP.md"
     },
     "startup_slice": {
-      "type": "array",
-      "minItems": 2,
-      "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
+      "const": [
+        "bootstrap/INDEX.md",
+        "bootstrap/BOOTSTRAP.md",
+        "entry/STARTUP.md"
+      ]
     },
     "entrypoint": {
       "const": "entry/DEEP_ITERATION_ENTRY.md"
@@ -230,6 +229,9 @@
         }
       },
       "additionalProperties": false
+    },
+    "bootstrap_index": {
+      "const": "bootstrap/INDEX.md"
     }
   },
   "additionalProperties": true

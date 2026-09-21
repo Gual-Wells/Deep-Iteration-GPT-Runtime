@@ -31,10 +31,11 @@ MANIFEST={
     'version':'5.0.0-alpha.5',
     'protocol':'digr-v5.0',
     'bootstrap_entry':'bootstrap/BOOTSTRAP.md',
+    'bootstrap_index':'bootstrap/INDEX.md',
     'entrypoint':'entry/DEEP_ITERATION_ENTRY.md',
     'core':['core/00_RESULT_SOVEREIGNTY.md'],
     'help':'entry/HELP.md',
-    'startup_slice':['bootstrap/BOOTSTRAP.md','entry/STARTUP.md'],
+    'startup_slice':['bootstrap/INDEX.md','bootstrap/BOOTSTRAP.md','entry/STARTUP.md'],
     'execution_bundle':{
         'path':'bundle/EXECUTION_PROTOCOL.json','schema':1,
         'members':['entry/DEEP_ITERATION_ENTRY.md','core/00_RESULT_SOVEREIGNTY.md'],
@@ -56,6 +57,7 @@ BUNDLE_BYTES=(json.dumps({
 FILES={
     'manifest.json':MANIFEST_BYTES,
     'VERSION':VERSION,
+    'bootstrap/INDEX.md':b'# transparent index\n',
     'bootstrap/BOOTSTRAP.md':b'# boot\n',
     'entry/STARTUP.md':b'# startup\n',
     **LOGICAL,
@@ -108,7 +110,7 @@ class TestRepositoryTransport(unittest.TestCase):
         bundle=s.acquire_startup('DIGR/help')
         self.assertEqual(bundle.resolution.commit_sha,SHA)
         self.assertEqual(bundle.version_bytes,VERSION)
-        self.assertEqual(tuple(p for p,_ in bundle.startup_files),('bootstrap/BOOTSTRAP.md','entry/STARTUP.md'))
+        self.assertEqual(tuple(p for p,_ in bundle.startup_files),('bootstrap/INDEX.md','bootstrap/BOOTSTRAP.md','entry/STARTUP.md'))
         self.assertEqual([r.purpose for r in bundle.attempts[:2]],['stable_branch_primary_r1','stable_ref_corroboration_r1'])
         self.assertTrue(all(r.success for r in bundle.attempts))
         self.assertTrue(route_failure_permitted(bundle.attempts))

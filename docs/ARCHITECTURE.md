@@ -3,12 +3,12 @@
 Alpha 5 retains five planes. Alpha 2 separated the execution/state planes; Alpha 4 made the previously implicit host-transport plane explicit.
 
 1. **Host repository transport:** actual direct acquisition → mutable `stable` corroboration → immutable pinned bytes + attempt receipts.
-2. **Transport/authority verification:** candidate route → pinned manifest/VERSION → startup/full protocol discovery.
+2. **Transport/authority verification:** candidate route → pinned manifest/VERSION → transparent machine index → startup/full protocol discovery.
 3. **Commitment/lifecycle:** clock genesis, parameter resolution, U0, Effective Contract, RunPhase.
 4. **Mutable native working state:** Strategy, Candidate, EST, Source workspaces, D interventions, completion gaps.
 5. **Evidence/audit:** clock/source-activity/event journals, evidence, isolation receipts, artifact index, run brief, final summary.
 
-The first three are deterministic reliability boundaries. The fourth belongs to native intelligence: stores are external memory, not an algorithmic controller. The fifth makes actuals/recovery auditable without exposing hidden chain-of-thought.
+The first three are deterministic reliability boundaries. Before startup interpretation, `bootstrap/INDEX.md` provides a pinned structural view of all five planes: implemented component classes, authoritative truth sources and the line between deterministic support and native intelligence. It is a lens over the architecture, not a sixth plane and not execution-semantic authority. The fourth belongs to native intelligence: stores are external memory, not an algorithmic controller. The fifth makes actuals/recovery auditable without exposing hidden chain-of-thought.
 
 ## Transport single-truth relationships
 - Mutable branch authority comes from direct current GitHub observations, never search/index snapshots.

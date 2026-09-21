@@ -14,7 +14,7 @@ A public DIGR bootstrap must not require the user to establish a new GitHub OAut
 
 After stable resolves to one SHA, every later resource is read at that exact SHA. `raw.githubusercontent.com/{SHA}/{PATH}` is canonical. GitHub Contents API is an allowed fallback only when the response is raw media or its JSON/base64 wrapper is decoded into actual file bytes.
 
-The first immutable stage remains deliberately small: `manifest.json`, `VERSION`, then `startup_slice`. This preserves cheap NATIVE/HELP/INVALID classification and keeps Clock Genesis at the same early boundary.
+The first immutable stage remains deliberately small but now has an explicit structural lens: `manifest.json`, `VERSION`, then `manifest.bootstrap_index`, then the remaining ordered `startup_slice`. The index exposes implemented repository machinery and truth-source ownership before startup interpretation without importing versioned execution semantics. Cheap NATIVE/HELP/INVALID classification and the early Clock Genesis boundary are preserved.
 
 For EXECUTING, Alpha 5 retains the separation between **logical protocol modularity** and **physical transport count**. The repository continues to maintain one entrypoint and 17 core source files, but the release builder deterministically generates `bundle/EXECUTION_PROTOCOL.json`. After Clock Genesis the host fetches this single pinned bundle, verifies that it contains exactly the manifest-declared entrypoint/core members in order with matching byte lengths and SHA-256 digests, and persists an `ExecutingProtocolLoadReceipt`. Parameter resolution cannot start without that receipt.
 

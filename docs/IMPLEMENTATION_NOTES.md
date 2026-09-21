@@ -2,7 +2,13 @@
 
 Alpha 5 is a narrow hard-default timing correction over the Alpha 4 black-box integration baseline.
 
-The only contract-policy change in Alpha 5 is the omitted timing-policy default: deterministic parameter resolution now supplies `B=1` and `b=1`. Explicit `B=0` / `b=0` retains the Alpha 4 soft-target behavior. The underlying soft/hard stop mechanics are unchanged.
+The only **contract-policy** change in Alpha 5 remains the omitted timing-policy default: deterministic parameter resolution supplies `B=1` and `b=1`. Explicit `B=0` / `b=0` retains the Alpha 4 soft-target behavior. The underlying soft/hard stop mechanics are unchanged. A later Alpha 5 bootstrap refinement adds structural transparency before startup without changing those execution semantics.
+
+## Transparent bootstrap index
+
+After immutable manifest/VERSION binding, current Alpha 5 loads manifest-declared `bootstrap/INDEX.md` first. The index gives the host/model a compact machine map: which protocol files and deterministic helpers are implemented, where workspace/state/schema truth lives, and where deterministic reliability support stops and native model intelligence begins. `runtime/routing.py` now validates that a declared `bootstrap_index` is the first `startup_slice` path. The index is structural only; it does not define N/T/R/S/D/L/time/stop/proof semantics.
+
+This specifically prevents two opposite integration failures: treating repository helpers/workspace as mere concepts or imaginary external services, and treating deterministic helpers as a planner that should replace native task strategy.
 
 ## Repository transport
 

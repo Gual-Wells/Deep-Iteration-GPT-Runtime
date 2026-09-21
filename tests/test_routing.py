@@ -30,6 +30,12 @@ class TestRouting(unittest.TestCase):
     def test_alpha2_staged_startup(self):
         m={'bootstrap_entry':'bootstrap/BOOTSTRAP.md','entrypoint':'entry/E.md','core':['core/A.md','core/B.md'],'help':'entry/H.md','startup_slice':['bootstrap/BOOTSTRAP.md','entry/STARTUP.md']}
         p=discovery_plan_from_manifest(m); self.assertFalse(p.legacy_manifest); self.assertTrue(p.staged_startup); self.assertEqual(p.initial_paths,('bootstrap/BOOTSTRAP.md','entry/STARTUP.md')); self.assertEqual(p.post_startup_paths,('entry/E.md','core/A.md','core/B.md')); self.assertEqual(p.optional_paths,('entry/H.md',))
+    def test_bootstrap_index_is_first_when_declared(self):
+        m={'bootstrap_entry':'bootstrap/BOOTSTRAP.md','bootstrap_index':'bootstrap/INDEX.md','entrypoint':'entry/E.md','core':['core/A.md'],'help':'entry/H.md','startup_slice':['bootstrap/INDEX.md','bootstrap/BOOTSTRAP.md','entry/STARTUP.md']}
+        p=discovery_plan_from_manifest(m);self.assertEqual(p.bootstrap_index,'bootstrap/INDEX.md');self.assertEqual(p.initial_paths[0],p.bootstrap_index)
+        bad=dict(m);bad['startup_slice']=['bootstrap/BOOTSTRAP.md','bootstrap/INDEX.md','entry/STARTUP.md']
+        with self.assertRaisesRegex(ValueError,'bootstrap_index must be the first'):discovery_plan_from_manifest(bad)
+
     def test_staged_manifest_execution_bundle_reduces_physical_post_startup_reads(self):
         m={'bootstrap_entry':'bootstrap/BOOTSTRAP.md','entrypoint':'entry/E.md','core':['core/A.md','core/B.md'],'help':'entry/H.md','startup_slice':['bootstrap/BOOTSTRAP.md','entry/STARTUP.md'],'execution_bundle':{'path':'bundle/EXECUTION_PROTOCOL.json','schema':1,'members':['entry/E.md','core/A.md','core/B.md']}}
         p=discovery_plan_from_manifest(m)

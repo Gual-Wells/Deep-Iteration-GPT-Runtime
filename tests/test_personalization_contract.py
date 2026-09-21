@@ -9,14 +9,14 @@ class TestPersonalization(unittest.TestCase):
     def test_candidate_exact_uppercase_and_native_return(self):
         for x in ('精确大写 ASCII `DIGR`','`digr`、`Digr` 等不路由','宽捕获','NATIVE','原始消息交还普通 ChatGPT'):self.assertIn(x,self.text)
     def test_exact_repository_and_staged_navigation(self):
-        for x in ('Gual-Wells/Deep-Iteration-GPT-Runtime','https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime','/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','startup_slice','entrypoint','core[]','manifest.help','完整 40 位 commit SHA','同一 SHA','必须实际获取','没有尝试本身不是路由失败'):
+        for x in ('Gual-Wells/Deep-Iteration-GPT-Runtime','https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime','/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','bootstrap_index','startup_slice','entrypoint','core[]','manifest.help','完整 40 位 commit SHA','同一 SHA','必须实际获取','没有尝试本身不是路由失败'):
             self.assertIn(x,self.text)
-        self.assertIn('DIGR 路由失败：未取得仓库运行协议',self.text)
+        self.assertIn('DIGR 路由失败：未取得仓库运行协议',self.text);self.assertIn('pin→索引→启动',self.text);self.assertIn('真实 helper',self.text);self.assertIn('外部 runtime/挂载/服务',self.text)
     def test_no_versioned_execution_copy(self):
         for token in ('monotonic','LiveDIGRRun','P_target','B=0','b=0','B=1','b=1','L(1)','Mature Gambit','Formal Active','proof'):
             self.assertNotIn(token,self.text)
     def test_full_explains_transport_boundary(self):
-        for x in ('Expanded Routing/Transport Reference','Candidate routing is an obligation','Mutable-ref provenance','Immutable pinned content','Staged authority handoff','Failure evidence','NATIVE'):
+        for x in ('Expanded Routing / Transparency Reference','Candidate routing is an obligation','Mutable-ref provenance','Transparent machine index comes first','Ordered authority handoff','Operating boundary','Failure evidence','NATIVE'):
             self.assertIn(x,self.full)
         self.assertNotIn('B=0',self.full); self.assertNotIn('B=1',self.full)
 if __name__=='__main__':unittest.main()

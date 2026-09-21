@@ -5,6 +5,7 @@ Alpha 2 remains the mother-base for the corrected 5.0 execution/state model. Alp
 The inherited Alpha 4 correction set remains in force. Alpha 5 additionally changes the fixed B/b default and its resolver/help/test contract:
 
 - `routing_schema=4` and `repository_transport_schema=3` distinguish connector branch-head authority from direct REST consensus with one bounded retry for live push races;
+- pinned `bootstrap/INDEX.md` is now the manifest-declared first repository-side path after manifest/VERSION, exposing implemented-machine structure and truth-source ownership before the remaining startup slice without becoming execution-semantic authority;
 - `run_session_schema=4` preserves corrected D/L semantics and additionally makes verified full execution-protocol load a hard post-genesis prerequisite;
 - timing documentation converges on soft/hard T/t targets rather than incorrectly calling all contract fields unconditional minima;
 - canonical proof rendering and canonical zh-CN Help are tightened to prevent host-side semantic drift;

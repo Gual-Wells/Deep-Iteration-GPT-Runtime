@@ -51,7 +51,7 @@ Initialization/repository/META work remains outside T/t unless it becomes substa
 
 The protocol now explicitly requires the same user-visible proof semantics as `runtime/proof.py`: actual durations floor to whole seconds; hard-unverified time is `?`; raw float/nanosecond values do not leak. The canonical Help is now a professional zh-CN reference with explicit default precedence, timing policy, SourceDisposition, D/L and proof rules.
 
-## Authority and startup
+## Authority, transparent index and startup
 
 ```text
 candidate message
@@ -65,7 +65,9 @@ immutable 40-hex SHA
   ↓
 pinned manifest/VERSION
   ↓
-manifest startup_slice
+pinned bootstrap/INDEX.md
+  ↓
+remaining manifest startup_slice
   ↓
 NATIVE | HELP | INVALID | EXECUTING
                            ↓
