@@ -47,7 +47,9 @@ def main() -> None:
     if m.get('protocol')!='digr-v5.0' or m.get('version')!=VERSION:fail('manifest version/protocol')
     for k,v in INTERFACES.items():
         if m.get(k)!=v:fail(f'manifest interface {k}')
-    if m.get('startup_slice')!=['bootstrap/BOOTSTRAP.md','entry/STARTUP.md']:fail('startup_slice')
+    if m.get('bootstrap_index')!='bootstrap/INDEX.md':fail('bootstrap_index')
+    if m.get('startup_slice')!=['bootstrap/INDEX.md','bootstrap/BOOTSTRAP.md','entry/STARTUP.md']:fail('startup_slice')
+    if m['startup_slice'][0]!=m['bootstrap_index']:fail('bootstrap index must be first startup path')
     if m.get('workspace_spec')!='workspace/layout-v2.json':fail('workspace_spec')
     if m.get('routing',{}).get('candidate_match')!='lstrip_prefix; DIGR_exact_uppercase; remainder_unvalidated':fail('exact-uppercase candidate route metadata')
     if m.get('routing',{}).get('candidate_route_keys')!=['DIGR','深度迭代']:fail('candidate route keys')
@@ -61,7 +63,7 @@ def main() -> None:
     }
     for k,v in expected_routing.items():
         if routing.get(k)!=v:fail(f'Alpha5 routing transport metadata {k}')
-    for k in ('route_requires_actual_acquisition_attempt','route_failure_requires_acquisition_evidence','mutable_ref_search_index_forbidden','mutable_ref_direct_live_provenance_required','mutable_ref_ref_branch_consensus_when_using_rest','pinned_raw_sha_content_is_cache_safe','contents_api_wrapper_must_be_raw_or_decoded','repository_transport_is_host_bridge_not_execution_semantics','D_zero_means_no_minimum_not_disabled','L_applicability_follows_actual_D','timing_targets_soft_when_policy_zero','timing_targets_hard_lower_bounds_when_policy_one','canonical_proof_actual_durations_floor_to_whole_seconds','executing_protocol_bundle_preserves_logical_modularity','executing_protocol_load_receipt_required_before_parameter_resolution','post_genesis_protocol_load_failure_aborts_born_run','execution_bundle_is_immutable_sha_pinned'):
+    for k in ('route_requires_actual_acquisition_attempt','route_failure_requires_acquisition_evidence','mutable_ref_search_index_forbidden','mutable_ref_direct_live_provenance_required','mutable_ref_ref_branch_consensus_when_using_rest','pinned_raw_sha_content_is_cache_safe','contents_api_wrapper_must_be_raw_or_decoded','repository_transport_is_host_bridge_not_execution_semantics','bootstrap_index_precedes_startup','bootstrap_index_is_structural_not_semantic_authority','implemented_repository_helpers_are_real_execution_facilities','no_phantom_external_runtime_dependency','D_zero_means_no_minimum_not_disabled','L_applicability_follows_actual_D','timing_targets_soft_when_policy_zero','timing_targets_hard_lower_bounds_when_policy_one','canonical_proof_actual_durations_floor_to_whole_seconds','executing_protocol_bundle_preserves_logical_modularity','executing_protocol_load_receipt_required_before_parameter_resolution','post_genesis_protocol_load_failure_aborts_born_run','execution_bundle_is_immutable_sha_pinned'):
         if m.get('policies',{}).get(k) is not True:fail(f'Alpha5 policy {k}')
     for retired in ('D_zero_disables','D_zero_makes_L_nonblocking'):
         if retired in m.get('policies',{}):fail(f'retired Alpha3 D policy still present: {retired}')
@@ -72,7 +74,7 @@ def main() -> None:
     if m.get('execution_bundle_schema')!=1 or m.get('execution_protocol_load_schema')!=1:fail('execution bundle/load schemas')
     eb=m.get('execution_bundle')
     if not isinstance(eb,dict) or eb.get('path')!='bundle/EXECUTION_PROTOCOL.json' or eb.get('schema')!=1 or eb.get('members')!=[m['entrypoint'],*m['core']]:fail('execution bundle metadata')
-    required_paths=[m['bootstrap_entry'],*m['startup_slice'],m['entrypoint'],m['help'],m['workspace_spec'],eb['path'],*m['core'],*m['deterministic_helpers']]
+    required_paths=[m['bootstrap_index'],m['bootstrap_entry'],*m['startup_slice'],m['entrypoint'],m['help'],m['workspace_spec'],eb['path'],*m['core'],*m['deterministic_helpers']]
     for rel in dict.fromkeys(required_paths):
         if not (ROOT/rel).is_file():fail(f'missing manifest path {rel}')
     if len(m['core'])!=len(set(m['core'])):fail('duplicate core path')
@@ -121,15 +123,21 @@ def main() -> None:
     for token in (
         '精确大写 ASCII `DIGR`','`digr`、`Digr` 等不路由','宽捕获','NATIVE','原始消息交还普通 ChatGPT',
         'Gual-Wells/Deep-Iteration-GPT-Runtime','https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime',
-        '/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','startup_slice','execution bundle','entrypoint','core[]','manifest.help','完整 40 位 commit SHA','同一 SHA','必须实际获取','没有尝试本身不是路由失败',
-        'DIGR 路由失败：未取得仓库运行协议',
+        '/git/ref/heads/stable','/branches/stable','raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}','manifest.json','VERSION','bootstrap_index','startup_slice','execution bundle','entrypoint','core[]','manifest.help','完整 40 位 commit SHA','同一 SHA','必须实际获取','没有尝试本身不是路由失败',
+        'pin→索引→启动','真实 helper','外部 runtime/挂载/服务','DIGR 路由失败：未取得仓库运行协议',
     ):
         if token not in text:fail(f'router missing {token}')
     for bad in ('monotonic','LiveDIGRRun','P_target','B=0','b=0','B=1','b=1','L(1)','Mature Gambit','Formal Active','proof'):
         if bad in text:fail(f'compact router duplicates versioned execution semantics: {bad}')
-    for token in ('Expanded Routing/Transport Reference','Candidate routing is an obligation','Mutable-ref provenance','Immutable pinned content','Staged authority handoff','Failure evidence','NATIVE'):
+    for token in ('Expanded Routing / Transparency Reference','Candidate routing is an obligation','Mutable-ref provenance','Transparent machine index comes first','Ordered authority handoff','Operating boundary','Failure evidence','NATIVE'):
         if token not in full_text:fail(f'full router reference missing {token}')
     if any(x in full_text for x in ('B=0','b=0','B=1','b=1')):fail('full local reference copies versioned execution defaults')
+
+    index_text=read_text(m['bootstrap_index'])
+    for token in ('Reality model','Machine topology','Truth-source map','Structure-closed, intelligence-open','deterministic_helpers[]','workspace_spec','runtime/run_session.py','runtime/run_recovery.py','runtime/actuals.py','not versioned execution semantics'):
+        if token not in index_text:fail(f'bootstrap index missing {token}')
+    if any(x in index_text for x in ('B=0','b=0','B=1','b=1','L(1)')):
+        fail('bootstrap index copies versioned execution defaults')
 
     help_text=read_text('entry/HELP.md')
     for token in ('## 1. 调用与路由','## 2. 参数解析顺序与缺省规则','## 3. 参数参考','## 4. Effective Contract 与来源策略','## 5. N / R / D / L','## 6. 时间与停止','## 7. 执行链与启动成本','## 8. 输出与 canonical proof','## 9. 版本与权威'):
