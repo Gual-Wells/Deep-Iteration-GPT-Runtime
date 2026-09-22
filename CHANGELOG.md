@@ -12,6 +12,8 @@ Alpha 8 is a convergence pass over Alpha 7. It reduces reliability overhead whil
 - Exclusive D Result production is clock/state-bound to D_EXCLUSIVE until explicit MAIN reintegration.
 - Public L remains removed; obsolete L2/L3 active examples were removed and proof/schema/docs converged on internal L1.
 - Release cleanup no longer deletes repository .git metadata.
+- Execution-integrity interrogation is amortized over a verified runtime package/executor binding instead of repeated for every helper call.
+- Stable publishes a durable exact-commit runtime prerelease asset so runtime delivery does not disappear after Actions artifact retention expires.
 - Release validation is being tightened so checked-in generated metadata must match deterministic regeneration.
 
 ## 5.0.0-alpha.7 — formal-time continuity and internal L1
