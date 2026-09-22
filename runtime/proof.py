@@ -110,6 +110,8 @@ def proof_data_from_contract_actuals(contract,actual):
         t_target_seconds=contract.S.t_seconds,t_actual_seconds=actual.t_seconds,
         r_target=contract.S.r,r_actual=actual.r_min,b=contract.S.b,
         D_target=contract.D_s,D_actual=actual.D_s,
-        T_hard_verified=actual.T_hard_verified,t_hard_verified=actual.t_hard_verified,
-        T_coverage_complete=actual.T_coverage_complete,t_coverage_complete=actual.t_coverage_complete,
+        T_hard_verified=actual.T_hard_verified,
+        t_hard_verified=actual.t_hard_verified or not contract.source_required,
+        T_coverage_complete=actual.T_coverage_complete,
+        t_coverage_complete=actual.t_coverage_complete or not contract.source_required,
     )
