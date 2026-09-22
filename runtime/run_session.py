@@ -1,4 +1,4 @@
-"""DIGR 5.0 Alpha 6 Native Assist run session.
+"""DIGR 5.0 Alpha 7 Native Assist run session.
 
 The session is a reliability exoskeleton. It freezes authority/U0/minimum
 commitments and binds timing/evidence/state, while leaving task strategy and
@@ -12,7 +12,7 @@ import shutil,tempfile,uuid,json
 from typing import Any,Callable,Iterable
 from .actuals import ActualsProvenance,derive_contract_actuals
 from .candidate_store import CandidateSnapshot,CandidateStore
-from .clock_journal import ClockJournal,derive_work_intervals
+from .clock_journal import ClockJournal,derive_work_timeline
 from .clock_probe import ClockSnapshot,snapshot
 from .completion_state import CompletionState
 from .d_intervention import DInterventionStore,ReintegrationReceipt
@@ -65,7 +65,7 @@ def _load_snapshot(d)->ClockSnapshot:return ClockSnapshot(d['provider'],d['sessi
 def _load_startup(d)->TaskStartupReceipt:
     return TaskStartupReceipt(_load_authority(d['authority']),_load_invocation(d['invocation']),ClockReadiness(tuple(_load_snapshot(x) for x in d['clock']['samples'])),False)
 def _load_contract(d)->EffectiveContract:
-    s=d['S'];return EffectiveContract(d['N'],d['T_seconds'],d['R'],d['B'],SourceContract(s['n'],s['t_seconds'],s['r'],s['b']),d['D_s'],d['L_e'],SourceDisposition(d.get('source_disposition','REQUIRED')),d.get('source_waiver_reason'),d.get('L_mismatch_blocks_delivery',False))
+    s=d['S'];return EffectiveContract(d['N'],d['T_seconds'],d['R'],d['B'],SourceContract(s['n'],s['t_seconds'],s['r'],s['b']),d['D_s'],SourceDisposition(d.get('source_disposition','REQUIRED')),d.get('source_waiver_reason'))
 
 class LiveDIGRRun:
     def __init__(self,run_id,startup,workspace,journal,snapshot_fn,*,restoring=False):
@@ -87,7 +87,7 @@ class LiveDIGRRun:
     @classmethod
     def start(cls,authority:ProtocolAuthority,message:str,workspace_parent:Path|None=None,snapshot_fn:Callable[[],ClockSnapshot]=snapshot,run_id:str|None=None):
         surface=classify_surface(message)
-        if surface is None or surface.kind is not InvocationKind.EXECUTING:raise RunGenesisError('SURFACE','message is not an executing DIGR 5.0 Alpha 6 invocation')
+        if surface is None or surface.kind is not InvocationKind.EXECUTING:raise RunGenesisError('SURFACE','message is not an executing DIGR 5.0 Alpha 7 invocation')
         try: startup=start_task(authority,surface,snapshot_fn)
         except Exception as exc:raise RunGenesisError('CLOCK',str(exc)) from exc
         rid=run_id or ('digr-'+uuid.uuid4().hex);parent=Path(workspace_parent) if workspace_parent is not None else Path(tempfile.gettempdir())/'.digr-runs';ws=None
@@ -111,14 +111,27 @@ class LiveDIGRRun:
         if ws.path('parameter-resolution.json').is_file():obj.parameters=ParameterResolution.from_dict(ws.read_json('parameter-resolution.json'))
         if ws.path('U0.json').is_file():obj.U0=U0Receipt.from_dict(ws.read_json('U0.json'))
         if ws.path('contract.json').is_file():obj.contract=_load_contract(ws.read_json('contract.json'))
+        pre=derive_work_timeline(journal.events)
+        bridge_state=pre.open_state if pre.lease_open else None
+        bridge_source_ids=()
+        if bridge_state is WorkState.SOURCE:
+            if pre.open_state_ref is None:raise RunResumeError('leased SOURCE state lacks clock reference')
+            bridge_source_ids=obj.source_activity.by_clock_ref().get(pre.open_state_ref,())
+            if not bridge_source_ids:raise RunResumeError('leased SOURCE state lacks active-source binding')
         samples=tuple(snapshot_fn() for _ in range(3))
         try:journal.append_resume(samples)
         except Exception as exc:raise RunResumeError(f'cross-session clock continuity unverifiable: {exc}') from exc
-        # Re-index immediately: a crash after this point still leaves the journal/index consistent.
+        if bridge_state in (WorkState.MAIN,WorkState.SOURCE,WorkState.D_EXCLUSIVE):
+            resumed=journal.append('STATE',samples[-1],bridge_state)
+            if bridge_state is WorkState.SOURCE:obj.source_activity.append(resumed.record_hash,bridge_source_ids)
         obj._reindex_journals()
         if obj.contract is not None:
-            intervals=derive_work_intervals(journal.events)
-            obj.ledger=FormalTimeLedger.resume_from_intervals(startup,intervals,journal.events[-1].snapshot,hard_T=obj.contract.B==1,hard_t=obj.contract.S.b==1)
+            timeline=derive_work_timeline(journal.events)
+            obj.ledger=FormalTimeLedger.resume_from_timeline(
+                startup,timeline.intervals,timeline.gaps,journal.events[-1].snapshot,
+                open_state=timeline.open_state,open_start=timeline.open_start,
+                hard_T=obj.contract.B==1,hard_t=obj.contract.S.b==1,
+            )
         obj.refresh_brief();return obj
 
     def _reindex_journals(self):
@@ -176,10 +189,9 @@ class LiveDIGRRun:
             if explicit is not None and explicit!=actual:raise ValueError(f'contract changes explicit parameter {name}')
         for name,explicit,actual in (('S.n',p.S.n,contract.S.n),('S.t_seconds',p.S.t_seconds,contract.S.t_seconds),('S.r',p.S.r,contract.S.r)):
             if explicit is not None and explicit!=actual:raise ValueError(f'contract changes explicit parameter {name}')
-        # B/b/L are fixed-default-or-explicit structural values, never semantic completion.
+        # B/b are fixed-default-or-explicit structural values, never semantic completion.
         if p.B!=contract.B:raise ValueError('contract changes resolved/default B')
         if p.S.b!=contract.S.b:raise ValueError('contract changes resolved/default b')
-        if p.L_e!=contract.L_e:raise ValueError('contract changes resolved/default L')
 
     def freeze_contract(self,contract:EffectiveContract):
         if self.phase.phase is not RunPhase.U0_FROZEN:raise RuntimeError('freeze U0 before contract')
