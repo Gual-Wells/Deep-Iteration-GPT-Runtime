@@ -8,7 +8,7 @@ INTERFACES={
     'routing_schema':4,'repository_transport_schema':3,'invocation_surface_schema':2,
     'parameter_resolution_schema':2,'run_session_schema':6,'workspace_schema':2,
     'clock_journal_schema':1,'event_receipt_schema':2,'execution_commitment_schema':1,
-    'execution_attempt_schema':1,'runtime_distribution_schema':1,
+    'execution_attempt_schema':1,'runtime_distribution_schema':2,
 }
 
 def fail(msg):
@@ -50,14 +50,14 @@ def main():
         'revision_history_is_authoritative_over_latest_pointers','D_result_must_preserve_isolation_until_reintegration',
         'reentry_cannot_move_backward_to_superseded_result','release_builder_never_deletes_repository_metadata',
         'source_work_lease_carries_active_source_binding','finalization_admission_precedes_ledger_finish',
-        'FINISHED_requires_delivery_ready',
+        'FINISHED_requires_delivery_ready','durable_exact_commit_runtime_release_asset',
     )
     for k in required_policies:
         if m.get('policies',{}).get(k) is not True:fail(f'policy {k}')
 
     eb=m.get('execution_bundle');rd=m.get('runtime_distribution')
     if not isinstance(eb,dict) or eb.get('members')!=[m['entrypoint'],*m['core']]:fail('execution bundle metadata')
-    if not isinstance(rd,dict) or rd.get('artifact_name_template')!='digr-runtime-{SHA}':fail('runtime distribution')
+    if not isinstance(rd,dict) or rd.get('schema')!=2 or rd.get('artifact_name_template')!='digr-runtime-{SHA}' or rd.get('durable_release_tag_template')!='digr-runtime-{SHA}' or rd.get('durable_release_asset_template')!='DIGR-RUNTIME-{SHA}.zip':fail('runtime distribution')
     required=[m['bootstrap_index'],m['bootstrap_entry'],*m['startup_slice'],m['entrypoint'],m['help'],m['workspace_spec'],eb['path'],rd['workflow_path'],*m['core'],*m['deterministic_helpers']]
     for rel in dict.fromkeys(required):
         if not (ROOT/rel).is_file():fail(f'missing path {rel}')
