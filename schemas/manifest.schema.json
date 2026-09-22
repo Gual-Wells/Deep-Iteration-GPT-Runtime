@@ -244,7 +244,7 @@
       "const": 1
     },
     "runtime_distribution_schema": {
-      "const": 1
+      "const": 2
     },
     "runtime_distribution": {
       "type": "object",
@@ -258,14 +258,17 @@
         "runtime_index_path",
         "identity_verification",
         "preferred_path",
-        "fallback_path"
+        "durable_fallback_path",
+        "durable_release_tag_template",
+        "durable_release_asset_template",
+        "transient_fallback_path"
       ],
       "properties": {
         "schema": {
-          "const": 1
+          "const": 2
         },
         "mode": {
-          "const": "github_actions_artifact_or_native_bridge"
+          "const": "native_bridge_or_exact_commit_release_or_actions_artifact"
         },
         "workflow_path": {
           "const": ".github/workflows/digr-runtime-artifact.yml"
@@ -283,12 +286,21 @@
           "const": "RUNTIME-INDEX.json"
         },
         "identity_verification": {
-          "const": "exact_commit_head_sha_plus_pinned_git_tree_blob_identity"
+          "const": "exact_commit_sha_plus_pinned_git_tree_blob_identity"
         },
         "preferred_path": {
           "const": "native_same_sha_file_to_executor_bridge"
         },
-        "fallback_path": {
+        "durable_fallback_path": {
+          "const": "same_commit_github_prerelease_asset"
+        },
+        "durable_release_tag_template": {
+          "const": "digr-runtime-{SHA}"
+        },
+        "durable_release_asset_template": {
+          "const": "DIGR-RUNTIME-{SHA}.zip"
+        },
+        "transient_fallback_path": {
           "const": "same_commit_github_actions_artifact"
         }
       },
