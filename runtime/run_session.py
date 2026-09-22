@@ -101,7 +101,8 @@ class LiveDIGRRun:
 
     @classmethod
     def resume(cls,root:Path,run_id:str,snapshot_fn:Callable[[],ClockSnapshot]=snapshot):
-        from .run_recovery import verify_run_workspace
+        from .run_recovery import recover_run_workspace,verify_run_workspace
+        recover_run_workspace(root,run_id)
         report=verify_run_workspace(root,run_id)
         ws=RunWorkspace.open_existing(Path(root).resolve(),run_id);phase=RunPhaseStore.load(ws)
         if phase.phase in (RunPhase.FINISHED,RunPhase.ABORTED):raise RunResumeError(f'cannot resume terminal run: {phase.phase.value}')
