@@ -1,4 +1,4 @@
-# DIGR Transparent Machine Index — Alpha 6
+# DIGR Transparent Machine Index — Alpha 7
 
 This pinned file is the first repository-side structural view after `manifest.json` + `VERSION`. It is a **machine map**, not versioned execution semantics and not user-task work. Its purpose is to make the already-implemented DIGR system transparent before the host/model operates it.
 
@@ -31,6 +31,10 @@ Semantic equivalence is not implementation identity. Understanding code is not e
 
 Before each declared operational component, form the compact component commitment defined by the pinned protocol: identify the exact component, exact operation and concrete executor; select direct execution now; reject substitution and manual-result construction. If the commitment is incomplete or penetrating, apply only the bounded lightweight re-education defined by the protocol and ask again. Once accepted, the next relevant action must be actual implementation delivery/invocation or a concrete failure.
 
+### Cross-host work-state reality
+
+After task work begins, repository/runtime processes and external tools may live in different host domains. Alpha 7 uses persisted work leases so known MAIN/SOURCE/D_EXCLUSIVE work can cross a verified same-boot boundary without losing formal time. An unleased formal boundary becomes an explicit coverage gap; it is never silently deleted or guessed into a state.
+
 ### Implementation delivery reality
 
 Repository visibility and executor availability are separate capabilities. If the host cannot natively move exact same-SHA files from repository transport into an executor, use manifest.runtime_distribution when declared. Alpha 6's same-commit Actions artifact is a byte-delivery fallback whose members must verify against the pinned Git tree before use. The artifact never becomes protocol authority.
@@ -54,7 +58,7 @@ Repository visibility and executor availability are separate capabilities. If th
 - complete implemented helper set → `manifest.deterministic_helpers[]`;
 - current persisted run facts → workspace authoritative stores/journals, not chat memory;
 - timing truth → clock journal + formal ledger;
-- N/R/S/D/L and related mechanical actuals → bound persisted evidence re-derived by runtime actuals logic, not model self-report;
+- N/R/S/D and related mechanical actuals → bound persisted evidence re-derived by runtime actuals logic, not model self-report;
 - current Strategy/Candidate/Source/D/Completion state → their revision stores;
 - recovery validity → `run_recovery.py` over the persisted workspace;
 - mechanical stop gates → `stop_checks.py`;
@@ -69,4 +73,4 @@ Repository visibility and executor availability are separate capabilities. If th
 
 After this index is understood, continue the remaining manifest-declared `startup_slice` in order. For this pinned Alpha 6 structure that means `bootstrap/BOOTSTRAP.md` then `entry/STARTUP.md`.
 
-This index has no authority to alter N/T/R/S/D/L, timing, stop or proof semantics. If any wording here conflicts with the pinned manifest/startup/entry/core, the latter wins.
+This index has no authority to alter N/T/R/S/D, timing, stop or proof semantics. If any wording here conflicts with the pinned manifest/startup/entry/core, the latter wins.
