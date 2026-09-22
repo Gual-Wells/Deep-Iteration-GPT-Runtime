@@ -29,6 +29,12 @@ jobs:
           tar --exclude=.git -cf - . | tar -xf - -C /tmp/digr-release-work
           cd /tmp/digr-release-work
           python tools/build_release.py --output "/tmp/Deep-Iteration-GPT-Runtime-${GITHUB_SHA}.zip"
+      - name: Require committed generated metadata on stable
+        if: github.ref_name == 'stable'
+        run: |
+          cmp -s bundle/EXECUTION_PROTOCOL.json /tmp/digr-release-work/bundle/EXECUTION_PROTOCOL.json || { echo "stable execution bundle drift"; exit 1; }
+          cmp -s FILE_TREE.txt /tmp/digr-release-work/FILE_TREE.txt || { echo "stable FILE_TREE drift"; exit 1; }
+          cmp -s SHA256SUMS.txt /tmp/digr-release-work/SHA256SUMS.txt || { echo "stable SHA256SUMS drift"; exit 1; }
       - name: Import validated generated metadata
         run: |
           cp /tmp/digr-release-work/bundle/EXECUTION_PROTOCOL.json bundle/EXECUTION_PROTOCOL.json
