@@ -13,7 +13,7 @@ class TestSchemas(unittest.TestCase):
     def test_manifest_alpha8_interfaces(self):
         d=load('manifest.schema.json');self.assertEqual(d['properties']['version']['const'],'5.0.0-alpha.8')
         self.assertEqual(d['properties']['protocol']['const'],'digr-v5.0')
-        expect={'routing_schema':4,'repository_transport_schema':3,'invocation_surface_schema':2,'parameter_resolution_schema':2,'run_session_schema':6,'workspace_schema':2,'clock_journal_schema':1,'event_receipt_schema':2,'execution_commitment_schema':1,'execution_attempt_schema':1,'runtime_distribution_schema':1}
+        expect={'routing_schema':4,'repository_transport_schema':3,'invocation_surface_schema':2,'parameter_resolution_schema':2,'run_session_schema':6,'workspace_schema':2,'clock_journal_schema':1,'event_receipt_schema':2,'execution_commitment_schema':1,'execution_attempt_schema':1,'runtime_distribution_schema':2}
         for k,v in expect.items():self.assertIn(k,d['required']);self.assertEqual(d['properties'][k]['const'],v)
 
     def test_manifest_instance_conforms_to_manifest_schema(self):
