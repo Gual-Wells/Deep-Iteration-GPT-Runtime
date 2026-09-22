@@ -4,7 +4,7 @@ D is a minimum number of completed disruptive interventions. D(0) means no manda
 
 A D intervention remains revisionable as a proposal until Decree, then executes, produces a D Result and must be reintegrated into MAIN with an explicit consequence. Only completed/reintegrated interventions count toward D actual.
 
-Alpha 7 uses internal L1 semantic isolation for D. There is no public L parameter or proof field. The implementation must preserve the semantic firewall between the disruptive proposal/work and ordinary MAIN reasoning until reintegration.
+Alpha 8 uses internal L1 semantic isolation for D. There is no public L parameter or proof field. The implementation preserves the semantic firewall through both execution **and result production**: an exclusive intervention's execution receipt and D Result must remain bound to D_EXCLUSIVE. Only the explicit reintegration receipt may return selected consequences to MAIN.
 
-Exclusive D execution uses D_EXCLUSIVE. D_EXCLUSIVE is substantive task work and therefore counts toward T. It never counts toward source time t. If D work itself crosses a host/process boundary, the same work-lease rules apply.
+D_EXCLUSIVE is substantive task work and therefore counts toward T. It never counts toward source time t. If D work crosses a host/process boundary, the same work-lease accounting applies; an unleased gap simply receives no time credit.
 
