@@ -432,7 +432,7 @@ class LiveDIGRRun:
         )
         gate=check_mechanical_minima(self.contract,prospective)
         if not gate.minima_satisfied:
-            failed=[k for k,v in gate.__dict__.items() if k.endswith('_ok') and not v]
+            failed=[k for k,v in gate.__dict__.items() if k.endswith('_ok') and not v and k not in ('T_coverage_ok','t_coverage_ok')]
             raise RuntimeError('finalization admission denied: '+','.join(failed))
         self.ledger.finish(at)
         self.clock_journal.append('FINISH',at,WorkState.META)
