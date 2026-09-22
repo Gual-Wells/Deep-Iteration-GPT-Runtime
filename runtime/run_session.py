@@ -112,6 +112,25 @@ class LiveDIGRRun:
         if ws.path('U0.json').is_file():obj.U0=U0Receipt.from_dict(ws.read_json('U0.json'))
         if ws.path('contract.json').is_file():obj.contract=_load_contract(ws.read_json('contract.json'))
         pre=derive_work_timeline(journal.events)
+        hard_t=bool(obj.contract and obj.contract.source_required and obj.contract.S.b==1)
+        if pre.finished:
+            if obj.contract is None:
+                raise RunResumeError('finished formal timeline without frozen contract')
+            obj.ledger=FormalTimeLedger.resume_from_timeline(
+                startup,pre.intervals,pre.gaps,journal.events[-1].snapshot,
+                finished=True,hard_T=obj.contract.B==1,hard_t=hard_t,
+            )
+            if phase.phase is RunPhase.EXECUTING:
+                obj.phase.transition(RunPhase.FINALIZING,'recovered committed FINISH after crash')
+            elif phase.phase is not RunPhase.FINALIZING:
+                raise RunResumeError(f'FINISH journal is incompatible with phase {phase.phase.value}')
+            if ws.path('final/run-summary.json').is_file():
+                # The summary write may have committed before the FINALIZING->FINISHED phase write.
+                # verify_run_workspace already validated any present summary against authoritative stores.
+                obj.phase.transition(RunPhase.FINISHED,'recovered committed final summary after crash')
+            obj.refresh_brief();return obj
+        if phase.phase is RunPhase.FINALIZING:
+            raise RunResumeError('FINALIZING phase exists without committed FINISH journal event')
         bridge_state=pre.open_state if pre.lease_open else None
         bridge_source_ids=()
         if bridge_state is WorkState.SOURCE:
@@ -130,7 +149,7 @@ class LiveDIGRRun:
             obj.ledger=FormalTimeLedger.resume_from_timeline(
                 startup,timeline.intervals,timeline.gaps,journal.events[-1].snapshot,
                 open_state=timeline.open_state,open_start=timeline.open_start,
-                hard_T=obj.contract.B==1,hard_t=obj.contract.S.b==1,
+                hard_T=obj.contract.B==1,hard_t=hard_t,
             )
         obj.refresh_brief();return obj
 
@@ -197,7 +216,7 @@ class LiveDIGRRun:
         if self.phase.phase is not RunPhase.U0_FROZEN:raise RuntimeError('freeze U0 before contract')
         if not isinstance(contract,EffectiveContract):raise TypeError('contract must be EffectiveContract')
         self._validate_contract_against_parameters(contract)
-        self.contract=contract;self.ledger=FormalTimeLedger(self.startup,hard_T=contract.B==1,hard_t=contract.S.b==1);self.workspace.write_json('contract.json',contract.to_dict(),kind='effective-contract');self.clock_journal.append('CONTRACT_FROZEN',self._snapshot_fn(),WorkState.META);self._reindex_journals();self.phase.transition(RunPhase.CONTRACT_FROZEN,'contract commitments frozen; strategy remains mutable');self.refresh_brief()
+        self.contract=contract;self.ledger=FormalTimeLedger(self.startup,hard_T=contract.B==1,hard_t=contract.source_required and contract.S.b==1);self.workspace.write_json('contract.json',contract.to_dict(),kind='effective-contract');self.clock_journal.append('CONTRACT_FROZEN',self._snapshot_fn(),WorkState.META);self._reindex_journals();self.phase.transition(RunPhase.CONTRACT_FROZEN,'contract commitments frozen; strategy remains mutable');self.refresh_brief()
 
     def save_strategy(self,state:StrategyState):
         # Strategy Genesis is real task work.  The run must already be in MAIN/
