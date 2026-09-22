@@ -1,42 +1,12 @@
-# Migration from 4.1.1 to 5.0.0 Alpha 5
+# Migration from 4.1.1 to the 5.0 Alpha 8 baseline
 
-Alpha 5 is the current 5.0 pre-final integration baseline and retains the Alpha 4 architecture. Alpha 2 supplied the corrected execution/state mother-base; Alpha 3 hardened repository transport; Alpha 4 uses live black-box evidence to correct connector routing, D/L lower-bound semantics, timing terminology and canonical user presentation.
+The 5.0 line evolved through several correction passes: Alpha 2 established the current execution/state mother-base, Alpha 3 hardened repository transport, Alpha 4 corrected live integration, Alpha 5 made B/b hard by default, Alpha 6 added implementation-identity execution, Alpha 7 added cross-host time attribution, and Alpha 8 converges crash recovery and public semantics.
 
-## Stable conceptual commitments
+Current public parameters are N/T/R/B/S/D. Public L is removed; D uses internal L1.
 
-- local personalization is a thin routing/authority transport layer, not a copy of versioned DIGR execution semantics; current Alpha 5 additionally follows a pinned structural `bootstrap_index` before startup so implemented machine structure is explicit rather than guessed;
-- each routed turn resolves `stable` to one immutable commit and binds manifest/VERSION/bootstrap-index/startup/core reads to that same commit;
-- P_run, U0, explicit user hard constraints and the Effective Contract are frozen for the run; Strategy/Candidate/Source/D working state remains revisable;
-- Result Sovereignty, semantic completion, Formal Active Time, trusted monotonic clock facts, `?` for unverifiable actuals, compact proof, deterministic releases and non-sticky activation remain foundational;
-- deterministic runtime validates integrity/lifecycle/evidence and does not choose the model's intellectual strategy.
+Current timing is T=MAIN+SOURCE+D_EXCLUSIVE and t=SOURCE. B/b=1 proves a lower bound over counted hard-verifiable intervals. Unleased gaps receive no time credit but do not invalidate the whole run.
 
-## Transport evolution
+Current recovery treats immutable revision history and verified journals as authoritative, while latest pointers/run-brief are derived. FINISH is a durable commit point.
 
-Alpha 3 proved that “no acquisition attempt” cannot be treated as repository failure and introduced direct provenance + immutable pinning. Alpha 4 further distinguishes host capabilities: an already-connected GitHub repository connector may resolve the public `stable` branch HEAD directly; a genuine REST client performs branch/ref consensus. Search/crawl/index representations remain inadmissible mutable-ref authority. Current Alpha 5 adds a pinned `bootstrap/INDEX.md` structural handoff after manifest/VERSION and before the remaining startup slice; this changes host understanding/navigation, not versioned execution semantics.
+Historical 4.x/early-5.x L2/L3, D-not-in-T and complete-coverage stop rules must not be imported into the current pinned protocol.
 
-## Parameter and timing semantics
-
-Header punctuation normalization, typed T/t and unique-or-fail mapping remain. Fixed defaults are B=1, b=1 and L1; missing N/T/R/n/t/r/s are semantically completed from U0 + explicit parameters.
-
-Alpha 5 changes the omitted timing-policy defaults to hard; explicit B=0/b=0 still selects soft timing.
-
-Alpha 4 clarifies the contract categories:
-
-- N/R/n/r/D are lower bounds;
-- T/t are frozen time targets;
-- B/b=0 makes the corresponding target soft;
-- B/b=1 upgrades it to a hard lower bound requiring trusted timing evidence.
-
-## Source, D and L
-
-Normal execution still defaults SourceDisposition to REQUIRED unless a concrete U0/host reason records a waiver. S numeric zeros do not disable source presumption.
-
-D is a revisioned intervention lifecycle with proposal, Decree, execution/result evidence and MAIN reintegration. `D(0)` means no completed D is required; it does not prohibit D. Actual D may exceed target. L_target/L_cap/L_actual remain distinct, and completed-D L applicability follows actual execution rather than the D minimum.
-
-## Recovery and proof
-
-Workspace v2, RunPhase, artifact index and recovery integrity remain. Resume still requires a fresh trusted same-provider/equal-nonempty-boot bridge. Canonical proof continues to be compact; Alpha 4 explicitly forbids raw fractional/nanosecond leakage in visible actual duration and requires hard-unverified time to render as `?`.
-
-## Intermediate pre-release note
-
-Alpha 1 established the Native Assist/clock-journal substrate. Alpha 2 corrected execution integration. Alpha 3 hardened host transport. Alpha 4 is a narrow correction pass driven by successful live connector operation and subsequent black-box execution findings rather than a new execution architecture.
