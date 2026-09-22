@@ -1,5 +1,19 @@
 # Changelog
 
+## 5.0.0-alpha.8 — convergence and crash recovery
+
+Alpha 8 is a convergence pass over Alpha 7. It reduces reliability overhead while tightening mechanical correctness.
+
+- SourceDisposition=WAIVED now disables all source mechanical gates, including hard t.
+- Hard T/t is a verified lower bound over counted intervals. Unleased coverage gaps are retained and excluded from the count instead of poisoning the whole run.
+- Added single-slot workspace write-intent recovery and deterministic rebuilding of derived latest pointers/run brief from authoritative history.
+- FINISH is a durable commit point; resume repairs FINISH→FINALIZING and valid-summary→FINISHED crash windows rather than reopening formal time.
+- MAIN/source re-entry can no longer move backward to superseded result revisions.
+- Exclusive D Result production is clock/state-bound to D_EXCLUSIVE until explicit MAIN reintegration.
+- Public L remains removed; obsolete L2/L3 active examples were removed and proof/schema/docs converged on internal L1.
+- Release cleanup no longer deletes repository .git metadata.
+- Release validation is being tightened so checked-in generated metadata must match deterministic regeneration.
+
 ## 5.0.0-alpha.7 — formal-time continuity and internal L1
 
 Alpha 7 preserves Alpha 6 implementation-execution integrity and same-commit runtime delivery, then fixes cross-host formal-time attribution and finalization.
