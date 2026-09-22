@@ -1,4 +1,4 @@
-# DIGR 5.0 Alpha 7 Test Matrix
+# DIGR 5.0 Alpha 8 Test Matrix
 
 The suite covers the prior authority/execution-integrity baseline plus live formal-time defects observed on multi-tool ChatGPT hosts.
 
@@ -19,7 +19,7 @@ The suite covers the prior authority/execution-integrity baseline plus live form
 13. same-commit runtime artifact verifies helper identity against the pinned tree;
 14. missing identity-preserving delivery fails closed.
 
-## Alpha 7 parameter and contract surface
+## Alpha 8 parameter and contract surface
 
 15. public order is N<T<R<B<S<D;
 16. B=1 and b=1 are the only fixed parameter defaults;
@@ -42,7 +42,7 @@ The suite covers the prior authority/execution-integrity baseline plus live form
 30. leased external SOURCE time contributes to T and t;
 31. unleased formal resume produces a CoverageGap;
 32. an unleased gap is never silently dropped;
-33. coverage gaps invalidate hard T/t verification;
+33. coverage gaps are excluded from hard T/t lower-bound time;
 34. hard verification still requires trusted clock continuity;
 35. soft timing remains non-blocking;
 36. parallel source work uses clock-union time rather than per-source multiplication.
@@ -65,17 +65,17 @@ The suite covers the prior authority/execution-integrity baseline plus live form
 47. semantic completion readiness is required before finalization;
 48. finish_time projects actuals before mutating the live ledger;
 49. unmet hard time denies finalization and leaves phase EXECUTING;
-50. incomplete coverage denies hard finalization;
+50. incomplete coverage is diagnostic and excluded from counted time;
 51. admitted finish closes ledger then enters FINALIZING;
 52. FINISHED requires delivery_ready=true;
 53. canonical proof omits L;
-54. hard-unverified or coverage-incomplete actual time renders ?;
+54. hard-unverified counted actual time renders ?;
 55. visible actual durations floor to whole seconds.
 
 ## Release and cold validation
 
 56. every persisted artifact family conforms to its schema;
-57. manifest/interface versions match Alpha 7;
+57. manifest/interface versions match Alpha 8;
 58. execution bundle exactly matches current entrypoint/core bytes and SHA-256 digests;
 59. Python sources parse under the declared minimum grammar;
 60. UTF-8/LF release hygiene is enforced;
