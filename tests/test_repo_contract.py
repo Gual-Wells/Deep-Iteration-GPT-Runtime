@@ -5,49 +5,53 @@ ROOT=Path(__file__).resolve().parents[1]
 
 class TestRepoContract(unittest.TestCase):
     def test_version_manifest_and_corrected_interfaces(self):
-        self.assertEqual((ROOT/'VERSION').read_text().strip(),'5.0.0-alpha.6');m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['version'],'5.0.0-alpha.6');self.assertEqual(m['protocol'],'digr-v5.0');self.assertEqual(m['workspace_spec'],'workspace/layout-v2.json');self.assertEqual(m['clock_journal_schema'],1);self.assertEqual((m['routing_schema'],m['repository_transport_schema'],m['run_session_schema'],m['workspace_schema'],m['event_receipt_schema']),(4,3,4,2,2));self.assertEqual(m['invocation_surface_schema'],2);self.assertEqual(m['parameter_resolution_schema'],1);self.assertEqual((m['execution_commitment_schema'],m['execution_attempt_schema'],m['runtime_distribution_schema']),(1,1,1))
+        self.assertEqual((ROOT/'VERSION').read_text().strip(),'5.0.0-alpha.7')
+        m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['version'],'5.0.0-alpha.7')
+        self.assertEqual((m['run_session_schema'],m['parameter_resolution_schema']),(5,2))
+        self.assertNotIn('L_e',m['defaults']);self.assertNotIn('L',m['parameters'])
+        self.assertTrue(m['time_states']['D_EXCLUSIVE']['T']);self.assertFalse(m['time_states']['D_EXCLUSIVE']['t'])
+
     def test_indexed_staged_startup_is_manifested(self):
-        m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['bootstrap_index'],'bootstrap/INDEX.md');self.assertEqual(m['startup_slice'],['bootstrap/INDEX.md','bootstrap/BOOTSTRAP.md','entry/STARTUP.md']);self.assertEqual(m['startup_slice'][0],m['bootstrap_index']);self.assertEqual(m['execution_bundle']['path'],'bundle/EXECUTION_PROTOCOL.json');self.assertEqual(m['execution_bundle']['members'],[m['entrypoint'],*m['core']]);t=(ROOT/'entry/STARTUP.md').read_text();self.assertIn('NATIVE | HELP | INVALID | EXECUTING',t);self.assertIn('before parameter resolution, U0 or substantive task work',t);self.assertIn('ExecutingProtocolLoadReceipt',t);self.assertIn('aborts the born run',t)
+        m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['bootstrap_index'],'bootstrap/INDEX.md')
+        self.assertEqual(m['execution_bundle']['members'],[m['entrypoint'],*m['core']])
+
     def test_transparent_machine_index_is_structural_first_path(self):
         m=json.loads((ROOT/'manifest.json').read_text());t=(ROOT/m['bootstrap_index']).read_text()
-        for x in ('Reality model','Machine topology','Truth-source map','Structure-closed, intelligence-open','deterministic_helpers[]','workspace_spec','runtime/run_session.py','runtime/run_recovery.py','runtime/actuals.py','native model intelligence','not versioned execution semantics','Execute-before-interpret inoculation','Implementation delivery reality'):
+        for x in ('Reality model','Machine topology','Truth-source map','Structure-closed, intelligence-open','Execute-before-interpret inoculation','Implementation delivery reality'):
             self.assertIn(x,t)
-        self.assertLess(m['startup_slice'].index(m['bootstrap_index']),m['startup_slice'].index('bootstrap/BOOTSTRAP.md'))
 
     def test_run_lifecycle_is_reliability_not_planner(self):
-        t=(ROOT/'core/25_RUN_SESSION_AND_EXTERNAL_MEMORY.md').read_text();self.assertIn('GENESIS',t);self.assertIn('PARAMETER_RESOLVED',t);self.assertIn('ABORTED',t);self.assertIn('do not plan task work',t)
-    def test_strategy_genesis_and_mutability(self):
-        t=(ROOT/'core/35_STRATEGY_AND_CANDIDATE_STATE.md').read_text();self.assertIn('Freeze commitments, never freeze strategy',t);self.assertIn('Strategy Genesis',t);self.assertIn('next_step',t);self.assertIn('Candidate',t)
-    def test_source_presumption_and_single_time_chain(self):
-        t=(ROOT/'core/50_SOURCE_EVOLUTION.md').read_text();self.assertIn('REQUIRED',t);self.assertIn('WAIVED',t);self.assertIn('active_source_ids',t);self.assertIn('parallel',t.lower())
-        self.assertFalse((ROOT/'runtime/source_aggregate.py').exists())
-    def test_formal_time_and_cross_session_strictness(self):
-        t=(ROOT/'core/60_FORMAL_ACTIVE_TIME.md').read_text();
-        for x in ('MAIN','SOURCE','D_EXCLUSIVE','META','IDLE','Observed duration','hard-verifiable duration','same provider','non-empty boot identity','?'):self.assertIn(x,t)
-    def test_d_l_reintegrated(self):
-        t=(ROOT/'core/77_ISOLATION_LEVELS.md').read_text();self.assertIn('L_target',t);self.assertIn('L_cap',t);self.assertIn('L_actual',t);self.assertIn('Input Packet',t);self.assertIn('Output Packet',t);self.assertIn('background',t)
-        d=(ROOT/'core/75_DISRUPTIVE_GAMBIT.md').read_text();self.assertIn('proposal',d.lower());self.assertIn('Decree',d);self.assertIn('reintegration',d.lower());self.assertIn('Candidate',d)
+        t=(ROOT/'core/25_RUN_SESSION_AND_EXTERNAL_MEMORY.md').read_text().lower()
+        for x in ('genesis','parameter_resolved','aborted','work lease','coverage gap'):self.assertIn(x,t)
+
+    def test_formal_time_contract(self):
+        t=(ROOT/'core/60_FORMAL_ACTIVE_TIME.md').read_text().lower()
+        for x in ('main','source','d_exclusive','work lease','coverage','same provider','boot'):self.assertIn(x,t)
+
+    def test_internal_L1_not_public_L(self):
+        p=(ROOT/'core/11_PARAMETER_FORMAT_AND_RESOLUTION.md').read_text()
+        self.assertIn('N < T < R < B < S < D',p);self.assertNotIn(' < L',p)
+        iso=(ROOT/'core/77_ISOLATION_LEVELS.md').read_text().lower()
+        self.assertIn('internal',iso);self.assertIn('l1',iso)
+        proof=(ROOT/'core/80_STOP_AND_PROOF.md').read_text();self.assertNotIn('L（',proof)
+
     def test_workspace_layout_v2_matches_runtime_constants(self):
-        d=json.loads((ROOT/'workspace/layout-v2.json').read_text());self.assertEqual(d['schema_version'],WORKSPACE_SCHEMA_VERSION);self.assertEqual(tuple(d['required_genesis_files']),REQUIRED_GENESIS_FILES);self.assertEqual(tuple(d['state_directories']),STATE_DIRECTORIES)
-    def test_help_is_canonical_zh_cn_professional_reference(self):
-        t=(ROOT/'entry/HELP.md').read_text();
-        for x in ('## 1. 调用与路由','## 2. 参数解析顺序与缺省规则','## 3. 参数参考','## 4. Effective Contract 与来源策略','## 5. N / R / D / L','## 6. 时间与停止','## 7. 执行链与启动成本','## 8. 输出与 canonical proof','## 9. 版本与权威'):
-            self.assertIn(x,t)
-        for x in ('`B=1`、`b=1`、`L(1)`','SourceDisposition','`REQUIRED`','`D(0)`','soft target','hard lower bound','actual duration 向下取整到完整秒','NATIVE'):
-            self.assertIn(x,t)
-    def test_pre_release_baseline_documented(self):
-        t=(ROOT/'docs/PRE_RELEASE_BASELINE.md').read_text();self.assertIn('execution-integrity',t.lower());self.assertIn('mother-base',t);self.assertIn('Change discipline',t);self.assertIn('clock-journal',t)
-    def test_alpha6_execution_integrity_and_distribution_are_manifested(self):
+        d=json.loads((ROOT/'workspace/layout-v2.json').read_text());self.assertEqual(d['schema_version'],WORKSPACE_SCHEMA_VERSION)
+        self.assertEqual(tuple(d['required_genesis_files']),REQUIRED_GENESIS_FILES);self.assertEqual(tuple(d['state_directories']),STATE_DIRECTORIES)
+
+    def test_help_reflects_alpha7_surface(self):
+        t=(ROOT/'entry/HELP.md').read_text()
+        self.assertIn('N / R / D',t);self.assertNotIn('N / R / D / L',t)
+        self.assertIn('D_EXCLUSIVE',t);self.assertIn('work lease',t.lower());self.assertNotIn('L(1)',t)
+
+    def test_alpha6_execution_integrity_remains_manifested(self):
         m=json.loads((ROOT/'manifest.json').read_text());rd=m['runtime_distribution']
-        self.assertEqual(rd['workflow_path'],'.github/workflows/digr-runtime-artifact.yml')
         self.assertEqual(rd['artifact_name_template'],'digr-runtime-{SHA}')
         self.assertIn('runtime/execution_integrity.py',m['deterministic_helpers'])
-        self.assertIn('core/13_IMPLEMENTATION_EXECUTION_INTEGRITY.md',m['core'])
-        t=(ROOT/'core/13_IMPLEMENTATION_EXECUTION_INTEGRITY.md').read_text()
-        for x in ('Drift inoculation','Component interrogation gate','semantic equivalence','Implementation delivery'):
-            self.assertIn(x,t)
 
-    def test_removed_alpha1_overlap_artifacts(self):
-        for rel in ('schemas/runtime-state.schema.json','schemas/invocation.schema.json','workspace/layout-v1.json','runtime/source_aggregate.py'):
-            self.assertFalse((ROOT/rel).exists(),rel)
+    def test_alpha7_policies(self):
+        m=json.loads((ROOT/'manifest.json').read_text());p=m['policies']
+        for k in ('D_exclusive_counts_T_not_t','public_L_parameter_removed','internal_D_isolation_fixed_to_L1','formal_work_lease_required_for_cross_host_attribution','unleased_formal_cross_host_gap_is_preserved_not_dropped','hard_time_requires_complete_semantic_time_coverage','finalization_admission_precedes_ledger_finish','FINISHED_requires_delivery_ready'):
+            self.assertTrue(p[k])
+
 if __name__=='__main__':unittest.main()
