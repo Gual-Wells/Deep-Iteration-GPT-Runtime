@@ -1,4 +1,4 @@
-"""Comprehensive DIGR 5.0 Alpha 7 workspace integrity/recovery verification.
+"""Comprehensive DIGR 5.0 Alpha 8 workspace integrity/recovery verification.
 
 Verification proves persisted structure and cross-store bindings.  It deliberately
 separates *workspace integrity* from *future clock continuity*: LiveDIGRRun.resume
@@ -336,7 +336,7 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
     for item in dstore.items:
         iso=dstore.isolation(item.isolation_receipt_id)
         if iso.L_target!=1:
-            raise ValueError('Alpha 7 D isolation must use internal L1')
+            raise ValueError('Alpha 8 D isolation must use internal L1')
         if iso.L_actual is not None and iso.L_actual>=2:
             ws.require_indexed_artifact(iso.input_packet_ref,kind='d-input-packet')
         if iso.output_packet_ref is not None:
