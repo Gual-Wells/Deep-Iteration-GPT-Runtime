@@ -1,4 +1,4 @@
-"""Version-semantic-free repository routing helpers for DIGR 5.0.0-alpha.5.
+"""Version-semantic-free repository routing helpers for DIGR 5.0.0-alpha.8.
 
 The router performs only candidate response, exact GitHub location, immutable
 pinning metadata, manifest/VERSION integrity, and manifest-declared path
