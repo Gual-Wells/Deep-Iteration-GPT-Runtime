@@ -29,7 +29,7 @@ A declared operational helper is something to **operate**, not something for the
 
 Semantic equivalence is not implementation identity. Understanding code is not evidence that it ran.
 
-Before each declared operational component, form the compact component commitment defined by the pinned protocol: identify the exact component, exact operation and concrete executor; select direct execution now; reject substitution and manual-result construction. If the commitment is incomplete or penetrating, apply only the bounded lightweight re-education defined by the protocol and ask again. Once accepted, the next relevant action must be actual implementation delivery/invocation or a concrete failure.
+At each real implementation-delivery boundary, form the compact binding defined by the pinned protocol: identify the pinned package/component set and concrete executor, select direct execution, and reject substitution/manual-result construction. Once that package/executor binding is verified, subsequent helper calls from the same binding execute directly without repeating the cognitive gate; re-open it only if package/executor identity changes or becomes uncertain.
 
 ### Cross-host work-state reality
 
@@ -37,7 +37,7 @@ After task work begins, repository/runtime processes and external tools may live
 
 ### Implementation delivery reality
 
-Repository visibility and executor availability are separate capabilities. If the host cannot natively move exact same-SHA files from repository transport into an executor, use manifest.runtime_distribution when declared. The inherited same-commit Actions artifact is a byte-delivery fallback whose members must verify against the pinned Git tree before use. The artifact never becomes protocol authority.
+Repository visibility and executor availability are separate capabilities. If the host cannot natively move exact same-SHA files into an executor, use manifest.runtime_distribution when declared. Alpha 8 may provide a durable same-commit GitHub prerelease asset and a transient same-commit Actions artifact; either remains byte-delivery transport only, and every helper member must still verify against the pinned Git tree before use.
 
 ## 2. Machine topology
 
