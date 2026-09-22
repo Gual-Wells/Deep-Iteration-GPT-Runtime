@@ -1,8 +1,20 @@
-# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.6
+# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.7
 
-**Status:** execution-integrity and runtime-delivery baseline intended to converge toward DIGR 5.0 final.
+**Status:** formal-time continuity and simplified isolation baseline intended to converge toward DIGR 5.0 final.
 
 DIGR 5.0 is a reliability exoskeleton around native model intelligence. It does not replace the model with a planner/search controller. An explicitly invoked high-investment task receives pinned protocol authority, early trusted timing, immutable U0/contract commitments, revisable strategy/source/candidate state, disruptive interventions, evidence, persistence and recovery.
+
+## Alpha 7 formal-time continuity
+
+Alpha 7 preserves Alpha 6 execution-integrity/runtime-delivery semantics and repairs timing across multi-tool hosts.
+
+- **Work leases:** MAIN, SOURCE or D_EXCLUSIVE can be explicitly carried across a verified same-boot host/process/tool boundary. SOURCE leases carry active source bindings.
+- **Coverage gaps:** unleased formal boundaries are preserved as explicit unattributed gaps instead of being silently dropped. Hard T/t requires complete relevant semantic-time coverage.
+- **D counts toward T:** formal T is MAIN + SOURCE + D_EXCLUSIVE; t remains SOURCE only.
+- **Public L removed:** L is no longer an invocation parameter, Effective Contract field, stop gate or proof field. D uses an internal fixed L1 semantic-isolation baseline.
+- **Finalization admission:** finish is projected and mechanically checked before the live ledger closes. A failed hard-time/coverage/completion gate leaves the run EXECUTING.
+
+The canonical proof is now `N/T/R/B + S + D` only; L is intentionally absent.
 
 ## Alpha 6 execution integrity and runtime delivery
 
@@ -111,9 +123,9 @@ Deterministic release:
 
 ```bash
 python tools/build_release.py \
-  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.6.zip \
-  --personalization-output ../DIGR-5.0.0-alpha.6-CHATGPT-LOCAL-PERSONALIZATION.txt \
-  --full-personalization-output ../DIGR-5.0.0-alpha.6-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
+  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.7.zip \
+  --personalization-output ../DIGR-5.0.0-alpha.7-CHATGPT-LOCAL-PERSONALIZATION.txt \
+  --full-personalization-output ../DIGR-5.0.0-alpha.7-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
 ```
 
 The builder regenerates release metadata, rejects cross-platform path collisions/symlinks/traversal/cache artifacts, cold-extracts the ZIP, verifies all hashes and reruns the full suite + repository validator.
