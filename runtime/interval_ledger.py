@@ -1,4 +1,4 @@
-"""Formal Active Time ledger for DIGR 5.0 Alpha 7.
+"""Formal Active Time ledger for DIGR 5.0 Alpha 8.
 
 MAIN, SOURCE and D_EXCLUSIVE all contribute to T.  SOURCE additionally
 contributes to t.  Cross-host attribution gaps are preserved explicitly; hard
