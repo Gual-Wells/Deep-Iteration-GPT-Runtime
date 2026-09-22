@@ -262,7 +262,8 @@
     "revision_history_is_authoritative_over_latest_pointers": true,
     "D_result_must_preserve_isolation_until_reintegration": true,
     "reentry_cannot_move_backward_to_superseded_result": true,
-    "release_builder_never_deletes_repository_metadata": true
+    "release_builder_never_deletes_repository_metadata": true,
+    "durable_exact_commit_runtime_release_asset": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
   "bootstrap_index": "bootstrap/INDEX.md",
@@ -373,17 +374,20 @@
   },
   "execution_commitment_schema": 1,
   "execution_attempt_schema": 1,
-  "runtime_distribution_schema": 1,
+  "runtime_distribution_schema": 2,
   "runtime_distribution": {
-    "schema": 1,
-    "mode": "github_actions_artifact_or_native_bridge",
+    "schema": 2,
+    "mode": "native_bridge_or_exact_commit_release_or_actions_artifact",
     "workflow_path": ".github/workflows/digr-runtime-artifact.yml",
     "artifact_name_template": "digr-runtime-{SHA}",
     "archive_filename_template": "DIGR-RUNTIME-{SHA}.zip",
     "member_source": "deterministic_helpers",
     "runtime_index_path": "RUNTIME-INDEX.json",
-    "identity_verification": "exact_commit_head_sha_plus_pinned_git_tree_blob_identity",
+    "identity_verification": "exact_commit_sha_plus_pinned_git_tree_blob_identity",
     "preferred_path": "native_same_sha_file_to_executor_bridge",
-    "fallback_path": "same_commit_github_actions_artifact"
+    "durable_fallback_path": "same_commit_github_prerelease_asset",
+    "durable_release_tag_template": "digr-runtime-{SHA}",
+    "durable_release_asset_template": "DIGR-RUNTIME-{SHA}.zip",
+    "transient_fallback_path": "same_commit_github_actions_artifact"
   }
 }
