@@ -1,6 +1,6 @@
 # Repository transport example
 
-For a candidate `DIGR/help` or executing invocation, Alpha 5 has two admissible mutable-ref modes.
+For a candidate `DIGR/help` or executing invocation, Alpha 8 has two admissible mutable-ref modes.
 
 Connected GitHub connector:
 
@@ -27,11 +27,11 @@ pinned:bootstrap/INDEX.md      first manifest-declared structural path
 pinned:<remaining startup>     GET raw.githubusercontent.com/.../{SHA}/...
 ```
 
-After the startup slice classifies an EXECUTING invocation and Clock Genesis succeeds, the current Alpha 5 manifest declares:
+After the startup slice classifies an EXECUTING invocation and Clock Genesis succeeds, the current Alpha 8 manifest declares:
 
 ```text
 pinned:bundle/EXECUTION_PROTOCOL.json
-    → exactly entrypoint + 17 core logical members
+    → exactly entrypoint + 18 core logical members
     → verify order, length and SHA-256 for every member
     → ExecutingProtocolLoadReceipt
     → only then parameter resolution
