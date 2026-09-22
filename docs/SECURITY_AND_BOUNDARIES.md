@@ -1,9 +1,10 @@
 # Security, Authority and Intelligence Boundaries
 
-Repository pinning prevents context from redefining protocol semantics. Alpha 5 continues to treat **transport provenance** as part of the trust boundary: search snippets, crawled/indexed pages and Memory cannot be relabeled as a live mutable-ref observation. Direct GitHub REST mode corroborates two independent branch-head endpoints before accepting `stable`.
+Repository pinning prevents conversation context from redefining protocol semantics. Search snippets, crawled/indexed pages and Memory cannot be relabeled as live mutable-ref authority. Direct REST mode corroborates independent branch-head endpoints; disagreement fails closed.
 
-The standard transport adapter requests cache revalidation for mutable endpoints, but no client can promise zero propagation delay inside an external service. Therefore disagreement fails closed; Alpha 5 prefers an explicit route failure over silently pinning whichever stale observation appears plausible.
+Once a full commit SHA is pinned, later content is immutable by identity. Path validation, atomic replacement, write-intent recovery, hash-chained journals, artifact digests and revision-chain checks address accidental/host-level corruption. They are not a cryptographic defense against a malicious host.
 
-Once a full commit SHA is pinned, cached immutable content is safe in the semantic sense that the Git object cannot change. Path validation, atomic writes, release path/symlink checks, hash-chained journals and artifact digests address accidental/host-level state corruption; they are not a cryptographic trust system against a malicious host.
+Recovery is deliberately asymmetric: deterministic state may rebuild deterministic derivatives, but it may never invent semantic task facts.
 
-The model's hidden reasoning is never persisted as required protocol state. Strategy/Candidate/EST store concise external working state only. Deterministic helpers validate transport/lifecycle/types/references/timing facts, not “good ideas”.
+The model's hidden reasoning is never persisted as required protocol state. Strategy/Candidate/EST store concise external working state only. Deterministic helpers validate transport/lifecycle/types/references/timing facts, not intellectual merit.
+
