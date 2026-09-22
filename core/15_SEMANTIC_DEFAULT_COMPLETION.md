@@ -7,7 +7,7 @@
 `EffectiveContract = Complete_native(U0, E, M)`
 
 ## Fixed defaults
-只有三个直接缺省值：
+只有两个直接缺省值：
 - `B = 1`（hard）
 - `b = 1`（hard）
 
