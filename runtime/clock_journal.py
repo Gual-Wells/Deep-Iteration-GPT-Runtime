@@ -1,4 +1,4 @@
-"""Append-only, hash-chained clock/state journal for DIGR 5.0 Alpha 7.
+"""Append-only, hash-chained clock/state journal for DIGR 5.0 Alpha 8.
 
 The journal is the single timing/state audit substrate.  Formal work may cross
 host/process boundaries only when an explicit WORK_LEASE_OPEN event was
