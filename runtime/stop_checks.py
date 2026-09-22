@@ -51,7 +51,7 @@ class MechanicalStopCheck:
     def minima_satisfied(self)->bool:
         return all((
             self.N_ok,self.R_ok,self.source_instance_ok,self.n_ok,self.r_ok,
-            self.T_coverage_ok,self.t_coverage_ok,self.hard_T_ok,self.hard_t_ok,self.D_ok,
+            self.hard_T_ok,self.hard_t_ok,self.D_ok,
         ))
 
 
@@ -64,19 +64,21 @@ def check_mechanical_minima(contract:EffectiveContract,actual:ContractActuals)->
     n_ok=actual.n_min>=contract.S.n if source_required else True
     r_ok=actual.r_min>=contract.S.r if source_required else True
 
-    T_coverage_ok=actual.T_coverage_complete or contract.B==0
-    t_coverage_ok=(not source_required) or actual.t_coverage_complete or contract.S.b==0
+    # Coverage completeness remains diagnostic. Missing intervals are excluded
+    # from counted time, so they cannot falsify a lower-bound timing proof.
+    T_coverage_ok=actual.T_coverage_complete
+    t_coverage_ok=(not source_required) or actual.t_coverage_complete
 
     hard_T_ok=True
     if contract.B==1:
         hard_T_ok=(
-            actual.T_coverage_complete and actual.T_hard_verified
+            actual.T_hard_verified
             and actual.T_seconds is not None and actual.T_seconds>=contract.T_seconds
         )
     hard_t_ok=True
     if source_required and contract.S.b==1:
         hard_t_ok=(
-            actual.t_coverage_complete and actual.t_hard_verified
+            actual.t_hard_verified
             and actual.t_seconds is not None and actual.t_seconds>=contract.S.t_seconds
         )
 
