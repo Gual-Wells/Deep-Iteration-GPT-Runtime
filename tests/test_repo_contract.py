@@ -5,9 +5,9 @@ ROOT=Path(__file__).resolve().parents[1]
 
 class TestRepoContract(unittest.TestCase):
     def test_version_manifest_and_corrected_interfaces(self):
-        self.assertEqual((ROOT/'VERSION').read_text().strip(),'5.0.0-alpha.7')
-        m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['version'],'5.0.0-alpha.7')
-        self.assertEqual((m['run_session_schema'],m['parameter_resolution_schema']),(5,2))
+        self.assertEqual((ROOT/'VERSION').read_text().strip(),'5.0.0-alpha.8')
+        m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['version'],'5.0.0-alpha.8')
+        self.assertEqual((m['run_session_schema'],m['parameter_resolution_schema']),(6,2))
         self.assertNotIn('L_e',m['defaults']);self.assertNotIn('L',m['parameters'])
         self.assertTrue(m['time_states']['D_EXCLUSIVE']['T']);self.assertFalse(m['time_states']['D_EXCLUSIVE']['t'])
 
@@ -39,9 +39,9 @@ class TestRepoContract(unittest.TestCase):
         d=json.loads((ROOT/'workspace/layout-v2.json').read_text());self.assertEqual(d['schema_version'],WORKSPACE_SCHEMA_VERSION)
         self.assertEqual(tuple(d['required_genesis_files']),REQUIRED_GENESIS_FILES);self.assertEqual(tuple(d['state_directories']),STATE_DIRECTORIES)
 
-    def test_help_reflects_alpha7_surface(self):
+    def test_help_reflects_alpha8_surface(self):
         t=(ROOT/'entry/HELP.md').read_text()
-        self.assertIn('N / R / D',t);self.assertNotIn('N / R / D / L',t)
+        self.assertIn('R 与 D',t);self.assertNotIn('N / R / D / L',t)
         self.assertIn('D_EXCLUSIVE',t);self.assertIn('work lease',t.lower());self.assertNotIn('L(1)',t)
 
     def test_alpha6_execution_integrity_remains_manifested(self):
@@ -49,9 +49,9 @@ class TestRepoContract(unittest.TestCase):
         self.assertEqual(rd['artifact_name_template'],'digr-runtime-{SHA}')
         self.assertIn('runtime/execution_integrity.py',m['deterministic_helpers'])
 
-    def test_alpha7_policies(self):
+    def test_alpha8_policies(self):
         m=json.loads((ROOT/'manifest.json').read_text());p=m['policies']
-        for k in ('D_exclusive_counts_T_not_t','public_L_parameter_removed','internal_D_isolation_fixed_to_L1','formal_work_lease_required_for_cross_host_attribution','unleased_formal_cross_host_gap_is_preserved_not_dropped','hard_time_requires_complete_semantic_time_coverage','finalization_admission_precedes_ledger_finish','FINISHED_requires_delivery_ready'):
+        for k in ('D_exclusive_counts_T_not_t','public_L_parameter_removed','internal_D_isolation_fixed_to_L1','formal_work_lease_required_for_cross_host_attribution','unleased_formal_cross_host_gap_is_preserved_not_dropped','hard_time_is_verified_counted_lower_bound','unattributed_gaps_are_excluded_not_estimated','coverage_completeness_is_diagnostic_not_stop_gate','source_waiver_disables_all_source_mechanical_gates','committed_FINISH_survives_phase_write_crash','reentry_cannot_move_backward_to_superseded_result','D_result_must_preserve_isolation_until_reintegration','finalization_admission_precedes_ledger_finish','FINISHED_requires_delivery_ready'):
             self.assertTrue(p[k])
 
 if __name__=='__main__':unittest.main()
