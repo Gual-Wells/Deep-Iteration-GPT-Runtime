@@ -1,8 +1,10 @@
-"""Append-only, hash-chained clock/state journal for DIGR 5.0.
+"""Append-only, hash-chained clock/state journal for DIGR 5.0 Alpha 7.
 
-The journal is an audit substrate, not a scheduler. The model/host decides the
-semantic work state. The journal records snapshots, sequence, and state changes
-so formal time can be re-derived and truncation/reordering can be detected.
+The journal is the single timing/state audit substrate.  Formal work may cross
+host/process boundaries only when an explicit WORK_LEASE_OPEN event was
+persisted before the boundary.  Unleased formal work gaps are never silently
+discarded: they become CoverageGap records and therefore invalidate hard time
+coverage.
 """
 from __future__ import annotations
 from dataclasses import dataclass
@@ -11,8 +13,8 @@ import json
 import os
 from pathlib import Path
 from typing import Any, Iterable
-from .clock_probe import ClockSnapshot, elapsed_ns, observed_elapsed_ns
-from .interval_ledger import WorkState, WorkInterval
+from .clock_probe import ClockSnapshot, elapsed_ns, observed_elapsed_ns, pair_is_hard_verifiable
+from .interval_ledger import WorkState, WorkInterval, CoverageGap
 from .validation import require_nonempty_text, require_nonnegative_int
 
 
@@ -60,49 +62,105 @@ class ClockJournalEvent:
         return d
 
 
-def derive_work_intervals(events: Iterable[ClockJournalEvent]) -> tuple[WorkInterval, ...]:
-    """Re-derive formal foreground intervals from journal STATE/FINISH events."""
+@dataclass(frozen=True)
+class DerivedWorkTimeline:
+    intervals: tuple[WorkInterval, ...]
+    gaps: tuple[CoverageGap, ...]
+    open_state: WorkState | None
+    open_start: ClockSnapshot | None
+    open_state_ref: str | None
+    lease_open: bool
+    finished: bool
+
+
+def _interval(state: WorkState, start: ClockSnapshot, end: ClockSnapshot) -> WorkInterval:
+    observed = observed_elapsed_ns(start, end)
+    return WorkInterval(state, start, end, observed, pair_is_hard_verifiable(start, end))
+
+
+def _gap(state: WorkState, start: ClockSnapshot, end: ClockSnapshot) -> CoverageGap:
+    observed = observed_elapsed_ns(start, end)
+    return CoverageGap(state, start, end, observed, pair_is_hard_verifiable(start, end))
+
+
+def derive_work_timeline(events: Iterable[ClockJournalEvent]) -> DerivedWorkTimeline:
+    """Re-derive intervals, open work state and unattributed cross-host gaps.
+
+    A WORK_LEASE_OPEN event explicitly authorizes the current semantic work
+    state to remain attributable across the next process/host boundary.  A
+    RESUME_ANCHOR without such a lease closes whatever part can still be
+    attributed and records the boundary as an unattributed gap instead of
+    erasing it.
+    """
     active_state: WorkState | None = None
     active_start: ClockSnapshot | None = None
+    active_ref: str | None = None
+    lease_open = False
     out: list[WorkInterval] = []
+    gaps: list[CoverageGap] = []
     finished = False
+    last_snapshot: ClockSnapshot | None = None
+
     for item in events:
-        if item.event == 'RESUME_ANCHOR':
-            # A process boundary cannot prove that an open semantic state was
-            # continuously active while no receipts were being written. Drop
-            # the unclosed tail rather than counting inter-call idle time.
-            active_state = None
-            active_start = None
-            finished = False
-            continue
         if item.event == 'STATE':
             if finished:
                 raise ValueError('STATE event after FINISH')
             if item.state is None:
                 raise ValueError('STATE journal event requires state')
             if active_state is not None and active_start is not None:
-                observed = observed_elapsed_ns(active_start, item.snapshot)
-                hard = True
-                try:
-                    elapsed_ns(active_start, item.snapshot)
-                except ValueError:
-                    hard = False
-                out.append(WorkInterval(active_state, active_start, item.snapshot, observed, hard))
+                out.append(_interval(active_state, active_start, item.snapshot))
             active_state = item.state
             active_start = item.snapshot
+            active_ref = item.record_hash
+            lease_open = False
+
+        elif item.event == 'WORK_LEASE_OPEN':
+            if finished:
+                raise ValueError('WORK_LEASE_OPEN after FINISH')
+            if item.state is None or active_state is None or active_start is None:
+                raise ValueError('work lease requires an active work state')
+            if item.state is not active_state:
+                raise ValueError('work lease state must match active work state')
+            lease_open = True
+            active_ref = item.record_hash
+
+        elif item.event == 'RESUME_ANCHOR':
+            if active_state is not None and active_start is not None:
+                if lease_open:
+                    # Keep the original interval open through the boundary.  A
+                    # resumed STATE event will close/re-anchor it after readiness.
+                    lease_open = False
+                else:
+                    # We can only attribute up to the last persisted clock
+                    # event.  The remainder is preserved as an explicit gap.
+                    if last_snapshot is not None:
+                        if last_snapshot.monotonic_ns > active_start.monotonic_ns:
+                            out.append(_interval(active_state, active_start, last_snapshot))
+                        if item.snapshot.monotonic_ns > last_snapshot.monotonic_ns:
+                            gaps.append(_gap(active_state, last_snapshot, item.snapshot))
+                    active_state = None
+                    active_start = None
+                    active_ref = None
+                    lease_open = False
+
         elif item.event == 'FINISH':
             if finished:
                 raise ValueError('duplicate FINISH')
             if active_state is not None and active_start is not None:
-                observed = observed_elapsed_ns(active_start, item.snapshot)
-                hard = True
-                try:
-                    elapsed_ns(active_start, item.snapshot)
-                except ValueError:
-                    hard = False
-                out.append(WorkInterval(active_state, active_start, item.snapshot, observed, hard))
-            active_state = None; active_start = None; finished = True
-    return tuple(out)
+                out.append(_interval(active_state, active_start, item.snapshot))
+            active_state = None
+            active_start = None
+            active_ref = None
+            lease_open = False
+            finished = True
+
+        last_snapshot = item.snapshot
+
+    return DerivedWorkTimeline(tuple(out), tuple(gaps), active_state, active_start, active_ref, lease_open, finished)
+
+
+def derive_work_intervals(events: Iterable[ClockJournalEvent]) -> tuple[WorkInterval, ...]:
+    return derive_work_timeline(events).intervals
 
 
 class ClockJournal:
@@ -125,8 +183,6 @@ class ClockJournal:
         event = require_nonempty_text('event', event)
         if self._events:
             prev = self._events[-1]
-            # All recorded events must move monotonically within a provider;
-            # hard continuity is checked by callers where required.
             observed_elapsed_ns(prev.snapshot, snapshot)
             prev_hash = prev.record_hash
         else:
@@ -160,35 +216,22 @@ class ClockJournal:
         for a, b in zip(samples, samples[1:]):
             elapsed_ns(a, b)
         for i, snap in enumerate(samples):
-            if i == 0:
-                event = 'GENESIS_ANCHOR'
-            elif i == len(samples) - 1:
-                event = 'GENESIS_READY'
-            else:
-                event = 'GENESIS_PROBE'
+            event = 'GENESIS_ANCHOR' if i == 0 else ('GENESIS_READY' if i == len(samples) - 1 else 'GENESIS_PROBE')
             self.append(event, snap, WorkState.META)
 
     def append_resume(self, samples) -> None:
-        """Append a cross-process resume readiness sequence.
-
-        Resume is deliberately stricter than ordinary soft timing: the previous
-        journal snapshot and the new anchor must share a provider and a non-
-        empty equal boot identity. This prevents a new monotonic epoch from
-        being mistaken for continuity. The unclosed semantic state before the
-        boundary is not charged across the process gap.
-        """
-        samples=tuple(samples)
-        if len(samples)<3:
+        """Append a hard-verified same-boot cross-process readiness sequence."""
+        samples = tuple(samples)
+        if len(samples) < 3:
             raise ValueError('resume requires at least three clock samples')
         if not self._events:
             raise ValueError('resume requires an existing journal')
-        # hard bridge from persisted last snapshot to new process anchor
         elapsed_ns(self._events[-1].snapshot, samples[0])
-        for a,b in zip(samples,samples[1:]):
-            elapsed_ns(a,b)
-        for i,snap in enumerate(samples):
-            event='RESUME_ANCHOR' if i==0 else ('RESUME_READY' if i==len(samples)-1 else 'RESUME_PROBE')
-            self.append(event,snap,WorkState.META)
+        for a, b in zip(samples, samples[1:]):
+            elapsed_ns(a, b)
+        for i, snap in enumerate(samples):
+            event = 'RESUME_ANCHOR' if i == 0 else ('RESUME_READY' if i == len(samples) - 1 else 'RESUME_PROBE')
+            self.append(event, snap, WorkState.META)
 
     def verify(self, require_hard_continuity: bool = False) -> bool:
         prev_hash: str | None = None
