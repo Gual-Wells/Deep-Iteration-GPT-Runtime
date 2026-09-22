@@ -1,11 +1,16 @@
-# Stop, Final Synthesis and Visible Proof
+# Stop, Finalization Admission and Visible Proof
 
-Mechanical contract gates distinguish unconditional minima from timing policy. `N/R/n/r/D` are lower bounds. T/t are frozen targets: with `B/b=0` they are soft and do not themselves block stopping; with `B/b=1` they become hard lower bounds that require verified actual time. Meeting all applicable mechanical gates permits but does not force stopping; Result Sovereignty still asks whether useful additional work can materially improve the faithful result.
+Mechanical gates are N/R/n/r/D minima plus B/b-governed timing. L is not a public or stopping dimension.
 
-Mechanical actuals come from bound facts: Event v2 for N; Candidate-backed MAIN re-entry for R; real SourceWorkspace + SOURCE-time/activity + semantic source receipts for S/n/r/t; completed/reintegrated D sessions for D actual; intervention-bound isolation receipts for L; formal clock ledger for T/t. Unknown unverifiable actuals remain `?`.
+For hard timing, a target is satisfied only when the duration target is reached, relevant intervals are hard-verifiable, and semantic-time coverage is complete. Unattributed formal gaps therefore fail hard timing even when their clock duration is itself measurable.
 
-D target zero does not disable D. L applicability follows actual D: without a completed D, no completed-intervention L conformance is required; once a D completes, target/capability/actual isolation is evaluated normally. L mismatch may be displayed without blocking unless U0 explicitly required exact isolation as a delivery condition.
+Finalization uses an admission gate **before** timing is closed. While still EXECUTING, the runtime projects a finish at the proposed snapshot and evaluates the resulting mechanical actuals. If any required minimum, hard timing gate or coverage gate fails, finish is denied and the live ledger remains open in EXECUTING. Semantic completion must also be ready.
 
-Before formal timing closes, execution must return to `MAIN`. Final synthesis/final task reasoning therefore remains counted task work rather than being silently performed after the ledger has moved to META/FINALIZING. The lifecycle then enters FINALIZING, writes the final summary, and only then becomes FINISHED.
+Only an admitted run may close the ledger, append FINISH and enter FINALIZING. write_run_summary must refuse to transition FINISHED unless delivery readiness is true. A FINISHED run with delivery_ready=false is invalid.
 
-The user-facing result comes first. Visible proof remains compact and canonical; it does not dump Strategy, EST, hidden reasoning, audit logs or schemas. Canonical actual durations are rendered by flooring verified/observed seconds to whole seconds; raw nanoseconds or arbitrary floating-point seconds must never leak into the user-facing proof. For B/b=1, lack of hard verification hides the corresponding actual as `?` rather than exposing an observed-but-unverified duration.
+The visible result comes first, followed by canonical proof:
+
+`DIGR（N_target/N_actual，T_target/T_actual，R_target/R_actual，B，S_i（n_target/n_actual，t_target/t_actual，r_target/r_actual，b），D(target)/D(actual)）`
+
+L is intentionally absent. Actual durations are floored to whole seconds for display. With B/b=1, incomplete clock verification or incomplete semantic-time coverage renders the corresponding actual as ? rather than publishing a misleading partial duration.
+
