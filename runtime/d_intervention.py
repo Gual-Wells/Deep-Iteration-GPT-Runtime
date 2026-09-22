@@ -57,6 +57,7 @@ class ResultRevision:
     summary: str
     evidence_refs: tuple[str, ...] = ()
     output_packet_ref: str | None = None
+    clock_event_ref: str | None = None
 
     def __post_init__(self):
         require_nonnegative_int('result revision', self.revision)
@@ -64,6 +65,11 @@ class ResultRevision:
         object.__setattr__(self, 'evidence_refs', tuple(require_nonempty_text('evidence_ref', x) for x in self.evidence_refs))
         if self.output_packet_ref is not None:
             object.__setattr__(self, 'output_packet_ref', require_nonempty_text('output_packet_ref', self.output_packet_ref))
+        if self.clock_event_ref is not None:
+            ref=require_nonempty_text('clock_event_ref',self.clock_event_ref).lower()
+            if len(ref)!=64 or any(c not in '0123456789abcdef' for c in ref):
+                raise ValueError('clock_event_ref must be lowercase SHA-256 hex')
+            object.__setattr__(self,'clock_event_ref',ref)
 
 
 @dataclass(frozen=True)
@@ -160,7 +166,7 @@ class DIntervention:
         proposals = tuple(ProposalRevision(**x) for x in d.get('proposals', []))
         decree = Decree(**d['decree']) if d.get('decree') else None
         execs = tuple(ExecutionEvent(x['seq'], x['summary'], tuple(x.get('evidence_refs', [])), x.get('clock_event_ref')) for x in d.get('execution_events', []))
-        results = tuple(ResultRevision(x['revision'], x['summary'], tuple(x.get('evidence_refs', [])), x.get('output_packet_ref')) for x in d.get('results', []))
+        results = tuple(ResultRevision(x['revision'], x['summary'], tuple(x.get('evidence_refs', [])), x.get('output_packet_ref'), x.get('clock_event_ref')) for x in d.get('results', []))
         rein = ReintegrationReceipt(**d['reintegration']) if d.get('reintegration') else None
         return cls(d['intervention_id'], d['state_revision'], d['isolation_receipt_id'], proposals, decree, execs, results, rein, d.get('status', 'ACTIVE'), d.get('abort_reason'))
 
@@ -236,12 +242,12 @@ class DInterventionStore:
         ev = ExecutionEvent(len(old.execution_events), summary, tuple(evidence_refs), clock_event_ref)
         return self._save(DIntervention(intervention_id, old.state_revision + 1, old.isolation_receipt_id, old.proposals, old.decree, old.execution_events + (ev,), old.results, old.reintegration, old.status, old.abort_reason))
 
-    def record_result(self, intervention_id: str, summary: str, evidence_refs: Iterable[str] = (), *, output_packet_ref: str | None = None) -> DIntervention:
+    def record_result(self, intervention_id: str, summary: str, evidence_refs: Iterable[str] = (), *, output_packet_ref: str | None = None, clock_event_ref: str | None = None) -> DIntervention:
         old = self.latest(intervention_id)
         self._require_active(old)
         if not old.execution_events:
             raise ValueError('result requires execution evidence')
-        r = ResultRevision(len(old.results), summary, tuple(evidence_refs), output_packet_ref)
+        r = ResultRevision(len(old.results), summary, tuple(evidence_refs), output_packet_ref, clock_event_ref)
         return self._save(DIntervention(intervention_id, old.state_revision + 1, old.isolation_receipt_id, old.proposals, old.decree, old.execution_events, old.results + (r,), old.reintegration, old.status, old.abort_reason))
 
     def reintegrate(self, intervention_id: str, receipt: ReintegrationReceipt) -> DIntervention:
