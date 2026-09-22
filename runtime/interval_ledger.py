@@ -66,7 +66,7 @@ class FormalTimeLedger:
         self._last_event=startup.clock.probe; self._intervals:list[WorkInterval]=[]; self._gaps:list[CoverageGap]=[]; self._finished=False
 
     @classmethod
-    def resume_from_timeline(cls,startup:TaskStartupReceipt,intervals,gaps,last_snapshot:ClockSnapshot,*,open_state=None,open_start=None,hard_T:bool=False,hard_t:bool=False):
+    def resume_from_timeline(cls,startup:TaskStartupReceipt,intervals,gaps,last_snapshot:ClockSnapshot,*,open_state=None,open_start=None,finished:bool=False,hard_T:bool=False,hard_t:bool=False):
         obj=cls(startup,hard_T=hard_T,hard_t=hard_t)
         vals=list(intervals); gap_vals=list(gaps)
         if any(not isinstance(x,WorkInterval) for x in vals): raise TypeError('all resumed intervals must be WorkInterval')
@@ -75,7 +75,9 @@ class FormalTimeLedger:
         if open_state is not None and not isinstance(open_state,WorkState): open_state=WorkState(open_state)
         if (open_state is None)!=(open_start is None): raise ValueError('open_state/open_start must be paired')
         if open_start is not None and not isinstance(open_start,ClockSnapshot): raise TypeError('open_start must be ClockSnapshot')
-        obj._intervals=vals; obj._gaps=gap_vals; obj._state=open_state; obj._start=open_start; obj._last_event=last_snapshot; obj._finished=False
+        require_bool('finished',finished)
+        if finished and (open_state is not None or open_start is not None): raise ValueError('finished ledger cannot restore an open work state')
+        obj._intervals=vals; obj._gaps=gap_vals; obj._state=open_state; obj._start=open_start; obj._last_event=last_snapshot; obj._finished=finished
         return obj
 
     @property
