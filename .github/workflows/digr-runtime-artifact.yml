@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - stable
-      - alpha6-execution-integrity
+      - alpha7-formal-time-continuity
   workflow_dispatch:
 
 permissions:
@@ -47,7 +47,7 @@ jobs:
           cp FILE_TREE.txt generated/
           cp SHA256SUMS.txt generated/
       - name: Commit validated generated metadata on Alpha 6 branch
-        if: github.ref_name == 'alpha6-execution-integrity'
+        if: github.ref_name == 'alpha7-formal-time-continuity'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
