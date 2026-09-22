@@ -4,57 +4,44 @@ DIGR distinguishes **operating a declared implementation** from merely understan
 
 ## Drift inoculation
 
-Before the first operational component is used, the host/model must explicitly recognize the main failure mode:
+At each implementation-delivery boundary, the host/model explicitly distinguishes:
 
-- **Correct:** bind the exact pinned component, select a host channel that can actually execute it, then execute that component and consume its real result.
-- **Incorrect:** read/understand the component and then reproduce, translate, simulate, manually reconstruct, or fabricate an equivalent result/receipt.
+- **Correct:** exact pinned package/component → compatible executor → direct invocation → real result.
+- **Incorrect:** read/understand component → rewrite/translate/simulate equivalent behavior → hand-construct the expected receipt/result.
 
-Knowing what code does is not evidence that the code ran. A semantically equivalent reimplementation is not the declared implementation.
+Knowing what code does is not evidence that it ran.
 
-## Component interrogation gate
+## Delivery binding
 
-Immediately before a repository-declared operational component is used, the model must form a compact structured commitment that answers all of the following without hidden chain-of-thought:
+The interrogation/commitment gate is paid **once when implementation identity is established for a concrete pinned runtime package and executor**, not before every subsequent helper call from that same verified binding.
 
-1. Which exact pinned component is about to be operated?
-2. Which concrete operation/function is being invoked?
-3. Which available host execution channel will actually run that implementation?
-4. Is direct execution selected now?
-5. Are model-written substitution, cross-language reimplementation, manual receipt construction and semantic simulation explicitly rejected?
+The compact binding records, at minimum:
 
-A generic statement such as “I will follow the protocol” is insufficient. The commitment must identify the concrete component and execution channel.
+1. pinned commit/package identity;
+2. concrete executor/channel;
+3. direct execution selected;
+4. semantic substitution/manual receipt construction rejected.
 
-If the answer is incomplete, ambiguous, or chooses substitution, insert one lightweight corrective reminder of the execute-vs-penetrate distinction and interrogate again. At most two corrective rounds are allowed. Repeated failure is a startup/runtime integration failure, not permission to continue task work.
+Once accepted, the next relevant action must be actual delivery/invocation or a concrete failure. After the package has executed successfully, later operations from the same package/executor proceed directly without repeated cognitive interrogation.
 
-## Execution commitment
+Re-open the gate only when:
+- a different runtime package/component delivery path is introduced;
+- the executor/channel changes in a way that breaks prior identity evidence;
+- resume cannot establish that the previously verified binding still applies;
+- an actual direct execution/delivery attempt fails and a repository-declared fallback is considered.
 
-Once the gate accepts a commitment, the next relevant action is constrained to one of:
-
-- an actual attempt to deliver/materialize the exact pinned implementation into a compatible executor;
-- an actual attempt to invoke that exact implementation;
-- recording a concrete delivery/execution failure.
-
-New semantic analysis, alternate implementation, manual result construction or task work between accepted commitment and actual execution attempt reopens the gate and is non-conforming.
+This keeps integrity machinery proportional to real identity boundaries rather than ordinary helper-call frequency.
 
 ## Substitution boundary
 
-A declared implementation may be substituted only when:
-
-- an actual direct execution/delivery attempt has failed;
-- the pinned protocol explicitly permits a compatibility fallback; and
-- the fallback preserves implementation identity or is explicitly defined as a different authoritative path.
-
-“Same algorithm”, “same output”, “easier in another language”, or “I already understand it” are never sufficient substitution grounds.
+A declared implementation may be substituted only when an actual direct execution/delivery attempt failed and the pinned protocol explicitly permits another authoritative compatibility path. “Same algorithm”, “same output”, “easier in another language”, or “I understand it” are never sufficient.
 
 ## Implementation delivery
 
-Execution intent is useless if repository bytes cannot reach an executor. Alpha 6 therefore treats **implementation delivery** as a first-class startup concern.
+When the host already has a native same-SHA file-to-executor bridge, use it. Otherwise use a manifest-declared identity-preserving runtime distribution path for the exact P_run commit and verify member identity against the pinned Git tree before execution.
 
-When the host already has a native same-SHA file-to-executor bridge, use it. Otherwise, if manifest.runtime_distribution declares an immutable same-commit artifact path, acquire that artifact for the exact P_run commit, materialize it into the executor, and verify its member identity against the pinned Git tree before execution.
-
-Artifact transport is not protocol authority. The pinned repository remains authoritative; the artifact is only a byte-delivery vehicle.
-
-A missing exact-commit artifact plus no native identity-preserving bridge is an implementation-delivery failure. It must not be converted into model-written runtime code.
+Runtime transport is never protocol authority. A missing exact-commit delivery path plus no native bridge is an implementation-delivery failure, not permission to synthesize runtime code.
 
 ## Result sovereignty
 
-These gates exist to prevent silent runtime impersonation, not to add bureaucracy. They should remain compact and local to actual operational boundaries. Once the declared component has executed successfully, return control to native intelligence immediately.
+These gates exist to prevent silent runtime impersonation, not to become a competing reasoning objective. Verification should be deterministic and coarse-grained at real delivery/resume boundaries; once the binding is valid, return attention to the user's task.
