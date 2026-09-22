@@ -10,7 +10,6 @@
 只有三个直接缺省值：
 - `B = 1`（hard）
 - `b = 1`（hard）
-- `L(1)`（语义隔离）
 
 其余缺失的 `N/T/R/n/t/r/s` 必须由 ChatGPT 根据 U0 与**所有已给出的参数**联合判断，不允许固定 workload table、难度等级查表、正则 parser 或 deterministic helper 代替模型语义校准。
 
