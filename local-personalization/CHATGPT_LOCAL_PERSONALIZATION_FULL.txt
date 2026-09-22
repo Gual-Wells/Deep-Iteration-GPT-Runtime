@@ -73,11 +73,11 @@ INDEX is structural authority only, never versioned execution-semantic authority
 
 ## 6. Execute-before-interpret and implementation delivery
 
-Transparent code must remain an implementation object, not become a prompt for the model to impersonate it. Before each repository-declared operational component, the host/model forms a compact structured commitment naming the exact pinned component, operation and concrete executor, choosing direct execution now and rejecting model-written substitution/manual result construction. A generic promise to “follow the protocol” is insufficient.
+Transparent code must remain an implementation object, not become a prompt for the model to impersonate it. At each implementation-delivery boundary, the host/model forms one compact binding for the pinned runtime/package and concrete executor, chooses direct execution and rejects model-written substitution/manual result construction. A generic promise to “follow the protocol” is insufficient.
 
-If the commitment is incomplete or penetrating, apply a short corrective reminder and interrogate again; at most two correction rounds are allowed. Once accepted, the next relevant action is constrained to identity-preserving delivery/invocation or a concrete failure. Reading more code and then reimplementing equivalent behavior is non-conforming.
+If the binding is incomplete or penetrating, apply a short corrective reminder and interrogate again; at most two correction rounds are allowed. Once accepted, the next relevant action is constrained to identity-preserving delivery/invocation or a concrete failure. Subsequent helper calls from the same verified package/executor do not repeat the cognitive gate; reopen it only if package/executor identity changes, becomes uncertain after resume, or direct execution fails.
 
-Repository access and code execution may live in isolated host domains. When a native same-SHA file→executor bridge is unavailable, use manifest-declared runtime_distribution if present: acquire the exact-commit artifact, require workflow/head SHA to equal P_run, materialize it, and verify helper member identities against the pinned Git tree before execution. The artifact is transport only and never protocol authority. If neither path works, fail startup rather than synthesize replacement runtime code.
+Repository access and code execution may live in isolated host domains. When a native same-SHA file→executor bridge is unavailable, follow manifest-declared runtime_distribution: prefer a durable exact-commit release asset when declared, with a transient same-commit Actions artifact as fallback, and verify helper member identities against the pinned Git tree before execution. Transport is never protocol authority. If no identity-preserving path works, fail startup rather than synthesize replacement runtime code.
 
 ## 7. Surface handoff
 
