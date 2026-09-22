@@ -72,6 +72,112 @@ def _derived_actuals(events, sources, activity, dstore, timeline) -> ContractAct
         D_s=dstore.completed_count,
     )
 
+
+def _json_equal(ws: RunWorkspace, rel: str, value: dict) -> bool:
+    p=ws.path(rel)
+    return p.is_file() and ws.read_json(rel)==value
+
+
+def recover_run_workspace(root: Path, run_id: str) -> dict:
+    """Repair only mechanically reconstructible crash residue, never semantic facts."""
+    run_id=validate_run_id(run_id)
+    ws=RunWorkspace.open_existing(root,run_id)
+    actions=[]
+    outcome=ws.recover_pending_write()
+    if outcome is not None:
+        actions.append(f'workspace-write:{outcome}')
+
+    # Append-only journals can safely refresh their artifact-index digest after
+    # their own hash/sequence verification succeeds.
+    journal_specs=(
+        ('time/clock.journal.ndjson','clock-journal',lambda p: ClockJournal.load(run_id,p).verify(False)),
+        ('time/source-activity.ndjson','source-activity',lambda p: SourceActivityLog.load(p).verify()),
+        ('events.ndjson','event-log',lambda p: EvolutionEventLog.load(p).verify()),
+    )
+    for rel,kind,verify in journal_specs:
+        p=ws.path(rel)
+        if p.is_file():
+            verify(p)
+            ws.index_existing(rel,kind=kind)
+            actions.append(f'reindexed:{rel}')
+
+    def repair_pointer(source_rel,target_rel,kind,revision):
+        value=ws.read_json(source_rel)
+        if not _json_equal(ws,target_rel,value):
+            ws.write_json(target_rel,value,kind=kind,revision=revision)
+            actions.append(f'rebuilt:{target_rel}')
+
+    # Immutable revision history is authoritative; latest pointers are caches.
+    for prefix,latest_name,kind in (
+        ('strategy-r','strategy-latest.json','strategy-latest'),
+        ('candidate-r','candidate-latest.json','candidate-latest'),
+        ('run-phase-r','run-phase.json','run-phase-latest'),
+    ):
+        files=sorted(ws.path('state').glob(prefix+'*.json'))
+        if files:
+            src=files[-1]
+            value=ws.read_json(str(src.relative_to(ws.root)))
+            revision=value['revision']
+            repair_pointer(str(src.relative_to(ws.root)),f'state/{latest_name}',kind,revision)
+
+    src_root=ws.path('sources')
+    if src_root.exists():
+        for d in sorted(x for x in src_root.iterdir() if x.is_dir()):
+            files=sorted(d.glob('state-r*.json'))
+            if files:
+                src=files[-1]; value=ws.read_json(str(src.relative_to(ws.root)))
+                repair_pointer(str(src.relative_to(ws.root)),str((d/'state.json').relative_to(ws.root)),'source-latest',value['revision'])
+
+    d_latest={}
+    for p in sorted(ws.path('dictator').glob('*-r*.json')):
+        value=ws.read_json(str(p.relative_to(ws.root)))
+        iid=value.get('intervention_id')
+        rev=value.get('state_revision')
+        if isinstance(iid,str) and isinstance(rev,int):
+            prior=d_latest.get(iid)
+            if prior is None or rev>prior[0]:
+                d_latest[iid]=(rev,p)
+    for iid,(rev,p) in sorted(d_latest.items()):
+        repair_pointer(str(p.relative_to(ws.root)),f'dictator/{iid}.json','d-intervention-latest',rev)
+
+    est_latest={}
+    for p in sorted(ws.path('state').glob('est-*-r*.json')):
+        value=ws.read_json(str(p.relative_to(ws.root)))
+        scope=value.get('scope'); rev=value.get('revision')
+        if isinstance(scope,str) and isinstance(rev,int):
+            prior=est_latest.get(scope)
+            if prior is None or rev>prior[0]:
+                est_latest[scope]=(rev,p,value)
+    for scope,(rev,p,value) in sorted(est_latest.items()):
+        safe=''.join(c if c.isalnum() or c in '._-' else '_' for c in scope)[:48]
+        tag=sha256(scope.encode()).hexdigest()[:10]
+        rel=f'state/est-{safe}-{tag}-latest.json'
+        if not _json_equal(ws,rel,value):
+            ws.write_json(rel,value,kind='est-latest',revision=rev)
+            actions.append(f'rebuilt:{rel}')
+
+    # completion.json is a summary of immutable gap revisions plus assessment
+    # strings.  Keep committed assessments, but rebuild the latest gap view.
+    gap_hist={}
+    gap_files=sorted(ws.path('state/gaps').glob('*-r*.json')) if ws.path('state/gaps').exists() else []
+    for p in gap_files:
+        value=ws.read_json(str(p.relative_to(ws.root)))
+        gid=value.get('gap_id'); rev=value.get('revision')
+        if isinstance(gid,str) and isinstance(rev,int):
+            prior=gap_hist.get(gid)
+            if prior is None or rev>prior[0]:
+                gap_hist[gid]=(rev,value)
+    cp=ws.path('state/completion.json')
+    current=ws.read_json('state/completion.json') if cp.is_file() else {'assessment_revisions':[]}
+    assessments=list(current.get('assessment_revisions',[]))
+    expected={'gaps':[gap_hist[k][1] for k in sorted(gap_hist)],'assessment_revisions':assessments}
+    if gap_hist and not _json_equal(ws,'state/completion.json',expected):
+        revision=len(gap_files)+len(assessments)
+        ws.write_json('state/completion.json',expected,kind='completion',revision=revision)
+        actions.append('rebuilt:state/completion.json')
+
+    return {'run_id':run_id,'recovery_actions':tuple(actions)}
+
 def verify_run_workspace(root: Path, run_id: str) -> dict:
     run_id=validate_run_id(run_id)
     ws=RunWorkspace.open_existing(root,run_id)
