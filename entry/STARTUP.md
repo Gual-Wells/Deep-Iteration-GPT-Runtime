@@ -1,4 +1,4 @@
-# DIGR 5.0 Alpha 7 — Minimal Startup Slice
+# DIGR 5.0 Alpha 8 — Minimal Startup Slice
 
 This file is deliberately small enough to load before the full protocol. It is reached only after the pinned bootstrap_index has made the repository machine structure explicit and bootstrap/BOOTSTRAP.md has established authority/navigation. It defines repository-surface classification, implementation-delivery / execution-precommitment gates, Clock Genesis and the full-protocol-ready boundary for the already pinned P_run.
 
@@ -6,7 +6,7 @@ This file is deliberately small enough to load before the full protocol. It is r
 2. NATIVE: return the original user message unchanged to native ChatGPT. Do not create a run, U0, contract or proof.
 3. HELP: load only manifest.help; do not create the task clock.
 4. INVALID: return a concise invocation-structure diagnostic; do not perform task work.
-5. EXECUTING: before operating any declared runtime component, apply the Alpha 6 execute-before-interpret inoculation. Correct behavior is direct use of the exact pinned implementation; reading/understanding then reimplementing, translating, simulating or manually fabricating an equivalent receipt is not execution.
+5. EXECUTING: before operating any declared runtime component, apply the inherited execute-before-interpret inoculation. Correct behavior is direct use of the exact pinned implementation; reading/understanding then reimplementing, translating, simulating or manually fabricating an equivalent receipt is not execution.
 6. Resolve an identity-preserving implementation-delivery path. Prefer a native same-SHA repository-file → compatible-executor bridge. If that bridge is unavailable and manifest.runtime_distribution is declared, acquire the exact-commit runtime artifact, require workflow/head SHA == P_run commit, materialize it into the executor, and verify every deterministic_helpers member against the pinned Git tree blob identity/byte length before use. Artifact transport is not semantic authority.
 7. Immediately before the concrete Genesis component is operated, perform the component interrogation gate: identify the exact pinned component and operation, name the concrete compatible executor, commit to direct execution now, and explicitly reject model-written substitution/manual receipt construction. An incomplete or penetrating commitment receives a lightweight correction and is re-interrogated; at most two correction rounds are allowed. Repeated failure aborts startup.
 8. Once the commitment is accepted, the next relevant action must be actual delivery/invocation of that component or recording a concrete delivery/execution failure. Do not insert new semantic analysis, equivalent implementation or task work between commitment and attempt.
