@@ -1,11 +1,10 @@
-# D — Disruptive Gambit Intervention Session
+# Disruptive Gambit
 
-D is a non-local intervention for escaping Main's current frame. It is not a second planner. Each intervention binds one IsolationReceipt and has revisioned proposals, a Decree, execution events, result revisions, then Main reintegration.
+D is a minimum number of completed disruptive interventions. D(0) means no mandatory minimum; it never disables quality-driven D.
 
-`D(s)` freezes only the minimum number of completed/reintegrated interventions. `D(0)` therefore means no D completion is mechanically required; it does not prohibit the native model from invoking D when a non-local challenge can materially improve the result. Actual D may exceed the target.
+A D intervention remains revisionable as a proposal until Decree, then executes, produces a D Result and must be reintegrated into MAIN with an explicit consequence. Only completed/reintegrated interventions count toward D actual.
 
-Before Decree the proposal may pivot freely. Decree is the commitment point and binds one proposal revision. If the decreed route is fundamentally wrong, abort the intervention and explicitly start/re-decree another instead of silently rewriting committed history. `ABORTED` and `COMPLETED` interventions are terminal and cannot later accumulate proposals, execution, results or reintegration edits.
+Alpha 7 uses internal L1 semantic isolation for D. There is no public L parameter or proof field. The implementation must preserve the semantic firewall between the disruptive proposal/work and ordinary MAIN reasoning until reintegration.
 
-D execution is state-bound. Exclusive isolation executes only while formal foreground state is `D_EXCLUSIVE`; background isolation is allowed only where the actual L mode supports it and the foreground remains MAIN/SOURCE. Every execution receipt binds the clock event proving that state.
+Exclusive D execution uses D_EXCLUSIVE. D_EXCLUSIVE is substantive task work and therefore counts toward T. It never counts toward source time t. If D work itself crosses a host/process boundary, the same work-lease rules apply.
 
-A completed D requires result evidence and a ReintegrationReceipt. Reintegration is itself MAIN work: it binds a real MAIN clock state, the D result, candidate-before when available, accepted/rejected material, concrete Main consequence, and any resulting Strategy/Candidate revision. Rejecting all D output is valid after independent evaluation; a bare “reintegrated” string is not.
