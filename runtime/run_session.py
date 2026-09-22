@@ -387,13 +387,25 @@ class LiveDIGRRun:
         if self.ledger is None:raise RuntimeError('no active ledger')
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('finish_time requires formal MAIN execution to have started')
         if not self.strategy.has_state:raise RuntimeError('finish_time requires Strategy Genesis/current StrategyState')
+        if self.contract is None:raise RuntimeError('contract missing')
         if self.ledger.foreground_state is not WorkState.MAIN:
             raise RuntimeError('final synthesis/finalization must return to MAIN before formal timing finishes')
-        self.phase.transition(RunPhase.FINALIZING,'formal timing finalized')
-        self.ledger.finish(at);self.clock_journal.append('FINISH',at,WorkState.META);self.clock_journal.verify(self.contract.hard_timing_required if self.contract else False);self._reindex_journals()
-        derived=derive_work_intervals(self.clock_journal.events)
-        lhs=[(x.state,x.start.monotonic_ns,x.end.monotonic_ns,x.observed_ns,x.hard_verified) for x in self.ledger.intervals];rhs=[(x.state,x.start.monotonic_ns,x.end.monotonic_ns,x.observed_ns,x.hard_verified) for x in derived]
-        if lhs!=rhs:raise RuntimeError('clock journal / formal ledger parity failure')
+        if not self.completion.ready:
+            raise RuntimeError('semantic completion must be ready before finalization admission')
+        projected=self.ledger.preview_finish(at)
+        prospective=derive_contract_actuals(
+            self.events,self.sources,self.source_activity,self.dictator,projected,self.clock_journal,verify_parity=False
+        )
+        gate=check_mechanical_minima(self.contract,prospective)
+        if not gate.minima_satisfied:
+            failed=[k for k,v in gate.__dict__.items() if k.endswith('_ok') and not v]
+            raise RuntimeError('finalization admission denied: '+','.join(failed))
+        self.ledger.finish(at)
+        self.clock_journal.append('FINISH',at,WorkState.META)
+        self.clock_journal.verify(self.contract.hard_timing_required)
+        self._reindex_journals()
+        derive_contract_actuals(self.events,self.sources,self.source_activity,self.dictator,self.ledger,self.clock_journal)
+        self.phase.transition(RunPhase.FINALIZING,'formal timing finalized after admission gate')
         self.refresh_brief()
 
     def actuals(self):
@@ -405,7 +417,10 @@ class LiveDIGRRun:
     def _require_finalizing(self):
         if self.phase.phase is not RunPhase.FINALIZING or self.ledger is None or not self.ledger.finished:raise RuntimeError('finish formal timing before finalization')
     def write_run_summary(self):
-        self._require_finalizing();actual=self.actuals();stop=self.stop_check();prov=ActualsProvenance();summary={'run_id':self.run_id,'authority':self.startup.authority.to_dict(),'invocation':self.startup.invocation.to_dict(),'phase':'FINISHED','U0':self.U0.to_dict() if self.U0 else None,'contract':self.contract.to_dict(),'actuals':actual.__dict__,'provenance':prov.__dict__,'mechanical_checks':stop.__dict__,'mechanical_minima_satisfied':stop.minima_satisfied,'semantic_completion_assessed':self.completion.semantically_assessed,'blocking_open_gaps':len(self.completion.blocking_open),'delivery_ready':stop.minima_satisfied and self.completion.ready,'clock_journal_events':len(self.clock_journal.events)}
+        self._require_finalizing();actual=self.actuals();stop=self.stop_check();prov=ActualsProvenance()
+        if not stop.minima_satisfied or not self.completion.ready:
+            raise RuntimeError('FINISHED is forbidden when delivery readiness is false')
+        summary={'run_id':self.run_id,'authority':self.startup.authority.to_dict(),'invocation':self.startup.invocation.to_dict(),'phase':'FINISHED','U0':self.U0.to_dict() if self.U0 else None,'contract':self.contract.to_dict(),'actuals':actual.__dict__,'provenance':prov.__dict__,'mechanical_checks':stop.__dict__,'mechanical_minima_satisfied':True,'semantic_completion_assessed':self.completion.semantically_assessed,'blocking_open_gaps':len(self.completion.blocking_open),'delivery_ready':True,'clock_journal_events':len(self.clock_journal.events)}
         self.workspace.write_json('final/run-summary.json',summary,kind='run-summary');self.phase.transition(RunPhase.FINISHED,'final summary persisted');self.refresh_brief();return summary
     def delivery_ready(self):
         if self.phase.phase not in (RunPhase.FINALIZING,RunPhase.FINISHED) or self.ledger is None or not self.ledger.finished:return False
