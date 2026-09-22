@@ -1,4 +1,4 @@
-"""Deterministic DIGR 5.0.0-alpha.7 execution-protocol bundle verification.
+"""Deterministic DIGR 5.0.0-alpha.8 execution-protocol bundle verification.
 
 The repository keeps entrypoint/core modules as independent source files for
 review, diffing and tests.  Release/runtime transport may carry those logical
