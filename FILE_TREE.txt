@@ -39,6 +39,7 @@ docs/PROTOCOL_SPEC_5.0.0-alpha.4.md
 docs/PROTOCOL_SPEC_5.0.0-alpha.5.md
 docs/PROTOCOL_SPEC_5.0.0-alpha.6.md
 docs/PROTOCOL_SPEC_5.0.0-alpha.7.md
+docs/PROTOCOL_SPEC_5.0.0-alpha.8.md
 docs/REPOSITORY_TRANSPORT.md
 docs/ROUTING_CONTRACT.md
 docs/RUN_SESSION_ARCHITECTURE.md
@@ -51,8 +52,6 @@ entry/STARTUP.md
 examples/ALL_DEFAULTS.md
 examples/DIGR_ALIAS.md
 examples/D_L1.md
-examples/D_L2.md
-examples/D_L3.md
 examples/D_ZERO_MINIMUM.md
 examples/EVENT_BACKED_R.md
 examples/EXAMPLE_HELP.md
@@ -60,8 +59,6 @@ examples/FORMAL_TIME_PAUSE.md
 examples/HARD_TIMING_READINESS.md
 examples/HARD_UNKNOWN_PROOF.md
 examples/HARD_VERIFICATION_FACT.md
-examples/L2_HANDOFF_NONCONFORMANCE.md
-examples/L_CAPABILITY_DOWNGRADE.md
 examples/MULTI_SOURCE_AGGREGATION.md
 examples/NON_STICKY.md
 examples/NON_TRIGGER_DISCUSSION.md
