@@ -1,25 +1,20 @@
 # Repository transport
 
-Alpha 5 retains repository transport outside DIGR execution semantics and keeps transport mode explicit.
+Alpha 8 keeps repository transport outside task-execution semantics.
 
-## Admissible mutable-ref sources
+## Mutable authority
 
-- `github_connector`: an already-connected GitHub repository connector may read the public repository `stable` branch resource and accept its current full 40-hex HEAD SHA. Connector mode does not require a Git-ref endpoint the connector product does not expose.
-- `direct_https`: a real direct GitHub REST client reads both the stable branch resource and Git-ref resource. If a push lands between those two live reads, one bounded re-observation is allowed; only a matching full SHA is accepted.
-- search/index/crawl/snippet/browser-search snapshots are never mutable-ref authority.
+- an already-connected GitHub connector may resolve the current public `stable` branch HEAD directly;
+- direct HTTPS mode corroborates Branches and Git-ref endpoints;
+- search/index/crawl snapshots are never mutable-ref authority.
 
-A public DIGR bootstrap must not require the user to establish a new GitHub OAuth connection merely to read this repository. If a connector is already connected, it is preferred; otherwise a host may use genuine direct REST if available.
+After one full SHA is pinned, all later reads use that SHA.
 
-## Immutable staged phase
+## Staged startup
 
-After stable resolves to one SHA, every later resource is read at that exact SHA. `raw.githubusercontent.com/{SHA}/{PATH}` is canonical. GitHub Contents API is an allowed fallback only when the response is raw media or its JSON/base64 wrapper is decoded into actual file bytes.
+Read manifest/VERSION, then bootstrap_index and the remaining startup slice. For EXECUTING, Clock Genesis precedes the manifest-declared execution bundle. The current bundle transports one entrypoint plus 18 core logical members and produces the ExecutingProtocolLoadReceipt required before parameter resolution.
 
-The first immutable stage remains deliberately small but now has an explicit structural lens: `manifest.json`, `VERSION`, then `manifest.bootstrap_index`, then the remaining ordered `startup_slice`. The index exposes implemented repository machinery and truth-source ownership before startup interpretation without importing versioned execution semantics. Cheap NATIVE/HELP/INVALID classification and the early Clock Genesis boundary are preserved.
+Runtime-distribution artifacts are transport only. Their members must match the exact pinned Git tree and cannot redefine P_run.
 
-For EXECUTING, Alpha 5 retains the separation between **logical protocol modularity** and **physical transport count**. The repository continues to maintain one entrypoint and 17 core source files, but the release builder deterministically generates `bundle/EXECUTION_PROTOCOL.json`. After Clock Genesis the host fetches this single pinned bundle, verifies that it contains exactly the manifest-declared entrypoint/core members in order with matching byte lengths and SHA-256 digests, and persists an `ExecutingProtocolLoadReceipt`. Parameter resolution cannot start without that receipt.
+Transport receipts do not define versioned parameter, timing, stop or proof semantics.
 
-Older staged manifests without an execution bundle remain compatible by loading their entrypoint/core individually and normalizing those verified files into the same receipt shape.
-
-A post-genesis mandatory protocol-load failure is a failure of a **born** run: the standard host bridge persists `ABORTED`, and the run cannot continue parameter resolution from an unverified GENESIS state.
-
-Transport receipts prove that real acquisitions occurred. They do not contain or define N/T/R/S/D/L, timing, stop or proof semantics.
