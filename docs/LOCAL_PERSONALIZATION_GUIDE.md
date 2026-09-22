@@ -18,9 +18,9 @@ After pinning, every repository read uses the same SHA. Bind manifest/VERSION fi
 
 ## Execute-before-interpret
 
-The local layer teaches one additional pre-task distinction without copying versioned task-parameter semantics: a repository-declared operational helper is an implementation to operate, not a description for the model to imitate. Before use, identify the exact component/operation/executor, commit to direct execution now, and reject semantic-equivalent rewrite/manual receipt construction. If incomplete, apply only bounded lightweight correction; after acceptance, go directly to delivery/execution attempt or a concrete failure.
+The local layer teaches one additional pre-task distinction without copying versioned task-parameter semantics: a repository-declared operational helper is an implementation to operate, not a description for the model to imitate. At the implementation-delivery boundary, identify the pinned runtime/package and concrete executor once, select direct execution, and reject semantic-equivalent rewrite/manual receipt construction. After that verified binding is established, subsequent helper calls from the same package/executor execute directly; repeat the gate only when package/executor identity changes or becomes uncertain.
 
-When repository access and code execution are isolated, follow the pinned manifest's runtime_distribution path when available. Exact-commit artifact transport must verify member identity against the pinned Git tree. Bridge failure never licenses model-written runtime replacement.
+When repository access and code execution are isolated, follow the pinned manifest's runtime_distribution path when available. Prefer any declared durable exact-commit transport, with transient artifact fallback as needed; every transport must still verify member identity against the pinned Git tree. Bridge failure never licenses model-written runtime replacement.
 
 ## Structural transparency and handoff
 
