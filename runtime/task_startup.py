@@ -1,4 +1,4 @@
-"""DIGR 5.0 Alpha 6 executing-task genesis with multi-sample clock readiness."""
+"""DIGR 5.0 Alpha 8 executing-task genesis with multi-sample clock readiness."""
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable
