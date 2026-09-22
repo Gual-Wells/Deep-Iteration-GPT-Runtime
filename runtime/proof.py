@@ -1,4 +1,4 @@
-"""Canonical compact DIGR 5.0.0-alpha.7 proof renderer.
+"""Canonical compact DIGR 5.0.0-alpha.8 proof renderer.
 
 L is intentionally absent from public proof.  For hard timing, an actual value
 is visible only when both clock verification and semantic-time coverage are
