@@ -18,7 +18,7 @@ After pinning, every repository read uses the same SHA. Bind manifest/VERSION fi
 
 ## Execute-before-interpret
 
-The local layer teaches one additional pre-task distinction without copying versioned N/T/R/S/D/L semantics: a repository-declared operational helper is an implementation to operate, not a description for the model to imitate. Before use, identify the exact component/operation/executor, commit to direct execution now, and reject semantic-equivalent rewrite/manual receipt construction. If incomplete, apply only bounded lightweight correction; after acceptance, go directly to delivery/execution attempt or a concrete failure.
+The local layer teaches one additional pre-task distinction without copying versioned task-parameter semantics: a repository-declared operational helper is an implementation to operate, not a description for the model to imitate. Before use, identify the exact component/operation/executor, commit to direct execution now, and reject semantic-equivalent rewrite/manual receipt construction. If incomplete, apply only bounded lightweight correction; after acceptance, go directly to delivery/execution attempt or a concrete failure.
 
 When repository access and code execution are isolated, follow the pinned manifest's runtime_distribution path when available. Exact-commit artifact transport must verify member identity against the pinned Git tree. Bridge failure never licenses model-written runtime replacement.
 
@@ -30,4 +30,5 @@ Broad capture is not takeover: pinned startup may return NATIVE, HELP, INVALID o
 
 The fixed route-failure string is not a shortcut. No current-turn acquisition attempt means the router was not executed; it does not mean repository acquisition failed. Once P_run exists, startup/runtime failure is governed by P_run and must not be rewritten as route failure.
 
-Local text must never copy N/T/R/S/D/L/time/stop/proof semantics.
+Local text must never copy versioned task-parameter/time/stop/proof semantics.
+
