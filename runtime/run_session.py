@@ -241,6 +241,27 @@ class LiveDIGRRun:
         if state is WorkState.SOURCE:self.source_activity.append(ev.record_hash,ids)
         self._reindex_journals();self.refresh_brief()
 
+    def open_work_lease(self,at:ClockSnapshot):
+        """Persist permission for current formal work to cross one host/process boundary."""
+        if self.phase.phase is not RunPhase.EXECUTING or self.ledger is None:
+            raise RuntimeError('work lease requires EXECUTING phase and active ledger')
+        state=self.ledger.foreground_state
+        if state not in (WorkState.MAIN,WorkState.SOURCE,WorkState.D_EXCLUSIVE):
+            raise RuntimeError('work lease requires active MAIN/SOURCE/D_EXCLUSIVE state')
+        timeline=derive_work_timeline(self.clock_journal.events)
+        if timeline.lease_open:raise RuntimeError('work lease already open')
+        source_ids=()
+        if state is WorkState.SOURCE:
+            bindings=self.source_activity.by_clock_ref()
+            for e in reversed(self.clock_journal.events):
+                if e.state is WorkState.SOURCE and e.record_hash in bindings:
+                    source_ids=bindings[e.record_hash];break
+            if not source_ids:raise RuntimeError('SOURCE work lease requires active-source binding')
+        self.ledger.mark(at)
+        ev=self.clock_journal.append('WORK_LEASE_OPEN',at,state)
+        if state is WorkState.SOURCE:self.source_activity.append(ev.record_hash,source_ids)
+        self._reindex_journals();self.refresh_brief();return ev
+
     def _event_context(self, expected_state: WorkState):
         if self.phase.phase is not RunPhase.EXECUTING:
             raise RuntimeError('semantic evolution event requires EXECUTING phase')
@@ -311,7 +332,7 @@ class LiveDIGRRun:
     def add_isolation_facts(self,receipt_id:str,facts:IsolationFacts,*,input_packet_ref=None,output_packet_ref=None,mode='exclusive'):
         if self.contract is None or self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('isolation receipt requires an executing contracted run')
         if not self.strategy.has_state:raise RuntimeError('Strategy Genesis must exist before D isolation')
-        r=make_isolation_receipt(receipt_id,self.contract.L_e,facts,input_packet_ref=input_packet_ref,output_packet_ref=output_packet_ref,mode=mode)
+        r=make_isolation_receipt(receipt_id,1,facts,input_packet_ref=input_packet_ref,output_packet_ref=output_packet_ref,mode=mode)
         if r.L_actual is not None and r.L_actual>=2:
             self.workspace.require_indexed_artifact(r.input_packet_ref,kind='d-input-packet')
             if r.output_packet_ref is not None:self.workspace.require_indexed_artifact(r.output_packet_ref,kind='d-output-packet')
