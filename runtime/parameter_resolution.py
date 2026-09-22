@@ -1,4 +1,4 @@
-"""Deterministic parameter-format resolution for DIGR 5.0 Alpha 7.
+"""Deterministic parameter-format resolution for DIGR 5.0 Alpha 8.
 
 Public order is N < T < R < B < S < D.  L is no longer a public parameter:
 D isolation uses an internal fixed L1 baseline.  A bare numeric token can never
