@@ -2,7 +2,7 @@
 
 Input: `DIGR（R=3）：检查并改进方案`
 
-Required order for the pinned Alpha 5 protocol:
+Required order for the pinned Alpha 8 protocol:
 
 1. local route resolves `stable` → immutable SHA, reads pinned manifest/VERSION, then reads `manifest.bootstrap_index` first and continues the remaining manifest-declared startup slice;
 2. repository startup surface returns `EXECUTING`;
