@@ -15,6 +15,8 @@ Alpha 8 keeps Alpha 7's authority, implementation-identity and cross-host timing
 - **Current-result R/r:** re-entry cannot move backward to superseded Candidate/Source revisions.
 - **D isolation closure:** exclusive D Result production stays in D_EXCLUSIVE until explicit MAIN reintegration.
 - **Public L remains removed:** internal L1 only.
+- **Lower execution overhead:** implementation identity is bound once per verified runtime package/executor rather than re-interrogated before every helper.
+- **Durable runtime delivery:** stable publishes a permanent exact-commit prerelease asset in addition to the transient Actions artifact.
 
 The canonical proof remains `N/T/R/B + S + D`; coverage completeness is retained as machine/audit state rather than a separate stop gate.
 
