@@ -60,12 +60,12 @@ class ProofData:
 
     @property
     def visible_T_actual(self):
-        if self.B==1 and (not self.T_hard_verified or not self.T_coverage_complete):return None
+        if self.B==1 and not self.T_hard_verified:return None
         return self.T_actual_seconds
 
     @property
     def visible_t_actual(self):
-        if self.b==1 and (not self.t_hard_verified or not self.t_coverage_complete):return None
+        if self.b==1 and not self.t_hard_verified:return None
         return self.t_actual_seconds
 
     def to_dict(self)->dict:
