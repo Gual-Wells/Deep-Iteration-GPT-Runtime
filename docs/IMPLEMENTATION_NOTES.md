@@ -1,51 +1,32 @@
-# Alpha 6 Implementation Notes
+# Alpha 8 Implementation Notes
 
-Alpha 6 preserves Alpha 5 hard-default timing semantics and adds execution-integrity plus identity-preserving runtime delivery after two live host failures.
+Alpha 8 is a convergence/recovery release over Alpha 7 rather than a new task-control layer.
 
-The **contract-policy** behavior inherited from Alpha 5 remains the omitted timing-policy default: deterministic parameter resolution supplies `B=1` and `b=1`. Explicit `B=0` / `b=0` retains the Alpha 4 soft-target behavior. The underlying soft/hard stop mechanics are unchanged. A later Alpha 5 bootstrap refinement adds structural transparency before startup without changing those execution semantics.
+## Timing
 
-## Transparent bootstrap index
+T counts MAIN + SOURCE + D_EXCLUSIVE; t counts SOURCE. B/b=1 proves a **lower bound over counted hard-verifiable intervals**. Unleased gaps remain recorded but are excluded from the number, so they cannot inflate a hard minimum. Complete coverage is audit information rather than a separate delivery gate.
 
-After immutable manifest/VERSION binding, current Alpha 6 loads manifest-declared `bootstrap/INDEX.md` first. The index gives the host/model a compact machine map: which protocol files and deterministic helpers are implemented, where workspace/state/schema truth lives, and where deterministic reliability support stops and native model intelligence begins. `runtime/routing.py` now validates that a declared `bootstrap_index` is the first `startup_slice` path. The index is structural only; it does not define N/T/R/S/D/L/time/stop/proof semantics.
+SourceDisposition=WAIVED makes all source mechanical gates non-applicable, including t/hard-t even when the structural default b remains 1.
 
-This specifically prevents two opposite integration failures: treating repository helpers/workspace as mere concepts or imaginary external services, and treating deterministic helpers as a planner that should replace native task strategy.
+## Re-entry and D
 
-## Execute-before-interpret gate
+Retained MAIN/source re-entry must bind the current result revision. Changed re-entry must end at the current revision and persisted R/r history cannot move backward behind a prior result.
 
-Alpha 5 made implemented helpers visible but did not fully prevent a model from reading a helper and reproducing its behavior. Alpha 6 adds a protocol-level drift inoculation and component interrogation gate. The compact commitment names component, operation and executor, chooses direct execution, and rejects substitution/manual result construction. Incomplete commitments get at most two lightweight correction rounds. After acceptance, the next relevant action must be actual delivery/execution or a concrete failure.
+Exclusive D execution and D Result production both remain in D_EXCLUSIVE; only reintegration returns consequences to MAIN. Public L stays removed; internal L1 is the only active isolation baseline.
 
-runtime/execution_integrity.py provides deterministic structured records for the commitment and the resulting attempt. It does not store chain-of-thought and does not choose task strategy.
+## Crash recovery
 
-## Runtime implementation delivery
+RunWorkspace uses a single-slot write-intent around ordinary artifact writes. On resume, deterministic recovery may complete/roll back that write, verify and re-index append-only journals, and rebuild derived latest pointers from immutable revision history.
 
-A second live failure showed that GitHub reading and Python execution may exist in separate host domains with no byte bridge. Alpha 6 therefore declares runtime_distribution in manifest.json and ships a permanent GitHub Actions artifact workflow. The artifact is named by the exact commit SHA and contains manifest/VERSION plus deterministic_helpers and a runtime index with Git blob identities. A host that lacks a native same-SHA file→executor bridge can materialize this artifact, verify it against the pinned Git tree, and execute the real implementation.
+run-brief is a cache and no longer has authority to invalidate an otherwise consistent workspace.
 
-The artifact is not authority and cannot be used to rebind P_run. If neither native bridge nor exact-commit artifact can deliver verified implementation bytes, startup fails closed instead of synthesizing replacement runtime code.
+FINISH is a durable commit point. If a crash occurs after FINISH but before phase=FINALIZING, resume restores a finished ledger and completes the missing phase transition. A valid final summary written before phase=FINISHED is likewise recoverable.
 
-## Repository transport
+## Release safety
 
-`runtime/repository_transport.py` now models transport capability rather than pretending every direct source exposes the same endpoint set. The first mutable observation is the public repository `stable` branch resource. If provenance is `github_connector`, that current branch HEAD is sufficient and no Git-ref endpoint is required. If provenance is `direct_https`, the Git-ref endpoint is additionally read and the two full 40-hex SHAs must agree. Search/index/crawl provenance remains rejected. All later reads are immutable-SHA pinned.
+Release cleanup excludes .git from package traversal but never deletes repository metadata. CI must compare regenerated bundle/tree/hash metadata with committed stable contents rather than silently validating a repaired temporary copy.
 
-This mirrors the live ChatGPT GitHub connector behavior observed during Alpha 3 testing: the connector returned the same `stable` HEAD as direct `git ls-remote` and successfully fetched pinned VERSION/manifest/startup/help, while its generic fetch surface did not expose the Git-ref REST endpoint.
+## Inherited integrity
 
-## D/L correction
+Alpha 6 implementation-identity delivery remains active: exact pinned helpers must be executed when available, and semantic-equivalent model rewrites are not substitutes. Alpha 8 does not add another cognitive gate around every helper call.
 
-`D_s` is mechanically a completed-intervention lower bound. Alpha 3 accidentally introduced an enable/disable interpretation through `EffectiveContract.dictator_enabled`, `LiveDIGRRun.create_d_intervention()` and recovery validation. Alpha 4 removes that gate. D actual may exceed a zero target when the native model judges a disruptive intervention useful.
-
-L remains `target/capability/actual`. Mechanical L applicability is based on actual completed D, not the D minimum. A zero D target with an actual completed D therefore receives normal L validation; a run with no completed D has no completed-intervention L gate.
-
-## Timing and proof
-
-The deterministic stop code already treated B/b=0 as soft and B/b=1 as hard. Alpha 4 aligns protocol language with that behavior: N/R/n/r/D are unconditional minima, T/t are targets whose stop-gate strength is controlled by B/b.
-
-`runtime/proof.py` remains the canonical renderer. Live host output had exposed raw fractional seconds; Alpha 4 makes the protocol-level presentation rule explicit: actual duration floors to whole seconds, and hard-unverified B/b time is hidden as `?`. This is a host-integration requirement, not a change to the renderer algorithm.
-
-## Initialization
-
-Alpha 4 intentionally does not remove staged authority, complete pinned execution-protocol verification, Clock Genesis, U0/contract setup or META verification to reduce wall-clock latency. Full-parameter black-box runs showed that semantic default completion is only one part of startup cost. The logical entrypoint + 18 core modules remain separate source files, while a deterministic execution bundle reduces their post-genesis physical repository acquisitions from 18 to 1. Any later performance work must preserve the same authority/clock/contract boundaries.
-
-## Retained Alpha 2/3 state machinery
-
-`runtime/routing.py`, `runtime/repository_transport.py`, `runtime/invocation_surface.py` and `runtime/parameter_resolution.py` remain boundary helpers. None of these chooses task strategy. `LiveDIGRRun` continues to replace raw `.events.append()` use with thin semantic wrappers. Wrappers validate references, not intellectual quality.
-
-Strategy/Candidate/EST/Source/D/Completion stores remain revisioned. Source time still derives from formal SOURCE intervals plus source-activity bindings rather than a second aggregate truth. Isolation facts describe evidenced capability; isolation receipts bind target-bounded actual mode to interventions. Recovery still verifies complete workspace semantics before resume; integrity alone is not time continuity.
