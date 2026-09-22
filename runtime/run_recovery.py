@@ -234,6 +234,10 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
     journal=ClockJournal.load(run_id,ws.path('time/clock.journal.ndjson'))
     journal.verify(False)
     timeline=derive_work_timeline(journal.events)
+    if phase.phase in (RunPhase.FINALIZING,RunPhase.FINISHED) and not timeline.finished:
+        raise ValueError(f'phase {phase.phase.value} requires committed FINISH journal event')
+    if timeline.finished and phase.phase not in (RunPhase.EXECUTING,RunPhase.FINALIZING,RunPhase.FINISHED):
+        raise ValueError(f'committed FINISH is incompatible with phase {phase.phase.value}')
     intervals=timeline.intervals
     clock_hashes={e.record_hash:e for e in journal.events}
     formal_T_ns=sum(x.observed_ns for x in intervals if x.state in (WorkState.MAIN,WorkState.SOURCE,WorkState.D_EXCLUSIVE))
@@ -267,6 +271,8 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
 
     # Event-v2 proves not only that a receipt has a hash, but where in the
     # formal state/time stream the semantic work happened.
+    main_r_floor=None
+    source_r_floor={}
     for e in events.events:
         clock=clock_hashes.get(e.clock_event_ref)
         if clock is None:
@@ -299,13 +305,22 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         if e.kind is EvolutionKind.MAIN_REENTRY:
             if e.candidate_revision is None:
                 raise ValueError('MAIN R event must bind candidate_before')
+            if main_r_floor is not None and e.candidate_revision<main_r_floor:
+                raise ValueError('MAIN R cannot move backward to a superseded candidate')
             if not e.retained:
                 if e.candidate_after_revision is None or e.candidate_after_revision<=e.candidate_revision:
                     raise ValueError('non-retained MAIN R must bind a newer candidate_after')
+                main_r_floor=e.candidate_after_revision
+            else:
+                main_r_floor=e.candidate_revision
         elif e.kind is EvolutionKind.SOURCE_REENTRY:
+            floor=source_r_floor.get(e.source_id)
+            if floor is not None and e.source_revision<floor:
+                raise ValueError('SOURCE R cannot move backward to a superseded source revision')
             if e.retained:
                 if e.source_after_revision is not None:
                     raise ValueError('retained SOURCE R cannot bind source_after')
+                source_r_floor[e.source_id]=e.source_revision
             else:
                 if e.source_after_revision is None or e.source_after_revision<=e.source_revision:
                     raise ValueError('non-retained SOURCE R must bind a newer source_after')
@@ -313,6 +328,7 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
                     sources.get(e.source_id,e.source_after_revision)
                 except (KeyError,IndexError):
                     raise ValueError('SOURCE R references missing source_after revision') from None
+                source_r_floor[e.source_id]=e.source_after_revision
 
     # D/L is one integrated information-flow lifecycle.  Capability alone does
     # not prove actual isolation, and L2/L3 packets must be real indexed
@@ -338,6 +354,15 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
                 raise ValueError('background D execution is not bound to MAIN/SOURCE state')
 
         for result in item.results:
+            if result.clock_event_ref is None or result.clock_event_ref not in clock_hashes:
+                raise ValueError('D result lacks valid clock journal binding')
+            rce=clock_hashes[result.clock_event_ref]
+            if rce.event not in ('STATE','WORK_LEASE_OPEN'):
+                raise ValueError('D result must bind a foreground STATE/WORK_LEASE_OPEN clock event')
+            if iso.mode=='exclusive' and rce.state is not WorkState.D_EXCLUSIVE:
+                raise ValueError('exclusive D result is not bound to D_EXCLUSIVE state')
+            if iso.mode=='background' and rce.state not in (WorkState.MAIN,WorkState.SOURCE):
+                raise ValueError('background D result is not bound to MAIN/SOURCE state')
             if iso.L_actual is not None and iso.L_actual>=2:
                 if result.output_packet_ref is None:
                     raise ValueError('L2/L3 D result lacks Output Packet artifact')
@@ -366,6 +391,7 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         if x.candidate_revision is not None and x.candidate_revision>=len(candidates.items):
             raise ValueError('EST references missing candidate revision')
 
+    brief_stale=False
     if ws.path('state/run-brief.json').is_file():
         brief_expected={
             'schema_version':1,
@@ -381,12 +407,24 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
             'key_evidence_refs':[x.evidence_id for x in evidence.items][-24:],
             'latest_meaningful_event_refs':[e.event_id for e in events.events[-8:]],
         }
-        verify_run_brief(ws,brief_expected)
+        try:
+            verify_run_brief(ws,brief_expected)
+        except (ValueError,KeyError,TypeError):
+            # run-brief is explicitly derived/cache state.  Recovery may rebuild
+            # it after authoritative stores have verified.
+            brief_stale=True
 
-    if phase.phase is RunPhase.FINISHED:
-        summary=ws.read_json('final/run-summary.json')
+    summary_path=ws.path('final/run-summary.json')
+    if phase.phase is RunPhase.FINISHED and not summary_path.is_file():
+        raise ValueError('FINISHED run missing final/run-summary.json')
+    if summary_path.is_file():
+        if phase.phase not in (RunPhase.FINALIZING,RunPhase.FINISHED):
+            raise ValueError('final summary exists before FINALIZING')
+        if not timeline.finished:
+            raise ValueError('final summary exists without committed FINISH')
         if contract is None or u0 is None:
-            raise ValueError('FINISHED run missing U0/contract')
+            raise ValueError('final summary requires U0/contract')
+        summary=ws.read_json('final/run-summary.json')
         actual=_derived_actuals(events,sources,activity,dstore,timeline)
         stop=check_mechanical_minima(contract,actual)
         expected={
@@ -408,6 +446,8 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         if summary!=expected:
             bad=sorted(k for k in set(summary)|set(expected) if summary.get(k)!=expected.get(k))
             raise ValueError(f'final run summary drift: {bad}')
+        if not expected['delivery_ready']:
+            raise ValueError('persisted final summary is not delivery-ready')
 
     return {
         'run_id':run_id,'workspace':str(ws.root),'phase':phase.phase.value,
@@ -415,6 +455,6 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         'event_count':len(events.events),'strategy_revisions':len(strategy.items),
         'candidate_revisions':len(candidates.items),'source_count':len(sources.states),
         'D_completed':dstore.completed_count,'artifact_count':len(ws.artifact_records()),
-        'integrity_ok':True,
+        'integrity_ok':True,'run_brief_stale':brief_stale,
         'hard_continuity_after_recovery':'must_be_reestablished_by_resume',
     }
