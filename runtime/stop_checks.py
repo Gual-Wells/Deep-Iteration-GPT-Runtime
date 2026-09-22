@@ -1,4 +1,4 @@
-"""Mechanical DIGR 5.0 Alpha 7 contract-minimum checks."""
+"""Mechanical DIGR 5.0 Alpha 8 contract-minimum checks."""
 from __future__ import annotations
 from dataclasses import dataclass
 from .effective_contract import EffectiveContract
