@@ -28,12 +28,12 @@ class TestIntervalLedger(unittest.TestCase):
         l=self.st(True);l.transition(WorkState.MAIN,self.s(.4))
         p=l.preview_finish(self.s(2))
         self.assertTrue(p.finished);self.assertFalse(l.finished);self.assertEqual(p.formal_T_ns(),1_600_000_000)
-    def test_coverage_gap_invalidates_hard_time(self):
+    def test_coverage_gap_excludes_time_but_preserves_hard_lower_bound(self):
         receipt,_=startup(FakeClock(provider='test',session='same',boot='boot-test'))
         iv=WorkInterval(WorkState.MAIN,self.s(1),self.s(2),1_000_000_000,True)
         gap=CoverageGap(WorkState.MAIN,self.s(2),self.s(5,'other','boot-test'),3_000_000_000,True)
         l=FormalTimeLedger.resume_from_timeline(receipt,[iv],[gap],self.s(5,'other','boot-test'),hard_T=True)
-        self.assertFalse(l.T_coverage_complete());self.assertEqual(l.unattributed_T_ns(),3_000_000_000);self.assertFalse(l.T_hard_verified())
+        self.assertFalse(l.T_coverage_complete());self.assertEqual(l.unattributed_T_ns(),3_000_000_000);self.assertTrue(l.T_hard_verified())
     def test_timeline_no_backwards_or_after_finish(self):
         l=self.st();l.transition(WorkState.META,self.s(.4));l.transition(WorkState.MAIN,self.s(1))
         with self.assertRaises(ValueError):l.transition(WorkState.SOURCE,self.s(.9))
