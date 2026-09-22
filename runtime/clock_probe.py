@@ -1,4 +1,4 @@
-"""Trusted monotonic-clock facts for DIGR 5.0.0-alpha.5.
+"""Trusted monotonic-clock facts for DIGR 5.0.0-alpha.8.
 
 Two notions are intentionally separated:
 
