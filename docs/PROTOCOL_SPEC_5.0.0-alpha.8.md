@@ -48,8 +48,8 @@ Historical L2/L3 storage structures may remain for compatibility but are not act
 
 Current-facing schemas/docs/examples identify Alpha 8 behavior. Obsolete active L2/L3 examples are removed.
 
-Release cleanup never deletes repository .git metadata. Stable validation must detect checked-in generated metadata drift rather than silently validating a repaired temporary tree.
+Release cleanup never deletes repository .git metadata. Stable validation must detect checked-in generated metadata drift rather than silently validating a repaired temporary tree. Stable also publishes a permanent prerelease asset tagged by exact commit SHA, while the Actions artifact remains a transient fallback.
 
 ## 7. Design constraint
 
-Alpha 8 does not add a new supervisory reasoning layer. Reliability work should remain deterministic and cheap on the normal path, with expensive recovery logic paid only after an actual interruption or persisted inconsistency.
+Alpha 8 does not add a new supervisory reasoning layer. Implementation-execution identity is established once per verified runtime package/executor binding and reused until that identity changes or becomes uncertain. Reliability work should remain deterministic and cheap on the normal path, with expensive recovery logic paid only after an actual interruption or persisted inconsistency.
