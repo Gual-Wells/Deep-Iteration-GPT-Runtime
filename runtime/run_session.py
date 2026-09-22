@@ -312,12 +312,16 @@ class LiveDIGRRun:
 
     def record_main_reentry(self,candidate_before:int,challenge,action,outcome,*,candidate_after:int|None=None,retained:bool=False,evidence_refs=()):
         require_nonnegative_int('candidate_before',candidate_before);before=self.candidates.get(candidate_before);c,s,_=self._event_context(WorkState.MAIN)
+        current=self.candidates.current
+        if current is None:raise RuntimeError('MAIN re-entry requires a current candidate')
         if retained:
+            if before.revision!=current.revision:raise ValueError('retained MAIN re-entry must challenge the current candidate')
             if candidate_after is not None and candidate_after!=candidate_before:raise ValueError('retained re-entry cannot name a different candidate_after')
             after=None
         else:
             if candidate_after is None:raise ValueError('non-retained R requires candidate_after')
             after=self.candidates.get(candidate_after)
+            if after.revision!=current.revision:raise ValueError('candidate_after must be the current candidate')
             if after.revision<=before.revision:raise ValueError('candidate_after must be newer')
         e=self.events._append(EvolutionKind.MAIN_REENTRY,'MAIN',challenge,action,outcome,evidence_refs=evidence_refs,clock_event_ref=c,strategy_revision=s,candidate_revision=before.revision,candidate_after_revision=after.revision if after else None,retained=retained)
         self._reindex_journals();self.refresh_brief();return e
@@ -326,12 +330,15 @@ class LiveDIGRRun:
         if not self.sources.exists(source_id):raise ValueError('unknown source workspace')
         require_nonnegative_int('source_before_revision',source_before_revision);before=self.sources.get(source_id,source_before_revision)
         c,s,candidate_context=self._event_context(WorkState.SOURCE);self._require_source_active(source_id,c)
+        current=self.sources.latest(source_id)
         if retained:
+            if before.revision!=current.revision:raise ValueError('retained source re-entry must challenge the current source revision')
             if source_after_revision is not None and source_after_revision!=source_before_revision:raise ValueError('retained source re-entry cannot name a different source_after_revision')
             after=None
         else:
             if source_after_revision is None:raise ValueError('non-retained source R requires source_after_revision')
             after=self.sources.get(source_id,source_after_revision)
+            if after.revision!=current.revision:raise ValueError('source_after_revision must be the current source revision')
             if after.revision<=before.revision:raise ValueError('source_after_revision must be newer')
         e=self.events._append(EvolutionKind.SOURCE_REENTRY,f'S:{source_id}',challenge,action,outcome,evidence_refs=evidence_refs,clock_event_ref=c,strategy_revision=s,candidate_revision=candidate_context,source_id=source_id,source_revision=before.revision,source_after_revision=after.revision if after else None,retained=retained)
         self._reindex_journals();self.refresh_brief();return e
@@ -382,12 +389,19 @@ class LiveDIGRRun:
     def record_d_result(self,intervention_id:str,summary:str,evidence_refs=(),*,output_packet_ref:str|None=None):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('D result receipt requires EXECUTING phase')
         item=self.dictator.latest(intervention_id);iso=self.dictator.isolation(item.isolation_receipt_id)
+        if self.ledger is None:raise RuntimeError('D result requires formal work state')
+        state=self.ledger.foreground_state
+        if iso.mode=='exclusive' and state is not WorkState.D_EXCLUSIVE:
+            raise RuntimeError('exclusive D result must be produced inside D_EXCLUSIVE before reintegration')
+        if iso.mode=='background' and state not in (WorkState.MAIN,WorkState.SOURCE):
+            raise RuntimeError('background D result requires concurrent MAIN/SOURCE foreground work')
         if iso.L_actual is not None and iso.L_actual>=2:
             if output_packet_ref is None:raise ValueError('L2/L3 D result requires controlled Output Packet artifact')
             self.workspace.require_indexed_artifact(output_packet_ref,kind='d-output-packet')
         elif output_packet_ref is not None:
             self.workspace.require_indexed_artifact(output_packet_ref,kind='d-output-packet')
-        out=self.dictator.record_result(intervention_id,summary,evidence_refs,output_packet_ref=output_packet_ref);self.refresh_brief();return out
+        clock_ref=self.clock_journal.events[-1].record_hash
+        out=self.dictator.record_result(intervention_id,summary,evidence_refs,output_packet_ref=output_packet_ref,clock_event_ref=clock_ref);self.refresh_brief();return out
     def reintegrate_d(self,intervention_id:str,*,accepted:str,rejected:str,main_consequence:str,strategy_revision:int|None=None,candidate_revision:int|None=None,candidate_before_revision:int|None=None):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('D reintegration requires EXECUTING phase')
         if self.ledger is None or self.ledger.foreground_state is not WorkState.MAIN:
