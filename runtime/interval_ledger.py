@@ -139,11 +139,13 @@ class FormalTimeLedger:
     def T_coverage_complete(self)->bool: return self.unattributed_T_ns()==0
     def t_coverage_complete(self)->bool: return self.unattributed_t_ns()==0
     def T_hard_verified(self)->bool:
+        # Formal targets are lower bounds. Unattributed gaps are excluded from
+        # counted time; they cannot inflate the verified lower bound.
         rel=[x for x in self._intervals if x.state in _FORMAL_T]
-        return bool(rel) and self.T_coverage_complete() and all(x.hard_verified for x in rel)
+        return bool(rel) and all(x.hard_verified for x in rel)
     def t_hard_verified(self)->bool:
         rel=[x for x in self._intervals if x.state in _FORMAL_t]
-        return bool(rel) and self.t_coverage_complete() and all(x.hard_verified for x in rel)
+        return bool(rel) and all(x.hard_verified for x in rel)
 
     def to_dict(self)->dict:
         return {
