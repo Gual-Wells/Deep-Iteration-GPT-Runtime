@@ -10,10 +10,10 @@ class TestSchemas(unittest.TestCase):
             d=load(p.name);self.assertEqual(d['$schema'],'https://json-schema.org/draft/2020-12/schema')
             self.assertTrue(d['$id'].endswith('/'+p.name));Draft202012Validator.check_schema(d)
 
-    def test_manifest_alpha7_interfaces(self):
-        d=load('manifest.schema.json');self.assertEqual(d['properties']['version']['const'],'5.0.0-alpha.7')
+    def test_manifest_alpha8_interfaces(self):
+        d=load('manifest.schema.json');self.assertEqual(d['properties']['version']['const'],'5.0.0-alpha.8')
         self.assertEqual(d['properties']['protocol']['const'],'digr-v5.0')
-        expect={'routing_schema':4,'repository_transport_schema':3,'invocation_surface_schema':2,'parameter_resolution_schema':2,'run_session_schema':5,'workspace_schema':2,'clock_journal_schema':1,'event_receipt_schema':2,'execution_commitment_schema':1,'execution_attempt_schema':1,'runtime_distribution_schema':1}
+        expect={'routing_schema':4,'repository_transport_schema':3,'invocation_surface_schema':2,'parameter_resolution_schema':2,'run_session_schema':6,'workspace_schema':2,'clock_journal_schema':1,'event_receipt_schema':2,'execution_commitment_schema':1,'execution_attempt_schema':1,'runtime_distribution_schema':1}
         for k,v in expect.items():self.assertIn(k,d['required']);self.assertEqual(d['properties'][k]['const'],v)
 
     def test_manifest_instance_conforms_to_manifest_schema(self):
@@ -30,8 +30,8 @@ class TestSchemas(unittest.TestCase):
         self.assertNotIn('L_e',d['properties']);self.assertNotIn('L_mismatch_blocks_delivery',d['properties'])
 
     def test_execution_bundle_and_load_receipt_schemas(self):
-        self.assertEqual(load('execution-protocol-bundle.schema.json')['properties']['version']['const'],'5.0.0-alpha.7')
-        self.assertEqual(load('executing-protocol-load.schema.json')['properties']['version']['const'],'5.0.0-alpha.7')
+        self.assertEqual(load('execution-protocol-bundle.schema.json')['properties']['version']['const'],'5.0.0-alpha.8')
+        self.assertEqual(load('executing-protocol-load.schema.json')['properties']['version']['const'],'5.0.0-alpha.8')
 
     def test_surface_four_states_and_syntax_only(self):
         d=load('invocation-surface.schema.json');self.assertEqual(set(d['properties']['kind']['enum']),{'EXECUTING','HELP','NATIVE','INVALID'})
