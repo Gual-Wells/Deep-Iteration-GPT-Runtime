@@ -1,15 +1,14 @@
-# L — D Isolation as Actual Information Flow
+# Internal D Isolation Baseline
 
-Keep three distinct facts: `L_target` (requested contract mode), `L_cap` (maximum host capability evidenced), and `L_actual` (mode actually selected for a D isolation receipt). Capability never automatically becomes actual. Normally actual mode is target-bounded by capability.
+Alpha 7 removes L from the public DIGR parameter and result surface. Users cannot request L1/L2/L3, the Effective Contract contains no L field, and canonical proof contains no L target/actual pair.
 
-L1: same-context semantic firewall/sparse D state and exclusive D work. It cannot honestly claim physical/context isolation or background execution.
+D internally uses a fixed **L1 semantic isolation baseline**:
 
-L2 uses a temporal packet boundary:
+- disruptive proposal/state is kept semantically separated from ordinary MAIN reasoning while D is active;
+- exclusive D work runs in D_EXCLUSIVE;
+- only explicit reintegration returns selected consequences to MAIN.
 
-`Main → controlled Input Packet → isolated D context/private D state → Output Packet → Main reintegration`.
+IsolationReceipt remains an internal auditable implementation object. Its target for Alpha 7 must be 1. Existing capability evidence fields may remain for backward-compatible internal structure, but host capability must not silently upgrade the actual intervention above the fixed public-independent L1 baseline.
 
-The **Input Packet exists and is indexed before isolated execution starts**. The **Output Packet is produced by that execution**, is indexed afterwards and is bound to a D Result revision; it cannot be required before the isolated work has run. Full Main history is not simply handed across. L2 may be exclusive or supported background work; background D time itself is not T/t while foreground Main/SOURCE can continue.
+Because isolation is now an internal reliability invariant rather than a user contract dimension, it does not participate in parameter resolution, semantic completion, mechanical stop minima or visible proof.
 
-L3 preserves the L2 packet boundary and additionally requires independently evidenced agent identity, instructions, execution loop and tool lifecycle.
-
-Input/output packets are immutable workspace artifacts. Every counted D intervention references its actual IsolationReceipt, so a global host capability fact cannot falsely upgrade unrelated interventions. If completed interventions use different actual modes, proof reports the conservative actual level rather than overstating isolation. L mismatch is visible but blocks delivery only when U0 separately makes exact L a hard condition. `D(0)` is only a zero completed-D minimum, not an off switch: quality-driven D may still run. If no D completes, L remains target/capability/actual state and may stay `?`; if D completes, intervention-linked actual isolation is evaluated normally regardless of the D target.
