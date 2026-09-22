@@ -3,10 +3,10 @@ import ast,hashlib,json
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-VERSION='5.0.0-alpha.7'
+VERSION='5.0.0-alpha.8'
 INTERFACES={
     'routing_schema':4,'repository_transport_schema':3,'invocation_surface_schema':2,
-    'parameter_resolution_schema':2,'run_session_schema':5,'workspace_schema':2,
+    'parameter_resolution_schema':2,'run_session_schema':6,'workspace_schema':2,
     'clock_journal_schema':1,'event_receipt_schema':2,'execution_commitment_schema':1,
     'execution_attempt_schema':1,'runtime_distribution_schema':1,
 }
@@ -26,7 +26,7 @@ def main():
     if m.get('startup_slice')!=['bootstrap/INDEX.md','bootstrap/BOOTSTRAP.md','entry/STARTUP.md']:fail('startup slice')
     if m.get('workspace_spec')!='workspace/layout-v2.json':fail('workspace spec')
 
-    # Public Alpha 7 parameter/time surface.
+    # Public Alpha 8 parameter/time surface.
     if 'L_e' in m.get('defaults',{}) or 'L' in m.get('parameters',{}):fail('public L remains in manifest')
     ts=m.get('time_states',{})
     if ts.get('D_EXCLUSIVE',{}).get('T') is not True or ts.get('D_EXCLUSIVE',{}).get('t') is not False:
@@ -43,7 +43,12 @@ def main():
         'runtime_artifact_members_verify_against_pinned_git_tree','no_identity_preserving_delivery_path_fails_closed',
         'D_zero_means_no_minimum_not_disabled','D_exclusive_counts_T_not_t','public_L_parameter_removed',
         'internal_D_isolation_fixed_to_L1','formal_work_lease_required_for_cross_host_attribution',
-        'unleased_formal_cross_host_gap_is_preserved_not_dropped','hard_time_requires_complete_semantic_time_coverage',
+        'unleased_formal_cross_host_gap_is_preserved_not_dropped',
+        'hard_time_is_verified_counted_lower_bound','unattributed_gaps_are_excluded_not_estimated',
+        'coverage_completeness_is_diagnostic_not_stop_gate','source_waiver_disables_all_source_mechanical_gates',
+        'crash_recovery_repairs_only_mechanically_reconstructible_state','committed_FINISH_survives_phase_write_crash',
+        'revision_history_is_authoritative_over_latest_pointers','D_result_must_preserve_isolation_until_reintegration',
+        'reentry_cannot_move_backward_to_superseded_result','release_builder_never_deletes_repository_metadata',
         'source_work_lease_carries_active_source_binding','finalization_admission_precedes_ledger_finish',
         'FINISHED_requires_delivery_ready',
     )
@@ -68,7 +73,7 @@ def main():
     if 'L_e' in ps.get('properties',{}) or 'L_e' in ec.get('properties',{}):fail('L remains in public schema')
     if 'L_mismatch_blocks_delivery' in ec.get('properties',{}):fail('L mismatch remains in contract')
 
-    # Local router remains version-neutral; Alpha 7 semantics stay repository-side.
+    # Local router remains version-neutral; Alpha 8 semantics stay repository-side.
     primary=read('local-personalization/CHATGPT_LOCAL_PERSONALIZATION.txt')
     full=read('local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FULL.txt')
     if not 1500 < len(primary) <= 5000:fail('Plus router length')
@@ -84,19 +89,19 @@ def main():
         if token not in index:fail(f'INDEX missing {token}')
 
     help_text=read('entry/HELP.md')
-    for token in ('## 1. 调用与路由','## 2. 参数解析顺序与缺省规则','## 3. 参数参考','## 4. Effective Contract 与来源策略','## 5. N / R / D','## 6. 时间与停止','## 7. 执行链与启动成本','## 8. 输出与 canonical proof','## 9. 版本与权威','work lease','coverage gap','D_EXCLUSIVE'):
+    for token in ('## 1. 调用与路由','## 2. 参数解析与缺省','## 3. 参数语义','## 4. SourceDisposition','## 5. R 与 D','## 6. 时间、WorkLease 与 coverage','## 7. 崩溃恢复','## 8. Finalization','## 9. 输出','## 10. 权威','work lease','coverage gap','D_EXCLUSIVE'):
         if token not in help_text:fail(f'help missing {token}')
     if 'N / R / D / L' in help_text or 'L(target)/L(actual)' in help_text or '`L(1)`' in help_text:fail('help exposes public L')
 
-    # Alpha 7 implementation invariants.
+    # Alpha 8 implementation invariants.
     rs=read('runtime/run_session.py')
-    for token in ('open_work_lease','derive_work_timeline','preview_finish','finalization admission denied','FINISHED is forbidden when delivery readiness is false','make_isolation_receipt(receipt_id,1'):
+    for token in ('open_work_lease','derive_work_timeline','preview_finish','recover_run_workspace','finalization admission denied','FINISHED is forbidden when delivery readiness is false','make_isolation_receipt(receipt_id,1'):
         if token not in rs:fail(f'run-session invariant missing {token}')
     cj=read('runtime/clock_journal.py')
     for token in ('WORK_LEASE_OPEN','CoverageGap','derive_work_timeline','lease_open'):
         if token not in cj:fail(f'clock journal invariant missing {token}')
     il=read('runtime/interval_ledger.py')
-    for token in ('WorkState.D_EXCLUSIVE','T_coverage_complete','unattributed_T_ns','preview_finish'):
+    for token in ('WorkState.D_EXCLUSIVE','T_coverage_complete','unattributed_T_ns','preview_finish','finished:bool=False'):
         if token not in il:fail(f'ledger invariant missing {token}')
     if 'L_target:' in read('runtime/proof.py') or "L_target=contract" in read('runtime/proof.py'):fail('proof still exposes L')
 
@@ -113,7 +118,7 @@ def main():
         try:raw.decode('utf-8')
         except UnicodeDecodeError:fail(f'non-UTF8 {p.relative_to(ROOT)}')
 
-    for rel in ('docs/PRE_RELEASE_BASELINE.md','docs/CLOCK_RELIABILITY.md','docs/RUN_SESSION_ARCHITECTURE.md','docs/PROTOCOL_SPEC_5.0.0-alpha.6.md','docs/PROTOCOL_SPEC_5.0.0-alpha.7.md','docs/TEST_MATRIX.md'):
+    for rel in ('docs/PRE_RELEASE_BASELINE.md','docs/CLOCK_RELIABILITY.md','docs/RUN_SESSION_ARCHITECTURE.md','docs/PROTOCOL_SPEC_5.0.0-alpha.6.md','docs/PROTOCOL_SPEC_5.0.0-alpha.7.md','docs/PROTOCOL_SPEC_5.0.0-alpha.8.md','docs/TEST_MATRIX.md'):
         if not (ROOT/rel).is_file():fail(f'missing release doc {rel}')
 
     # Execution bundle is exact generated transport.
@@ -126,6 +131,6 @@ def main():
         if item.get('byte_length')!=len(data) or item.get('sha256')!=hashlib.sha256(data).hexdigest() or item.get('content')!=data.decode('utf-8'):
             fail(f'bundle drift {item["path"]}')
 
-    print('DIGR 5.0.0-alpha.7 formal-time continuity / internal-L1 baseline: OK')
+    print('DIGR 5.0.0-alpha.8 convergence / crash-recovery baseline: OK')
 
 if __name__=='__main__':main()
