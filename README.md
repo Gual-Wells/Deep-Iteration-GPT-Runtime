@@ -1,20 +1,22 @@
-# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.7
+# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.8
 
-**Status:** formal-time continuity and simplified isolation baseline intended to converge toward DIGR 5.0 final.
+**Status:** convergence and crash-recovery baseline intended to converge toward DIGR 5.0 final.
 
 DIGR 5.0 is a reliability exoskeleton around native model intelligence. It does not replace the model with a planner/search controller. An explicitly invoked high-investment task receives pinned protocol authority, early trusted timing, immutable U0/contract commitments, revisable strategy/source/candidate state, disruptive interventions, evidence, persistence and recovery.
 
-## Alpha 7 formal-time continuity
+## Alpha 8 convergence and crash recovery
 
-Alpha 7 preserves Alpha 6 execution-integrity/runtime-delivery semantics and repairs timing across multi-tool hosts.
+Alpha 8 keeps Alpha 7's authority, implementation-identity and cross-host timing model, but removes reliability failure modes that were consuming task attention.
 
-- **Work leases:** MAIN, SOURCE or D_EXCLUSIVE can be explicitly carried across a verified same-boot host/process/tool boundary. SOURCE leases carry active source bindings.
-- **Coverage gaps:** unleased formal boundaries are preserved as explicit unattributed gaps instead of being silently dropped. Hard T/t requires complete relevant semantic-time coverage.
-- **D counts toward T:** formal T is MAIN + SOURCE + D_EXCLUSIVE; t remains SOURCE only.
-- **Public L removed:** L is no longer an invocation parameter, Effective Contract field, stop gate or proof field. D uses an internal fixed L1 semantic-isolation baseline.
-- **Finalization admission:** finish is projected and mechanically checked before the live ledger closes. A failed hard-time/coverage/completion gate leaves the run EXECUTING.
+- **Verified lower-bound timing:** unleased gaps remain visible but receive no T/t credit; they no longer poison otherwise hard-verified counted time.
+- **Source waiver closure:** WAIVED source work disables all source mechanical gates, including hard t.
+- **Crash recovery:** a single-slot write intent repairs ordinary file/index crash windows; verified journals can refresh their index; immutable revision history rebuilds derived latest pointers/run brief.
+- **Durable finalization:** a committed FINISH survives crashes before FINALIZING/FINISHED phase writes.
+- **Current-result R/r:** re-entry cannot move backward to superseded Candidate/Source revisions.
+- **D isolation closure:** exclusive D Result production stays in D_EXCLUSIVE until explicit MAIN reintegration.
+- **Public L remains removed:** internal L1 only.
 
-The canonical proof is now `N/T/R/B + S + D` only; L is intentionally absent.
+The canonical proof remains `N/T/R/B + S + D`; coverage completeness is retained as machine/audit state rather than a separate stop gate.
 
 ## Alpha 6 execution integrity and runtime delivery
 
@@ -123,9 +125,9 @@ Deterministic release:
 
 ```bash
 python tools/build_release.py \
-  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.7.zip \
-  --personalization-output ../DIGR-5.0.0-alpha.7-CHATGPT-LOCAL-PERSONALIZATION.txt \
-  --full-personalization-output ../DIGR-5.0.0-alpha.7-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
+  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.8.zip \
+  --personalization-output ../DIGR-5.0.0-alpha.8-CHATGPT-LOCAL-PERSONALIZATION.txt \
+  --full-personalization-output ../DIGR-5.0.0-alpha.8-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
 ```
 
 The builder regenerates release metadata, rejects cross-platform path collisions/symlinks/traversal/cache artifacts, cold-extracts the ZIP, verifies all hashes and reruns the full suite + repository validator.
