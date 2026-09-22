@@ -1,4 +1,4 @@
-# Personalization fresh-chat routing smoke test — Alpha 5
+# Personalization fresh-chat routing smoke test — Alpha 8
 
 This is a black-box deployment test, not merely a text-presence check.
 
