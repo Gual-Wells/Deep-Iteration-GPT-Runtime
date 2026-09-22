@@ -9,12 +9,12 @@ SHA='a'*40
 
 def authority():
     r=RouteReceipt(AUTHORITATIVE_REPOSITORY,'stable',SHA,'manifest.json','b'*64,'VERSION','c'*64)
-    p=ProtocolIdentity('digr-v5.0','5.0.0-alpha.6',AUTHORITATIVE_REPOSITORY,SHA)
+    p=ProtocolIdentity('digr-v5.0','5.0.0-alpha.7',AUTHORITATIVE_REPOSITORY,SHA)
     return ProtocolAuthority(r,p)
 
 def protocol_load_receipt():
     return ExecutingProtocolLoadReceipt(
-        1,SHA,'b'*64,'5.0.0-alpha.6','digr-v5.0','bundle',
+        1,SHA,'b'*64,'5.0.0-alpha.7','digr-v5.0','bundle',
         'bundle/EXECUTION_PROTOCOL.json','d'*64,
         (ProtocolMemberReceipt('entry/DEEP_ITERATION_ENTRY.md','e'*64,1),),
     )
