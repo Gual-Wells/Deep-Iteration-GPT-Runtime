@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and cold-validate a deterministic DIGR 5.0.0-alpha.6 source ZIP.
+"""Build and cold-validate a deterministic DIGR 5.0 source ZIP.
 
 Standard-library only.  The builder rejects symlinks/path traversal, tests the
 source before cache cleanup, regenerates FILE_TREE/SHA256SUMS, writes a sorted
@@ -22,6 +22,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 EXCLUDED_DIRS = {'.git', '.pytest_cache', '.mypy_cache', '.ruff_cache', '__pycache__'}
+CLEANABLE_CACHE_DIRS = {'.pytest_cache', '.mypy_cache', '.ruff_cache', '__pycache__'}
 EXCLUDED_SUFFIXES = {'.pyc', '.pyo'}
 TREE_FILE = 'FILE_TREE.txt'
 SUMS_FILE = 'SHA256SUMS.txt'
@@ -87,7 +88,7 @@ def clean_caches(root: Path) -> None:
     for p in sorted(root.rglob('*'), key=lambda x: len(x.parts), reverse=True):
         if p.is_symlink():
             continue
-        if p.is_dir() and p.name in EXCLUDED_DIRS:
+        if p.is_dir() and p.name in CLEANABLE_CACHE_DIRS:
             shutil.rmtree(p)
         elif p.is_file() and p.suffix in EXCLUDED_SUFFIXES:
             p.unlink()
