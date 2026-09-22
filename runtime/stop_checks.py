@@ -65,7 +65,7 @@ def check_mechanical_minima(contract:EffectiveContract,actual:ContractActuals)->
     r_ok=actual.r_min>=contract.S.r if source_required else True
 
     T_coverage_ok=actual.T_coverage_complete or contract.B==0
-    t_coverage_ok=actual.t_coverage_complete or contract.S.b==0
+    t_coverage_ok=(not source_required) or actual.t_coverage_complete or contract.S.b==0
 
     hard_T_ok=True
     if contract.B==1:
@@ -74,7 +74,7 @@ def check_mechanical_minima(contract:EffectiveContract,actual:ContractActuals)->
             and actual.T_seconds is not None and actual.T_seconds>=contract.T_seconds
         )
     hard_t_ok=True
-    if contract.S.b==1:
+    if source_required and contract.S.b==1:
         hard_t_ok=(
             actual.t_coverage_complete and actual.t_hard_verified
             and actual.t_seconds is not None and actual.t_seconds>=contract.S.t_seconds
