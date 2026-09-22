@@ -23,6 +23,7 @@ REQUIRED_GENESIS_FILES = (
 )
 STATE_DIRECTORIES = ('time','sources','dictator','evidence','final','state')
 _INDEX_PATH = 'state/artifact-index.json'
+_WRITE_INTENT_PATH = 'state/workspace-write-intent.json'
 
 
 def validate_run_id(run_id: str) -> str:
@@ -109,22 +110,95 @@ class RunWorkspace:
             with os.fdopen(fd, 'wb') as f:
                 f.write(bytes(data)); f.flush(); os.fsync(f.fileno())
             os.replace(tmp, dest)
+            try:
+                dfd=os.open(str(dest.parent),os.O_RDONLY)
+                try:os.fsync(dfd)
+                finally:os.close(dfd)
+            except OSError:
+                pass
         finally:
             if os.path.exists(tmp): os.unlink(tmp)
         return sha256_bytes(bytes(data))
 
-    def write_json(self, rel: str, value: Any, *, kind: str='json', revision: int | None=None, last_event_ref: str | None=None) -> str:
-        digest=self.atomic_write_bytes(rel, canonical_json_bytes(value))
-        if rel != _INDEX_PATH:
-            self.index_existing(rel, kind=kind, revision=revision, last_event_ref=last_event_ref, expected_digest=digest)
+    def _clear_write_intent(self) -> None:
+        p=self.path(_WRITE_INTENT_PATH)
+        if p.exists():
+            p.unlink()
+            try:
+                dfd=os.open(str(p.parent),os.O_RDONLY)
+                try:os.fsync(dfd)
+                finally:os.close(dfd)
+            except OSError:
+                pass
+
+    def _transactional_write(self, rel: str, data: bytes, *, kind: str, revision: int | None=None, last_event_ref: str | None=None) -> str:
+        if rel in (_INDEX_PATH,_WRITE_INTENT_PATH):
+            return self.atomic_write_bytes(rel,data)
+        if self.path(_WRITE_INTENT_PATH).exists():
+            raise RuntimeError('workspace has an unresolved write intent; recover it before writing')
+        dest=self.path(rel)
+        previous_sha256=sha256_bytes(dest.read_bytes()) if dest.is_file() else None
+        digest=sha256_bytes(data)
+        intent={
+            'schema_version':1,'run_id':self.run_id,'path':rel,'sha256':digest,
+            'previous_sha256':previous_sha256,'kind':kind,'revision':revision,
+            'last_event_ref':last_event_ref,
+        }
+        self.atomic_write_bytes(_WRITE_INTENT_PATH,canonical_json_bytes(intent))
+        self.atomic_write_bytes(rel,data)
+        self.index_existing(rel,kind=kind,revision=revision,last_event_ref=last_event_ref,expected_digest=digest)
+        self._clear_write_intent()
         return digest
+
+    def recover_pending_write(self) -> str | None:
+        p=self.path(_WRITE_INTENT_PATH)
+        if not p.is_file():
+            return None
+        d=json.loads(p.read_text(encoding='utf-8'))
+        if d.get('schema_version')!=1 or d.get('run_id')!=self.run_id:
+            raise ValueError('workspace write-intent identity/version mismatch')
+        rel=require_nonempty_text('write-intent path',d.get('path'))
+        if rel in (_INDEX_PATH,_WRITE_INTENT_PATH):
+            raise ValueError('write-intent targets internal workspace metadata')
+        kind=require_nonempty_text('write-intent kind',d.get('kind'))
+        revision=d.get('revision')
+        if revision is not None:require_nonnegative_int('write-intent revision',revision)
+        last_event_ref=d.get('last_event_ref')
+        if last_event_ref is not None:last_event_ref=require_nonempty_text('write-intent last_event_ref',last_event_ref)
+        expected=require_nonempty_text('write-intent sha256',d.get('sha256')).lower()
+        previous=d.get('previous_sha256')
+        if len(expected)!=64 or any(c not in '0123456789abcdef' for c in expected):
+            raise ValueError('write-intent sha256 invalid')
+        if previous is not None:
+            previous=require_nonempty_text('write-intent previous_sha256',previous).lower()
+            if len(previous)!=64 or any(c not in '0123456789abcdef' for c in previous):
+                raise ValueError('write-intent previous_sha256 invalid')
+        target=self.path(rel)
+        current=sha256_bytes(target.read_bytes()) if target.is_file() else None
+        if current==expected:
+            self.index_existing(rel,kind=kind,revision=revision,last_event_ref=last_event_ref,expected_digest=expected)
+            outcome='completed'
+        elif current==previous:
+            items=self._load_index()
+            if previous is None:
+                if rel in items:raise ValueError('rolled-back new artifact is unexpectedly indexed')
+            else:
+                rec=items.get(rel)
+                if rec is None or rec.get('sha256')!=previous:
+                    raise ValueError('rolled-back artifact index no longer matches prior state')
+            outcome='rolled_back'
+        else:
+            raise ValueError('workspace write-intent target matches neither prior nor intended content')
+        self._clear_write_intent()
+        return outcome
+
+    def write_json(self, rel: str, value: Any, *, kind: str='json', revision: int | None=None, last_event_ref: str | None=None) -> str:
+        return self._transactional_write(rel,canonical_json_bytes(value),kind=kind,revision=revision,last_event_ref=last_event_ref)
 
     def write_text(self, rel: str, text: str, *, kind: str='text', revision: int | None=None, last_event_ref: str | None=None) -> str:
         if not isinstance(text, str): raise TypeError('text must be str')
-        digest=self.atomic_write_bytes(rel, text.replace('\r\n','\n').replace('\r','\n').encode('utf-8'))
-        if rel != _INDEX_PATH:
-            self.index_existing(rel, kind=kind, revision=revision, last_event_ref=last_event_ref, expected_digest=digest)
-        return digest
+        data=text.replace('\r\n','\n').replace('\r','\n').encode('utf-8')
+        return self._transactional_write(rel,data,kind=kind,revision=revision,last_event_ref=last_event_ref)
 
     def read_json(self, rel: str) -> Any:
         return json.loads(self.path(rel).read_text(encoding='utf-8'))
@@ -201,7 +275,7 @@ class RunWorkspace:
             if not p.is_file():
                 continue
             rel=p.relative_to(self.root).as_posix()
-            if rel==_INDEX_PATH or p.name.startswith('.tmp-'):
+            if rel in (_INDEX_PATH,_WRITE_INTENT_PATH) or p.name.startswith('.tmp-'):
                 continue
             actual.add(rel)
         extra=sorted(actual-indexed)
