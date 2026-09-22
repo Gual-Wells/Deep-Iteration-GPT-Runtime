@@ -1,9 +1,19 @@
-# Run Session, Lifecycle, Workspace and Recovery
+# Run Session, External Memory and Cross-Host Continuity
 
-Alpha 5 has one authoritative persisted lifecycle: `GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → FINISHED`, with `ABORTED` reachable from any nonterminal phase. Phase checks prevent lifecycle writes in the wrong order; they do not plan task work. GENESIS contains a mandatory reliability sub-barrier: after Clock Genesis the complete pinned logical entrypoint/core protocol must be verified and persisted as `protocol-load.json`; `PARAMETER_RESOLVED` is unreachable without that receipt. A mandatory post-genesis protocol-load failure transitions the born run to ABORTED.
+A live run follows the reliability lifecycle:
 
-The workspace persists authority, invocation, startup, parameter resolution, U0, contract, clock/source-activity/event journals, revisioned strategy/candidate/EST/source/D/completion state, evidence, run brief and final summary. `state/artifact-index.json` stores path/revision/digest metadata so recovery can detect mixed revisions or accidental overwrites.
+GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → FINISHED
 
-`state/run-brief.json` is a compact derived cache: U0 digest, contract presence, current strategy/candidate revisions, active S IDs, D/completion/evidence/event references. It is never a second truth source.
+ABORTED is terminal. These phases are reliability facts and do not plan task work.
 
-Recovery first verifies the complete persisted workspace and cross-references. `LiveDIGRRun.resume()` then takes at least three new clock samples. Cross-process/session continuity is accepted only when provider matches and both sides carry the same non-empty boot identity. If that cannot be proven, do not fabricate continuity or hard elapsed time. A valid resume appends `RESUME_*` journal facts and continues from authoritative persisted state.
+Alpha 7 adds a persisted **work lease** for host/process boundaries. Before substantive MAIN, SOURCE or D_EXCLUSIVE work leaves the runtime process for another host tool, connector or process, the current formal state may open one WORK_LEASE_OPEN event in the hash-chained clock journal. That lease authorizes exactly the current state to remain attributable across the next verified same-boot resume boundary.
+
+On resume:
+- a valid lease plus trusted clock bridge restores the same formal state and charges the cross-host interval to that state;
+- SOURCE also restores its active_source_ids binding;
+- without a lease, the boundary is not guessed. The un-attributable formal interval becomes a persistent **coverage gap** rather than disappearing.
+
+A coverage gap is evidence, not an error-recovery deletion. Hard T/t cannot be declared verified while relevant coverage is incomplete.
+
+Workspace journals/stores remain authoritative across model/tool process changes. Strategy remains native and mutable; commitments and persisted facts remain frozen/auditable.
+
