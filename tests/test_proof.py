@@ -16,11 +16,11 @@ class TestProof(unittest.TestCase):
         self.assertNotIn('isolation',d);self.assertTrue(d['main']['T_coverage_complete'])
     def test_canonical(self):
         self.assertEqual(self.data().render(),'DIGR（4/6，10min/11m08s，2/3，1，S₃（2/4，4min/5m12s，1/2，1），D（1）/D（2））')
-    def test_unknown_when_hard_unverified_or_coverage_incomplete(self):
+    def test_unknown_only_when_hard_unverified(self):
         p=self.data(T_hard_verified=False,t_hard_verified=False).render()
         self.assertIn('10min/?',p);self.assertIn('4min/?',p)
         p=self.data(T_coverage_complete=False,t_coverage_complete=False).render()
-        self.assertIn('10min/?',p);self.assertIn('4min/?',p)
+        self.assertIn('10min/11m08s',p);self.assertIn('4min/5m12s',p)
     def test_soft_unverified_observed_number_can_be_shown(self):
         p=self.data(B=0,b=0,T_hard_verified=False,t_hard_verified=False,T_coverage_complete=False,t_coverage_complete=False).render()
         self.assertIn('10min/11m08s',p);self.assertIn('4min/5m12s',p)
