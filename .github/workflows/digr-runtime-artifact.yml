@@ -52,6 +52,23 @@ jobs:
           cp bundle/EXECUTION_PROTOCOL.json generated/
           cp FILE_TREE.txt generated/
           cp SHA256SUMS.txt generated/
+      - name: Publish durable exact-commit runtime release
+        if: github.ref_name == 'stable'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="digr-runtime-${GITHUB_SHA}"
+          ASSET="dist/DIGR-RUNTIME-${GITHUB_SHA}.zip"
+          if gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" "${ASSET}" --clobber --repo "${GITHUB_REPOSITORY}"
+          else
+            gh release create "${TAG}" "${ASSET}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --target "${GITHUB_SHA}" \
+              --title "DIGR runtime ${GITHUB_SHA}" \
+              --notes "Durable exact-commit DIGR runtime transport for ${GITHUB_SHA}. Repository protocol files at the same commit remain semantic authority." \
+              --prerelease
+          fi
       - name: Commit validated generated metadata on Alpha 8 branch
         if: github.ref_name == 'alpha8-convergence-fixes'
         run: |
