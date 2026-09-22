@@ -1,66 +1,84 @@
-# DIGR 5.0 Alpha 6 Test Matrix
+# DIGR 5.0 Alpha 7 Test Matrix
 
-The suite covers protocol invariants plus live black-box defects observed through Alpha 3 deployment.
+The suite covers the prior authority/execution-integrity baseline plus live formal-time defects observed on multi-tool ChatGPT hosts.
 
-## Repository transport and routing
+## Repository transport, authority and execution integrity
 
-1. exact-uppercase `DIGR` / exact `深度迭代` local candidate capture;
+1. exact-uppercase DIGR / exact 深度迭代 candidate capture;
 2. no repository acquisition for non-candidates;
-3. actual acquisition evidence precedes route success/failure;
-4. search/index/crawl provenance is rejected for mutable `stable`;
-5. already-connected connector mode accepts the current `stable` branch HEAD without requiring Git-ref endpoint access;
-6. direct REST mode requires Branches/Git-ref full-SHA consensus and permits one bounded live re-observation for a push-between-reads race;
-7. pinned resources use immutable SHA URLs and Contents raw/base64 fallback is normalized;
-8. manifest/VERSION same-SHA binding and staged startup;
-9. manifest-declared `bootstrap_index` is acquired first, exposes implemented-machine/truth-source/native-intelligence boundaries, and remains non-semantic authority;
-10. Plus local-router task-work firewall: reading STARTUP is not execution, EXECUTING is not readiness, and the exact observed regression (task comparison beginning before startup gates) is rejected;
-11. NATIVE/HELP/INVALID/EXECUTING surface behavior and >=3 compatible monotonic genesis samples;
-12. EXECUTING uses one manifest-declared immutable execution bundle after genesis; bundle members must exactly cover entrypoint/core with verified digests;
-13. parameter resolution is blocked until ExecutingProtocolLoadReceipt exists; mandatory post-genesis protocol-load failure persists ABORTED;
-14. execute-before-interpret regression: an existing helper cannot be replaced by semantic-equivalent model code/manual receipt;
-15. component interrogation requires exact component/operation/executor plus explicit direct-execution / no-substitution / no-manual-result commitment, with at most two re-education rounds;
-16. exact-commit runtime artifact names bind to P_run SHA and runtime index members match deterministic_helpers;
-17. artifact helper identity is Git-blob/byte-length verifiable against the pinned commit tree; missing bridge + missing/invalid artifact fails closed.
+3. mutable stable requires real current acquisition evidence;
+4. immutable P_run binds manifest/VERSION at one commit;
+5. bootstrap_index precedes startup and remains structural rather than semantic authority;
+6. NATIVE/HELP/INVALID/EXECUTING surface behavior;
+7. >=3 compatible monotonic Genesis samples;
+8. full execution bundle verification before parameter resolution;
+9. post-Genesis protocol-load failure persists ABORTED;
+10. existing helpers cannot be replaced by semantic-equivalent model code;
+11. component interrogation binds exact component/operation/executor;
+12. accepted execution commitment constrains the next relevant action;
+13. same-commit runtime artifact verifies helper identity against the pinned tree;
+14. missing identity-preserving delivery fails closed.
 
-## Parameter, contract and timing integrity
+## Alpha 7 parameter and contract surface
 
-18. deterministic fixed defaults B=1/b=1/L1 precede semantic completion;
-19. typed T/t, unique-or-fail mapping, legal empty S/D/L markers and ordered D/L tail;
-20. explicit values cannot be overwritten by semantic completion;
-21. SourceDisposition is independent of S numeric minima;
-22. N/R/n/r/D lower-bound semantics remain distinct from B/b-governed T/t targets;
-23. B/b=0 soft timing does not become a mechanical lower-bound gate; B/b=1 requires verified hard time;
-24. initialization/META does not inflate T/t.
+15. public order is N<T<R<B<S<D;
+16. B=1 and b=1 are the only fixed parameter defaults;
+17. missing N/T/R/n/t/r/s are semantic completion fields;
+18. bare numbers never become T/t;
+19. L/L()/L= inputs are INVALID;
+20. parameter-resolution schema contains no L_e;
+21. Effective Contract contains no L field or L mismatch policy;
+22. D internally receives fixed L1 isolation.
 
-## Mutable native state and actuals
+## Formal time and cross-host continuity
 
-25. Strategy/Candidate/EST/Source/Completion revision chains and latest-state integrity;
-26. MAIN semantic receipts bind MAIN state/current strategy;
-27. SOURCE receipts bind SOURCE state, active source and valid source revision;
-28. empty source workspace cannot satisfy required Source;
-29. MAIN R is Candidate-backed; source r is SourceWorkspace-revision-backed;
-30. source t is SOURCE clock-union time, not per-source summation.
+23. T = MAIN + SOURCE + D_EXCLUSIVE;
+24. t = SOURCE only;
+25. META/IDLE do not count;
+26. D_EXCLUSIVE contributes to T;
+27. a work lease requires active MAIN/SOURCE/D_EXCLUSIVE;
+28. leased same-boot resume restores the semantic state;
+29. leased SOURCE resume restores active_source_ids;
+30. leased external SOURCE time contributes to T and t;
+31. unleased formal resume produces a CoverageGap;
+32. an unleased gap is never silently dropped;
+33. coverage gaps invalidate hard T/t verification;
+34. hard verification still requires trusted clock continuity;
+35. soft timing remains non-blocking;
+36. parallel source work uses clock-union time rather than per-source multiplication.
 
-## D / L integration
+## Actuals, D and state integrity
 
-31. `D(0)` permits quality-driven intervention creation and actual D may exceed target;
-32. recovery accepts valid D interventions under a zero D minimum;
-33. D actual remains completed+reintegrated intervention count;
-34. L target/capability/actual remain distinct;
-35. no completed D makes completed-intervention L gating inapplicable;
-36. actual completed D under D target zero receives normal L mismatch/gating checks;
-37. L2/L3 require indexed controlled Input/Output Packets and correct foreground-state bindings;
-38. reintegration binds MAIN state and concrete Main consequence;
-39. tampered D/L references are rejected during recovery.
+37. MAIN evolution/re-entry receipts require valid MAIN bindings;
+38. SOURCE receipts require real SourceWorkspace plus active SOURCE binding;
+39. empty source workspace cannot satisfy SourceDisposition REQUIRED;
+40. D(0) means zero minimum, not disabled;
+41. D actual counts completed/reintegrated interventions;
+42. D execution/reintegration remains clock/state bound;
+43. internal isolation target is L1;
+44. artifact-index/latest-state drift is detected;
+45. recovery independently re-derives timing/state facts.
 
-## Proof, Help, lifecycle and release
+## Finalization and proof
 
-40. canonical proof floors actual durations to whole seconds and hides hard-unverified time as `?`;
-41. canonical zh-CN Help states fixed-default precedence, Source REQUIRED semantics, D(0) lower-bound semantics and timing policies;
-42. RunPhase legality including MAIN final synthesis;
-43. artifact-index/latest-state drift and derived summary checks;
-44. resume continuity rules;
-45. schemas/workspace layout cover persisted artifact families;
-46. release builder rejects unsafe/case-colliding/Windows-nonportable paths, symlinks, traversal and caches;
-47. deterministic ZIP cold-reruns suite + validator;
-48. Plus deployable/FULL standalone personalization exports are byte-exact package copies; no Free/Go local-personalization copy is shipped.
+46. finish_time requires MAIN;
+47. semantic completion readiness is required before finalization;
+48. finish_time projects actuals before mutating the live ledger;
+49. unmet hard time denies finalization and leaves phase EXECUTING;
+50. incomplete coverage denies hard finalization;
+51. admitted finish closes ledger then enters FINALIZING;
+52. FINISHED requires delivery_ready=true;
+53. canonical proof omits L;
+54. hard-unverified or coverage-incomplete actual time renders ?;
+55. visible actual durations floor to whole seconds.
+
+## Release and cold validation
+
+56. every persisted artifact family conforms to its schema;
+57. manifest/interface versions match Alpha 7;
+58. execution bundle exactly matches current entrypoint/core bytes and SHA-256 digests;
+59. Python sources parse under the declared minimum grammar;
+60. UTF-8/LF release hygiene is enforced;
+61. deterministic runtime artifact build reruns the unit suite and repository validator;
+62. protocol spec, Help, core and manifest agree on work leases, D time and public-L removal.
+
