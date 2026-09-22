@@ -14,21 +14,22 @@ class TestStopChecks(unittest.TestCase):
         );d.update(kw);return ContractActuals(**d)
     def test_all_minima(self):
         x=check_mechanical_minima(self.contract(),self.actual());self.assertTrue(x.minima_satisfied)
-    def test_hard_time_requires_verification_and_coverage(self):
+    def test_hard_time_requires_verification_but_not_complete_coverage(self):
         self.assertFalse(check_mechanical_minima(self.contract(),self.actual(T_hard_verified=False)).hard_T_ok)
         x=check_mechanical_minima(self.contract(),self.actual(T_coverage_complete=False,unattributed_T_seconds=3))
-        self.assertFalse(x.T_coverage_ok);self.assertFalse(x.hard_T_ok)
+        self.assertFalse(x.T_coverage_ok);self.assertTrue(x.hard_T_ok)
         y=check_mechanical_minima(self.contract(),self.actual(t_coverage_complete=False,unattributed_t_seconds=1))
-        self.assertFalse(y.t_coverage_ok);self.assertFalse(y.hard_t_ok)
+        self.assertFalse(y.t_coverage_ok);self.assertTrue(y.hard_t_ok)
     def test_soft_timing_does_not_gate_coverage(self):
         c=self.contract(B=0,S=SourceContract(1,5,1,0))
         x=check_mechanical_minima(c,self.actual(T_hard_verified=False,T_coverage_complete=False,unattributed_T_seconds=9,t_hard_verified=False,t_coverage_complete=False,unattributed_t_seconds=2))
-        self.assertTrue(x.T_coverage_ok);self.assertTrue(x.t_coverage_ok);self.assertTrue(x.hard_T_ok);self.assertTrue(x.hard_t_ok)
+        self.assertFalse(x.T_coverage_ok);self.assertFalse(x.t_coverage_ok);self.assertTrue(x.hard_T_ok);self.assertTrue(x.hard_t_ok)
     def test_source_presumption_and_waiver(self):
         c=self.contract(S=SourceContract(0,0,0,0),D_s=0)
         self.assertFalse(check_mechanical_minima(c,self.actual(S_count=0,n_min=0,r_min=0,D_s=0)).source_instance_ok)
-        c=self.contract(S=SourceContract(0,0,0,0),D_s=0,source_disposition=SourceDisposition.WAIVED,source_waiver_reason='closed transform')
-        self.assertTrue(check_mechanical_minima(c,self.actual(S_count=0,n_min=0,r_min=0,D_s=0)).source_instance_ok)
+        c=self.contract(S=SourceContract(0,0,0,1),D_s=0,source_disposition=SourceDisposition.WAIVED,source_waiver_reason='closed transform')
+        x=check_mechanical_minima(c,self.actual(S_count=0,n_min=0,r_min=0,D_s=0,t_hard_verified=False,t_coverage_complete=False))
+        self.assertTrue(x.source_instance_ok);self.assertTrue(x.hard_t_ok);self.assertTrue(x.minima_satisfied)
     def test_D_minimum(self):
         self.assertFalse(check_mechanical_minima(self.contract(D_s=2),self.actual(D_s=1)).D_ok)
 
