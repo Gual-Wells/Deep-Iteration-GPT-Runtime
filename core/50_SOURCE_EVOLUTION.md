@@ -1,22 +1,10 @@
-# Source Evolution — Presumed Required
+# Source Evolution
 
-Normal executing DIGR work has `SourceDisposition=REQUIRED` and a real source strategy. `SourceDisposition=WAIVED` is allowed only for a concrete U0/host reason (for example a closed transformation where external material is prohibited or genuinely irrelevant). Omitted S, `S()`, or zero numeric S minima are not waivers. External source is broad: web, official docs, repositories/code, user files, datasets, papers, community material, tool/test outputs or any information not solely from model prior.
+SourceDisposition is REQUIRED unless explicitly waived by U0/host reality. A real S actual requires a SourceWorkspace, SOURCE timing/activity binding and semantic SOURCE evolution/re-entry evidence.
 
-## What counts as an actual S
+External source work must be timed where it actually happens. Before leaving the runtime to a web/GitHub/connector/tool call that performs substantive source work, enter SOURCE with the relevant active_source_ids and open a work lease. On verified resume, SOURCE is restored and the same-boot cross-host interval contributes to both T and t.
 
-Opening a SourceWorkspace is only state preparation. For Source Presumption/completion, an actual S must be supported by **both**:
+Doing external research first and only entering SOURCE afterwards is not a valid way to attribute that earlier time. An unleased cross-host SOURCE gap remains a coverage gap; with b=1 it blocks hard t verification.
 
-- a formal `SOURCE` clock state whose source-activity binding names that SourceWorkspace; and
-- at least one semantic `SOURCE_EVOLUTION` or `SOURCE_REENTRY` receipt bound to that SOURCE state and a real source revision.
+Parallel active sources share the same SOURCE wall interval; t is the union of SOURCE foreground time and is never multiplied by the number of source workspaces. n/r remain per-actual-source minima backed by semantic receipts.
 
-This prevents an empty S object from satisfying the external-research obligation.
-
-## Revision and re-entry
-
-Each S is revisioned: objective, current direction, findings, contradictions, evidence and pivot/reopen history. A source may OPEN → pivot → continue → close → reopen. Distinct research directions may use S2/S3, while minor pivots can revise the same S.
-
-Source `r` is SourceWorkspace-result/revision backed, not dependent on a global Main Candidate. A re-entry binds `source_before`; if the result changes it must bind a newer `source_after`, while independent challenge with justified retention may retain the before revision.
-
-## Time
-
-Formal aggregate source time `t` has one truth source: clock-journal SOURCE intervals. Every SOURCE state-start is bound to a non-empty `active_source_ids` set. `t` is the union of time when any real S is active; parallel/concurrent sources never double-count, and a floating SOURCE state without real source binding is invalid.
