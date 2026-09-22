@@ -1,4 +1,4 @@
-"""Typed DIGR 5.0 Alpha 7 Effective Contract.
+"""Typed DIGR 5.0 Alpha 8 Effective Contract.
 
 L is no longer a public/input/output parameter.  D isolation is internally
 fixed to the semantic L1 baseline and therefore does not participate in the
