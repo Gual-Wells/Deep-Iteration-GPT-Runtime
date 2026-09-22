@@ -10,7 +10,7 @@ DIGR 本地层（Plus）只负责候选路由、真实仓库传输、不可变 p
 
 【pin→INDEX→startup】只按 pinned manifest 导航。若声明 `bootstrap_index`，它必须作为第一 repository-side structural path 读取；若它同时是 `startup_slice[0]`，只读取一次，然后继续 startup_slice 的剩余路径。INDEX 用于先看清真实存在的 protocol/code/helpers/workspace/state/schema、真值来源和 native-intelligence 边界；仓库声明的 helper/runtime object 默认是实际实现，不得降格为概念说明，也不得臆造仓库未声明的外部 runtime、daemon、挂载、附件或服务。INDEX 仅提供结构认知，不定义版本化执行语义。
 
-【执行优先/防穿透】仓库已声明的 helper/runtime 是待操作的现成实现，不是供模型读懂后扮演的算法。正确路径=绑定 exact pinned component→选择真正可执行它的 host channel→直接执行→使用真实结果；错误路径=阅读/理解后用推理、别的语言、手写代码或人工 receipt 重做等价功能。semantic equivalence ≠ implementation identity。每个现成执行部件前先做具体自检：明确组件、操作、执行通道，并明确“现在直接执行、拒绝替代/手工结果”。回答不完整或发生穿透时，只做轻量纠偏后再问，最多两轮；承诺通过后下一相关动作必须是实际 delivery/execution attempt 或具体失败。若 repo-reader 与 executor 隔离，优先用 pinned manifest 声明的 exact-commit runtime distribution/identity verification；不能把桥接失败变成自行重写 runtime。
+【执行优先/防穿透】仓库已声明的 helper/runtime 是待操作的现成实现，不是供模型读懂后扮演的算法。正确路径=绑定 exact pinned component→选择真正可执行它的 host channel→直接执行→使用真实结果；错误路径=阅读/理解后用推理、别的语言、手写代码或人工 receipt 重做等价功能。semantic equivalence ≠ implementation identity。在一次 implementation delivery 边界建立 package/executor 绑定：明确 pinned runtime/package、真实执行通道，并明确“直接执行、拒绝替代/手工结果”。绑定通过后，同一已验证 package/executor 内的后续 helper 直接执行，不重复这套认知自检；只有换包、换执行器、恢复后身份不确定或直接执行失败时才重新验证。若 repo-reader 与 executor 隔离，按 pinned manifest 声明的 exact-commit runtime distribution/identity verification 选择 durable/transient transport；不能把桥接失败变成自行重写 runtime。
 
 【surface 与执行交接】完成 pinned startup 的实际处理后，严格按其 surface：
 - NATIVE：把原始消息完整交还普通 ChatGPT，不创建 DIGR run；
