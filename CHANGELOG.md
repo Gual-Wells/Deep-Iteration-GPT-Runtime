@@ -1,5 +1,18 @@
 # Changelog
 
+## 5.0.0-alpha.7 — formal-time continuity and internal L1
+
+Alpha 7 preserves Alpha 6 implementation-execution integrity and same-commit runtime delivery, then fixes cross-host formal-time attribution and finalization.
+
+- Added persisted `WORK_LEASE_OPEN` semantics so substantive MAIN/SOURCE/D_EXCLUSIVE work can cross verified same-boot host/process/tool boundaries without disappearing from formal time.
+- Added explicit derived coverage gaps for unleased formal boundaries. Hard T/t now requires both clock verification and complete relevant semantic-time coverage.
+- Changed formal T to MAIN + SOURCE + D_EXCLUSIVE; t remains SOURCE only.
+- Removed public L from invocation syntax, semantic completion, parameter-resolution schema, Effective Contract, stop checks and canonical proof. D now uses an internal fixed L1 semantic-isolation baseline.
+- Added SOURCE lease binding so external GitHub/Web/connector research is timed where it actually occurs rather than by a short post-hoc SOURCE receipt.
+- Added finalization admission before ledger closure. Failed minima/hard-time/coverage/completion checks leave the run EXECUTING; FINISHED requires delivery_ready=true.
+- Bumped parameter-resolution schema to 2 and run-session schema to 5.
+- Added black-box regressions for leased/unleased resume, D time accounting, coverage failure, L rejection and non-destructive finish denial.
+
 ## 5.0.0-alpha.6 — execution integrity and runtime delivery
 
 Alpha 6 preserves Alpha 5's hard-by-default B/b timing semantics and the Alpha 4/5 authority, clock, state and execution-protocol transport architecture. It addresses two live failures that remained possible after Alpha 5.
