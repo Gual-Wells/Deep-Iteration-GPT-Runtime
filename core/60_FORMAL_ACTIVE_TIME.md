@@ -1,9 +1,23 @@
 # Formal Active Time and Trusted Clock
 
-Every EXECUTING run opens a trusted monotonic clock with at least three samples before parameter resolution/U0/task work. Work states remain `MAIN`, `SOURCE`, `D_EXCLUSIVE`, `META`, `IDLE`: T counts MAIN+SOURCE, t counts SOURCE only; exclusive D, META and IDLE do not count.
+Every EXECUTING run establishes trusted monotonic clock readiness before parameter resolution/U0/task work.
 
-Observed duration and hard-verifiable duration are distinct facts. `B=0` / `b=0` makes T/t a soft target rather than a mechanical lower-bound gate. `B=1` / `b=1` upgrades the corresponding target to a hard lower bound and requires continuity evidence for every interval used in the claim. If continuity cannot be proven, hard actual is unknown (`?`) rather than estimated.
+Foreground states are MAIN, SOURCE, D_EXCLUSIVE, META and IDLE.
 
-Across process/session boundaries Alpha 5 requires same provider plus equal non-empty boot identity even for observed monotonic continuity. Resume does not charge the unknown inter-process gap as task work; it appends a new resume readiness sequence after proving the bridge.
+Alpha 7 accounting is:
 
-No sleep, waiting, repeated query, mechanical rewrite or logging may pad T/t. Formal time measures useful active work, not wall-clock occupation. Repository pinning, startup-slice/core loading, META contract setup and other initialization/reliability work remain outside T/t unless they themselves become substantive MAIN/SOURCE task work.
+- T = MAIN + SOURCE + D_EXCLUSIVE
+- t = SOURCE
+- META and IDLE do not count
+- D_EXCLUSIVE counts T because disruptive work is substantive task work; it does not count source time t.
+
+Observed duration, clock verification and semantic-time coverage are distinct facts. B=1/b=1 requires both:
+1. every counted interval used for the claim is hard-verifiable; and
+2. the corresponding formal timeline has complete semantic coverage.
+
+Across host/process boundaries, same provider plus equal non-empty boot identity proves clock continuity. Semantic attribution is separately carried by an explicit persisted work lease. A leased MAIN/SOURCE/D_EXCLUSIVE interval may cross one verified resume boundary and remains chargeable. An unleased formal boundary becomes an explicit coverage gap; it is never silently dropped and never guessed into a state.
+
+For SOURCE leases, active_source_ids travel with the lease binding. Thus external tool/connector time is counted where the source work actually occurs rather than through a post-hoc receipt.
+
+Sleep, intentional waiting, padding, repeated mechanical query, logging and pure META setup do not become formal time merely because the clock advanced. Hosts should open work leases only around substantive work whose semantic state is known.
+
