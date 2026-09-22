@@ -1,4 +1,4 @@
-"""DIGR 5.0 Alpha 6 execution-precommitment integrity records.
+"""DIGR 5.0 Alpha 8 execution-precommitment integrity records.
 
 This module does not decide task strategy. It validates a compact structured
 commitment that the host/model is about to execute a repository-declared
