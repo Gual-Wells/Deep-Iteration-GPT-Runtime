@@ -65,7 +65,7 @@ class EffectiveContract:
     @property
     def D_minimum_positive(self)->bool:return self.D_s>0
     @property
-    def hard_timing_required(self)->bool:return self.B==1 or self.S.b==1
+    def hard_timing_required(self)->bool:return self.B==1 or (self.source_required and self.S.b==1)
 
     def to_dict(self)->dict[str,Any]:
         d=asdict(self);d['source_disposition']=self.source_disposition.value;return d
