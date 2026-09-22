@@ -129,7 +129,8 @@
           "revision",
           "summary",
           "evidence_refs",
-          "output_packet_ref"
+          "output_packet_ref",
+          "clock_event_ref"
         ],
         "properties": {
           "revision": {
@@ -151,6 +152,17 @@
             "type": [
               "string",
               "null"
+            ]
+          },
+          "clock_event_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
