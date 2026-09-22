@@ -250,7 +250,7 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
             if rr.clock_event_ref is None or rr.clock_event_ref not in clock_hashes:
                 raise ValueError('D reintegration lacks valid clock journal binding')
             ce=clock_hashes[rr.clock_event_ref]
-            if ce.event!='STATE' or ce.state is not WorkState.MAIN:
+            if ce.event not in ('STATE','WORK_LEASE_OPEN') or ce.state is not WorkState.MAIN:
                 raise ValueError('D reintegration must bind MAIN foreground work')
 
     for scope in est.scopes:
