@@ -1,4 +1,4 @@
-# DIGR 5.0 Alpha 6 — Minimal Startup Slice
+# DIGR 5.0 Alpha 7 — Minimal Startup Slice
 
 This file is deliberately small enough to load before the full protocol. It is reached only after the pinned bootstrap_index has made the repository machine structure explicit and bootstrap/BOOTSTRAP.md has established authority/navigation. It defines repository-surface classification, implementation-delivery / execution-precommitment gates, Clock Genesis and the full-protocol-ready boundary for the already pinned P_run.
 
@@ -14,7 +14,8 @@ This file is deliberately small enough to load before the full protocol. It is r
 10. After successful Run Genesis, acquire the full logical entrypoint + core[] from the **same pinned commit** in META. If the pinned manifest declares execution_bundle, fetch that one immutable bundle and verify that its member list, order, byte lengths and digests exactly cover the manifest-declared entrypoint/core. Otherwise load the logical files individually for compatibility.
 11. Persist an ExecutingProtocolLoadReceipt bound to P_run. Parameter resolution is forbidden until this receipt exists. Any mandatory full-protocol acquisition or verification failure after genesis aborts the born run; it must not remain a resumable GENESIS or be rewritten as “never started”.
 12. After full protocol load, the same implementation-execution integrity rule continues wherever a repository-declared operational component is required. The full core defines the detailed gate and fallback semantics.
+13. Once substantive MAIN/SOURCE/D_EXCLUSIVE work begins, before leaving the runtime for another host/process/tool while that same work state continues, persist the repository-declared work lease first. On verified resume consume the lease and restore that state. Without a lease, preserve the boundary as a coverage gap rather than silently discarding time.
 
 If no native exact-byte bridge exists and the exact-commit runtime artifact cannot be acquired/verified, report a repository-defined **implementation-delivery startup failure**. Never convert that condition into model-written runtime code or an ordinary/native task answer.
 
-The startup slice does not define N/T/R/S/D/L semantics beyond the fact that parameter resolution happens only after Clock Genesis **and** verified full-protocol readiness. Full versioned semantics remain the logical pinned entrypoint/core; transport bundles/artifacts only deliver bytes.
+The startup slice does not define N/T/R/S/D semantics beyond the fact that parameter resolution happens only after Clock Genesis **and** verified full-protocol readiness. Full versioned semantics remain the logical pinned entrypoint/core; transport bundles/artifacts only deliver bytes.
