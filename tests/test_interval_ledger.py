@@ -23,7 +23,7 @@ class TestIntervalLedger(unittest.TestCase):
         l=self.st();self.assertTrue(l.timing_ready);l.transition(WorkState.MAIN,self.s(.4));l.finish(self.s(2));self.assertGreater(l.formal_T_ns(),0)
     def test_hard_identity_carries_from_startup_probe(self):
         c=FakeClock(start=0,step=100_000_000,provider='test',session='a',boot='boot-test');receipt,_=startup(c);l=FormalTimeLedger(receipt,hard_T=True)
-        with self.assertRaises(ValueError):l.transition(WorkState.MAIN,self.s(1,'b','boot-test'))
+        with self.assertRaises(ValueError):l.transition(WorkState.MAIN,self.s(1,'b','different-boot'))
     def test_preview_finish_does_not_mutate_live_ledger(self):
         l=self.st(True);l.transition(WorkState.MAIN,self.s(.4))
         p=l.preview_finish(self.s(2))
