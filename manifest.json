@@ -1,7 +1,7 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
-  "version": "5.0.0-alpha.7",
+  "version": "5.0.0-alpha.8",
   "protocol": "digr-v5.0",
   "language": "zh-CN",
   "philosophy": {
@@ -250,10 +250,19 @@
     "internal_D_isolation_fixed_to_L1": true,
     "formal_work_lease_required_for_cross_host_attribution": true,
     "unleased_formal_cross_host_gap_is_preserved_not_dropped": true,
-    "hard_time_requires_complete_semantic_time_coverage": true,
     "source_work_lease_carries_active_source_binding": true,
     "finalization_admission_precedes_ledger_finish": true,
-    "FINISHED_requires_delivery_ready": true
+    "FINISHED_requires_delivery_ready": true,
+    "hard_time_is_verified_counted_lower_bound": true,
+    "unattributed_gaps_are_excluded_not_estimated": true,
+    "coverage_completeness_is_diagnostic_not_stop_gate": true,
+    "source_waiver_disables_all_source_mechanical_gates": true,
+    "crash_recovery_repairs_only_mechanically_reconstructible_state": true,
+    "committed_FINISH_survives_phase_write_crash": true,
+    "revision_history_is_authoritative_over_latest_pointers": true,
+    "D_result_must_preserve_isolation_until_reintegration": true,
+    "reentry_cannot_move_backward_to_superseded_result": true,
+    "release_builder_never_deletes_repository_metadata": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
   "bootstrap_index": "bootstrap/INDEX.md",
@@ -281,15 +290,15 @@
     "content_raw_media_type": "application/vnd.github.raw+json",
     "mutable_ref_policy": "connector_branch_head_or_direct_rest_branch_ref_consensus; search_index_forbidden; attempt_required_before_failure"
   },
-  "run_session_schema": 5,
+  "run_session_schema": 6,
   "workspace_schema": 2,
   "clock_journal_schema": 1,
   "event_receipt_schema": 2,
   "release": {
     "channel": "alpha",
     "baseline_target": "5.0.0",
-    "status": "formal-time continuity and simplified isolation baseline intended to converge toward DIGR 5.0 final",
-    "compatibility_intent": "Alpha 7 preserves Alpha 6 execution-integrity/runtime-delivery semantics while repairing cross-host formal-time attribution, counting D in T, removing public L, and gating finalization before timing closes.",
+    "status": "convergence and crash-recovery baseline intended to converge toward DIGR 5.0 final",
+    "compatibility_intent": "Alpha 8 preserves Alpha 7 authority, execution-integrity and cross-host timing while making gaps conservative lower-bound omissions, repairing crash windows, tightening re-entry/D semantics, and converging public surfaces.",
     "frozen_interfaces": [
       "invocation_surface_schema",
       "parameter_resolution_schema",
@@ -315,13 +324,20 @@
       "time-coverage verification",
       "finalization admission",
       "public L removal / internal L1",
-      "D_EXCLUSIVE T accounting"
+      "D_EXCLUSIVE T accounting",
+      "run-session crash recovery",
+      "source waiver stop semantics",
+      "verified lower-bound timing semantics",
+      "current-result re-entry binding",
+      "D-result isolation binding",
+      "workspace transactional write recovery",
+      "release metadata convergence"
     ],
     "allowed_pre_final_evolution": [
       "bug fixes",
       "documentation",
       "tests",
-      "measured performance work that preserves Alpha 7 authority, execution-integrity, runtime-delivery, formal-time coverage and contract semantics"
+      "measured performance/reliability work that preserves Alpha 8 authority, execution-integrity, lower-bound timing and task-result sovereignty"
     ]
   },
   "workspace_spec": "workspace/layout-v2.json",
