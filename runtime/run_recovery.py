@@ -1,4 +1,4 @@
-"""Comprehensive DIGR 5.0 Alpha 5 workspace integrity/recovery verification.
+"""Comprehensive DIGR 5.0 Alpha 7 workspace integrity/recovery verification.
 
 Verification proves persisted structure and cross-store bindings.  It deliberately
 separates *workspace integrity* from *future clock continuity*: LiveDIGRRun.resume
@@ -11,7 +11,7 @@ from pathlib import Path
 
 from .actuals import ActualsProvenance
 from .candidate_store import CandidateStore
-from .clock_journal import ClockJournal, derive_work_intervals
+from .clock_journal import ClockJournal, derive_work_timeline
 from .completion_state import CompletionState
 from .d_intervention import DInterventionStore
 from .effective_contract import EffectiveContract, SourceContract, SourceDisposition
@@ -33,12 +33,12 @@ def _load_contract(d: dict) -> EffectiveContract:
     return EffectiveContract(
         d['N'],d['T_seconds'],d['R'],d['B'],
         SourceContract(s['n'],s['t_seconds'],s['r'],s['b']),
-        d['D_s'],d['L_e'],SourceDisposition(d.get('source_disposition','REQUIRED')),
-        d.get('source_waiver_reason'),d.get('L_mismatch_blocks_delivery',False),
+        d['D_s'],SourceDisposition(d.get('source_disposition','REQUIRED')),
+        d.get('source_waiver_reason'),
     )
 
 
-def _derived_actuals(events, sources, activity, dstore, intervals) -> ContractActuals:
+def _derived_actuals(events, sources, activity, dstore, timeline) -> ContractActuals:
     known={s.source_id for s in sources.states}
     active={sid for item in activity.items for sid in item.source_ids}
     semantic={
@@ -49,22 +49,28 @@ def _derived_actuals(events, sources, activity, dstore, intervals) -> ContractAc
     actual_source_ids=sorted(known & active & semantic)
     n=[events.count(EvolutionKind.SOURCE_EVOLUTION,f'S:{sid}') for sid in actual_source_ids]
     r=[events.count(EvolutionKind.SOURCE_REENTRY,f'S:{sid}') for sid in actual_source_ids]
-    T_rel=[x for x in intervals if x.state in (WorkState.MAIN,WorkState.SOURCE)]
-    t_rel=[x for x in intervals if x.state is WorkState.SOURCE]
+    T_rel=[x for x in timeline.intervals if x.state in (WorkState.MAIN,WorkState.SOURCE,WorkState.D_EXCLUSIVE)]
+    t_rel=[x for x in timeline.intervals if x.state is WorkState.SOURCE]
+    T_gaps=[x for x in timeline.gaps if x.state in (WorkState.MAIN,WorkState.SOURCE,WorkState.D_EXCLUSIVE)]
+    t_gaps=[x for x in timeline.gaps if x.state is WorkState.SOURCE]
+    T_coverage_complete=not T_gaps
+    t_coverage_complete=not t_gaps
     return ContractActuals(
         N=events.count(EvolutionKind.MAIN_EVOLUTION,'MAIN'),
         T_seconds=sum(x.observed_ns for x in T_rel)/1e9,
-        T_hard_verified=bool(T_rel) and all(x.hard_verified for x in T_rel),
+        T_hard_verified=bool(T_rel) and T_coverage_complete and all(x.hard_verified for x in T_rel),
+        T_coverage_complete=T_coverage_complete,
+        unattributed_T_seconds=sum(x.observed_ns for x in T_gaps)/1e9,
         R=events.count(EvolutionKind.MAIN_REENTRY,'MAIN'),
         S_count=len(actual_source_ids),
         n_min=min(n) if n else 0,
         t_seconds=sum(x.observed_ns for x in t_rel)/1e9,
-        t_hard_verified=bool(t_rel) and all(x.hard_verified for x in t_rel),
+        t_hard_verified=bool(t_rel) and t_coverage_complete and all(x.hard_verified for x in t_rel),
+        t_coverage_complete=t_coverage_complete,
+        unattributed_t_seconds=sum(x.observed_ns for x in t_gaps)/1e9,
         r_min=min(r) if r else 0,
         D_s=dstore.completed_count,
-        L_e=dstore.actual_isolation_level,
     )
-
 
 def verify_run_workspace(root: Path, run_id: str) -> dict:
     run_id=validate_run_id(run_id)
@@ -121,9 +127,10 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
 
     journal=ClockJournal.load(run_id,ws.path('time/clock.journal.ndjson'))
     journal.verify(False)
-    intervals=derive_work_intervals(journal.events)
+    timeline=derive_work_timeline(journal.events)
+    intervals=timeline.intervals
     clock_hashes={e.record_hash:e for e in journal.events}
-    formal_T_ns=sum(x.observed_ns for x in intervals if x.state in (WorkState.MAIN,WorkState.SOURCE))
+    formal_T_ns=sum(x.observed_ns for x in intervals if x.state in (WorkState.MAIN,WorkState.SOURCE,WorkState.D_EXCLUSIVE))
     formal_t_ns=sum(x.observed_ns for x in intervals if x.state is WorkState.SOURCE)
 
     strategy=StrategyStore.load(ws)
@@ -141,16 +148,16 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
     known_sources={x.source_id for x in sources.states}
     source_state_refs={
         e.record_hash for e in journal.events
-        if e.event=='STATE' and e.state is WorkState.SOURCE
+        if e.event in ('STATE','WORK_LEASE_OPEN') and e.state is WorkState.SOURCE
     }
     activity_by_ref=activity.by_clock_ref()
     for a in activity.items:
         if a.clock_event_ref not in source_state_refs:
-            raise ValueError('source activity clock reference is not a SOURCE state event')
+            raise ValueError('source activity clock reference is not a SOURCE state/lease event')
         if any(s not in known_sources for s in a.source_ids):
             raise ValueError('source activity references missing source workspace')
     if source_state_refs-set(activity_by_ref):
-        raise ValueError('SOURCE state event lacks active source binding')
+        raise ValueError('SOURCE state/lease event lacks active source binding')
 
     # Event-v2 proves not only that a receipt has a hash, but where in the
     # formal state/time stream the semantic work happened.
@@ -158,8 +165,8 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         clock=clock_hashes.get(e.clock_event_ref)
         if clock is None:
             raise ValueError('semantic event lacks valid clock journal binding')
-        if clock.event!='STATE':
-            raise ValueError('semantic event must bind a foreground STATE clock event')
+        if clock.event not in ('STATE','WORK_LEASE_OPEN'):
+            raise ValueError('semantic event must bind a foreground STATE/WORK_LEASE_OPEN clock event')
         if e.strategy_revision is None or e.strategy_revision>=len(strategy.items):
             raise ValueError('semantic event lacks valid strategy revision')
         for r in (e.candidate_revision,e.candidate_after_revision):
@@ -206,8 +213,8 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
     # artifacts. Execution and reintegration must be clock-state bound.
     for item in dstore.items:
         iso=dstore.isolation(item.isolation_receipt_id)
-        if contract is not None and iso.L_target!=contract.L_e:
-            raise ValueError('D isolation target does not match frozen contract L')
+        if iso.L_target!=1:
+            raise ValueError('Alpha 7 D isolation must use internal L1')
         if iso.L_actual is not None and iso.L_actual>=2:
             ws.require_indexed_artifact(iso.input_packet_ref,kind='d-input-packet')
         if iso.output_packet_ref is not None:
@@ -217,8 +224,8 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
             if de.clock_event_ref is None or de.clock_event_ref not in clock_hashes:
                 raise ValueError('D execution lacks valid clock journal binding')
             ce=clock_hashes[de.clock_event_ref]
-            if ce.event!='STATE':
-                raise ValueError('D execution must bind a foreground STATE clock event')
+            if ce.event not in ('STATE','WORK_LEASE_OPEN'):
+                raise ValueError('D execution must bind a foreground STATE/WORK_LEASE_OPEN clock event')
             if iso.mode=='exclusive' and ce.state is not WorkState.D_EXCLUSIVE:
                 raise ValueError('exclusive D execution is not bound to D_EXCLUSIVE state')
             if iso.mode=='background' and ce.state not in (WorkState.MAIN,WorkState.SOURCE):
@@ -274,7 +281,7 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
         summary=ws.read_json('final/run-summary.json')
         if contract is None or u0 is None:
             raise ValueError('FINISHED run missing U0/contract')
-        actual=_derived_actuals(events,sources,activity,dstore,intervals)
+        actual=_derived_actuals(events,sources,activity,dstore,timeline)
         stop=check_mechanical_minima(contract,actual)
         expected={
             'run_id':run_id,
