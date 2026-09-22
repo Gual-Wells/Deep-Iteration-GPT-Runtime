@@ -1,7 +1,7 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
-  "version": "5.0.0-alpha.6",
+  "version": "5.0.0-alpha.7",
   "protocol": "digr-v5.0",
   "language": "zh-CN",
   "philosophy": {
@@ -36,7 +36,6 @@
   "defaults": {
     "B": 1,
     "b": 1,
-    "L_e": 1,
     "semantic_completion": [
       "N",
       "T",
@@ -60,9 +59,6 @@
     },
     "D": {
       "s": "minimum_completed_disruptive_gambit_interventions; zero_means_no_minimum_not_disabled"
-    },
-    "L": {
-      "e": "exact_D_isolation_level_1_semantic_2_context_3_agent"
     }
   },
   "time_states": {
@@ -75,7 +71,7 @@
       "t": true
     },
     "D_EXCLUSIVE": {
-      "T": false,
+      "T": true,
       "t": false
     },
     "META": {
@@ -154,9 +150,7 @@
     "minimums_are_not_caps": true,
     "D_requires_mature_gambit_and_reintegration": true,
     "no_numeric_ambition_or_coup_controller": true,
-    "L1_does_not_claim_physical_isolation": true,
     "formal_active_time_only": true,
-    "D_exclusive_does_not_count_T_or_t": true,
     "meta_and_idle_do_not_count_T_or_t": true,
     "hard_time_requires_trusted_clock": true,
     "hard_time_fail_closed_when_unknown": true,
@@ -169,10 +163,8 @@
     "intervals_use_integer_nanoseconds": true,
     "actual_duration_proof_never_rounds_up": true,
     "strict_finite_numeric_records": true,
-    "L2_requires_controlled_telemetry_not_full_history": true,
     "observed_and_hard_verified_time_are_separate": true,
     "hard_proof_requires_verification_fact": true,
-    "isolation_level_requires_evidence_facts": true,
     "remote_protocol_ref_should_be_immutable_when_pinned": true,
     "release_builder_rejects_symlinks_and_path_traversal": true,
     "local_personalization_is_router_not_protocol": true,
@@ -206,8 +198,6 @@
     "candidate_backed_reentry_required": true,
     "D_proposal_revisionable_until_decree": true,
     "D_reintegration_binds_main_consequence": true,
-    "L_target_cap_actual_are_distinct": true,
-    "L_mismatch_nonblocking_unless_U0_requires_exact": true,
     "router_DIGR_requires_exact_uppercase": true,
     "surface_has_native_sovereignty_return": true,
     "parameter_resolution_unique_or_fail": true,
@@ -231,7 +221,6 @@
     "contents_api_wrapper_must_be_raw_or_decoded": true,
     "repository_transport_is_host_bridge_not_execution_semantics": true,
     "D_zero_means_no_minimum_not_disabled": true,
-    "L_applicability_follows_actual_D": true,
     "timing_targets_soft_when_policy_zero": true,
     "timing_targets_hard_lower_bounds_when_policy_one": true,
     "canonical_proof_actual_durations_floor_to_whole_seconds": true,
@@ -255,7 +244,16 @@
     "implementation_delivery_is_first_class_startup_requirement": true,
     "same_commit_runtime_artifact_is_transport_not_authority": true,
     "runtime_artifact_members_verify_against_pinned_git_tree": true,
-    "no_identity_preserving_delivery_path_fails_closed": true
+    "no_identity_preserving_delivery_path_fails_closed": true,
+    "D_exclusive_counts_T_not_t": true,
+    "public_L_parameter_removed": true,
+    "internal_D_isolation_fixed_to_L1": true,
+    "formal_work_lease_required_for_cross_host_attribution": true,
+    "unleased_formal_cross_host_gap_is_preserved_not_dropped": true,
+    "hard_time_requires_complete_semantic_time_coverage": true,
+    "source_work_lease_carries_active_source_binding": true,
+    "finalization_admission_precedes_ledger_finish": true,
+    "FINISHED_requires_delivery_ready": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
   "bootstrap_index": "bootstrap/INDEX.md",
@@ -283,15 +281,15 @@
     "content_raw_media_type": "application/vnd.github.raw+json",
     "mutable_ref_policy": "connector_branch_head_or_direct_rest_branch_ref_consensus; search_index_forbidden; attempt_required_before_failure"
   },
-  "run_session_schema": 4,
+  "run_session_schema": 5,
   "workspace_schema": 2,
   "clock_journal_schema": 1,
   "event_receipt_schema": 2,
   "release": {
     "channel": "alpha",
     "baseline_target": "5.0.0",
-    "status": "execution-integrity and runtime-delivery baseline intended to converge toward DIGR 5.0 final",
-    "compatibility_intent": "Alpha 6 preserves Alpha 5 authority/clock/state/parameter/timing semantics while adding execute-before-interpret precommitment and an identity-preserving runtime delivery path for hosts whose repository reader and executor are isolated.",
+    "status": "formal-time continuity and simplified isolation baseline intended to converge toward DIGR 5.0 final",
+    "compatibility_intent": "Alpha 7 preserves Alpha 6 execution-integrity/runtime-delivery semantics while repairing cross-host formal-time attribution, counting D in T, removing public L, and gating finalization before timing closes.",
     "frozen_interfaces": [
       "invocation_surface_schema",
       "parameter_resolution_schema",
@@ -303,7 +301,6 @@
       "routing_schema",
       "repository_transport_schema",
       "run_session_schema",
-      "D/L minimum semantics",
       "timing target semantics",
       "canonical proof/help presentation",
       "execution bundle transport",
@@ -312,18 +309,24 @@
       "implementation execution integrity",
       "execution precommitment gate",
       "runtime implementation delivery",
-      "same-commit runtime artifact transport"
+      "same-commit runtime artifact transport",
+      "formal-time cross-host continuity",
+      "work-lease timing attribution",
+      "time-coverage verification",
+      "finalization admission",
+      "public L removal / internal L1",
+      "D_EXCLUSIVE T accounting"
     ],
     "allowed_pre_final_evolution": [
       "bug fixes",
       "documentation",
       "tests",
-      "measured performance work that preserves Alpha 6 authority, clock, contract, execution-integrity and runtime-delivery semantics"
+      "measured performance work that preserves Alpha 7 authority, execution-integrity, runtime-delivery, formal-time coverage and contract semantics"
     ]
   },
   "workspace_spec": "workspace/layout-v2.json",
   "invocation_surface_schema": 2,
-  "parameter_resolution_schema": 1,
+  "parameter_resolution_schema": 2,
   "repository_transport_schema": 3,
   "execution_bundle_schema": 1,
   "execution_protocol_load_schema": 1,
