@@ -1,4 +1,4 @@
-"""Derive DIGR 5.0 Alpha 7 mechanical actuals from bound run facts."""
+"""Derive DIGR 5.0 Alpha 8 mechanical actuals from bound run facts."""
 from __future__ import annotations
 from dataclasses import dataclass
 from .clock_journal import ClockJournal,derive_work_timeline
