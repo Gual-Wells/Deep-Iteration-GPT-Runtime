@@ -422,9 +422,9 @@ class RepositoryTransportSession:
 
 
     def acquire_execution_protocol(self, startup: 'RepositoryStartupBundle') -> ExecutionProtocolBundle:
-        """Acquire and verify the logical entrypoint/core after Clock Genesis.
+        """Acquire and verify the complete logical entrypoint/core before Clock Genesis.
 
-        Current manifests use one immutable execution bundle. Older staged
+        Alpha 9 requires this receipt before a live run exists. Current manifests use one immutable execution bundle. Older staged
         manifests remain supported through individually pinned logical files.
         Legacy non-staged manifests already carry their full protocol in the
         startup bundle and are normalized into the same load receipt shape.
@@ -459,17 +459,8 @@ class RepositoryTransportSession:
             self._validation_failure('individual_execution_protocol_validation',AUTHORITATIVE_REPOSITORY_URL,exc,commit_sha=sha)
 
     def load_execution_protocol_for_run(self, run, startup: 'RepositoryStartupBundle') -> ExecutionProtocolBundle:
-        """Host bridge: post-genesis load either binds a receipt or aborts the born run."""
-        try:
-            bundle=self.acquire_execution_protocol(startup)
-            run.bind_protocol_load(bundle.receipt)
-            return bundle
-        except Exception as exc:
-            try:
-                run.abort_protocol_load(f'execution protocol acquisition/validation failed: {exc}')
-            except Exception:
-                pass
-            raise
+        """Retired Alpha 8 bridge; Alpha 9 requires protocol readiness before Genesis."""
+        raise RuntimeError('Alpha 9 requires acquire_execution_protocol before LiveDIGRRun.start')
 
 
 @dataclass(frozen=True)
