@@ -27,24 +27,22 @@ def build(output: Path, commit_sha: str) -> str:
     commit_sha=commit_sha.strip().lower()
     if len(commit_sha)!=40 or any(c not in "0123456789abcdef" for c in commit_sha):
         raise ValueError("commit_sha must be 40 lowercase hex")
-    manifest=json.loads((ROOT/"manifest.json").read_text(encoding="utf-8"))
+    manifest_path=ROOT/"manifest.json";version_path=ROOT/"VERSION"
+    manifest_bytes=manifest_path.read_bytes();version_bytes=version_path.read_bytes()
+    manifest=json.loads(manifest_bytes.decode("utf-8"))
     paths=[safe_path(p) for p in manifest["deterministic_helpers"]]
-    members=[]
-    payloads={}
+    bundle_rel=safe_path(manifest["execution_bundle"]["path"]);bundle_bytes=(ROOT/bundle_rel).read_bytes()
+    members=[];payloads={}
     for rel in paths:
         data=(ROOT/rel).read_bytes()
         members.append({"path":rel,"byte_length":len(data),"git_blob_sha":git_blob_sha(data)})
         payloads[rel]=data
-    index={
-        "schema_version":1,
-        "version":manifest["version"],
-        "protocol":manifest["protocol"],
-        "commit_sha":commit_sha,
-        "members":members,
-    }
+    index={"schema_version":2,"version":manifest["version"],"protocol":manifest["protocol"],"commit_sha":commit_sha,
+        "manifest":{"sha256":hashlib.sha256(manifest_bytes).hexdigest(),"git_blob_sha":git_blob_sha(manifest_bytes),"byte_length":len(manifest_bytes)},
+        "version_file":{"sha256":hashlib.sha256(version_bytes).hexdigest(),"git_blob_sha":git_blob_sha(version_bytes),"byte_length":len(version_bytes)},
+        "protocol_bundle":{"path":bundle_rel,"sha256":hashlib.sha256(bundle_bytes).hexdigest(),"git_blob_sha":git_blob_sha(bundle_bytes),"byte_length":len(bundle_bytes)},"members":members}
     payloads["RUNTIME-INDEX.json"]=(json.dumps(index,ensure_ascii=False,sort_keys=True,separators=(",",":"))+"\n").encode("utf-8")
-    payloads["VERSION"]=(ROOT/"VERSION").read_bytes()
-    payloads["manifest.json"]=(ROOT/"manifest.json").read_bytes()
+    payloads["VERSION"]=version_bytes;payloads["manifest.json"]=manifest_bytes;payloads[bundle_rel]=bundle_bytes
     output=output.resolve(); output.parent.mkdir(parents=True,exist_ok=True)
     if output.exists(): output.unlink()
     with zipfile.ZipFile(output,"w",compression=zipfile.ZIP_DEFLATED,compresslevel=9) as zf:
