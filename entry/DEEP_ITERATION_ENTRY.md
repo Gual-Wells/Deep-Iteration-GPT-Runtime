@@ -1,24 +1,25 @@
-# DIGR 5.0.0-alpha.9 — Deep Iteration Entry
+# DIGR 5.0.0-alpha.10 — Deep Iteration Entry
 
-This entrypoint becomes active only after the exact P_run runtime package and full entrypoint/core set were verified before Genesis and the born run persisted that receipt.
+Alpha 10 keeps DIGR deep while making reliability machinery coarse-grained.
 
 ## Authority
-P_run, raw-message binding, U0 and Effective Contract remain immutable. P_target cannot rebind the run.
+P_run, raw-message binding, U0, user hard constraints and Effective Contract are immutable for the run. P_target cannot rebind P_run.
 
-## Execution integrity
-Operate declared implementations directly. One verified package/executor attestation covers ordinary helper calls until identity changes or actual execution fails.
+## Contract
+B/b default to 0. Omitted D defaults to 0; explicit D()/D values may request a non-zero commitment. Missing N/T/R and applicable source minima are completed conservatively: they are safeguards against premature stopping, not aspirational workloads.
 
-## Post-Genesis
-Genesis has no mandatory repository/network dependency behind it. Resolve parameters, freeze U0, semantically complete missing N/T/R/n/t/r/s, decide SourceDisposition, freeze contract, then enter MAIN. B/b default to soft (0); explicit B=1/b=1 remains strict hard timing.
+SourceDisposition is a necessity decision, not a blanket presumption. REQUIRED is used when U0 explicitly asks external research/current facts or external evidence materially improves correctness. Otherwise WAIVED is valid with a concrete reason and source minima become non-applicable/zero.
 
-## Work semantics
-N counts meaningful MAIN evolution. SourceDisposition is REQUIRED unless waived. R/r challenge the current result and cannot move backward. D is a completed/reintegrated minimum, uses internal L1, and D_EXCLUSIVE counts T not t.
+## Work
+Native intelligence owns task strategy. N records meaningful evolution; R attacks the current Candidate. Source work and D are used when they improve the result, not to create protocol theatre. Ordinary completed D should use the compact lifecycle receipt; granular D revisions are exceptional.
 
-## Multi-epoch formal time
-T = MAIN + SOURCE + D_EXCLUSIVE; t = SOURCE. Hard actuals sum individually hard-verifiable counted intervals. A same-epoch work lease may bridge host boundaries. If clock continuity changes, prior verified intervals survive, the cross-epoch gap receives no credit, a new trusted epoch starts, and leased work may resume from that point.
+## Persistence and resume
+Authoritative revisions and hash-chained journals persist. Rebuildable latest pointers/run-brief are caches and stay out of the global integrity-index hot path. STATE and WorkLease records are already durable and do not force global checkpoints.
 
-## Persistence
-Authoritative journals/revisions stay on the hot path. run-brief/latest derived views may lag until checkpoints and are rebuildable.
+Ordinary resume performs write-intent repair + journal reindex + one store load. Full revision-tree verification is fallback/audit only.
 
-## Finalization
-Mechanical minima and semantic completion remain necessary. finish_time admits before FINISH; FINISH is durable and never reopens.
+## Time
+T = MAIN + SOURCE + D_EXCLUSIVE; t = SOURCE. Explicit B=1/b=1 makes timing hard. Clock-epoch discontinuity loses only unverifiable bridge credit.
+
+## Finish
+Semantic completion and mechanical hard commitments must hold before FINISH. FINISH is durable and never reopens.

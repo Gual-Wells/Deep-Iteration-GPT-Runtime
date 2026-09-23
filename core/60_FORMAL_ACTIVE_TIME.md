@@ -1,13 +1,11 @@
-# Formal Active Time and Trusted Clock
+# 60 — Formal Active Time
 
-Every EXECUTING run establishes trusted monotonic readiness only after full execution-package/protocol readiness.
+T = MAIN + SOURCE + D_EXCLUSIVE. t = SOURCE. META/IDLE never count.
 
-T = MAIN + SOURCE + D_EXCLUSIVE. t = SOURCE. META/IDLE do not count.
+B/b default to 0. Soft timing is descriptive guidance and never forces WorkLease, cross-host persistence or waiting. Explicit B=1/b=1 requires counted intervals to be hard-verifiable.
 
-B/b default to 0. Explicit B=1/b=1 requires the target to be reached by hard-verifiable counted intervals.
+A run may contain multiple trusted clock epochs. Verified intervals from different epochs may be summed. Cross-epoch discontinuity receives zero credit and is recorded diagnostically; it does not invalidate prior verified intervals or the run.
 
-Hard proof is interval-local, not dependent on one immortal clock lineage. Verified intervals from multiple trusted epochs may be summed. A clock-epoch discontinuity contributes no guessed time and marks coverage incomplete, but does not invalidate prior verified intervals or the run.
+WorkLease may bridge same-epoch attribution when that credit matters. Unleased or cross-epoch gaps are excluded rather than estimated.
 
-A same-epoch work lease may preserve attribution across a host boundary. A cross-epoch lease may restore semantic state only from the new epoch; the discontinuity itself is never charged.
-
-Waiting, padding, logging and pure META never count.
+Waiting, padding, protocol bookkeeping and pure recovery are not formal task time.

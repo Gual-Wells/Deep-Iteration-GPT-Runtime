@@ -1,17 +1,21 @@
-# DIGR 5.0 Alpha 9 — Minimal Startup Slice
+# DIGR 5.0 Alpha 10 — Contracted Startup
 
-Alpha 9 keeps task work blocked until the exact pinned execution package and complete logical protocol are ready. All mandatory repository/runtime transport dependencies are resolved before Clock Genesis so a born run cannot later be killed by a transport bridge.
+Alpha 10 treats startup as one coarse trust boundary, not a chain of per-helper gates.
 
-1. Classify: NATIVE | HELP | INVALID | EXECUTING.
-2. NATIVE returns the original message to native ChatGPT; HELP reads manifest.help; INVALID returns only structure diagnostics. None creates a run.
-3. EXECUTING applies execute-before-interpret: repository implementations are operated directly, never reproduced from understanding.
-4. Before Genesis, resolve one identity-preserving implementation-delivery path: native same-SHA file→executor bridge, else exact-commit durable release asset, else same-commit Actions artifact.
-5. Verify every deterministic helper against the pinned Git tree. Runtime-distribution schema 3 also requires the same-commit execution bundle in the package. RUNTIME-INDEX schema 2 binds commit, manifest, VERSION, helper identities and bundle identity as one package-attestation boundary.
-6. Still before Genesis, verify the complete execution bundle against manifest entrypoint/core order, byte lengths and digests and construct ExecutingProtocolLoadReceipt bound to P_run. Failure here means startup failure; no run is born.
-7. Bind the verified package to the concrete executor once. Reject model-written substitution/manual receipts. Re-open only when package/executor identity changes or a real direct attempt fails.
-8. Only now establish >=3 trusted monotonic samples and create Run Genesis. Genesis persists the already-verified protocol-load receipt with authority/invocation/startup state.
-9. After Genesis there is no mandatory repository/network transport gate. Resolve parameters, freeze U0, complete/freeze Effective Contract, then enter MAIN.
-10. For substantive cross-host work, open a work lease when bridge time credit matters. Same-epoch resume may credit the bridge. If clock continuity changed, the run survives: the discontinuity gets zero credit, a new trusted epoch is established, and a leased semantic state may restart at that epoch.
-11. Derived caches such as run-brief are checkpointed at coarse lifecycle/host-boundary/finalization points instead of every semantic event.
+1. Classify the pinned invocation as NATIVE | HELP | INVALID | EXECUTING.
+2. NATIVE/HELP/INVALID do not create a run.
+3. EXECUTING pins P_run and performs one runtime-package attestation before Genesis:
+   - obtain one recursive Git tree for the pinned commit;
+   - bridge the exact pinned `runtime/runtime_package.py` verifier;
+   - obtain the exact-commit runtime archive;
+   - execute the verifier once. It verifies manifest, VERSION, every deterministic helper, the execution bundle, and every bundle member against the pinned Git tree.
+4. Read the already-attested execution bundle and construct ExecutingProtocolLoadReceipt. The authoritative logical set is manifest.entrypoint + manifest.core[].
+5. Bind the verified package to the executor once. Do not repeat component interrogation or per-helper identity fetches inside the same binding.
+6. Establish trusted monotonic readiness and create Run Genesis.
+7. Resolve parameters, freeze U0 and Effective Contract, enter MAIN.
 
-No identity-preserving package path or failed pre-Genesis protocol verification ever authorizes model-written runtime code or a native fallback answer.
+After Genesis, ordinary task work has no repository-transport gate. Soft timing never requires WorkLease merely to preserve clock credit. WorkLease is used only when cross-boundary formal-time attribution materially matters, especially explicit hard timing.
+
+Ordinary resume uses the lightweight recovery path and validates each required store once. Full workspace audit/rebuild is an anomaly fallback or explicit audit operation, not a normal continuation prerequisite.
+
+No exact package path means startup failure; it never licenses a model-written runtime substitute.

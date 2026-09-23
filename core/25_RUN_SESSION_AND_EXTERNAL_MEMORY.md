@@ -1,11 +1,25 @@
-# Run Session, External Memory and Cross-Host Continuity
+# 25 — Run Session, Persistence and Recovery
 
-Lifecycle: GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → FINISHED. ABORTED is terminal.
+Lifecycle remains:
+GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → FINISHED.
+ABORTED and FINISHED are terminal.
 
-Alpha 9 places exact package/protocol readiness before GENESIS, so a born run has no mandatory repository acquisition pending.
+## Hot path
+Authoritative append-only journals and immutable semantic revisions persist. Rebuildable latest pointers and run-brief are caches; updating them must not rewrite the global integrity index.
 
-Work leases preserve semantic attribution across the next host/process/tool boundary. Same-epoch verified resume may credit the bridge. If the clock epoch changed, run identity and prior verified timing survive; the discontinuity is a continuity gap with zero T/t credit. A leased state may restart at the new epoch boundary.
+A STATE transition or WorkLease append is already durable and must not automatically trigger a global checkpoint.
 
-Crash recovery repairs only mechanically reconstructible state. Immutable revisions and append-only journals are authoritative; run-brief/latest pointers are checkpointed derived caches and may lag safely.
+## Ordinary resume
+Normal resume is:
+1. repair an interrupted transactional write if present;
+2. self-verify and reindex append-only journals in one batched index update;
+3. load required stores once;
+4. re-establish same clock epoch or open a new trusted epoch.
+
+It does **not** run full workspace audit first.
+
+If this fast path detects structural inconsistency, fall back to full recovery + full verification. Full audit is therefore exceptional, not a routine host-boundary tax.
+
+WorkLease is optional and exists for formal-time attribution across a real boundary. Soft timing alone is not a reason to open one.
 
 Committed FINISH remains durable.

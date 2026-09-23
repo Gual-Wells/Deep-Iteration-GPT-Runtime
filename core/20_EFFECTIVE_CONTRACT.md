@@ -1,18 +1,20 @@
-# Effective Contract
+# 20 — Effective Contract and Conservative Defaults
 
-The Effective Contract freezes task commitments, never strategy. Alpha 9 contract fields are:
+Public order remains `N < T < R < B < S < D`; S uses `n < t < r < b`. L is not public.
 
-- MAIN: N, T, R, B
-- Source: S(n,t,r,b)
-- D: minimum completed/reintegrated interventions s
-- SourceDisposition plus any explicit waiver reason
+Fixed defaults:
+- B = 0
+- b = 0
+- D omitted = 0
 
-L is absent from the contract. D isolation is internal fixed L1.
+Explicit `D()` may leave D for semantic completion; explicit D value is binding. Missing N/T/R are completed by native intelligence using the **minimum sufficient non-degenerate commitment** appropriate to U0. They must not be inflated merely to signal depth.
 
-N/R/n/r/D are lower bounds. T/t are B/b-governed timing targets. B=0/b=0 leaves timing soft and is the Alpha 9 fixed default. Explicit B=1 or b=1 makes the corresponding target a hard lower bound over counted, hard-verifiable intervals.
+SourceDisposition is decided before source minima:
+- REQUIRED when U0 explicitly asks research/current/external facts, or external evidence is materially necessary for correctness/reliability;
+- WAIVED when the task is closed-world creative/transformation/reasoning or external evidence has no material expected value; record a concrete reason.
 
-Verified hard intervals may come from more than one trusted clock epoch. Unattributed and cross-epoch gaps are excluded rather than estimated; they reduce coverage but do not invalidate the run or already verified intervals.
+If WAIVED, n/t/r are zero/non-applicable and b cannot resurrect a source gate. If REQUIRED, missing n/t/r may be completed conservatively.
 
-SourceDisposition is REQUIRED unless U0/host reality gives a concrete waiver reason. Zero numeric source minima do not waive source use. When SourceDisposition is WAIVED, source instance/n/r/t timing gates are non-applicable regardless of the structural b value.
+N/R/n/r/D are minima. T/t are soft targets unless explicit B=1/b=1 makes them verified lower bounds.
 
-The contract freezes minimum commitments and timing policy, not Strategy/Candidate/source/D reasoning choices.
+The contract freezes commitments, never Strategy, Candidate, source plan, validation plan or D proposal.

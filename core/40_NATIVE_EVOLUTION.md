@@ -1,7 +1,13 @@
-# Native Evolution and Event Receipts
+# 40 — Native Evolution, Re-entry, Source and D
 
-N counts substantive MAIN evolution determined by the native model/host under faithful U0—not mechanical rewriting. Event Receipt v2 binds each meaningful event to a real clock-journal **STATE** or **WORK_LEASE_OPEN** foreground event, the current Strategy revision and, when applicable, Candidate/Source/evidence references.
+N counts meaningful MAIN evolution. A semantic receipt binds the event to the current foreground clock state and Strategy revision, but the runtime does not score intellectual quality.
 
-A MAIN evolution or MAIN re-entry must bind a `MAIN` foreground clock event (`STATE` or `WORK_LEASE_OPEN`). A SOURCE evolution/re-entry must bind a `SOURCE` foreground clock event and a source that is active in that same source-activity binding. A receipt whose hash exists but whose work-state/scope does not match is invalid.
+R challenges the current Candidate/process under immutable U0. Retained R must bind the current Candidate; changed R must end at a newer current Candidate. R cannot move backward to superseded results.
 
-The raw event log is not a public counter API. `LiveDIGRRun` semantic wrappers validate lifecycle, work-state/scope and reference existence before appending receipts. They deliberately do **not** score intellectual quality or prescribe the next action; semantic qualification remains native-model responsibility.
+Source work uses SOURCE state plus active source binding. Source r follows the same current-result rule. Source mechanics apply only when SourceDisposition=REQUIRED.
+
+D is a disruptive intervention minimum, not a required ceremony. Omitted D=0. D_EXCLUSIVE counts T, not t, and reintegration returns to MAIN.
+
+For an ordinary completed D, the preferred persistence path is one **compact completed lifecycle** containing proposal, decree, execution evidence, result and reintegration in one immutable D revision after the semantic work has occurred. Fine-grained proposal/decree/result revisions are reserved for cases where intermediate durability or revision history has real value.
+
+ABG rejects mechanical paraphrase, counter inflation, source-count fetishism and protocol theatre.
