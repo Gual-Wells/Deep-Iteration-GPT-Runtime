@@ -70,6 +70,17 @@ jobs:
               --notes "Durable exact-commit DIGR runtime transport for ${GITHUB_SHA}. Repository protocol files at the same commit remain semantic authority." \
               --prerelease
           fi
+      - name: Remove obsolete duplicate runtime prereleases
+        if: github.ref_name == 'stable'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release list --repo "${GITHUB_REPOSITORY}" --limit 100 --json tagName --jq '.[].tagName' \
+            | grep '^runtime-' \
+            | while read -r tag; do
+                [ -n "$tag" ] || continue
+                gh release delete "$tag" --repo "${GITHUB_REPOSITORY}" --yes --cleanup-tag
+              done
       - name: Commit validated generated metadata on Alpha 8 branch
         if: github.ref_name == 'alpha8-convergence-fixes'
         run: |
