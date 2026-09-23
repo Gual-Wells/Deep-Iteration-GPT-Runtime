@@ -180,6 +180,7 @@ tests/test_repo_contract.py
 tests/test_repository_transport.py
 tests/test_routing.py
 tests/test_run_session.py
+tests/test_runtime_package.py
 tests/test_schemas.py
 tests/test_state_checks.py
 tests/test_static_hygiene.py
