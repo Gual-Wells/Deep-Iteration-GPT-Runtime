@@ -1,4 +1,4 @@
-"""Append-only, hash-chained clock/state journal for DIGR 5.0 Alpha 8.
+"""Append-only, hash-chained clock/state journal for DIGR 5.0 Alpha 9.
 
 The journal is the single timing/state audit substrate.  Formal work may cross
 host/process boundaries only when an explicit WORK_LEASE_OPEN event was
@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 from typing import Any, Iterable
 from .clock_probe import ClockSnapshot, elapsed_ns, observed_elapsed_ns, pair_is_hard_verifiable
-from .interval_ledger import WorkState, WorkInterval, CoverageGap
+from .interval_ledger import WorkState, WorkInterval, CoverageGap, ContinuityGap
 from .validation import require_nonempty_text, require_nonnegative_int
 
 
@@ -66,6 +66,7 @@ class ClockJournalEvent:
 class DerivedWorkTimeline:
     intervals: tuple[WorkInterval, ...]
     gaps: tuple[CoverageGap, ...]
+    continuity_gaps: tuple[ContinuityGap, ...]
     open_state: WorkState | None
     open_start: ClockSnapshot | None
     open_state_ref: str | None
@@ -83,6 +84,10 @@ def _gap(state: WorkState, start: ClockSnapshot, end: ClockSnapshot) -> Coverage
     return CoverageGap(state, start, end, observed, pair_is_hard_verifiable(start, end))
 
 
+def _continuity_gap(state: WorkState, before: ClockSnapshot, after: ClockSnapshot) -> ContinuityGap:
+    return ContinuityGap(state, before, after, 'clock-epoch-discontinuity')
+
+
 def derive_work_timeline(events: Iterable[ClockJournalEvent]) -> DerivedWorkTimeline:
     """Re-derive intervals, open work state and unattributed cross-host gaps.
 
@@ -98,6 +103,7 @@ def derive_work_timeline(events: Iterable[ClockJournalEvent]) -> DerivedWorkTime
     lease_open = False
     out: list[WorkInterval] = []
     gaps: list[CoverageGap] = []
+    continuity_gaps: list[ContinuityGap] = []
     finished = False
     last_snapshot: ClockSnapshot | None = None
 
@@ -143,6 +149,13 @@ def derive_work_timeline(events: Iterable[ClockJournalEvent]) -> DerivedWorkTime
                     active_ref = None
                     lease_open = False
 
+        elif item.event == 'EPOCH_ANCHOR':
+            if finished: raise ValueError('EPOCH_ANCHOR after FINISH')
+            if active_state is not None and active_start is not None and last_snapshot is not None:
+                if last_snapshot.monotonic_ns > active_start.monotonic_ns: out.append(_interval(active_state, active_start, last_snapshot))
+                continuity_gaps.append(_continuity_gap(active_state, last_snapshot, item.snapshot))
+            active_state=None;active_start=None;active_ref=None;lease_open=False
+
         elif item.event == 'FINISH':
             if finished:
                 raise ValueError('duplicate FINISH')
@@ -156,7 +169,7 @@ def derive_work_timeline(events: Iterable[ClockJournalEvent]) -> DerivedWorkTime
 
         last_snapshot = item.snapshot
 
-    return DerivedWorkTimeline(tuple(out), tuple(gaps), active_state, active_start, active_ref, lease_open, finished)
+    return DerivedWorkTimeline(tuple(out), tuple(gaps), tuple(continuity_gaps), active_state, active_start, active_ref, lease_open, finished)
 
 
 def derive_work_intervals(events: Iterable[ClockJournalEvent]) -> tuple[WorkInterval, ...]:
@@ -183,7 +196,7 @@ class ClockJournal:
         event = require_nonempty_text('event', event)
         if self._events:
             prev = self._events[-1]
-            observed_elapsed_ns(prev.snapshot, snapshot)
+            if event != 'EPOCH_ANCHOR': observed_elapsed_ns(prev.snapshot, snapshot)
             prev_hash = prev.record_hash
         else:
             prev_hash = None
@@ -233,6 +246,16 @@ class ClockJournal:
             event = 'RESUME_ANCHOR' if i == 0 else ('RESUME_READY' if i == len(samples) - 1 else 'RESUME_PROBE')
             self.append(event, snap, WorkState.META)
 
+    def append_epoch_resume(self, samples) -> None:
+        """Start a new trusted monotonic epoch without invalidating the run."""
+        samples=tuple(samples)
+        if len(samples)<3: raise ValueError('epoch resume requires at least three clock samples')
+        if not self._events: raise ValueError('epoch resume requires an existing journal')
+        for a,b in zip(samples,samples[1:]): elapsed_ns(a,b)
+        for i,snap in enumerate(samples):
+            event='EPOCH_ANCHOR' if i==0 else ('EPOCH_READY' if i==len(samples)-1 else 'EPOCH_PROBE')
+            self.append(event,snap,WorkState.META)
+
     def verify(self, require_hard_continuity: bool = False) -> bool:
         prev_hash: str | None = None
         prev_snap: ClockSnapshot | None = None
@@ -242,7 +265,7 @@ class ClockJournal:
             digest = sha256(_canonical_bytes(item.payload())).hexdigest()
             if digest != item.record_hash:
                 raise ValueError('clock journal record hash mismatch')
-            if prev_snap is not None:
+            if prev_snap is not None and item.event != 'EPOCH_ANCHOR':
                 if require_hard_continuity:
                     elapsed_ns(prev_snap, item.snapshot)
                 else:
