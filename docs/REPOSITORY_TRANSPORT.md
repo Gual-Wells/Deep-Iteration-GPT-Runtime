@@ -7,6 +7,6 @@ EXECUTING no longer verifies helpers one by one. Startup obtains:
 2. the exact pinned `runtime/runtime_package.py` verifier;
 3. the exact-commit runtime archive.
 
-The verifier checks manifest, VERSION, every helper, execution bundle, and every bundle member against the Git tree in one operation. The verified bundle then yields ExecutingProtocolLoadReceipt before Genesis.
+The verifier checks manifest, VERSION, every helper, execution bundle, and every bundle member against the Git tree in one operation and returns the protocol-load payload in the same result. That payload is converted to ExecutingProtocolLoadReceipt without a second bundle-verification pass.
 
 There is no mandatory repository transport after Genesis. Search/index snapshots are never mutable-ref authority.

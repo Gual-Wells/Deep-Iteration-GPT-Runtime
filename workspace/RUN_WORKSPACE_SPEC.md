@@ -15,10 +15,10 @@ Immutable revision files and append-only journals are authoritative. These lates
 They are atomically replaceable and may lag; recovery can rebuild them from authoritative revisions.
 
 ## Normal hot path
-Semantic events append their own durable journal/revision record. STATE transitions and WorkLease records do not trigger a global checkpoint. Journal artifact-index refresh is batched.
+Semantic events append their own durable journal/revision record. Their artifact identities append to `state/artifact-index.wal.ndjson`; they do not rewrite the complete base index. STATE transitions and WorkLease records do not trigger a global checkpoint. Journal identity refresh is batched into the same WAL.
 
 ## Resume
 Ordinary resume uses fast recovery. Full revision-tree repair and full workspace verification run only after a detected inconsistency or explicit audit request.
 
 ## Finalization
-FINISH remains the durable timing commit and never reopens.
+FINISH remains the durable timing commit and never reopens. Final delivery compacts the WAL and performs one artifact-integrity scan before the run becomes FINISHED.
