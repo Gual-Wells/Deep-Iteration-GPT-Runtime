@@ -5,14 +5,14 @@ GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING �
 ABORTED and FINISHED are terminal.
 
 ## Hot path
-Authoritative append-only journals and immutable semantic revisions persist. Rebuildable latest pointers and run-brief are caches; updating them must not rewrite the global integrity index.
+Authoritative append-only journals and immutable semantic revisions persist. Their artifact identities append to a small index-delta WAL instead of rewriting the complete artifact index per semantic write. Rebuildable latest pointers and run-brief are caches and stay outside the global integrity index.
 
 A STATE transition or WorkLease append is already durable and must not automatically trigger a global checkpoint.
 
 ## Ordinary resume
 Normal resume is:
 1. repair an interrupted transactional write if present;
-2. self-verify and reindex append-only journals in one batched index update;
+2. self-verify and append journal index deltas in one batched WAL write;
 3. load required stores once;
 4. re-establish same clock epoch or open a new trusted epoch.
 
@@ -23,3 +23,5 @@ If this fast path detects structural inconsistency, fall back to full recovery +
 WorkLease is optional and exists for formal-time attribution across a real boundary. Soft timing alone is not a reason to open one.
 
 Committed FINISH remains durable.
+
+Coarse checkpoints and final delivery may compact the index-delta WAL into the base artifact index. Compaction is not a per-event obligation.

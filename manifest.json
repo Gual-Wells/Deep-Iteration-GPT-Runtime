@@ -270,7 +270,9 @@
     "derived_latest_cache_is_unindexed": true,
     "journal_reindex_is_batched": true,
     "compact_D_completion_preferred": true,
-    "reliability_cost_must_not_scale_by_repeated_full_history_scans": true
+    "reliability_cost_must_not_scale_by_repeated_full_history_scans": true,
+    "artifact_index_hot_path_is_append_only_delta": true,
+    "artifact_index_full_compaction_is_coarse_or_final": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
   "bootstrap_index": "bootstrap/INDEX.md",
@@ -353,7 +355,8 @@
       "batched journal reindex",
       "omitted D default zero",
       "semantic source necessity",
-      "compact D completion"
+      "compact D completion",
+      "append-only artifact-index delta WAL"
     ],
     "allowed_pre_final_evolution": [
       "bug fixes",

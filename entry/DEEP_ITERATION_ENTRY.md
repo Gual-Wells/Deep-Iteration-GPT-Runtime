@@ -14,7 +14,7 @@ SourceDisposition is a necessity decision, not a blanket presumption. REQUIRED i
 Native intelligence owns task strategy. N records meaningful evolution; R attacks the current Candidate. Source work and D are used when they improve the result, not to create protocol theatre. Ordinary completed D should use the compact lifecycle receipt; granular D revisions are exceptional.
 
 ## Persistence and resume
-Authoritative revisions and hash-chained journals persist. Rebuildable latest pointers/run-brief are caches and stay out of the global integrity-index hot path. STATE and WorkLease records are already durable and do not force global checkpoints.
+Authoritative revisions and hash-chained journals persist. Their integrity metadata uses append-only index deltas on the hot path; full artifact-index compaction is coarse/final. Rebuildable latest pointers/run-brief are caches and stay out of the global integrity-index hot path. STATE and WorkLease records are already durable and do not force global checkpoints.
 
 Ordinary resume performs write-intent repair + journal reindex + one store load. Full revision-tree verification is fallback/audit only.
 
