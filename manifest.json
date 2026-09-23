@@ -1,7 +1,7 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
-  "version": "5.0.0-alpha.8",
+  "version": "5.0.0-alpha.9",
   "protocol": "digr-v5.0",
   "language": "zh-CN",
   "philosophy": {
@@ -34,8 +34,8 @@
     "auto_mode_exists": false
   },
   "defaults": {
-    "B": 1,
-    "b": 1,
+    "B": 0,
+    "b": 0,
     "semantic_completion": [
       "N",
       "T",
@@ -225,8 +225,6 @@
     "timing_targets_hard_lower_bounds_when_policy_one": true,
     "canonical_proof_actual_durations_floor_to_whole_seconds": true,
     "executing_protocol_bundle_preserves_logical_modularity": true,
-    "executing_protocol_load_receipt_required_before_parameter_resolution": true,
-    "post_genesis_protocol_load_failure_aborts_born_run": true,
     "execution_bundle_is_immutable_sha_pinned": true,
     "bootstrap_index_precedes_startup": true,
     "bootstrap_index_is_structural_not_semantic_authority": true,
@@ -263,7 +261,16 @@
     "D_result_must_preserve_isolation_until_reintegration": true,
     "reentry_cannot_move_backward_to_superseded_result": true,
     "release_builder_never_deletes_repository_metadata": true,
-    "durable_exact_commit_runtime_release_asset": true
+    "durable_exact_commit_runtime_release_asset": true,
+    "executing_protocol_load_receipt_required_before_genesis": true,
+    "no_mandatory_repository_transport_after_genesis": true,
+    "runtime_package_attestation_aggregates_delivery_identity": true,
+    "clock_epoch_rollover_preserves_run": true,
+    "clock_continuity_failure_forfeits_gap_not_run": true,
+    "hard_time_accumulates_verified_intervals_across_epochs": true,
+    "derived_cache_is_not_semantic_hot_path": true,
+    "run_brief_is_checkpointed_not_per_event": true,
+    "semantic_default_time_is_soft_unless_explicit_hard": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
   "bootstrap_index": "bootstrap/INDEX.md",
@@ -291,15 +298,15 @@
     "content_raw_media_type": "application/vnd.github.raw+json",
     "mutable_ref_policy": "connector_branch_head_or_direct_rest_branch_ref_consensus; search_index_forbidden; attempt_required_before_failure"
   },
-  "run_session_schema": 6,
+  "run_session_schema": 7,
   "workspace_schema": 2,
   "clock_journal_schema": 1,
   "event_receipt_schema": 2,
   "release": {
     "channel": "alpha",
     "baseline_target": "5.0.0",
-    "status": "convergence and crash-recovery baseline intended to converge toward DIGR 5.0 final",
-    "compatibility_intent": "Alpha 8 preserves Alpha 7 authority, execution-integrity and cross-host timing while making gaps conservative lower-bound omissions, repairing crash windows, tightening re-entry/D semantics, and converging public surfaces.",
+    "status": "liveness-convergence baseline intended to converge toward DIGR 5.0 final",
+    "compatibility_intent": "Alpha 9 preserves Alpha 8 authority, evidence, revision, D/R and lower-bound timing semantics while moving mandatory execution-package preparation before Genesis, permitting conservative clock-epoch rollover, restoring soft timing defaults, and removing derived-cache work from the semantic hot path.",
     "frozen_interfaces": [
       "invocation_surface_schema",
       "parameter_resolution_schema",
@@ -332,7 +339,13 @@
       "current-result re-entry binding",
       "D-result isolation binding",
       "workspace transactional write recovery",
-      "release metadata convergence"
+      "release metadata convergence",
+      "pre-genesis execution-package readiness",
+      "runtime distribution schema 3 / embedded execution bundle",
+      "run-session schema 7",
+      "clock epoch rollover",
+      "soft default B/b",
+      "checkpointed derived-cache persistence"
     ],
     "allowed_pre_final_evolution": [
       "bug fixes",
@@ -374,20 +387,23 @@
   },
   "execution_commitment_schema": 1,
   "execution_attempt_schema": 1,
-  "runtime_distribution_schema": 2,
+  "runtime_distribution_schema": 3,
   "runtime_distribution": {
-    "schema": 2,
+    "schema": 3,
     "mode": "native_bridge_or_exact_commit_release_or_actions_artifact",
     "workflow_path": ".github/workflows/digr-runtime-artifact.yml",
     "artifact_name_template": "digr-runtime-{SHA}",
     "archive_filename_template": "DIGR-RUNTIME-{SHA}.zip",
-    "member_source": "deterministic_helpers",
+    "member_source": "deterministic_helpers_plus_execution_bundle",
     "runtime_index_path": "RUNTIME-INDEX.json",
-    "identity_verification": "exact_commit_sha_plus_pinned_git_tree_blob_identity",
+    "identity_verification": "exact_commit_sha_plus_pinned_git_tree_blob_identity_plus_protocol_bundle",
     "preferred_path": "native_same_sha_file_to_executor_bridge",
     "durable_fallback_path": "same_commit_github_prerelease_asset",
     "durable_release_tag_template": "digr-runtime-{SHA}",
     "durable_release_asset_template": "DIGR-RUNTIME-{SHA}.zip",
-    "transient_fallback_path": "same_commit_github_actions_artifact"
+    "transient_fallback_path": "same_commit_github_actions_artifact",
+    "runtime_index_schema": 2,
+    "protocol_bundle_path": "bundle/EXECUTION_PROTOCOL.json",
+    "attestation_scope": "commit+manifest+VERSION+deterministic_helpers+execution_bundle"
   }
 }
