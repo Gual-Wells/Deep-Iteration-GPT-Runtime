@@ -1,4 +1,4 @@
-"""Revisioned candidate-result snapshots for DIGR 5.0 Alpha 8.
+"""Revisioned candidate-result snapshots for DIGR 5.0 Alpha 10.
 
 Candidate snapshots provide an external anchor for whole-process R re-entry
 without storing hidden chain-of-thought.
@@ -49,7 +49,7 @@ class CandidateStore:
         if item.revision!=len(self._items): raise ValueError(f'candidate revision must be {len(self._items)}')
         self._items.append(item)
         self.workspace.write_json(f'state/candidate-r{item.revision:04d}.json',item.to_dict(),kind='candidate',revision=item.revision)
-        self.workspace.write_json('state/candidate-latest.json',item.to_dict(),kind='candidate-latest',revision=item.revision)
+        self.workspace.write_cache_json('state/candidate-latest.json',item.to_dict())
         return item
     @property
     def latest(self): return self._items[-1] if self._items else None

@@ -182,7 +182,7 @@ class LiveDIGRRun:
             if p.is_file():self.workspace.index_existing(rel,kind=kind)
 
     def refresh_brief(self):
-        brief=build_run_brief(self);self.workspace.write_json('state/run-brief.json',brief,kind='run-brief');return brief
+        brief=build_run_brief(self);self.workspace.write_cache_json('state/run-brief.json',brief);return brief
 
     def checkpoint(self):
         self._reindex_journals();return self.refresh_brief()

@@ -1,4 +1,4 @@
-"""Persisted run lifecycle for DIGR 5.0 Alpha 8.
+"""Persisted run lifecycle for DIGR 5.0 Alpha 10.
 
 RunPhase constrains lifecycle ordering only. It is not a workflow planner and
 never dictates task strategy.
@@ -58,7 +58,7 @@ class RunPhaseStore:
         if state.revision!=len(self._history): raise ValueError('run phase revision drift')
         self._history.append(state)
         self.workspace.write_json(f'state/run-phase-r{state.revision:04d}.json',state.to_dict(),kind='run-phase',revision=state.revision)
-        self.workspace.write_json('state/run-phase.json',state.to_dict(),kind='run-phase-latest',revision=state.revision)
+        self.workspace.write_cache_json('state/run-phase.json',state.to_dict())
         return state
     @property
     def current(self): return self._history[-1]

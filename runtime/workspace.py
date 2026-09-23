@@ -1,4 +1,4 @@
-"""Safe explicit run-workspace storage for DIGR 5.0 Alpha 9.
+"""Safe explicit run-workspace storage for DIGR 5.0 Alpha 10.
 
 The workspace is a persistence substrate, not a decision engine. Alpha 9 retains the integrity index while allowing rebuildable derived caches to lag between coarse checkpoints.
 """
@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from hashlib import sha256
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePath
 import re
 import tempfile
 from typing import Any
@@ -23,6 +23,18 @@ REQUIRED_GENESIS_FILES = (
 STATE_DIRECTORIES = ('time','sources','dictator','evidence','final','state')
 _INDEX_PATH = 'state/artifact-index.json'
 _WRITE_INTENT_PATH = 'state/workspace-write-intent.json'
+
+def _is_derived_cache_path(rel: str) -> bool:
+    if rel in ('state/run-brief.json','state/strategy-latest.json','state/candidate-latest.json','state/run-phase.json'):
+        return True
+    if rel.startswith('state/est-') and rel.endswith('-latest.json'):
+        return True
+    parts=PurePath(rel).parts
+    if len(parts)==3 and parts[0]=='sources' and parts[2]=='state.json':
+        return True
+    if len(parts)==2 and parts[0]=='dictator' and parts[1].endswith('.json') and '-r' not in parts[1]:
+        return parts[1] not in ('',)
+    return False
 
 
 def validate_run_id(run_id: str) -> str:
@@ -194,6 +206,12 @@ class RunWorkspace:
     def write_json(self, rel: str, value: Any, *, kind: str='json', revision: int | None=None, last_event_ref: str | None=None) -> str:
         return self._transactional_write(rel,canonical_json_bytes(value),kind=kind,revision=revision,last_event_ref=last_event_ref)
 
+    def write_cache_json(self, rel: str, value: Any) -> str:
+        """Atomically replace rebuildable cache state without global-index churn."""
+        if not _is_derived_cache_path(rel):
+            raise ValueError(f'path is not a declared derived cache: {rel}')
+        return self.atomic_write_bytes(rel,canonical_json_bytes(value))
+
     def write_text(self, rel: str, text: str, *, kind: str='text', revision: int | None=None, last_event_ref: str | None=None) -> str:
         if not isinstance(text, str): raise TypeError('text must be str')
         data=text.replace('\r\n','\n').replace('\r','\n').encode('utf-8')
@@ -274,7 +292,7 @@ class RunWorkspace:
             if not p.is_file():
                 continue
             rel=p.relative_to(self.root).as_posix()
-            if rel in (_INDEX_PATH,_WRITE_INTENT_PATH) or p.name.startswith('.tmp-'):
+            if rel in (_INDEX_PATH,_WRITE_INTENT_PATH) or p.name.startswith('.tmp-') or _is_derived_cache_path(rel):
                 continue
             actual.add(rel)
         extra=sorted(actual-indexed)

@@ -1,4 +1,4 @@
-"""Lightweight revisioned Evolution State Tree memory for DIGR 5.0 Alpha 8.
+"""Lightweight revisioned Evolution State Tree memory for DIGR 5.0 Alpha 10.
 
 EST is a compact working-memory index, not a search algorithm and not a second
 source of truth for Strategy/Candidate.  It references their revisions instead
@@ -56,7 +56,7 @@ class ESTStore:
         self._latest[snapshot.scope]=snapshot; self._history.setdefault(snapshot.scope,[]).append(snapshot)
         safe=''.join(c if c.isalnum() or c in '._-' else '_' for c in snapshot.scope)[:48]; tag=sha256(snapshot.scope.encode()).hexdigest()[:10]; stem=f'est-{safe}-{tag}'
         self.workspace.write_json(f'state/{stem}-r{snapshot.revision:04d}.json',snapshot.to_dict(),kind='est',revision=snapshot.revision)
-        return self.workspace.write_json(f'state/{stem}-latest.json',snapshot.to_dict(),kind='est-latest',revision=snapshot.revision)
+        return self.workspace.write_cache_json(f'state/{stem}-latest.json',snapshot.to_dict())
     def latest(self,scope:str)->ESTSnapshot|None:return self._latest.get(scope)
     @property
     def scopes(self):return tuple(self._latest)

@@ -131,7 +131,7 @@ def recover_run_workspace(root: Path, run_id: str) -> dict:
     def repair_pointer(source_rel,target_rel,kind,revision):
         value=ws.read_json(source_rel)
         if not _json_equal(ws,target_rel,value):
-            ws.write_json(target_rel,value,kind=kind,revision=revision)
+            ws.write_cache_json(target_rel,value)
             actions.append(f'rebuilt:{target_rel}')
 
     # Immutable revision history is authoritative; latest pointers are caches.

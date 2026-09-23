@@ -1,4 +1,4 @@
-"""Revisioned source-research workspaces and source-activity binding for Alpha 8."""
+"""Revisioned source-research workspaces and source-activity binding for Alpha 10."""
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 from hashlib import sha256
@@ -45,7 +45,7 @@ class SourceWorkspaceRegistry:
         if s.revision!=len(hist): raise ValueError(f'source {s.source_id} revision must be {len(hist)}')
         hist.append(s)
         self.workspace.write_json(f'sources/{s.source_id}/state-r{s.revision:04d}.json',s.to_dict(),kind='source-state',revision=s.revision)
-        self.workspace.write_json(f'sources/{s.source_id}/state.json',s.to_dict(),kind='source-latest',revision=s.revision)
+        self.workspace.write_cache_json(f'sources/{s.source_id}/state.json',s.to_dict())
         return s
     def open(self,source_id:str,objective:str,current_direction:str|None=None)->SourceWorkspaceState:
         source_id=validate_component_id('source_id',source_id)

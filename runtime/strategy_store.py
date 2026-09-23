@@ -1,4 +1,4 @@
-"""Revisioned, non-authoritative Strategy State for DIGR 5.0 Alpha 8.
+"""Revisioned, non-authoritative Strategy State for DIGR 5.0 Alpha 10.
 
 A strategy snapshot records the model's current working approach. It never
 contains a scheduler field such as next_step/score/priority and never gains the
@@ -62,7 +62,7 @@ class StrategyStore:
         if state.revision!=expected: raise ValueError(f'strategy revision must be {expected}')
         self._items.append(state)
         self.workspace.write_json(f'state/strategy-r{state.revision:04d}.json',state.to_dict(),kind='strategy',revision=state.revision)
-        self.workspace.write_json('state/strategy-latest.json',state.to_dict(),kind='strategy-latest',revision=state.revision)
+        self.workspace.write_cache_json('state/strategy-latest.json',state.to_dict())
         return state
 
     @property
