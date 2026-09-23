@@ -19,7 +19,7 @@ The transport has four jobs only:
 The module includes a standard-library HTTPS fetcher for ordinary Python hosts.
 ChatGPT integrations may instead provide a connector-backed ``fetch`` callable,
 but they must preserve the provenance/freshness fields in ``TransportResponse``.
-No N/T/R/S/D/L, invocation-surface, clock, stop or proof semantics live here.
+No task-parameter, invocation-surface, clock, stop or proof semantics live here.
 """
 from __future__ import annotations
 
