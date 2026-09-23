@@ -89,6 +89,7 @@ def recover_run_workspace_fast(root: Path, run_id: str) -> dict:
     run_id=validate_run_id(run_id)
     ws=RunWorkspace.open_existing(root,run_id)
     actions=[]
+    if ws.repair_index_wal_tail():actions.append('artifact-index-wal:truncated-partial-tail')
     outcome=ws.recover_pending_write()
     if outcome is not None:
         actions.append(f'workspace-write:{outcome}')
@@ -112,6 +113,7 @@ def recover_run_workspace(root: Path, run_id: str) -> dict:
     run_id=validate_run_id(run_id)
     ws=RunWorkspace.open_existing(root,run_id)
     actions=[]
+    if ws.repair_index_wal_tail():actions.append('artifact-index-wal:truncated-partial-tail')
     outcome=ws.recover_pending_write()
     if outcome is not None:
         actions.append(f'workspace-write:{outcome}')
