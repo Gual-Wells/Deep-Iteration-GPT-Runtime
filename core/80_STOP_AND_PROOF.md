@@ -2,7 +2,7 @@
 
 Mechanical gates are N/R/n/r/D minima plus B/b-governed timing. L is not a public or stopping dimension.
 
-For hard timing, the counted duration must reach its target and every counted interval used for that claim must be hard-verifiable. Unattributed gaps are excluded from the number rather than estimated. Therefore incomplete coverage means the displayed/recorded T/t is a **verified lower bound**, not a complete wall-accounting total; it does not by itself block delivery.
+For hard timing, the counted duration must reach its target and every counted interval used for that claim must be hard-verifiable. Verified intervals may come from multiple trusted clock epochs; epoch discontinuities themselves are excluded. Unattributed gaps are excluded from the number rather than estimated. Therefore incomplete coverage means the displayed/recorded T/t is a **verified lower bound**, not a complete wall-accounting total; it does not by itself block delivery.
 
 If SourceDisposition is WAIVED, source instance/n/r/t gates are non-applicable.
 
