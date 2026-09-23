@@ -4,16 +4,16 @@ ROOT=Path(__file__).resolve().parents[1]
 class TestImplementationNotes(unittest.TestCase):
     @classmethod
     def setUpClass(cls):cls.t=(ROOT/'docs/IMPLEMENTATION_NOTES.md').read_text()
-    def test_runtime_boundary(self):
-        for x in ('lower bound','counted hard-verifiable intervals','SourceDisposition=WAIVED','Public L stays removed'):
+    def test_pre_genesis_boundary(self):
+        for x in ('execution bundle','before LiveDIGRRun.start creates Genesis','Post-Genesis protocol bind/abort paths are retired'):
             self.assertIn(x,self.t)
-    def test_recovery_model(self):
-        for x in ('single-slot write-intent','append-only journals','derived latest pointers','run-brief is a cache','FINISH is a durable commit point'):
+    def test_clock_epoch_recovery(self):
+        for x in ('same-epoch continuity','EPOCH_ANCHOR','Cross-epoch time is uncredited'):
             self.assertIn(x,self.t)
-    def test_reentry_and_d(self):
-        for x in ('Retained MAIN/source re-entry','persisted R/r history cannot move backward','D Result production','D_EXCLUSIVE'):
+    def test_hot_path_and_defaults(self):
+        for x in ('run-brief is derived cache state','no longer rewrites synchronously','B/b return to 0','explicit B=1/b=1 remains strict'):
             self.assertIn(x,self.t)
-    def test_release_and_inherited_integrity(self):
-        for x in ('.git','exact pinned helpers','does not add another cognitive gate'):
+    def test_safety_preserved(self):
+        for x in ('Exact implementation identity','P_run/U0/contract','Source/R/D semantics','FINISH durability'):
             self.assertIn(x,self.t)
 if __name__=='__main__':unittest.main()
