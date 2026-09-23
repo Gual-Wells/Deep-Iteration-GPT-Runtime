@@ -1,4 +1,4 @@
-"""Typed DIGR 5.0 Alpha 8 Effective Contract.
+"""Typed DIGR 5.0 Alpha 10 Effective Contract.
 
 L is no longer a public/input/output parameter.  D isolation is internally
 fixed to the semantic L1 baseline and therefore does not participate in the
@@ -40,7 +40,7 @@ class EffectiveContract:
     B:int
     S:SourceContract
     D_s:int
-    source_disposition:SourceDisposition=SourceDisposition.REQUIRED
+    source_disposition:SourceDisposition
     source_waiver_reason:str|None=None
 
     def __post_init__(self):

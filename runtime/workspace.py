@@ -17,7 +17,7 @@ _RUN_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{7,127}$')
 _COMPONENT_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$')
 WORKSPACE_SCHEMA_VERSION = 2
 REQUIRED_GENESIS_FILES = (
-    'authority.json','invocation.json','startup.json','time/clock.journal.ndjson',
+    'authority.json','invocation.json','startup.json','protocol-load.json','time/clock.journal.ndjson',
     'state/artifact-index.json','state/run-phase.json',
 )
 STATE_DIRECTORIES = ('time','sources','dictator','evidence','final','state')

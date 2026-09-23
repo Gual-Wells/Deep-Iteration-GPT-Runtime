@@ -4,6 +4,7 @@
     "authority.json",
     "invocation.json",
     "startup.json",
+    "protocol-load.json",
     "time/clock.journal.ndjson",
     "state/artifact-index.json",
     "state/run-phase.json"

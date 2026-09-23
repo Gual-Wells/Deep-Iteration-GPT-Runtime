@@ -197,7 +197,7 @@ class DInterventionStore:
             raise ValueError(f'D state revision must be {len(history)}')
         history.append(item)
         self.workspace.write_json(f'dictator/{item.intervention_id}-r{item.state_revision:04d}.json', item.to_dict(), kind='d-intervention', revision=item.state_revision)
-        self.workspace.write_json(f'dictator/{item.intervention_id}.json', item.to_dict(), kind='d-intervention-latest', revision=item.state_revision)
+        self.workspace.write_cache_json(f'dictator/{item.intervention_id}.json', item.to_dict())
         return item
 
     @staticmethod
