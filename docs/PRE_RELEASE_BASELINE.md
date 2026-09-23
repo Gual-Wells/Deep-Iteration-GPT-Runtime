@@ -1,21 +1,16 @@
-# 5.0.0-alpha.8 Convergence / Crash-Recovery Baseline
+# 5.0.0-alpha.9 Liveness-Convergence Baseline
 
-Alpha 8 preserves the established 5.0 architecture: immutable P_run/U0/contract commitments, native Strategy/Candidate/Source/D intelligence, pinned implementation delivery, trusted clocks and compact proof.
+Alpha 9 preserves immutable P_run/U0/contract authority, exact implementation identity, native Strategy/Candidate/Source/D intelligence, evidence-backed actuals and durable FINISH while correcting the long-run failure amplification accumulated across Alpha 5–8.
 
-The release is intentionally a convergence pass:
+The release converges the runtime around four liveness rules:
 
-- source waiver now disables all source mechanical gates;
-- hard timing is a verified counted lower bound; unleased gaps are excluded and retained as diagnostics rather than poisoning the run;
-- D_EXCLUSIVE remains part of T;
-- FINISH is a durable commit point and finalization crash windows are recoverable;
-- ordinary workspace writes have a single-slot recovery intent;
-- append-only journals may re-index only after chain verification;
-- immutable revision history may rebuild derived latest pointers/run-brief;
-- R/r cannot move backward to superseded results;
-- D Result stays inside the D isolation state until explicit reintegration;
-- public L remains removed and current schemas/examples/docs are converged;
-- release cleanup cannot delete repository .git metadata;
-- stable validation must detect stale checked-in generated metadata rather than silently validating a repaired copy.
+- all mandatory runtime delivery and complete protocol verification finish before Genesis;
+- a born run has no mandatory repository/bundle transport dependency remaining;
+- clock continuity may roll to a new trusted epoch, losing only unverifiable bridge time rather than the run;
+- rebuildable run-brief/latest cache work is checkpointed instead of synchronously paid on every semantic event.
 
-No new task-planning controller is introduced. Reliability work should be deterministic, exceptional-path heavy and cognitively cheap during normal task execution.
+B/b fixed defaults return to 0 so semantic T/t completion is soft unless the user explicitly requests hard timing with B=1/b=1.
 
+Safety rules remain strict: P_target cannot rebind P_run, implementation substitution is forbidden when exact runtime exists, revision-backed R/r cannot move backward, D uses internal L1, source requirements remain explicit, and FINISH cannot reopen.
+
+No new supervisory reasoning layer or long-lived degraded execution mode is introduced.
