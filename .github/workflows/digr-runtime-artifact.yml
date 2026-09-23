@@ -35,7 +35,14 @@ jobs:
           cmp -s bundle/EXECUTION_PROTOCOL.json /tmp/digr-release-work/bundle/EXECUTION_PROTOCOL.json || { echo "stable execution bundle drift"; exit 1; }
           cmp -s FILE_TREE.txt /tmp/digr-release-work/FILE_TREE.txt || { echo "stable FILE_TREE drift"; exit 1; }
           cmp -s SHA256SUMS.txt /tmp/digr-release-work/SHA256SUMS.txt || { echo "stable SHA256SUMS drift"; exit 1; }
-      - name: Import validated generated metadata
+      - name: Verify stable generated metadata is committed
+        if: github.ref_name == 'stable'
+        run: |
+          cmp bundle/EXECUTION_PROTOCOL.json /tmp/digr-release-work/bundle/EXECUTION_PROTOCOL.json
+          cmp FILE_TREE.txt /tmp/digr-release-work/FILE_TREE.txt
+          cmp SHA256SUMS.txt /tmp/digr-release-work/SHA256SUMS.txt
+      - name: Import validated generated metadata on development branch
+        if: github.ref_name == 'alpha8-convergence-fixes'
         run: |
           cp /tmp/digr-release-work/bundle/EXECUTION_PROTOCOL.json bundle/EXECUTION_PROTOCOL.json
           cp /tmp/digr-release-work/FILE_TREE.txt FILE_TREE.txt
