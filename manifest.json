@@ -1,7 +1,7 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
-  "version": "5.0.0-alpha.9",
+  "version": "5.0.0-alpha.10",
   "protocol": "digr-v5.0",
   "language": "zh-CN",
   "philosophy": {
@@ -42,9 +42,10 @@
       "R",
       "n",
       "t",
-      "r",
-      "s"
-    ]
+      "r"
+    ],
+    "D_s": 0,
+    "explicit_empty_D": "semantic_completion"
   },
   "parameters": {
     "N": "minimum_effective_main_evolution_cycles",
@@ -85,22 +86,11 @@
   },
   "core": [
     "core/00_RESULT_SOVEREIGNTY.md",
-    "core/05_TASK_COMMITMENT.md",
     "core/10_INVOCATION_AND_U0.md",
-    "core/11_PARAMETER_FORMAT_AND_RESOLUTION.md",
-    "core/12_PROTOCOL_AUTHORITY_AND_SELF_HOSTING.md",
-    "core/13_IMPLEMENTATION_EXECUTION_INTEGRITY.md",
-    "core/15_SEMANTIC_DEFAULT_COMPLETION.md",
     "core/20_EFFECTIVE_CONTRACT.md",
     "core/25_RUN_SESSION_AND_EXTERNAL_MEMORY.md",
-    "core/30_EVOLUTION_STATE_MEMORY.md",
-    "core/35_STRATEGY_AND_CANDIDATE_STATE.md",
     "core/40_NATIVE_EVOLUTION.md",
-    "core/50_SOURCE_EVOLUTION.md",
     "core/60_FORMAL_ACTIVE_TIME.md",
-    "core/70_REENTRY_AND_ABG.md",
-    "core/75_DISRUPTIVE_GAMBIT.md",
-    "core/77_ISOLATION_LEVELS.md",
     "core/80_STOP_AND_PROOF.md"
   ],
   "entrypoint": "entry/DEEP_ITERATION_ENTRY.md",
@@ -109,6 +99,7 @@
     "runtime/routing.py",
     "runtime/repository_transport.py",
     "runtime/execution_protocol.py",
+    "runtime/runtime_package.py",
     "runtime/execution_integrity.py",
     "runtime/protocol_authority.py",
     "runtime/invocation_surface.py",
@@ -191,8 +182,6 @@
     "EST_is_external_state_memory_not_search_controller": true,
     "run_summary_distinguishes_provenance_strength": true,
     "freeze_commitments_never_strategy": true,
-    "source_presumption_required_unless_waived": true,
-    "source_minimums_do_not_disable_source_presumption": true,
     "source_time_requires_active_source_binding": true,
     "strategy_state_is_revisioned_not_scheduler": true,
     "candidate_backed_reentry_required": true,
@@ -235,9 +224,6 @@
     "execute_before_interpret_for_declared_operational_components": true,
     "implementation_identity_precedes_semantic_equivalence": true,
     "declared_implementation_substitution_forbidden_until_actual_failure": true,
-    "component_interrogation_precedes_declared_helper_operation": true,
-    "incomplete_interrogation_gets_bounded_lightweight_reeducation": true,
-    "accepted_execution_commitment_constrains_next_relevant_action": true,
     "manual_receipt_or_equivalent_reimplementation_is_not_execution": true,
     "implementation_delivery_is_first_class_startup_requirement": true,
     "same_commit_runtime_artifact_is_transport_not_authority": true,
@@ -270,7 +256,21 @@
     "hard_time_accumulates_verified_intervals_across_epochs": true,
     "derived_cache_is_not_semantic_hot_path": true,
     "run_brief_is_checkpointed_not_per_event": true,
-    "semantic_default_time_is_soft_unless_explicit_hard": true
+    "semantic_default_time_is_soft_unless_explicit_hard": true,
+    "source_disposition_is_semantic_necessity_decision": true,
+    "source_required_only_when_materially_useful_or_explicit": true,
+    "omitted_D_defaults_zero": true,
+    "explicit_empty_D_may_semantically_complete": true,
+    "single_runtime_package_attestation_replaces_per_helper_verification": true,
+    "runtime_package_verifier_binds_bundle_members_to_git_tree": true,
+    "ordinary_resume_uses_fast_path": true,
+    "full_workspace_audit_is_anomaly_fallback_or_explicit": true,
+    "state_transition_does_not_force_global_checkpoint": true,
+    "soft_timing_does_not_force_work_lease": true,
+    "derived_latest_cache_is_unindexed": true,
+    "journal_reindex_is_batched": true,
+    "compact_D_completion_preferred": true,
+    "reliability_cost_must_not_scale_by_repeated_full_history_scans": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
   "bootstrap_index": "bootstrap/INDEX.md",
@@ -305,8 +305,8 @@
   "release": {
     "channel": "alpha",
     "baseline_target": "5.0.0",
-    "status": "liveness-convergence baseline intended to converge toward DIGR 5.0 final",
-    "compatibility_intent": "Alpha 9 preserves Alpha 8 authority, evidence, revision, D/R and lower-bound timing semantics while moving mandatory execution-package preparation before Genesis, permitting conservative clock-epoch rollover, restoring soft timing defaults, and removing derived-cache work from the semantic hot path.",
+    "status": "liveness-contraction baseline intended to converge toward DIGR 5.0 final",
+    "compatibility_intent": "Alpha 10 preserves P_run/U0/contract authority, lower-bound timing, current-result R/r, D reintegration and durable FINISH while contracting startup, persistence and ordinary-resume costs so reliability mechanics do not dominate task execution.",
     "frozen_interfaces": [
       "invocation_surface_schema",
       "parameter_resolution_schema",
@@ -345,13 +345,21 @@
       "run-session schema 7",
       "clock epoch rollover",
       "soft default B/b",
-      "checkpointed derived-cache persistence"
+      "checkpointed derived-cache persistence",
+      "seven-core execution authority",
+      "single runtime-package attestation",
+      "ordinary fast resume / exceptional full audit",
+      "unindexed derived latest caches",
+      "batched journal reindex",
+      "omitted D default zero",
+      "semantic source necessity",
+      "compact D completion"
     ],
     "allowed_pre_final_evolution": [
       "bug fixes",
       "documentation",
-      "tests",
-      "measured performance/reliability work that preserves Alpha 8 authority, execution-integrity, lower-bound timing and task-result sovereignty"
+      "regression guards",
+      "measured liveness/reliability work that preserves Alpha 10 result sovereignty and contracted normal-path costs"
     ]
   },
   "workspace_spec": "workspace/layout-v2.json",
@@ -366,22 +374,11 @@
     "members": [
       "entry/DEEP_ITERATION_ENTRY.md",
       "core/00_RESULT_SOVEREIGNTY.md",
-      "core/05_TASK_COMMITMENT.md",
       "core/10_INVOCATION_AND_U0.md",
-      "core/11_PARAMETER_FORMAT_AND_RESOLUTION.md",
-      "core/12_PROTOCOL_AUTHORITY_AND_SELF_HOSTING.md",
-      "core/13_IMPLEMENTATION_EXECUTION_INTEGRITY.md",
-      "core/15_SEMANTIC_DEFAULT_COMPLETION.md",
       "core/20_EFFECTIVE_CONTRACT.md",
       "core/25_RUN_SESSION_AND_EXTERNAL_MEMORY.md",
-      "core/30_EVOLUTION_STATE_MEMORY.md",
-      "core/35_STRATEGY_AND_CANDIDATE_STATE.md",
       "core/40_NATIVE_EVOLUTION.md",
-      "core/50_SOURCE_EVOLUTION.md",
       "core/60_FORMAL_ACTIVE_TIME.md",
-      "core/70_REENTRY_AND_ABG.md",
-      "core/75_DISRUPTIVE_GAMBIT.md",
-      "core/77_ISOLATION_LEVELS.md",
       "core/80_STOP_AND_PROOF.md"
     ]
   },
@@ -396,14 +393,14 @@
     "archive_filename_template": "DIGR-RUNTIME-{SHA}.zip",
     "member_source": "deterministic_helpers_plus_execution_bundle",
     "runtime_index_path": "RUNTIME-INDEX.json",
-    "identity_verification": "exact_commit_sha_plus_pinned_git_tree_blob_identity_plus_protocol_bundle",
-    "preferred_path": "native_same_sha_file_to_executor_bridge",
+    "identity_verification": "single_pinned_verifier_plus_recursive_git_tree_plus_protocol_bundle",
+    "preferred_path": "pinned_runtime_package_verifier_plus_exact_commit_archive",
     "durable_fallback_path": "same_commit_github_prerelease_asset",
     "durable_release_tag_template": "digr-runtime-{SHA}",
     "durable_release_asset_template": "DIGR-RUNTIME-{SHA}.zip",
     "transient_fallback_path": "same_commit_github_actions_artifact",
     "runtime_index_schema": 2,
     "protocol_bundle_path": "bundle/EXECUTION_PROTOCOL.json",
-    "attestation_scope": "commit+manifest+VERSION+deterministic_helpers+execution_bundle"
+    "attestation_scope": "commit+git_tree+manifest+VERSION+deterministic_helpers+execution_bundle+bundle_members"
   }
 }

@@ -1,9 +1,9 @@
-# DIGR 5.0 Bootstrap — Repository Authority and Staged Startup
+# DIGR 5.0 Bootstrap — Alpha 10
 
-The local personalization is transport routing, not DIGR semantics. Resolve stable from real current repository evidence to one immutable SHA, bind manifest.json + VERSION as P_run, read bootstrap_index first, then startup_slice in order.
+Resolve current stable to one immutable SHA. Bind manifest.json + VERSION from that SHA, read bootstrap_index, then startup_slice.
 
-For EXECUTING Alpha 9, exact runtime delivery, package attestation and complete logical protocol verification all occur before Clock Genesis. The exact-commit runtime package may carry deterministic helpers plus the generated execution bundle; the bundle transports but never replaces entrypoint/core authority. A run is born only after those bytes are local and verified.
+For EXECUTING, use the Alpha 10 single-boundary package attestation before Genesis: one pinned verifier, one pinned recursive Git tree, one exact-commit runtime archive. The verifier proves the runtime package and compact execution bundle against Git blob identity.
 
-All authority reads remain pinned to the same SHA. Context, Memory, previous answers and P_target cannot redefine current-run protocol semantics.
+Do not expand this into per-helper fetch/interrogation unless the single-boundary verifier itself cannot be delivered or executed.
 
-Legacy manifests follow their own pinned startup rules.
+After Genesis, repository transport is not a normal task dependency. Context and P_target cannot redefine P_run.

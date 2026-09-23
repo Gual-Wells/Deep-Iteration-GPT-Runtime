@@ -50,7 +50,7 @@
       "const": "DIGR"
     },
     "version": {
-      "const": "5.0.0-alpha.9"
+      "const": "5.0.0-alpha.10"
     },
     "protocol": {
       "const": "digr-v5.0"
@@ -289,10 +289,10 @@
           "const": "RUNTIME-INDEX.json"
         },
         "identity_verification": {
-          "const": "exact_commit_sha_plus_pinned_git_tree_blob_identity_plus_protocol_bundle"
+          "const": "single_pinned_verifier_plus_recursive_git_tree_plus_protocol_bundle"
         },
         "preferred_path": {
-          "const": "native_same_sha_file_to_executor_bridge"
+          "const": "pinned_runtime_package_verifier_plus_exact_commit_archive"
         },
         "durable_fallback_path": {
           "const": "same_commit_github_prerelease_asset"
@@ -313,7 +313,7 @@
           "const": "bundle/EXECUTION_PROTOCOL.json"
         },
         "attestation_scope": {
-          "const": "commit+manifest+VERSION+deterministic_helpers+execution_bundle"
+          "const": "commit+git_tree+manifest+VERSION+deterministic_helpers+execution_bundle+bundle_members"
         }
       },
       "additionalProperties": false
