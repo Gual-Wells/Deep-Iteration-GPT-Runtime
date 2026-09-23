@@ -1,15 +1,17 @@
-# Two-stage Run Genesis
+# Contracted Run Genesis — Alpha 10
 
 Input: `DIGR（R=3）：检查并改进方案`
 
-Required order for the pinned Alpha 8 protocol:
+Required order:
 
-1. local route resolves `stable` → immutable SHA, reads pinned manifest/VERSION, then reads `manifest.bootstrap_index` first and continues the remaining manifest-declared startup slice;
-2. repository startup surface returns `EXECUTING`;
-3. >=3 compatible monotonic samples establish TaskStartupReceipt and clock-journal genesis;
-4. `LiveDIGRRun` exists in `GENESIS`;
-5. the remaining entry/core protocol is loaded from the **same SHA**;
-6. parameter resolution runs (R=3 here), then U0 and Effective Contract freeze;
-7. MAIN begins and Strategy Genesis performs the first substantive task work.
+1. resolve stable → immutable SHA and bind manifest/VERSION;
+2. read INDEX + startup slice;
+3. classify EXECUTING;
+4. obtain one pinned recursive Git tree, the pinned runtime-package verifier, and the exact-commit runtime archive;
+5. execute one package attestation covering helpers + compact protocol bundle + bundle members;
+6. construct ExecutingProtocolLoadReceipt;
+7. establish trusted monotonic readiness and create Genesis;
+8. resolve R=3 and defaults, freeze U0/contract;
+9. enter MAIN.
 
-If parameter resolution is ambiguous/invalid, the already-born run becomes `ABORTED` and task analysis never starts. If clock genesis fails, no executing run workspace/U0 is created.
+No execution-bundle acquisition remains after Genesis.

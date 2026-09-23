@@ -1,7 +1,9 @@
-# Omitted parameters and Source Presumption
+# Omitted parameters — Alpha 10
 
 `DIGR：分析一个复杂技术方案并给出结论`
 
-This is not an AUTO mode. Fixed public defaults are B=1 and b=1; D uses internal L1. Explicit B=0/b=0 opts into soft timing. Missing N/T/R/n/t/r/s are semantically completed under U0. Count/D values freeze as minima; T/t freeze as B/b-governed soft/hard lower-bound targets.
+Fixed defaults are B=0, b=0 and omitted D=0. Missing N/T/R are semantically completed to a sufficient non-degenerate minimum.
 
-Separately, normal DIGR execution presumes `SourceDisposition=REQUIRED`. Even if semantic completion yields zero numeric S minima, that does not mean “do no external research.” A waiver requires a real task/host reason such as an explicitly closed transformation or a prohibition on external material.
+SourceDisposition is decided from the task. If external evidence materially helps correctness it becomes REQUIRED and source minima are completed; otherwise it may be WAIVED with a concrete reason.
+
+This is not AUTO mode and the minima are not caps.

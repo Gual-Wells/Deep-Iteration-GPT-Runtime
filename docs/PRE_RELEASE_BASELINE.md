@@ -1,16 +1,17 @@
-# 5.0.0-alpha.9 Liveness-Convergence Baseline
+# 5.0.0-alpha.10 Liveness-Contraction Baseline
 
-Alpha 9 preserves immutable P_run/U0/contract authority, exact implementation identity, native Strategy/Candidate/Source/D intelligence, evidence-backed actuals and durable FINISH while correcting the long-run failure amplification accumulated across Alpha 5–8.
+Alpha 10 is a contraction pass over Alpha 9. It does not add another supervisory layer.
 
-The release converges the runtime around four liveness rules:
+Normal-path rules:
 
-- all mandatory runtime delivery and complete protocol verification finish before Genesis;
-- a born run has no mandatory repository/bundle transport dependency remaining;
-- clock continuity may roll to a new trusted epoch, losing only unverifiable bridge time rather than the run;
-- rebuildable run-brief/latest cache work is checkpointed instead of synchronously paid on every semantic event.
+1. one package attestation before Genesis, not per-helper verification;
+2. seven compact authority modules, not eighteen;
+3. source work only when task necessity justifies it;
+4. omitted D=0 and compact D persistence by default;
+5. append/revision persistence without global checkpoint on every state change;
+6. ordinary resume = repair + batched journal reindex + single store load + clock resume;
+7. full revision-tree repair/audit only after detected inconsistency or explicit audit.
 
-B/b fixed defaults return to 0 so semantic T/t completion is soft unless the user explicitly requests hard timing with B=1/b=1.
+The retained strict invariants are P_run/U0/contract identity, exact package identity, current-result R/r, evidence/state bindings, explicit hard timing, D reintegration and irreversible FINISH.
 
-Safety rules remain strict: P_target cannot rebind P_run, implementation substitution is forbidden when exact runtime exists, revision-backed R/r cannot move backward, D uses internal L1, source requirements remain explicit, and FINISH cannot reopen.
-
-No new supervisory reasoning layer or long-lived degraded execution mode is introduced.
+This release should be evaluated primarily on whether long, tool-using DIGR runs now reach delivery without reliability machinery consuming the task budget.

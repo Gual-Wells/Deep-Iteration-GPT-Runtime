@@ -1,5 +1,21 @@
 # Changelog
 
+## 5.0.0-alpha.10 — liveness contraction
+
+Alpha 10 responds to repeated real runs failing to reach delivery even after Alpha 9 fixed the most direct transport/clock failure modes.
+
+- Contracted execution authority from 18 core modules to 7.
+- Added one standalone runtime-package verifier that checks the whole archive and execution-bundle members against one pinned recursive Git tree.
+- Ordinary resume no longer performs full recovery + full workspace verification before loading state.
+- Journal artifact-index refresh is batched.
+- STATE and WorkLease no longer force global checkpoint.
+- Rebuildable latest pointers/run-brief leave the global artifact-index hot path.
+- Omitted D now defaults to 0; explicit D() remains semantic.
+- SourceDisposition is a task-necessity decision instead of blanket REQUIRED.
+- Added compact completed-D persistence to avoid multi-revision ceremony for ordinary interventions.
+- Full audit/granular histories remain anomaly/explicit paths.
+
+
 ## 5.0.0-alpha.9 — liveness convergence
 
 Alpha 9 addresses the systemic long-run liveness regression exposed by real DIGR runs.
