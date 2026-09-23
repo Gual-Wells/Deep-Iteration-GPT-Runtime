@@ -315,6 +315,12 @@ class LiveDIGRRun:
         require_nonnegative_int('candidate_before',candidate_before);before=self.candidates.get(candidate_before);c,s,_=self._event_context(WorkState.MAIN)
         current=self.candidates.current
         if current is None:raise RuntimeError('MAIN re-entry requires a current candidate')
+        prior=[e for e in self.events.events if e.kind is EvolutionKind.MAIN_REENTRY]
+        if prior:
+            last=prior[-1]
+            floor=last.candidate_after_revision if not last.retained else last.candidate_revision
+            if floor is not None and before.revision<floor:
+                raise ValueError('MAIN re-entry cannot move backward to a superseded candidate')
         if retained:
             if before.revision!=current.revision:raise ValueError('retained MAIN re-entry must challenge the current candidate')
             if candidate_after is not None and candidate_after!=candidate_before:raise ValueError('retained re-entry cannot name a different candidate_after')
@@ -332,6 +338,12 @@ class LiveDIGRRun:
         require_nonnegative_int('source_before_revision',source_before_revision);before=self.sources.get(source_id,source_before_revision)
         c,s,candidate_context=self._event_context(WorkState.SOURCE);self._require_source_active(source_id,c)
         current=self.sources.latest(source_id)
+        prior=[e for e in self.events.events if e.kind is EvolutionKind.SOURCE_REENTRY and e.source_id==source_id]
+        if prior:
+            last=prior[-1]
+            floor=last.source_after_revision if not last.retained else last.source_revision
+            if floor is not None and before.revision<floor:
+                raise ValueError('source re-entry cannot move backward to a superseded source revision')
         if retained:
             if before.revision!=current.revision:raise ValueError('retained source re-entry must challenge the current source revision')
             if source_after_revision is not None and source_after_revision!=source_before_revision:raise ValueError('retained source re-entry cannot name a different source_after_revision')
