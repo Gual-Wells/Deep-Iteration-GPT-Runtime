@@ -291,14 +291,14 @@ class LiveDIGRRun:
     def record_main_evolution(self,summary,action,result,*,evidence_refs=()):
         c,s,r=self._event_context(WorkState.MAIN)
         e=self.events._append(EvolutionKind.MAIN_EVOLUTION,'MAIN',summary,action,result,evidence_refs=evidence_refs,clock_event_ref=c,strategy_revision=s,candidate_revision=r)
-        self.checkpoint();return e
+        return e
 
     def record_source_evolution(self,source_id,summary,action,result,*,evidence_refs=()):
         if not self.sources.exists(source_id):raise ValueError('unknown source workspace')
         c,s,r=self._event_context(WorkState.SOURCE);self._require_source_active(source_id,c)
         source_rev=self.sources.latest(source_id).revision
         e=self.events._append(EvolutionKind.SOURCE_EVOLUTION,f'S:{source_id}',summary,action,result,evidence_refs=evidence_refs,clock_event_ref=c,strategy_revision=s,candidate_revision=r,source_id=source_id,source_revision=source_rev)
-        self.checkpoint();return e
+        return e
 
     def record_main_reentry(self,candidate_before:int,challenge,action,outcome,*,candidate_after:int|None=None,retained:bool=False,evidence_refs=()):
         require_nonnegative_int('candidate_before',candidate_before);before=self.candidates.get(candidate_before);c,s,_=self._event_context(WorkState.MAIN)
@@ -320,7 +320,7 @@ class LiveDIGRRun:
             if after.revision!=current.revision:raise ValueError('candidate_after must be the current candidate')
             if after.revision<=before.revision:raise ValueError('candidate_after must be newer')
         e=self.events._append(EvolutionKind.MAIN_REENTRY,'MAIN',challenge,action,outcome,evidence_refs=evidence_refs,clock_event_ref=c,strategy_revision=s,candidate_revision=before.revision,candidate_after_revision=after.revision if after else None,retained=retained)
-        self.checkpoint();return e
+        return e
 
     def record_source_reentry(self,source_id,source_before_revision:int,challenge,action,outcome,*,source_after_revision:int|None=None,retained:bool=False,evidence_refs=()):
         if not self.sources.exists(source_id):raise ValueError('unknown source workspace')
@@ -343,7 +343,7 @@ class LiveDIGRRun:
             if after.revision!=current.revision:raise ValueError('source_after_revision must be the current source revision')
             if after.revision<=before.revision:raise ValueError('source_after_revision must be newer')
         e=self.events._append(EvolutionKind.SOURCE_REENTRY,f'S:{source_id}',challenge,action,outcome,evidence_refs=evidence_refs,clock_event_ref=c,strategy_revision=s,candidate_revision=candidate_context,source_id=source_id,source_revision=before.revision,source_after_revision=after.revision if after else None,retained=retained)
-        self.checkpoint();return e
+        return e
 
     def write_d_packet(self,packet_id:str,direction:str,payload:Any)->str:
         if self.phase.phase is not RunPhase.EXECUTING or not self.strategy.has_state:
@@ -355,7 +355,7 @@ class LiveDIGRRun:
         if self.workspace.path(rel).exists():
             raise ValueError('D packet artifacts are immutable; duplicate packet_id')
         self.workspace.write_json(rel,{'schema_version':1,'packet_id':packet_id,'direction':direction,'payload':payload},kind=f'd-{direction}-packet')
-        self.refresh_brief();return rel
+        return rel
 
     def add_isolation_facts(self,receipt_id:str,facts:IsolationFacts,*,input_packet_ref=None,output_packet_ref=None,mode='exclusive'):
         if self.contract is None or self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('isolation receipt requires an executing contracted run')
