@@ -105,6 +105,7 @@ runtime/run_brief.py
 runtime/run_lifecycle.py
 runtime/run_recovery.py
 runtime/run_session.py
+runtime/runtime_package.py
 runtime/source_workspace.py
 runtime/state_checks.py
 runtime/stop_checks.py
