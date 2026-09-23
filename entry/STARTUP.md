@@ -9,8 +9,8 @@ Alpha 10 treats startup as one coarse trust boundary, not a chain of per-helper 
    - bridge the exact pinned `runtime/runtime_package.py` verifier;
    - obtain the exact-commit runtime archive;
    - execute the verifier once. It verifies manifest, VERSION, every deterministic helper, the execution bundle, and every bundle member against the pinned Git tree.
-4. Read the already-attested execution bundle and construct ExecutingProtocolLoadReceipt. The authoritative logical set is manifest.entrypoint + manifest.core[].
-5. Bind the verified package to the executor once. Do not repeat component interrogation or per-helper identity fetches inside the same binding.
+4. The same verifier returns a protocol-load payload already derived from the attested bundle; instantiate ExecutingProtocolLoadReceipt from that payload without re-verifying the bundle. The authoritative logical set is manifest.entrypoint + manifest.core[].
+5. Bind the verified package to the executor once. Do not repeat component interrogation, per-helper identity fetches, or a second bundle-verification pass inside the same binding.
 6. Establish trusted monotonic readiness and create Run Genesis.
 7. Resolve parameters, freeze U0 and Effective Contract, enter MAIN.
 

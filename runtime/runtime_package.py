@@ -47,6 +47,7 @@ class RuntimePackageAttestationReceipt:
     protocol_member_count:int
     manifest_sha256:str
     protocol_bundle_sha256:str
+    protocol_load:dict[str,Any]
     def to_dict(self): return asdict(self)
 
 def attest_runtime_package(archive:Path,*,expected_commit_sha:str,git_tree:Mapping[str,Any])->RuntimePackageAttestationReceipt:
@@ -104,9 +105,25 @@ def attest_runtime_package(archive:Path,*,expected_commit_sha:str,git_tree:Mappi
 
     expected_names=set(helpers)|{'RUNTIME-INDEX.json','manifest.json','VERSION',bundle_path}
     if set(payload)!=expected_names: raise ValueError('runtime archive contains unexpected or missing members')
+    manifest_digest=sha256(manifest_bytes).hexdigest()
+    bundle_digest=sha256(payload[bundle_path]).hexdigest()
+    protocol_load={
+        'schema_version':1,
+        'commit_sha':expected_commit_sha,
+        'manifest_sha256':manifest_digest,
+        'version':version,
+        'protocol':manifest['protocol'],
+        'source_mode':'bundle',
+        'container_path':bundle_path,
+        'container_sha256':bundle_digest,
+        'members':[
+            {'path':_safe(item['path']),'sha256':item['sha256'],'byte_length':item['byte_length']}
+            for item in raw_members
+        ],
+    }
     return RuntimePackageAttestationReceipt(
         1,expected_commit_sha,sha256(raw_archive).hexdigest(),version,manifest['protocol'],
-        len(helpers),len(expected),sha256(manifest_bytes).hexdigest(),sha256(payload[bundle_path]).hexdigest()
+        len(helpers),len(expected),manifest_digest,bundle_digest,protocol_load
     )
 
 def main()->int:
