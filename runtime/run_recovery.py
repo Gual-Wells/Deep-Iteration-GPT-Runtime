@@ -32,7 +32,7 @@ def _load_contract(d: dict) -> EffectiveContract:
     return EffectiveContract(
         d['N'],d['T_seconds'],d['R'],d['B'],
         SourceContract(s['n'],s['t_seconds'],s['r'],s['b']),
-        d['D_s'],SourceDisposition(d.get('source_disposition','REQUIRED')),
+        d['D_s'],SourceDisposition(d['source_disposition']),
         d.get('source_waiver_reason'),
     )
 

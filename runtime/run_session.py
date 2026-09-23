@@ -65,7 +65,7 @@ def _load_snapshot(d)->ClockSnapshot:return ClockSnapshot(d['provider'],d['sessi
 def _load_startup(d)->TaskStartupReceipt:
     return TaskStartupReceipt(_load_authority(d['authority']),_load_invocation(d['invocation']),ClockReadiness(tuple(_load_snapshot(x) for x in d['clock']['samples'])),False)
 def _load_contract(d)->EffectiveContract:
-    s=d['S'];return EffectiveContract(d['N'],d['T_seconds'],d['R'],d['B'],SourceContract(s['n'],s['t_seconds'],s['r'],s['b']),d['D_s'],SourceDisposition(d.get('source_disposition','REQUIRED')),d.get('source_waiver_reason'))
+    s=d['S'];return EffectiveContract(d['N'],d['T_seconds'],d['R'],d['B'],SourceContract(s['n'],s['t_seconds'],s['r'],s['b']),d['D_s'],SourceDisposition(d['source_disposition']),d.get('source_waiver_reason'))
 
 class LiveDIGRRun:
     def __init__(self,run_id,startup,workspace,journal,snapshot_fn,*,restoring=False,protocol_load=None):
@@ -188,10 +188,10 @@ class LiveDIGRRun:
         self._reindex_journals();self.workspace.compact_artifact_index();return self.refresh_brief()
 
     def bind_protocol_load(self,receipt:ExecutingProtocolLoadReceipt)->ExecutingProtocolLoadReceipt:
-        raise RuntimeError('Alpha 9 requires full protocol verification before Genesis; post-genesis bind is forbidden')
+        raise RuntimeError('Alpha 10 requires package/protocol readiness before Genesis; post-genesis bind is forbidden')
 
     def abort_protocol_load(self,reason:str):
-        raise RuntimeError('Alpha 9 has no born run with an unresolved protocol load')
+        raise RuntimeError('Alpha 10 has no born run with an unresolved protocol load')
 
     def resolve_parameters(self,semantic_normalizations=None)->ParameterResolution:
         if self.phase.phase is not RunPhase.GENESIS:raise RuntimeError('parameter resolution only allowed at GENESIS')
