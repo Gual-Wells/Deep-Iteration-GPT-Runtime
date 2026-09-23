@@ -1,4 +1,4 @@
-"""Revisioned Disruptive Gambit intervention sessions for DIGR 5.0 Alpha 8.
+"""Revisioned Disruptive Gambit intervention sessions for DIGR 5.0 Alpha 10.
 
 The store persists D history and isolation linkage. It does not choose a gambit
 or evaluate its intellectual merit; the native model owns those decisions.
@@ -262,6 +262,38 @@ class DInterventionStore:
         old = self.latest(intervention_id)
         self._require_active(old)
         return self._save(DIntervention(intervention_id, old.state_revision + 1, old.isolation_receipt_id, old.proposals, old.decree, old.execution_events, old.results, old.reintegration, 'ABORTED', reason))
+
+    def complete_compact(self, intervention_id: str, isolation_receipt_id: str, *,
+                         proposal: str, proposal_reason: str, decree: str,
+                         execution_summary: str, execution_clock_event_ref: str,
+                         result_summary: str, result_clock_event_ref: str,
+                         reintegration: ReintegrationReceipt,
+                         execution_evidence_refs: Iterable[str] = (),
+                         result_evidence_refs: Iterable[str] = (),
+                         output_packet_ref: str | None = None) -> DIntervention:
+        """Persist one already-completed D lifecycle as one immutable revision.
+
+        Native reasoning may still revise the gambit in memory before commitment.
+        Granular proposal/decree/result revisions remain available when their
+        intermediate persistence is materially useful, but are not the default
+        tax for an ordinary completed intervention.
+        """
+        if intervention_id in self._hist:
+            raise ValueError('duplicate intervention_id')
+        receipt=self._isolations.get(isolation_receipt_id)
+        if receipt is None or receipt.L_actual is None:
+            raise ValueError('compact D requires a persisted usable isolation receipt')
+        if not isinstance(reintegration,ReintegrationReceipt):
+            raise TypeError('reintegration must be ReintegrationReceipt')
+        item=DIntervention(
+            intervention_id,0,isolation_receipt_id,
+            (ProposalRevision(0,proposal,proposal_reason),),
+            Decree(0,decree),
+            (ExecutionEvent(0,execution_summary,tuple(execution_evidence_refs),execution_clock_event_ref),),
+            (ResultRevision(0,result_summary,tuple(result_evidence_refs),output_packet_ref,result_clock_event_ref),),
+            reintegration,'COMPLETED'
+        )
+        return self._save(item)
 
     def latest(self, intervention_id: str) -> DIntervention:
         return self._hist[intervention_id][-1]

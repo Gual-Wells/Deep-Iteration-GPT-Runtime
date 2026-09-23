@@ -1,4 +1,4 @@
-"""Comprehensive DIGR 5.0 Alpha 9 workspace integrity/recovery verification.
+"""Comprehensive DIGR 5.0 Alpha 10 workspace integrity/recovery verification.
 
 Verification proves persisted structure and cross-store bindings.  It deliberately
 separates *workspace integrity* from *future clock continuity*: LiveDIGRRun.resume
@@ -79,8 +79,34 @@ def _json_equal(ws: RunWorkspace, rel: str, value: dict) -> bool:
     return p.is_file() and ws.read_json(rel)==value
 
 
+def recover_run_workspace_fast(root: Path, run_id: str) -> dict:
+    """Cheap ordinary-resume preparation.
+
+    Normal continuation repairs only an interrupted transactional write and
+    reindexes the three self-verifying append-only journals.  It deliberately
+    does not scan revision history or rebuild every derived pointer.
+    """
+    run_id=validate_run_id(run_id)
+    ws=RunWorkspace.open_existing(root,run_id)
+    actions=[]
+    outcome=ws.recover_pending_write()
+    if outcome is not None:
+        actions.append(f'workspace-write:{outcome}')
+    journal_specs=(
+        ('time/clock.journal.ndjson','clock-journal',lambda p: ClockJournal.load(run_id,p).verify(False)),
+        ('time/source-activity.ndjson','source-activity',lambda p: SourceActivityLog.load(p).verify()),
+        ('events.ndjson','event-log',lambda p: EvolutionEventLog.load(p).verify()),
+    )
+    for rel,kind,verify in journal_specs:
+        p=ws.path(rel)
+        if p.is_file():
+            verify(p)
+            ws.index_existing(rel,kind=kind)
+            actions.append(f'reindexed:{rel}')
+    return {'run_id':run_id,'recovery_actions':tuple(actions),'mode':'fast'}
+
 def recover_run_workspace(root: Path, run_id: str) -> dict:
-    """Repair only mechanically reconstructible crash residue, never semantic facts."""
+    """Full anomaly/crash repair, never the ordinary resume fast path."""
     run_id=validate_run_id(run_id)
     ws=RunWorkspace.open_existing(root,run_id)
     actions=[]
@@ -177,7 +203,7 @@ def recover_run_workspace(root: Path, run_id: str) -> dict:
         ws.write_json('state/completion.json',expected,kind='completion',revision=revision)
         actions.append('rebuilt:state/completion.json')
 
-    return {'run_id':run_id,'recovery_actions':tuple(actions)}
+    return {'run_id':run_id,'recovery_actions':tuple(actions),'mode':'full'}
 
 def verify_run_workspace(root: Path, run_id: str) -> dict:
     run_id=validate_run_id(run_id)

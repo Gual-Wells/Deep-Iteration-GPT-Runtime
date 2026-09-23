@@ -1,4 +1,4 @@
-"""DIGR 5.0 Alpha 9 Native Assist run session.
+"""DIGR 5.0 Alpha 10 liveness-contracted run session.
 
 The session is a reliability exoskeleton. It freezes authority/U0/minimum
 commitments and binds timing/evidence/state, while leaving task strategy and
@@ -87,7 +87,7 @@ class LiveDIGRRun:
     @classmethod
     def start(cls,authority:ProtocolAuthority,message:str,workspace_parent:Path|None=None,snapshot_fn:Callable[[],ClockSnapshot]=snapshot,run_id:str|None=None,*,protocol_load:ExecutingProtocolLoadReceipt|None=None):
         surface=classify_surface(message)
-        if surface is None or surface.kind is not InvocationKind.EXECUTING:raise RunGenesisError('SURFACE','message is not an executing DIGR 5.0 Alpha 9 invocation')
+        if surface is None or surface.kind is not InvocationKind.EXECUTING:raise RunGenesisError('SURFACE','message is not an executing DIGR 5.0 Alpha 10 invocation')
         if not isinstance(protocol_load,ExecutingProtocolLoadReceipt):raise RunGenesisError('PROTOCOL_PREP','verified full execution protocol must be ready before Genesis')
         ident=authority.P_run
         if (protocol_load.commit_sha!=ident.commit_sha or protocol_load.version!=ident.version or protocol_load.protocol!=ident.protocol or protocol_load.manifest_sha256!=authority.route.manifest_sha256): raise RunGenesisError('PROTOCOL_PREP','pre-genesis protocol receipt does not match P_run/manifest')
@@ -104,14 +104,31 @@ class LiveDIGRRun:
 
     @classmethod
     def resume(cls,root:Path,run_id:str,snapshot_fn:Callable[[],ClockSnapshot]=snapshot):
-        from .run_recovery import recover_run_workspace,verify_run_workspace
-        recover_run_workspace(root,run_id)
-        report=verify_run_workspace(root,run_id)
-        ws=RunWorkspace.open_existing(Path(root).resolve(),run_id);phase=RunPhaseStore.load(ws)
-        if phase.phase in (RunPhase.FINISHED,RunPhase.ABORTED):raise RunResumeError(f'cannot resume terminal run: {phase.phase.value}')
-        startup=_load_startup(ws.read_json('startup.json'));journal=ClockJournal.load(run_id,ws.path('time/clock.journal.ndjson'))
-        # Load/validate every semantic store before mutating the append-only clock journal.
-        obj=cls(run_id,startup,ws,journal,snapshot_fn,restoring=True)
+        from .run_recovery import recover_run_workspace_fast,recover_run_workspace,verify_run_workspace
+        root=Path(root).resolve()
+        recover_run_workspace_fast(root,run_id)
+        ws=RunWorkspace.open_existing(root,run_id)
+        try:
+            phase=RunPhaseStore.load(ws)
+            if phase.phase in (RunPhase.FINISHED,RunPhase.ABORTED):raise RunResumeError(f'cannot resume terminal run: {phase.phase.value}')
+            startup=_load_startup(ws.read_json('startup.json'))
+            journal=ClockJournal.load(run_id,ws.path('time/clock.journal.ndjson'))
+            # Ordinary resume validates each store once.  A full workspace audit
+            # is reserved for detected anomaly/recovery and explicit audit.
+            obj=cls(run_id,startup,ws,journal,snapshot_fn,restoring=True)
+        except RunResumeError:
+            raise
+        except (ValueError,KeyError,IndexError,FileNotFoundError,RuntimeError) as fast_exc:
+            recover_run_workspace(root,run_id)
+            try:
+                verify_run_workspace(root,run_id)
+                phase=RunPhaseStore.load(ws)
+                if phase.phase in (RunPhase.FINISHED,RunPhase.ABORTED):raise RunResumeError(f'cannot resume terminal run: {phase.phase.value}')
+                startup=_load_startup(ws.read_json('startup.json'))
+                journal=ClockJournal.load(run_id,ws.path('time/clock.journal.ndjson'))
+                obj=cls(run_id,startup,ws,journal,snapshot_fn,restoring=True)
+            except Exception as exc:
+                raise RunResumeError(f'fast resume failed ({fast_exc}); full recovery failed ({exc})') from exc
         if ws.path('parameter-resolution.json').is_file():obj.parameters=ParameterResolution.from_dict(ws.read_json('parameter-resolution.json'))
         if ws.path('U0.json').is_file():obj.U0=U0Receipt.from_dict(ws.read_json('U0.json'))
         if ws.path('contract.json').is_file():obj.contract=_load_contract(ws.read_json('contract.json'))
@@ -248,7 +265,7 @@ class LiveDIGRRun:
         elif ids:raise ValueError('active_source_ids only valid for SOURCE')
         self.ledger.transition(state,at);ev=self.clock_journal.append('STATE',at,state)
         if state is WorkState.SOURCE:self.source_activity.append(ev.record_hash,ids)
-        self.checkpoint()
+        # Alpha 10: STATE append is already durable; do not pay a global checkpoint here.
 
     def open_work_lease(self,at:ClockSnapshot):
         """Persist permission for current formal work to cross one host/process boundary."""
@@ -269,7 +286,9 @@ class LiveDIGRRun:
         self.ledger.mark(at)
         ev=self.clock_journal.append('WORK_LEASE_OPEN',at,state)
         if state is WorkState.SOURCE:self.source_activity.append(ev.record_hash,source_ids)
-        self.checkpoint();return ev
+        # The lease journal record is fsynced.  Full cache/index checkpointing is not
+        # required merely because the model is about to cross a host/tool boundary.
+        return ev
 
     def _event_context(self, expected_state: WorkState):
         if self.phase.phase is not RunPhase.EXECUTING:
