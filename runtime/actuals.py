@@ -1,4 +1,4 @@
-"""Derive DIGR 5.0 Alpha 8 mechanical actuals from bound run facts."""
+"""Derive DIGR 5.0 Alpha 9 mechanical actuals from bound run facts."""
 from __future__ import annotations
 from dataclasses import dataclass
 from .clock_journal import ClockJournal,derive_work_timeline
@@ -62,6 +62,9 @@ def _verify_ledger_journal_parity(ledger:FormalTimeLedger,journal:ClockJournal)-
     lg=[(x.state,x.start.monotonic_ns,x.end.monotonic_ns,x.observed_ns,x.hard_verified) for x in ledger.coverage_gaps]
     rg=[(x.state,x.start.monotonic_ns,x.end.monotonic_ns,x.observed_ns,x.hard_verified) for x in t.gaps]
     if lg!=rg:raise ValueError('formal ledger / clock journal coverage-gap drift')
+    lc=[(x.state,x.before.session_id,x.before.monotonic_ns,x.after.session_id,x.after.monotonic_ns) for x in ledger.continuity_gaps]
+    rc=[(x.state,x.before.session_id,x.before.monotonic_ns,x.after.session_id,x.after.monotonic_ns) for x in t.continuity_gaps]
+    if lc!=rc:raise ValueError('formal ledger / clock journal continuity-gap drift')
     if ledger.foreground_state is not t.open_state:
         raise ValueError('formal ledger / clock journal open-state drift')
 
