@@ -46,6 +46,7 @@
     "evidence/index.json": "schemas/evidence-index.schema.json",
     "state/gaps/*-r*.json": "schemas/completion-gap.schema.json",
     "state/completion.json": "schemas/completion-state.schema.json",
-    "final/run-summary.json": "schemas/run-summary.schema.json"
+    "final/run-summary.json": "schemas/run-summary.schema.json",
+    "state/artifact-index.wal.ndjson": "schemas/artifact-index-delta.schema.json"
   }
 }
