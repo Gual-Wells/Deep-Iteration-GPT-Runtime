@@ -1,4 +1,4 @@
-"""Trusted monotonic-clock facts for DIGR 5.0.0-alpha.8.
+"""Trusted monotonic-clock facts for DIGR 5.0.0-alpha.9.
 
 Two notions are intentionally separated:
 
@@ -7,8 +7,7 @@ Two notions are intentionally separated:
 
 Every executing DIGR 5.0 task must establish repository-defined task-clock readiness
 after invocation classification and before U0/substantive work. Soft T/t may then report honest observed duration.
-Hard T/t may only claim a number when continuity is additionally verified
-across the formal intervals used for the claim.
+Hard T/t may claim only the sum of individually hard-verifiable counted intervals. Later trusted epochs may differ; the discontinuity receives no credit and does not invalidate earlier verified intervals.
 """
 from __future__ import annotations
 from dataclasses import dataclass, asdict
