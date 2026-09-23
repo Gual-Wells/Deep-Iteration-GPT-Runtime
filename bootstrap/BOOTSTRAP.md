@@ -1,9 +1,9 @@
 # DIGR 5.0 Bootstrap — Repository Authority and Staged Startup
 
-The local personalization is a transport router, not a copy of DIGR semantics. This pinned bootstrap assumes the current candidate already produced real repository-acquisition evidence; no-attempt is not route failure. Each candidate route resolves `stable` to one immutable 40-hex commit, binds `manifest.json` and `VERSION`, and treats that pinned repository version as `P_run`.
+The local personalization is transport routing, not DIGR semantics. Resolve stable from real current repository evidence to one immutable SHA, bind manifest.json + VERSION as P_run, read bootstrap_index first, then startup_slice in order.
 
-For manifests declaring `bootstrap_index`, acquire that pinned index **first** after manifest/VERSION verification. It is a structural transparency map: it identifies implemented repository objects, truth sources and the runtime/native-intelligence boundary without defining versioned execution semantics. Then continue the ordered `startup_slice`. For this Alpha 8 commit the slice is `bootstrap/INDEX.md` → `bootstrap/BOOTSTRAP.md` → `entry/STARTUP.md`. Do not pre-load the full core before deciding NATIVE/HELP/INVALID/EXECUTING. For EXECUTING, the manifest may declare one deterministic `execution_bundle` that transports the logical entrypoint/core after Clock Genesis without changing their semantic authority.
+For EXECUTING Alpha 9, exact runtime delivery, package attestation and complete logical protocol verification all occur before Clock Genesis. The exact-commit runtime package may carry deterministic helpers plus the generated execution bundle; the bundle transports but never replaces entrypoint/core authority. A run is born only after those bytes are local and verified.
 
-All reads after pinning use the same SHA. Context, Memory, previous answers and a target version (`P_target`) may inform task content only after the pinned protocol permits it; `P_target` cannot redefine DIGR semantics or rebind the current `P_run`.
+All authority reads remain pinned to the same SHA. Context, Memory, previous answers and P_target cannot redefine current-run protocol semantics.
 
-Legacy pinned manifests without `startup_slice` follow their own declared navigation and are not retrofitted with Alpha 8 startup semantics.
+Legacy manifests follow their own pinned startup rules.
