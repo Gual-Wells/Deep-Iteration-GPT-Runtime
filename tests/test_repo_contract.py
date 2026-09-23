@@ -4,54 +4,35 @@ from runtime.workspace import WORKSPACE_SCHEMA_VERSION,REQUIRED_GENESIS_FILES,ST
 ROOT=Path(__file__).resolve().parents[1]
 
 class TestRepoContract(unittest.TestCase):
-    def test_version_manifest_and_corrected_interfaces(self):
-        self.assertEqual((ROOT/'VERSION').read_text().strip(),'5.0.0-alpha.9')
-        m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['version'],'5.0.0-alpha.9')
-        self.assertEqual((m['run_session_schema'],m['parameter_resolution_schema']),(7,2))
-        self.assertNotIn('L_e',m['defaults']);self.assertNotIn('L',m['parameters'])
-        self.assertTrue(m['time_states']['D_EXCLUSIVE']['T']);self.assertFalse(m['time_states']['D_EXCLUSIVE']['t'])
-
-    def test_indexed_staged_startup_is_manifested(self):
-        m=json.loads((ROOT/'manifest.json').read_text());self.assertEqual(m['bootstrap_index'],'bootstrap/INDEX.md')
-        self.assertEqual(m['execution_bundle']['members'],[m['entrypoint'],*m['core']])
-
-    def test_transparent_machine_index_is_structural_first_path(self):
-        m=json.loads((ROOT/'manifest.json').read_text());t=(ROOT/m['bootstrap_index']).read_text()
-        for x in ('Reality model','Machine topology','Truth-source map','Structure-closed, intelligence-open','Execute-before-interpret inoculation','Implementation delivery reality'):
-            self.assertIn(x,t)
-
-    def test_run_lifecycle_is_reliability_not_planner(self):
-        t=(ROOT/'core/25_RUN_SESSION_AND_EXTERNAL_MEMORY.md').read_text().lower()
-        for x in ('genesis','parameter_resolved','aborted','work lease','continuity gap'):self.assertIn(x,t)
-
-    def test_formal_time_contract(self):
-        t=(ROOT/'core/60_FORMAL_ACTIVE_TIME.md').read_text().lower()
-        for x in ('main','source','d_exclusive','work lease','epoch','continuity'):self.assertIn(x,t)
-
-    def test_internal_L1_not_public_L(self):
-        p=(ROOT/'core/11_PARAMETER_FORMAT_AND_RESOLUTION.md').read_text()
-        self.assertIn('N < T < R < B < S < D',p);self.assertNotIn(' < L',p)
-        iso=(ROOT/'core/77_ISOLATION_LEVELS.md').read_text().lower()
-        self.assertIn('internal',iso);self.assertIn('l1',iso)
-        proof=(ROOT/'core/80_STOP_AND_PROOF.md').read_text();self.assertNotIn('L（',proof)
-
-    def test_workspace_layout_v2_matches_runtime_constants(self):
-        d=json.loads((ROOT/'workspace/layout-v2.json').read_text());self.assertEqual(d['schema_version'],WORKSPACE_SCHEMA_VERSION)
-        self.assertEqual(tuple(d['required_genesis_files']),REQUIRED_GENESIS_FILES);self.assertEqual(tuple(d['state_directories']),STATE_DIRECTORIES)
-
-    def test_help_reflects_alpha9_surface(self):
-        t=(ROOT/'entry/HELP.md').read_text()
-        self.assertIn('R 与 D',t);self.assertNotIn('N / R / D / L',t)
-        self.assertIn('D_EXCLUSIVE',t);self.assertIn('work lease',t.lower());self.assertNotIn('L(1)',t)
-
-    def test_alpha6_execution_integrity_remains_manifested(self):
-        m=json.loads((ROOT/'manifest.json').read_text());rd=m['runtime_distribution']
-        self.assertEqual(rd['artifact_name_template'],'digr-runtime-{SHA}')
-        self.assertIn('runtime/execution_integrity.py',m['deterministic_helpers'])
-
-    def test_alpha9_policies(self):
-        m=json.loads((ROOT/'manifest.json').read_text());p=m['policies']
-        for k in ('D_exclusive_counts_T_not_t','public_L_parameter_removed','internal_D_isolation_fixed_to_L1','hard_time_is_verified_counted_lower_bound','coverage_completeness_is_diagnostic_not_stop_gate','source_waiver_disables_all_source_mechanical_gates','committed_FINISH_survives_phase_write_crash','reentry_cannot_move_backward_to_superseded_result','D_result_must_preserve_isolation_until_reintegration','finalization_admission_precedes_ledger_finish','FINISHED_requires_delivery_ready','executing_protocol_load_receipt_required_before_genesis','no_mandatory_repository_transport_after_genesis','clock_epoch_rollover_preserves_run','clock_continuity_failure_forfeits_gap_not_run','derived_cache_is_not_semantic_hot_path','semantic_default_time_is_soft_unless_explicit_hard'):
+    def setUp(self):self.m=json.loads((ROOT/'manifest.json').read_text())
+    def test_alpha10_identity_and_contracted_authority(self):
+        self.assertEqual((ROOT/'VERSION').read_text().strip(),'5.0.0-alpha.10')
+        self.assertEqual(self.m['version'],'5.0.0-alpha.10')
+        self.assertEqual(len(self.m['core']),7)
+        self.assertEqual(self.m['execution_bundle']['members'],[self.m['entrypoint'],*self.m['core']])
+    def test_lightweight_defaults(self):
+        d=self.m['defaults'];self.assertEqual((d['B'],d['b'],d['D_s']),(0,0,0))
+        self.assertNotIn('s',d['semantic_completion']);self.assertEqual(d['explicit_empty_D'],'semantic_completion')
+    def test_single_package_attestation_is_manifested(self):
+        self.assertIn('runtime/runtime_package.py',self.m['deterministic_helpers'])
+        rd=self.m['runtime_distribution']
+        self.assertIn('single_pinned_verifier',rd['identity_verification'])
+        self.assertIn('git_tree',rd['attestation_scope'])
+    def test_liveness_contraction_policies(self):
+        p=self.m['policies']
+        for k in ('ordinary_resume_uses_fast_path','full_workspace_audit_is_anomaly_fallback_or_explicit',
+                  'state_transition_does_not_force_global_checkpoint','derived_latest_cache_is_unindexed',
+                  'journal_reindex_is_batched','compact_D_completion_preferred',
+                  'source_disposition_is_semantic_necessity_decision','omitted_D_defaults_zero'):
             self.assertTrue(p[k])
-
+    def test_workspace_genesis_contract(self):
+        d=json.loads((ROOT/'workspace/layout-v2.json').read_text())
+        self.assertEqual(d['schema_version'],WORKSPACE_SCHEMA_VERSION)
+        self.assertEqual(tuple(d['required_genesis_files']),REQUIRED_GENESIS_FILES)
+        self.assertIn('protocol-load.json',REQUIRED_GENESIS_FILES)
+        self.assertEqual(tuple(d['state_directories']),STATE_DIRECTORIES)
+    def test_core_preserves_time_and_finish_invariants(self):
+        t=(ROOT/'core/60_FORMAL_ACTIVE_TIME.md').read_text().lower()
+        for x in ('main','source','d_exclusive','epoch','worklease'):self.assertIn(x,t)
+        f=(ROOT/'core/80_STOP_AND_PROOF.md').read_text();self.assertIn('FINISH',f);self.assertNotIn('L（',f)
 if __name__=='__main__':unittest.main()

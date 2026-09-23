@@ -9,25 +9,24 @@ SHA='a'*40
 
 def authority():
     r=RouteReceipt(AUTHORITATIVE_REPOSITORY,'stable',SHA,'manifest.json','b'*64,'VERSION','c'*64)
-    p=ProtocolIdentity('digr-v5.0','5.0.0-alpha.9',AUTHORITATIVE_REPOSITORY,SHA)
+    p=ProtocolIdentity('digr-v5.0','5.0.0-alpha.10',AUTHORITATIVE_REPOSITORY,SHA)
     return ProtocolAuthority(r,p)
 
 def protocol_load_receipt():
     return ExecutingProtocolLoadReceipt(
-        1,SHA,'b'*64,'5.0.0-alpha.9','digr-v5.0','bundle',
+        1,SHA,'b'*64,'5.0.0-alpha.10','digr-v5.0','bundle',
         'bundle/EXECUTION_PROTOCOL.json','d'*64,
         (ProtocolMemberReceipt('entry/DEEP_ITERATION_ENTRY.md','e'*64,1),),
     )
 
 class FakeClock:
-    def __init__(self, start=0, step=100_000_000, provider='test', session='same', boot='boot-test'):
-        self.n=start; self.step=step; self.provider=provider; self.session=session; self.boot=boot
+    def __init__(self,start=0,step=100_000_000,provider='test',session='same',boot='boot-test'):
+        self.n=start;self.step=step;self.provider=provider;self.session=session;self.boot=boot
     def __call__(self):
-        n=self.n; self.n+=self.step
+        n=self.n;self.n+=self.step
         return ClockSnapshot(self.provider,self.session,self.boot,n,n)
-    def at(self,ns): return ClockSnapshot(self.provider,self.session,self.boot,ns,ns)
+    def at(self,ns):return ClockSnapshot(self.provider,self.session,self.boot,ns,ns)
 
 def startup(clock=None,message='DIGR：任务'):
-    clock=clock or FakeClock()
-    inv=classify_surface(message)
+    clock=clock or FakeClock();inv=classify_surface(message)
     return start_task(authority(),inv,clock),clock

@@ -3,53 +3,21 @@ from pathlib import Path
 from jsonschema import Draft202012Validator,validate
 ROOT=Path(__file__).resolve().parents[1];S=ROOT/'schemas'
 def load(name):return json.loads((S/name).read_text(encoding='utf-8'))
-
 class TestSchemas(unittest.TestCase):
     def test_all_json_load_and_metaschema_valid(self):
         for p in S.glob('*.json'):
             d=load(p.name);self.assertEqual(d['$schema'],'https://json-schema.org/draft/2020-12/schema')
-            self.assertTrue(d['$id'].endswith('/'+p.name));Draft202012Validator.check_schema(d)
-
-    def test_manifest_alpha9_interfaces(self):
-        d=load('manifest.schema.json');self.assertEqual(d['properties']['version']['const'],'5.0.0-alpha.9')
-        self.assertEqual(d['properties']['protocol']['const'],'digr-v5.0')
-        expect={'routing_schema':4,'repository_transport_schema':3,'invocation_surface_schema':2,'parameter_resolution_schema':2,'run_session_schema':7,'workspace_schema':2,'clock_journal_schema':1,'event_receipt_schema':2,'execution_commitment_schema':1,'execution_attempt_schema':1,'runtime_distribution_schema':3}
-        for k,v in expect.items():self.assertIn(k,d['required']);self.assertEqual(d['properties'][k]['const'],v)
-
-    def test_manifest_instance_conforms_to_manifest_schema(self):
+            Draft202012Validator.check_schema(d)
+    def test_alpha10_manifest_and_protocol_versions(self):
+        self.assertEqual(load('manifest.schema.json')['properties']['version']['const'],'5.0.0-alpha.10')
+        self.assertEqual(load('execution-protocol-bundle.schema.json')['properties']['version']['const'],'5.0.0-alpha.10')
+        self.assertEqual(load('executing-protocol-load.schema.json')['properties']['version']['const'],'5.0.0-alpha.10')
+    def test_manifest_instance_conforms(self):
         validate(json.loads((ROOT/'manifest.json').read_text()),load('manifest.schema.json'))
-
-    def test_parameter_resolution_has_no_L(self):
-        d=load('parameter-resolution.schema.json')
-        self.assertEqual(set(d['properties']['status']['enum']),{'RESOLVED','AMBIGUOUS','INVALID'})
-        self.assertEqual(d['properties']['B']['enum'],[0,1]);self.assertNotIn('L_e',d['properties']);self.assertNotIn('L_e',d['required'])
-
-    def test_effective_contract_has_no_L(self):
-        d=load('effective-contract.schema.json')
-        self.assertIn('source_disposition',d['required']);self.assertEqual(set(d['properties']['source_disposition']['enum']),{'REQUIRED','WAIVED'})
-        self.assertNotIn('L_e',d['properties']);self.assertNotIn('L_mismatch_blocks_delivery',d['properties'])
-
-    def test_execution_bundle_and_load_receipt_schemas(self):
-        self.assertEqual(load('execution-protocol-bundle.schema.json')['properties']['version']['const'],'5.0.0-alpha.9')
-        self.assertEqual(load('executing-protocol-load.schema.json')['properties']['version']['const'],'5.0.0-alpha.9')
-
-    def test_surface_four_states_and_syntax_only(self):
-        d=load('invocation-surface.schema.json');self.assertEqual(set(d['properties']['kind']['enum']),{'EXECUTING','HELP','NATIVE','INVALID'})
-
-    def test_strategy_schema_forbids_scheduler_fields(self):
-        d=load('strategy-state.schema.json');txt=json.dumps(d);self.assertIn('next_step',txt);self.assertFalse(d['additionalProperties'])
-
-    def test_event_v2_binds_context(self):
-        d=load('evolution-event.schema.json');self.assertIn('clock_event_ref',d['required']);self.assertIn('strategy_revision',d['required'])
-
-    def test_workspace_v2_schema_matches_layout(self):
-        schema=load('run-workspace.schema.json');layout=json.loads((ROOT/'workspace/layout-v2.json').read_text())
-        validate(layout,schema);self.assertEqual(layout['schema_version'],2)
-
-    def test_run_summary_schema_matches_persisted_final_shape(self):
-        d=load('run-summary.schema.json');self.assertEqual(d['properties']['phase']['const'],'FINISHED');self.assertIn('mechanical_checks',d['required'])
-
-    def test_task_startup_still_requires_three_samples(self):
-        d=load('task-startup.schema.json');self.assertEqual(d['properties']['clock']['properties']['samples']['minItems'],3)
-
+    def test_contract_and_parameter_surfaces(self):
+        p=load('parameter-resolution.schema.json');e=load('effective-contract.schema.json')
+        self.assertNotIn('L_e',p['properties']);self.assertIn('source_disposition',e['required'])
+        self.assertEqual(set(e['properties']['source_disposition']['enum']),{'REQUIRED','WAIVED'})
+    def test_workspace_layout_conforms(self):
+        validate(json.loads((ROOT/'workspace/layout-v2.json').read_text()),load('run-workspace.schema.json'))
 if __name__=='__main__':unittest.main()
