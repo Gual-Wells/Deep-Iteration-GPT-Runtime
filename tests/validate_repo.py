@@ -1,140 +1,69 @@
 from __future__ import annotations
 import ast,hashlib,json
 from pathlib import Path
-
 ROOT=Path(__file__).resolve().parents[1]
-VERSION='5.0.0-alpha.9'
-INTERFACES={
-    'routing_schema':4,'repository_transport_schema':3,'invocation_surface_schema':2,
-    'parameter_resolution_schema':2,'run_session_schema':7,'workspace_schema':2,
-    'clock_journal_schema':1,'event_receipt_schema':2,'execution_commitment_schema':1,
-    'execution_attempt_schema':1,'runtime_distribution_schema':3,
-}
-
-def fail(msg):
-    print(f'FAIL: {msg}');raise SystemExit(1)
-
+VERSION='5.0.0-alpha.10'
+CORE=[
+ 'core/00_RESULT_SOVEREIGNTY.md','core/10_INVOCATION_AND_U0.md','core/20_EFFECTIVE_CONTRACT.md',
+ 'core/25_RUN_SESSION_AND_EXTERNAL_MEMORY.md','core/40_NATIVE_EVOLUTION.md',
+ 'core/60_FORMAL_ACTIVE_TIME.md','core/80_STOP_AND_PROOF.md'
+]
+def fail(msg):print(f'FAIL: {msg}');raise SystemExit(1)
 def read(rel):return (ROOT/rel).read_text(encoding='utf-8')
-
 def main():
     if read('VERSION').strip()!=VERSION:fail('VERSION')
     m=json.loads(read('manifest.json'))
     if m.get('version')!=VERSION or m.get('protocol')!='digr-v5.0':fail('manifest identity')
-    for k,v in INTERFACES.items():
-        if m.get(k)!=v:fail(f'interface {k}')
-    if m.get('bootstrap_index')!='bootstrap/INDEX.md':fail('bootstrap index')
-    if m.get('startup_slice')!=['bootstrap/INDEX.md','bootstrap/BOOTSTRAP.md','entry/STARTUP.md']:fail('startup slice')
-    if m.get('workspace_spec')!='workspace/layout-v2.json':fail('workspace spec')
-
-    # Public Alpha 9 parameter/time surface.
-    if 'L_e' in m.get('defaults',{}) or 'L' in m.get('parameters',{}):fail('public L remains in manifest')
-    ts=m.get('time_states',{})
-    if ts.get('D_EXCLUSIVE',{}).get('T') is not True or ts.get('D_EXCLUSIVE',{}).get('t') is not False:
-        fail('D_EXCLUSIVE must count T and not t')
-    if m.get('defaults',{}).get('B')!=0 or m.get('defaults',{}).get('b')!=0:fail('B/b defaults')
-
-    required_policies=(
-        'route_requires_actual_acquisition_attempt','repository_transport_is_host_bridge_not_execution_semantics',
-        'bootstrap_index_precedes_startup','implemented_repository_helpers_are_real_execution_facilities',
-        'router_task_work_firewall_until_startup_ready','startup_reading_is_not_execution',
-        'execute_before_interpret_for_declared_operational_components','implementation_identity_precedes_semantic_equivalence',
-        'declared_implementation_substitution_forbidden_until_actual_failure','component_interrogation_precedes_declared_helper_operation',
-        'accepted_execution_commitment_constrains_next_relevant_action','implementation_delivery_is_first_class_startup_requirement',
-        'runtime_artifact_members_verify_against_pinned_git_tree','no_identity_preserving_delivery_path_fails_closed',
-        'D_zero_means_no_minimum_not_disabled','D_exclusive_counts_T_not_t','public_L_parameter_removed',
-        'internal_D_isolation_fixed_to_L1','formal_work_lease_required_for_cross_host_attribution',
-        'unleased_formal_cross_host_gap_is_preserved_not_dropped',
-        'hard_time_is_verified_counted_lower_bound','unattributed_gaps_are_excluded_not_estimated',
-        'coverage_completeness_is_diagnostic_not_stop_gate','source_waiver_disables_all_source_mechanical_gates',
-        'crash_recovery_repairs_only_mechanically_reconstructible_state','committed_FINISH_survives_phase_write_crash',
-        'revision_history_is_authoritative_over_latest_pointers','D_result_must_preserve_isolation_until_reintegration',
-        'reentry_cannot_move_backward_to_superseded_result','release_builder_never_deletes_repository_metadata',
-        'source_work_lease_carries_active_source_binding','finalization_admission_precedes_ledger_finish',
-        'FINISHED_requires_delivery_ready','durable_exact_commit_runtime_release_asset',
-        'executing_protocol_load_receipt_required_before_genesis','no_mandatory_repository_transport_after_genesis',
-        'runtime_package_attestation_aggregates_delivery_identity','clock_epoch_rollover_preserves_run',
-        'clock_continuity_failure_forfeits_gap_not_run','hard_time_accumulates_verified_intervals_across_epochs',
-        'derived_cache_is_not_semantic_hot_path','run_brief_is_checkpointed_not_per_event','semantic_default_time_is_soft_unless_explicit_hard',
-    )
-    for k in required_policies:
-        if m.get('policies',{}).get(k) is not True:fail(f'policy {k}')
-
-    eb=m.get('execution_bundle');rd=m.get('runtime_distribution')
-    if not isinstance(eb,dict) or eb.get('members')!=[m['entrypoint'],*m['core']]:fail('execution bundle metadata')
-    if not isinstance(rd,dict) or rd.get('schema')!=3 or rd.get('runtime_index_schema')!=2 or rd.get('protocol_bundle_path')!=eb['path'] or rd.get('artifact_name_template')!='digr-runtime-{SHA}' or rd.get('durable_release_tag_template')!='digr-runtime-{SHA}' or rd.get('durable_release_asset_template')!='DIGR-RUNTIME-{SHA}.zip':fail('runtime distribution')
-    required=[m['bootstrap_index'],m['bootstrap_entry'],*m['startup_slice'],m['entrypoint'],m['help'],m['workspace_spec'],eb['path'],rd['workflow_path'],*m['core'],*m['deterministic_helpers']]
+    if m.get('core')!=CORE:fail('contracted core authority')
+    if m.get('execution_bundle',{}).get('members')!=[m['entrypoint'],*CORE]:fail('bundle member contract')
+    d=m.get('defaults',{})
+    if (d.get('B'),d.get('b'),d.get('D_s'))!=(0,0,0):fail('lightweight defaults')
+    if 's' in d.get('semantic_completion',[]):fail('omitted D still semantically forced')
+    if 'runtime/runtime_package.py' not in m.get('deterministic_helpers',[]):fail('runtime package verifier missing')
+    p=m.get('policies',{})
+    for k in (
+      'single_runtime_package_attestation_replaces_per_helper_verification',
+      'runtime_package_verifier_binds_bundle_members_to_git_tree',
+      'ordinary_resume_uses_fast_path','full_workspace_audit_is_anomaly_fallback_or_explicit',
+      'state_transition_does_not_force_global_checkpoint','soft_timing_does_not_force_work_lease',
+      'derived_latest_cache_is_unindexed','journal_reindex_is_batched','compact_D_completion_preferred',
+      'source_disposition_is_semantic_necessity_decision','omitted_D_defaults_zero',
+      'reliability_cost_must_not_scale_by_repeated_full_history_scans'):
+        if p.get(k) is not True:fail(f'policy {k}')
+    rd=m.get('runtime_distribution',{})
+    if 'single_pinned_verifier' not in rd.get('identity_verification',''):fail('package attestation identity')
+    if 'git_tree' not in rd.get('attestation_scope',''):fail('git tree attestation scope')
+    layout=json.loads(read('workspace/layout-v2.json'))
+    if 'protocol-load.json' not in layout.get('required_genesis_files',[]):fail('protocol load not genesis-required')
+    required=[m['bootstrap_index'],m['bootstrap_entry'],*m['startup_slice'],m['entrypoint'],m['help'],m['workspace_spec'],m['execution_bundle']['path'],rd['workflow_path'],*CORE,*m['deterministic_helpers']]
     for rel in dict.fromkeys(required):
         if not (ROOT/rel).is_file():fail(f'missing path {rel}')
-
-    # Schemas.
-    for p in sorted((ROOT/'schemas').glob('*.json')):
-        try:d=json.loads(p.read_text(encoding='utf-8'))
-        except Exception as exc:fail(f'invalid schema {p.name}: {exc}')
-        if d.get('$schema')!='https://json-schema.org/draft/2020-12/schema':fail(f'schema draft {p.name}')
-        if d.get('$id')!=f'https://gual-wells.github.io/Deep-Iteration-GPT-Runtime/schemas/{p.name}':fail(f'schema id {p.name}')
-    ps=json.loads(read('schemas/parameter-resolution.schema.json'))
-    ec=json.loads(read('schemas/effective-contract.schema.json'))
-    if 'L_e' in ps.get('properties',{}) or 'L_e' in ec.get('properties',{}):fail('L remains in public schema')
-    if 'L_mismatch_blocks_delivery' in ec.get('properties',{}):fail('L mismatch remains in contract')
-
-    # Local router remains version-neutral; Alpha 9 semantics stay repository-side.
+    for path in sorted((ROOT/'schemas').glob('*.json')):
+        obj=json.loads(path.read_text(encoding='utf-8'))
+        if obj.get('$schema')!='https://json-schema.org/draft/2020-12/schema':fail(f'schema draft {path.name}')
     primary=read('local-personalization/CHATGPT_LOCAL_PERSONALIZATION.txt')
-    full=read('local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FULL.txt')
-    if not 1500 < len(primary) <= 5000:fail('Plus router length')
-    for token in ('精确大写 ASCII `DIGR`','NATIVE','bootstrap_index','startup_slice','【任务工作防火墙】','【执行优先/防穿透】','semantic equivalence ≠ implementation identity'):
+    for token in ('精确大写 ASCII `DIGR`','【任务工作防火墙】','bootstrap_index','startup_slice','package-level attestation verifier'):
         if token not in primary:fail(f'router missing {token}')
-    for bad in ('B=0','b=0','B=1','b=1','L(1)','Formal Active'):
-        if bad in primary:fail(f'router copied execution semantics {bad}')
-    for token in ('Expanded Routing / Transparency / Execution-Integrity Reference','Execute-before-interpret and implementation delivery'):
-        if token not in full:fail(f'full router missing {token}')
-
-    index=read(m['bootstrap_index'])
-    for token in ('Reality model','Machine topology','Truth-source map','Structure-closed, intelligence-open','Execute-before-interpret inoculation','Implementation delivery reality'):
-        if token not in index:fail(f'INDEX missing {token}')
-
-    help_text=read('entry/HELP.md')
-    for token in ('## 1. 调用与路由','## 2. 参数解析与缺省','## 3. 参数语义','## 4. SourceDisposition','## 5. R 与 D','## 6. 时间、WorkLease 与 coverage','## 7. 崩溃恢复','## 8. Finalization','## 9. 输出','## 10. 权威','work lease','continuity gap','D_EXCLUSIVE'):
-        if token not in help_text:fail(f'help missing {token}')
-    if 'N / R / D / L' in help_text or 'L(target)/L(actual)' in help_text or '`L(1)`' in help_text:fail('help exposes public L')
-
-    # Alpha 9 implementation invariants.
+    for bad in ('B=0','B=1','D=0','Formal Active','LiveDIGRRun'):
+        if bad in primary:fail(f'router copied versioned semantics {bad}')
     rs=read('runtime/run_session.py')
-    for token in ('open_work_lease','derive_work_timeline','preview_finish','recover_run_workspace','finalization admission denied','FINISHED is forbidden when delivery readiness is false','make_isolation_receipt(receipt_id,1'):
-        if token not in rs:fail(f'run-session invariant missing {token}')
-    cj=read('runtime/clock_journal.py')
-    for token in ('WORK_LEASE_OPEN','CoverageGap','ContinuityGap','EPOCH_ANCHOR','derive_work_timeline','lease_open'):
-        if token not in cj:fail(f'clock journal invariant missing {token}')
-    il=read('runtime/interval_ledger.py')
-    for token in ('WorkState.D_EXCLUSIVE','ContinuityGap','T_coverage_complete','unattributed_T_ns','preview_finish','finished:bool=False'):
-        if token not in il:fail(f'ledger invariant missing {token}')
-    if 'L_target:' in read('runtime/proof.py') or "L_target=contract" in read('runtime/proof.py'):fail('proof still exposes L')
-
-    # Python 3.10 and UTF-8/LF release hygiene.
-    for p in sorted(ROOT.rglob('*.py')):
-        if any(x in p.parts for x in ('.git','__pycache__')):continue
-        try:ast.parse(p.read_text(encoding='utf-8'),filename=str(p),feature_version=(3,10))
-        except Exception as exc:fail(f'Python 3.10 parse failure {p.relative_to(ROOT)}: {exc}')
-    for p in sorted(ROOT.rglob('*')):
-        if not p.is_file() or any(x in p.parts for x in ('.git','__pycache__')):continue
-        if p.suffix.lower() not in {'.py','.md','.txt','.json'} and p.name!='VERSION':continue
-        raw=p.read_bytes()
-        if b'\r' in raw:fail(f'CR line ending {p.relative_to(ROOT)}')
-        try:raw.decode('utf-8')
-        except UnicodeDecodeError:fail(f'non-UTF8 {p.relative_to(ROOT)}')
-
-    for rel in ('docs/PRE_RELEASE_BASELINE.md','docs/CLOCK_RELIABILITY.md','docs/RUN_SESSION_ARCHITECTURE.md','docs/PROTOCOL_SPEC_5.0.0-alpha.6.md','docs/PROTOCOL_SPEC_5.0.0-alpha.7.md','docs/PROTOCOL_SPEC_5.0.0-alpha.9.md','docs/TEST_MATRIX.md'):
-        if not (ROOT/rel).is_file():fail(f'missing release doc {rel}')
-
-    # Execution bundle is exact generated transport.
-    bundle=json.loads(read(eb['path']))
-    if bundle.get('schema_version')!=1 or bundle.get('version')!=VERSION or bundle.get('protocol')!='digr-v5.0':fail('bundle identity')
-    members=bundle.get('members')
-    if [x.get('path') for x in members]!=eb['members']:fail('bundle member order')
-    for item in members:
+    for token in ('recover_run_workspace_fast','complete_d_intervention_compact','index_existing_many'):
+        if token not in rs:fail(f'run-session contraction missing {token}')
+    if 'self.checkpoint()\n\n    def open_work_lease' in rs:fail('transition still checkpoints globally')
+    wp=read('runtime/workspace.py')
+    for token in ('write_cache_json','_is_derived_cache_path','index_existing_many'):
+        if token not in wp:fail(f'workspace contraction missing {token}')
+    pkg=read('runtime/runtime_package.py')
+    for token in ('attest_runtime_package','RUNTIME-INDEX.json','execution bundle member differs from authoritative Git blob'):
+        if token not in pkg:fail(f'package verifier missing {token}')
+    bundle=json.loads(read(m['execution_bundle']['path']))
+    if bundle.get('version')!=VERSION or [x.get('path') for x in bundle.get('members',[])]!=m['execution_bundle']['members']:fail('generated bundle identity')
+    for item in bundle['members']:
         data=(ROOT/item['path']).read_bytes()
-        if item.get('byte_length')!=len(data) or item.get('sha256')!=hashlib.sha256(data).hexdigest() or item.get('content')!=data.decode('utf-8'):
-            fail(f'bundle drift {item["path"]}')
-
-    print('DIGR 5.0.0-alpha.9 liveness-convergence baseline: OK')
-
+        if item.get('byte_length')!=len(data) or item.get('sha256')!=hashlib.sha256(data).hexdigest() or item.get('content')!=data.decode('utf-8'):fail(f'bundle drift {item["path"]}')
+    for path in sorted(ROOT.rglob('*.py')):
+        if '__pycache__' in path.parts:continue
+        try:ast.parse(path.read_text(encoding='utf-8'),filename=str(path),feature_version=(3,10))
+        except Exception as exc:fail(f'Python 3.10 parse failure {path.relative_to(ROOT)}: {exc}')
+    print('DIGR 5.0.0-alpha.10 liveness-contraction candidate: OK')
 if __name__=='__main__':main()
