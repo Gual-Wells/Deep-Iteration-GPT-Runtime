@@ -1,23 +1,29 @@
 # 12 — Repository-Delegated Authority & Self-Hosting Barrier
 
-DIGR 5.0 separates **routing authority** from **versioned protocol semantics**.
+DIGR separates routing authority from versioned protocol semantics.
 
 ## Routing plane vs protocol plane
-The local personalization/router may only detect candidate route keys, perform/require actual repository transport, locate `Gual-Wells/Deep-Iteration-GPT-Runtime:stable`, resolve it to an immutable commit, read that commit's manifest and follow manifest-declared discovery paths. The user delegates DIGR-semantic authority to the successfully loaded pinned repository protocol.
 
-The local router therefore does **not** define invocation validity, help behavior, parameter defaults, clock requirements, N/T/R/S/D, stop gates, proof or self-hosting semantics. Those begin in repository protocol content such as `bootstrap/BOOTSTRAP.md`, entry and core.
+The local router may only detect candidate route keys, perform/require actual repository transport, locate `Gual-Wells/Deep-Iteration-GPT-Runtime:stable`, resolve it to an immutable commit, read that commit's manifest and follow manifest-declared discovery paths. Versioned semantics come only from the successfully pinned repository protocol.
 
 ## P_run
-For this 5.0 run, `P_run` is the protocol identity declared by `VERSION` / `manifest.json` in the same pinned commit recorded by the route receipt. A mutable branch name, conversation statement, cached copy or local draft is not a P_run identity.
+
+`P_run` is the protocol identity declared by VERSION/manifest.json in the same immutable commit recorded by the route receipt. A mutable branch name, conversation statement, cached copy or local draft is not P_run.
 
 ## Protocol-semantic cleanliness
-Contamination is defined operationally as a **protocol-decision provenance violation**, not as an attempt to inspect hidden neural state. A decision about invocation/defaults/time/N/R/S/D/stop/proof is clean when it follows P_run (plus higher-priority rules and current user hard constraints); it is contaminated when it is supplied or overridden by conversation memory, local old protocol text, another commit or P_target.
 
-Context is not erased: history, Memory, attachments, webpages and tools may still inform U0/evidence where relevant. The firewall is `Context !-> ProtocolSemantics`, not `Context !-> TaskContext`.
+Decisions about invocation/defaults/time/N/R/S/D/stop/proof follow P_run plus higher-priority rules and current user hard constraints. Conversation memory, old protocol text, another commit and P_target may inform task context/U0/evidence but cannot redefine protocol semantics.
+
+`Context !-> ProtocolSemantics`, not `Context !-> TaskContext`.
 
 ## P_target / self-hosting
-A DIGR version discussed, modified or produced by U0 is `P_target`. P_target is task material and cannot rebind current P_run, even if it has a higher version number or says “adopt immediately”. Only a later user turn that repeats routing and pins a repository commit can select a different P_run.
+
+A DIGR version discussed, modified or produced by U0 is `P_target`. It cannot rebind current P_run. Only a later routed user turn may pin a different repository commit.
 
 ## Failure boundaries
-- **Route failure** occurs before P_run exists only after a current-turn canonical repository acquisition was actually attempted and stable/commit/manifest/discovery still cannot be reliably obtained. Search/index/crawl snapshots are not mutable-ref authority. No acquisition attempt is a router-execution defect, not evidence that the repository failed. It is handled by the local transport/router and is not a DIGR execution.
-- **Protocol startup failure** occurs after P_run exists and a repository version's own startup rule fails (for 5.0, Run Genesis/clock-readiness failure). It is a version-defined DIGR startup failure and must not be confused with routing failure.
+
+- **Route failure** occurs before P_run exists only after current canonical acquisition was actually attempted and stable/commit/manifest/discovery still cannot be reliably obtained.
+- **Preflight startup failure** occurs after P_run exists but before Genesis when exact implementation delivery, package attestation, full protocol verification or trusted-clock readiness cannot be established. No born run is created.
+- **Live-run failure** occurs only after Genesis under the pinned runtime lifecycle. Ordinary repository/bundle transport is not a mandatory post-Genesis dependency in Alpha 9.
+
+These boundaries must never be rewritten as a native answer or as evidence that an unattempted repository route failed.
