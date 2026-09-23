@@ -7,15 +7,15 @@ class TestParameterResolution(unittest.TestCase):
         for x in (None,'','()'):
             r=self.r(x); self.assertEqual(r.status,ResolutionStatus.RESOLVED)
             self.assertIsNone(r.N); self.assertIsNone(r.T_seconds); self.assertIsNone(r.R)
-            self.assertEqual((r.B,r.S.b),(1,1)); self.assertFalse(hasattr(r,'L_e'))
+            self.assertEqual((r.B,r.S.b),(0,0)); self.assertFalse(hasattr(r,'L_e'))
     def test_one_value_is_typed_or_ambiguous(self):
         self.assertEqual(self.r('(1)').status,ResolutionStatus.AMBIGUOUS)
         self.assertEqual(self.r('(10min)').T_seconds,600)
         self.assertEqual(self.r('(半小时)').T_seconds,1800)
     def test_two_counts_are_N_R(self):
-        r=self.r('(1,2)'); self.assertEqual((r.N,r.T_seconds,r.R,r.B),(1,None,2,1))
+        r=self.r('(1,2)'); self.assertEqual((r.N,r.T_seconds,r.R,r.B),(1,None,2,0))
     def test_three_and_four_require_duration_middle(self):
-        r=self.r('(1,10min,2)'); self.assertEqual((r.N,r.T_seconds,r.R,r.B),(1,600,2,1))
+        r=self.r('(1,10min,2)'); self.assertEqual((r.N,r.T_seconds,r.R,r.B),(1,600,2,0))
         r=self.r('(1,10min,2,0)'); self.assertEqual((r.N,r.T_seconds,r.R,r.B),(1,600,2,0))
         self.assertEqual(self.r('(1,1,1)').status,ResolutionStatus.INVALID)
     def test_markers_are_S_then_D_only(self):
