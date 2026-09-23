@@ -14,10 +14,9 @@ from tests.helpers import authority,FakeClock,protocol_load_receipt
 class TestRunSession(unittest.TestCase):
     def bootstrap(self,td,msg='DIGR(1,1,S,D):任务',contract=None,clock=None):
         c=clock or FakeClock()
-        run=LiveDIGRRun.start(authority(),msg,Path(td),c,run_id='digr-12345678')
-        run.bind_protocol_load(protocol_load_receipt())
+        run=LiveDIGRRun.start(authority(),msg,Path(td),c,run_id='digr-12345678',protocol_load=protocol_load_receipt())
         r=run.resolve_parameters();self.assertEqual(r.status.value,'RESOLVED');run.freeze_u0('任务')
-        contract=contract or EffectiveContract(1,0,1,1,SourceContract(1,0,1,1),1,SourceDisposition.REQUIRED)
+        contract=contract or EffectiveContract(1,0,1,0,SourceContract(1,0,1,0),1,SourceDisposition.REQUIRED)
         run.freeze_contract(contract);return run,c
 
     def genesis_strategy(self,run,c):
@@ -39,26 +38,23 @@ class TestRunSession(unittest.TestCase):
         run.transition(WorkState.MAIN,c());run.reintegrate_d('D1',accepted='none',rejected='countermodel',main_consequence='retain candidate after independent challenge',candidate_before_revision=0)
         run.completion.assess('quality complete');run.finish_time(c());return run,c
 
-    def test_genesis_precedes_parameter_u0_contract(self):
+    def test_pre_genesis_protocol_readiness_precedes_live_run(self):
         with tempfile.TemporaryDirectory() as td:
-            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR：任务',Path(td),c,run_id='digr-12345678')
+            with self.assertRaisesRegex(RunGenesisError,'PROTOCOL_PREP'):
+                LiveDIGRRun.start(authority(),'DIGR：任务',Path(td),FakeClock(),run_id='digr-12345678')
+            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR：任务',Path(td),c,run_id='digr-12345678',protocol_load=protocol_load_receipt())
             self.assertEqual(run.phase.phase,RunPhase.GENESIS);self.assertGreaterEqual(len(run.clock_journal.events),3)
+            self.assertTrue(run.workspace.path('protocol-load.json').is_file())
             with self.assertRaises(RuntimeError):run.freeze_u0('任务')
-            run.bind_protocol_load(protocol_load_receipt());run.resolve_parameters();run.freeze_u0('任务')
-            run.freeze_contract(EffectiveContract(0,0,0,1,SourceContract(0,0,0,1),0,SourceDisposition.WAIVED,'closed'))
+            run.resolve_parameters();run.freeze_u0('任务')
+            run.freeze_contract(EffectiveContract(0,0,0,0,SourceContract(0,0,0,0),0,SourceDisposition.WAIVED,'closed'))
             self.assertEqual(run.phase.phase,RunPhase.CONTRACT_FROZEN)
 
-    def test_parameter_resolution_requires_verified_protocol_load_receipt(self):
+    def test_post_genesis_protocol_rebind_is_forbidden(self):
         with tempfile.TemporaryDirectory() as td:
-            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR：任务',Path(td),c,run_id='digr-12345678')
-            with self.assertRaisesRegex(RuntimeError,'protocol load receipt required'):run.resolve_parameters()
-            run.bind_protocol_load(protocol_load_receipt());self.assertEqual(run.resolve_parameters().status.value,'RESOLVED')
-
-    def test_post_genesis_protocol_load_abort_is_terminal(self):
-        with tempfile.TemporaryDirectory() as td:
-            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR：任务',Path(td),c,run_id='digr-12345678')
-            run.abort_protocol_load('mandatory execution bundle unavailable');self.assertEqual(run.phase.phase,RunPhase.ABORTED)
-            with self.assertRaises(RuntimeError):run.resolve_parameters()
+            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR：任务',Path(td),c,run_id='digr-12345678',protocol_load=protocol_load_receipt())
+            with self.assertRaisesRegex(RuntimeError,'before Genesis'):run.bind_protocol_load(protocol_load_receipt())
+            with self.assertRaisesRegex(RuntimeError,'no born run'):run.abort_protocol_load('should never exist')
 
     def test_invalid_or_help_native_never_get_live_run(self):
         with tempfile.TemporaryDirectory() as td:
@@ -67,20 +63,20 @@ class TestRunSession(unittest.TestCase):
 
     def test_parameter_L_is_invalid(self):
         with tempfile.TemporaryDirectory() as td:
-            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR(D,L(2))：x',Path(td),c,run_id='digr-12345678')
-            run.bind_protocol_load(protocol_load_receipt());r=run.resolve_parameters()
+            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR(D,L(2))：x',Path(td),c,run_id='digr-12345678',protocol_load=protocol_load_receipt())
+            r=run.resolve_parameters()
             self.assertEqual(r.status.value,'INVALID');self.assertEqual(run.phase.phase,RunPhase.ABORTED)
 
     def test_explicit_parameters_cannot_be_changed_by_contract_completion(self):
         with tempfile.TemporaryDirectory() as td:
-            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR(N=2,R=1)：x',Path(td),c,run_id='digr-12345678')
-            run.bind_protocol_load(protocol_load_receipt());run.resolve_parameters();run.freeze_u0('x')
+            c=FakeClock();run=LiveDIGRRun.start(authority(),'DIGR(N=2,R=1)：x',Path(td),c,run_id='digr-12345678',protocol_load=protocol_load_receipt())
+            run.resolve_parameters();run.freeze_u0('x')
             with self.assertRaises(ValueError):
-                run.freeze_contract(EffectiveContract(3,0,1,1,SourceContract(0,0,0,1),0,SourceDisposition.WAIVED,'closed'))
+                run.freeze_contract(EffectiveContract(3,0,1,0,SourceContract(0,0,0,0),0,SourceDisposition.WAIVED,'closed'))
 
     def test_strategy_genesis_is_main_work_not_meta(self):
         with tempfile.TemporaryDirectory() as td:
-            contract=EffectiveContract(0,0,0,1,SourceContract(0,0,0,1),0,SourceDisposition.WAIVED,'closed')
+            contract=EffectiveContract(0,0,0,0,SourceContract(0,0,0,0),0,SourceDisposition.WAIVED,'closed')
             run,c=self.bootstrap(td,'DIGR：任务',contract)
             with self.assertRaises(RuntimeError):run.save_strategy(StrategyState(0,'m','r'))
             run.transition(WorkState.MAIN,c());run.save_strategy(StrategyState(0,'m','r'));self.assertEqual(run.phase.phase,RunPhase.EXECUTING)
@@ -149,12 +145,15 @@ class TestRunSession(unittest.TestCase):
             self.assertEqual(resumed.ledger.foreground_state,WorkState.SOURCE);self.assertGreater(resumed.ledger.formal_t_ns(),1_000_000_000)
             resumed.record_source_evolution('S1','finding','external tool','result')
 
-    def test_resume_fails_closed_without_boot_continuity(self):
+    def test_resume_rolls_clock_epoch_without_killing_run(self):
         with tempfile.TemporaryDirectory() as td:
             c=FakeClock(start=0,step=100_000_000,session='s1',boot='boot-x');run,c=self.bootstrap(td,clock=c);self.genesis_strategy(run,c)
             run.open_work_lease(c())
-            with self.assertRaises(RunResumeError):
-                LiveDIGRRun.resume(run.workspace.root,run.run_id,FakeClock(start=10_000_000_000,step=100_000_000,session='s2',boot=None))
+            resumed=LiveDIGRRun.resume(run.workspace.root,run.run_id,FakeClock(start=10_000_000_000,step=100_000_000,session='s2',boot=None))
+            self.assertEqual(resumed.ledger.foreground_state,WorkState.MAIN)
+            self.assertFalse(resumed.ledger.T_coverage_complete())
+            self.assertEqual(len(resumed.ledger.continuity_gaps),1)
+            resumed.record_main_evolution('epoch rollover','continue','run survived')
 
     def test_finalization_admission_denies_hard_time_without_closing_ledger(self):
         with tempfile.TemporaryDirectory() as td:
