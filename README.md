@@ -1,8 +1,17 @@
-# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.8
+# Deep Iteration GPT Runtime (DIGR) 5.0.0-alpha.9
 
-**Status:** convergence and crash-recovery baseline intended to converge toward DIGR 5.0 final.
+**Status:** liveness-convergence baseline intended to converge toward DIGR 5.0 final.
 
-DIGR 5.0 is a reliability exoskeleton around native model intelligence. It does not replace the model with a planner/search controller. An explicitly invoked high-investment task receives pinned protocol authority, early trusted timing, immutable U0/contract commitments, revisable strategy/source/candidate state, disruptive interventions, evidence, persistence and recovery.
+## Alpha 9 liveness convergence
+
+Alpha 9 keeps Alpha 8's authority/evidence/recovery guarantees while shrinking the long-run critical path exposed by real ChatGPT execution.
+
+- **Pre-Genesis readiness:** exact runtime delivery and complete protocol verification happen before a run is born.
+- **Single package boundary:** the exact-commit runtime artifact carries deterministic helpers plus the generated execution bundle under one RUNTIME-INDEX attestation.
+- **No mandatory post-Genesis transport:** later repository/bundle IO cannot kill an already-born run.
+- **Multi-epoch timing:** clock-continuity loss forfeits only the unverifiable bridge; the same run may establish a fresh trusted epoch and continue.
+- **Hot-path reduction:** authoritative journals/revisions persist normally, while run-brief and other derived-cache work moves to checkpoints.
+- **Soft timing defaults restored:** B/b default to 0; explicit B=1/b=1 remains strict hard lower-bound timing.
 
 ## Alpha 8 convergence and crash recovery
 
@@ -105,13 +114,15 @@ NATIVE | HELP | INVALID | EXECUTING
                            ↓
                 direct exact execution
                            ↓
-                       CLOCK GENESIS
+               exact runtime package
                            ↓
-              pinned execution bundle
+        package attestation + execution bundle
                            ↓
              verified entrypoint/core[]
                            ↓
             ExecutingProtocolLoadReceipt
+                           ↓
+                       CLOCK GENESIS
 ```
 
 ## Validation
@@ -127,9 +138,9 @@ Deterministic release:
 
 ```bash
 python tools/build_release.py \
-  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.8.zip \
-  --personalization-output ../DIGR-5.0.0-alpha.8-CHATGPT-LOCAL-PERSONALIZATION.txt \
-  --full-personalization-output ../DIGR-5.0.0-alpha.8-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
+  --output ../Deep-Iteration-GPT-Runtime-5.0.0-alpha.9.zip \
+  --personalization-output ../DIGR-5.0.0-alpha.9-CHATGPT-LOCAL-PERSONALIZATION.txt \
+  --full-personalization-output ../DIGR-5.0.0-alpha.9-CHATGPT-LOCAL-PERSONALIZATION-FULL.txt
 ```
 
 The builder regenerates release metadata, rejects cross-platform path collisions/symlinks/traversal/cache artifacts, cold-extracts the ZIP, verifies all hashes and reruns the full suite + repository validator.
