@@ -22,6 +22,7 @@ REQUIRED_GENESIS_FILES = (
 )
 STATE_DIRECTORIES = ('time','sources','dictator','evidence','final','state')
 _INDEX_PATH = 'state/artifact-index.json'
+_INDEX_WAL_PATH = 'state/artifact-index.wal.ndjson'
 _WRITE_INTENT_PATH = 'state/workspace-write-intent.json'
 
 def _is_derived_cache_path(rel: str) -> bool:
@@ -143,7 +144,7 @@ class RunWorkspace:
                 pass
 
     def _transactional_write(self, rel: str, data: bytes, *, kind: str, revision: int | None=None, last_event_ref: str | None=None) -> str:
-        if rel in (_INDEX_PATH,_WRITE_INTENT_PATH):
+        if rel in (_INDEX_PATH,_INDEX_WAL_PATH,_WRITE_INTENT_PATH):
             return self.atomic_write_bytes(rel,data)
         if self.path(_WRITE_INTENT_PATH).exists():
             raise RuntimeError('workspace has an unresolved write intent; recover it before writing')
@@ -169,7 +170,7 @@ class RunWorkspace:
         if d.get('schema_version')!=1 or d.get('run_id')!=self.run_id:
             raise ValueError('workspace write-intent identity/version mismatch')
         rel=require_nonempty_text('write-intent path',d.get('path'))
-        if rel in (_INDEX_PATH,_WRITE_INTENT_PATH):
+        if rel in (_INDEX_PATH,_INDEX_WAL_PATH,_WRITE_INTENT_PATH):
             raise ValueError('write-intent targets internal workspace metadata')
         kind=require_nonempty_text('write-intent kind',d.get('kind'))
         revision=d.get('revision')
@@ -220,6 +221,32 @@ class RunWorkspace:
     def read_json(self, rel: str) -> Any:
         return json.loads(self.path(rel).read_text(encoding='utf-8'))
 
+    def _read_index_wal(self, *, repair_partial_tail: bool=False) -> tuple[dict[str,Any],...]:
+        p=self.path(_INDEX_WAL_PATH)
+        if not p.is_file(): return ()
+        raw=p.read_bytes()
+        if raw and not raw.endswith(b'\n'):
+            if not repair_partial_tail: raise ValueError('artifact index WAL has partial crash tail')
+            cut=raw.rfind(b'\n');raw=b'' if cut<0 else raw[:cut+1]
+            self.atomic_write_bytes(_INDEX_WAL_PATH,raw)
+        out=[]
+        for i,line in enumerate(raw.splitlines(),1):
+            if not line.strip():continue
+            try:d=json.loads(line)
+            except json.JSONDecodeError as exc:raise ValueError(f'artifact index WAL malformed at line {i}') from exc
+            if d.get('schema_version')!=1 or d.get('run_id')!=self.run_id:
+                raise ValueError('artifact index WAL identity/version mismatch')
+            item=d.get('artifact')
+            if not isinstance(item,dict) or 'path' not in item:raise ValueError('malformed artifact index WAL record')
+            out.append(item)
+        return tuple(out)
+
+    def repair_index_wal_tail(self) -> bool:
+        p=self.path(_INDEX_WAL_PATH)
+        if not p.is_file():return False
+        before=p.stat().st_size;self._read_index_wal(repair_partial_tail=True)
+        return p.stat().st_size!=before
+
     def _load_index(self) -> dict[str, dict[str, Any]]:
         p=self.path(_INDEX_PATH)
         if not p.is_file(): return {}
@@ -233,11 +260,30 @@ class RunWorkspace:
             if not isinstance(item,dict) or 'path' not in item: raise ValueError('malformed artifact index entry')
             if item['path'] in out: raise ValueError('duplicate artifact index path')
             out[item['path']]=item
+        for item in self._read_index_wal():out[item['path']]=item
         return out
 
     def _write_index(self, mapping: dict[str, dict[str, Any]]) -> None:
         payload={'schema_version':1,'run_id':self.run_id,'artifacts':[mapping[k] for k in sorted(mapping)]}
         self.atomic_write_bytes(_INDEX_PATH, canonical_json_bytes(payload))
+
+    def _append_index_records(self, records: Iterable[ArtifactRecord]) -> None:
+        records=tuple(records)
+        if not records:return
+        p=self.path(_INDEX_WAL_PATH);p.parent.mkdir(parents=True,exist_ok=True)
+        if p.is_file() and p.stat().st_size:
+            with p.open('rb') as f:
+                f.seek(-1,os.SEEK_END)
+                if f.read(1)!=b'\n':raise RuntimeError('artifact index WAL has unresolved partial tail')
+        with p.open('ab') as f:
+            for rec in records:
+                f.write(canonical_json_bytes({'schema_version':1,'run_id':self.run_id,'artifact':rec.to_dict()}))
+            f.flush();os.fsync(f.fileno())
+
+    def compact_artifact_index(self) -> int:
+        items=self._load_index();self._write_index(items)
+        if self.path(_INDEX_WAL_PATH).exists():self.atomic_write_bytes(_INDEX_WAL_PATH,b'')
+        return len(items)
 
     def index_existing(self, rel: str, *, kind: str, revision: int | None=None, last_event_ref: str | None=None, expected_digest: str | None=None) -> ArtifactRecord:
         rel=require_nonempty_text('artifact path',rel)
@@ -250,14 +296,14 @@ class RunWorkspace:
         if expected_digest is not None and digest != expected_digest:
             raise ValueError('artifact digest changed before indexing')
         rec=ArtifactRecord(rel,digest,kind,revision,last_event_ref)
-        items=self._load_index(); items[rel]=rec.to_dict(); self._write_index(items)
+        self._append_index_records((rec,))
         return rec
 
     def index_existing_many(self, specs) -> tuple[ArtifactRecord,...]:
         """Update several existing authoritative artifacts with one index rewrite."""
         vals=tuple(specs)
         if not vals:return ()
-        items=self._load_index();out=[]
+        out=[]
         for spec in vals:
             if len(spec)==2:
                 rel,kind=spec;revision=None;last_event_ref=None
@@ -270,8 +316,8 @@ class RunWorkspace:
             p=self.path(rel)
             if not p.is_file():raise FileNotFoundError(p)
             rec=ArtifactRecord(rel,sha256_bytes(p.read_bytes()),kind,revision,last_event_ref)
-            items[rel]=rec.to_dict();out.append(rec)
-        self._write_index(items)
+            out.append(rec)
+        self._append_index_records(out)
         return tuple(out)
 
     def artifact_records(self) -> tuple[ArtifactRecord,...]:
@@ -313,7 +359,7 @@ class RunWorkspace:
             if not p.is_file():
                 continue
             rel=p.relative_to(self.root).as_posix()
-            if rel in (_INDEX_PATH,_WRITE_INTENT_PATH) or p.name.startswith('.tmp-') or _is_derived_cache_path(rel):
+            if rel in (_INDEX_PATH,_INDEX_WAL_PATH,_WRITE_INTENT_PATH) or p.name.startswith('.tmp-') or _is_derived_cache_path(rel):
                 continue
             actual.add(rel)
         extra=sorted(actual-indexed)
