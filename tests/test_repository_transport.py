@@ -191,20 +191,19 @@ class TestRepositoryTransport(unittest.TestCase):
         self.assertEqual(sess.resolve_stable().commit_sha,SHA)
         self.assertEqual(sum(r.purpose.startswith('stable_branch_primary') for r in sess.receipts),2)
 
-    def test_standard_post_genesis_bridge_aborts_when_bundle_cannot_load(self):
+    def test_protocol_transport_failure_prevents_genesis_instead_of_aborting_born_run(self):
         class BrokenBundle(FakeFetcher):
             def __call__(self,req):
                 if 'bundle/EXECUTION_PROTOCOL.json' in req.url:
                     self.requests.append(req)
-                    freshness=FRESHNESS_IMMUTABLE
-                    return TransportResponse(req.url,503,b'',self.source_kind,freshness)
+                    return TransportResponse(req.url,503,b'',self.source_kind,FRESHNESS_IMMUTABLE)
                 return super().__call__(req)
         f=BrokenBundle(source_kind='github_connector');sess=RepositoryTransportSession(f);startup=sess.acquire_startup('DIGR：x')
+        with self.assertRaises(RouteAcquisitionError):sess.acquire_execution_protocol(startup)
         authority=authority_from_route_bytes(startup.route_receipt,startup.manifest_bytes,startup.version_bytes)
         with __import__('tempfile').TemporaryDirectory() as td:
-            run=LiveDIGRRun.start(authority,'DIGR：x',__import__('pathlib').Path(td),FakeClock(),run_id='digr-12345678')
-            with self.assertRaises(RouteAcquisitionError):sess.load_execution_protocol_for_run(run,startup)
-            self.assertEqual(run.phase.phase,RunPhase.ABORTED)
+            with self.assertRaisesRegex(Exception,'PROTOCOL_PREP'):
+                LiveDIGRRun.start(authority,'DIGR：x',__import__('pathlib').Path(td),FakeClock(),run_id='digr-12345678')
 
     def test_contents_base64_wrapper_is_decoded(self):
         payload=json.dumps({'type':'file','path':'VERSION','encoding':'base64','content':base64.b64encode(VERSION).decode()}).encode()
