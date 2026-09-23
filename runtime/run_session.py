@@ -1,4 +1,4 @@
-"""DIGR 5.0 Alpha 8 Native Assist run session.
+"""DIGR 5.0 Alpha 9 Native Assist run session.
 
 The session is a reliability exoskeleton. It freezes authority/U0/minimum
 commitments and binds timing/evidence/state, while leaving task strategy and
@@ -68,9 +68,9 @@ def _load_contract(d)->EffectiveContract:
     s=d['S'];return EffectiveContract(d['N'],d['T_seconds'],d['R'],d['B'],SourceContract(s['n'],s['t_seconds'],s['r'],s['b']),d['D_s'],SourceDisposition(d.get('source_disposition','REQUIRED')),d.get('source_waiver_reason'))
 
 class LiveDIGRRun:
-    def __init__(self,run_id,startup,workspace,journal,snapshot_fn,*,restoring=False):
+    def __init__(self,run_id,startup,workspace,journal,snapshot_fn,*,restoring=False,protocol_load=None):
         self.run_id=run_id;self.startup=startup;self.workspace=workspace;self.clock_journal=journal;self._snapshot_fn=snapshot_fn
-        self.U0=None;self.contract=None;self.parameters=None;self.ledger=None;self.protocol_load=None
+        self.U0=None;self.contract=None;self.parameters=None;self.ledger=None;self.protocol_load=protocol_load
         if restoring:
             self.events=EvolutionEventLog.load(workspace.path('events.ndjson'))
             self.est=ESTStore.load(workspace);self.evidence=EvidenceIndex.load(workspace);self.sources=SourceWorkspaceRegistry.load(workspace)
@@ -79,20 +79,23 @@ class LiveDIGRRun:
             if workspace.path('protocol-load.json').is_file():
                 self.protocol_load=ExecutingProtocolLoadReceipt.from_dict(workspace.read_json('protocol-load.json'))
         else:
+            if not isinstance(protocol_load,ExecutingProtocolLoadReceipt):raise TypeError('verified pre-genesis protocol load receipt required')
             self.events=EvolutionEventLog(workspace.path('events.ndjson'));self.est=ESTStore(workspace);self.evidence=EvidenceIndex(workspace);self.sources=SourceWorkspaceRegistry(workspace);self.source_activity=SourceActivityLog(workspace.path('time/source-activity.ndjson'));self.strategy=StrategyStore(workspace);self.candidates=CandidateStore(workspace);self.dictator=DInterventionStore(workspace);self.completion=CompletionState(workspace);self.phase=RunPhaseStore(workspace)
-            workspace.write_json('authority.json',startup.authority.to_dict(),kind='authority');workspace.write_json('invocation.json',startup.invocation.to_dict(),kind='invocation-surface');workspace.write_json('startup.json',startup.to_dict(),kind='startup')
-            self._reindex_journals()
-            self.refresh_brief()
+            workspace.write_json('authority.json',startup.authority.to_dict(),kind='authority');workspace.write_json('invocation.json',startup.invocation.to_dict(),kind='invocation-surface');workspace.write_json('startup.json',startup.to_dict(),kind='startup');workspace.write_json('protocol-load.json',protocol_load.to_dict(),kind='executing-protocol-load')
+            self.checkpoint()
 
     @classmethod
-    def start(cls,authority:ProtocolAuthority,message:str,workspace_parent:Path|None=None,snapshot_fn:Callable[[],ClockSnapshot]=snapshot,run_id:str|None=None):
+    def start(cls,authority:ProtocolAuthority,message:str,workspace_parent:Path|None=None,snapshot_fn:Callable[[],ClockSnapshot]=snapshot,run_id:str|None=None,*,protocol_load:ExecutingProtocolLoadReceipt|None=None):
         surface=classify_surface(message)
-        if surface is None or surface.kind is not InvocationKind.EXECUTING:raise RunGenesisError('SURFACE','message is not an executing DIGR 5.0 Alpha 8 invocation')
+        if surface is None or surface.kind is not InvocationKind.EXECUTING:raise RunGenesisError('SURFACE','message is not an executing DIGR 5.0 Alpha 9 invocation')
+        if not isinstance(protocol_load,ExecutingProtocolLoadReceipt):raise RunGenesisError('PROTOCOL_PREP','verified full execution protocol must be ready before Genesis')
+        ident=authority.P_run
+        if (protocol_load.commit_sha!=ident.commit_sha or protocol_load.version!=ident.version or protocol_load.protocol!=ident.protocol or protocol_load.manifest_sha256!=authority.route.manifest_sha256): raise RunGenesisError('PROTOCOL_PREP','pre-genesis protocol receipt does not match P_run/manifest')
         try: startup=start_task(authority,surface,snapshot_fn)
         except Exception as exc:raise RunGenesisError('CLOCK',str(exc)) from exc
         rid=run_id or ('digr-'+uuid.uuid4().hex);parent=Path(workspace_parent) if workspace_parent is not None else Path(tempfile.gettempdir())/'.digr-runs';ws=None
         try:
-            ws=RunWorkspace.create(parent,rid);j=ClockJournal(rid,ws.path('time/clock.journal.ndjson'));j.append_genesis(startup.clock.samples);return cls(rid,startup,ws,j,snapshot_fn)
+            ws=RunWorkspace.create(parent,rid);j=ClockJournal(rid,ws.path('time/clock.journal.ndjson'));j.append_genesis(startup.clock.samples);return cls(rid,startup,ws,j,snapshot_fn,protocol_load=protocol_load)
         except Exception as exc:
             if ws is not None:
                 try:shutil.rmtree(ws.root)
@@ -119,7 +122,7 @@ class LiveDIGRRun:
                 raise RunResumeError('finished formal timeline without frozen contract')
             obj.ledger=FormalTimeLedger.resume_from_timeline(
                 startup,pre.intervals,pre.gaps,journal.events[-1].snapshot,
-                finished=True,hard_T=obj.contract.B==1,hard_t=hard_t,
+                continuity_gaps=pre.continuity_gaps,finished=True,hard_T=obj.contract.B==1,hard_t=hard_t,
             )
             if phase.phase is RunPhase.EXECUTING:
                 obj.phase.transition(RunPhase.FINALIZING,'recovered committed FINISH after crash')
@@ -139,8 +142,10 @@ class LiveDIGRRun:
             bridge_source_ids=obj.source_activity.by_clock_ref().get(pre.open_state_ref,())
             if not bridge_source_ids:raise RunResumeError('leased SOURCE state lacks active-source binding')
         samples=tuple(snapshot_fn() for _ in range(3))
-        try:journal.append_resume(samples)
-        except Exception as exc:raise RunResumeError(f'cross-session clock continuity unverifiable: {exc}') from exc
+        try: journal.append_resume(samples)
+        except (TypeError,ValueError):
+            try: journal.append_epoch_resume(samples)
+            except Exception as exc: raise RunResumeError(f'new clock epoch readiness failed: {exc}') from exc
         if bridge_state in (WorkState.MAIN,WorkState.SOURCE,WorkState.D_EXCLUSIVE):
             resumed=journal.append('STATE',samples[-1],bridge_state)
             if bridge_state is WorkState.SOURCE:obj.source_activity.append(resumed.record_hash,bridge_source_ids)
@@ -149,7 +154,7 @@ class LiveDIGRRun:
             timeline=derive_work_timeline(journal.events)
             obj.ledger=FormalTimeLedger.resume_from_timeline(
                 startup,timeline.intervals,timeline.gaps,journal.events[-1].snapshot,
-                open_state=timeline.open_state,open_start=timeline.open_start,
+                continuity_gaps=timeline.continuity_gaps,open_state=timeline.open_state,open_start=timeline.open_start,
                 hard_T=obj.contract.B==1,hard_t=hard_t,
             )
         obj.refresh_brief();return obj
@@ -162,30 +167,14 @@ class LiveDIGRRun:
     def refresh_brief(self):
         brief=build_run_brief(self);self.workspace.write_json('state/run-brief.json',brief,kind='run-brief');return brief
 
+    def checkpoint(self):
+        self._reindex_journals();return self.refresh_brief()
+
     def bind_protocol_load(self,receipt:ExecutingProtocolLoadReceipt)->ExecutingProtocolLoadReceipt:
-        """Bind verified full execution semantics to this born run before parameters."""
-        if self.phase.phase is not RunPhase.GENESIS:
-            raise RuntimeError('executing protocol load is only bindable at GENESIS')
-        if self.protocol_load is not None or self.workspace.path('protocol-load.json').exists():
-            raise RuntimeError('executing protocol load receipt already exists')
-        if not isinstance(receipt,ExecutingProtocolLoadReceipt):
-            raise TypeError('receipt must be ExecutingProtocolLoadReceipt')
-        ident=self.startup.authority.P_run
-        if (receipt.commit_sha!=ident.commit_sha or receipt.version!=ident.version or receipt.protocol!=ident.protocol
-                or receipt.manifest_sha256!=self.startup.authority.route.manifest_sha256):
-            raise ValueError('executing protocol load receipt does not match P_run/manifest')
-        self.protocol_load=receipt
-        self.workspace.write_json('protocol-load.json',receipt.to_dict(),kind='executing-protocol-load')
-        self.clock_journal.append('PROTOCOL_READY',self._snapshot_fn(),WorkState.META)
-        self._reindex_journals();self.refresh_brief();return receipt
+        raise RuntimeError('Alpha 9 requires full protocol verification before Genesis; post-genesis bind is forbidden')
 
     def abort_protocol_load(self,reason:str):
-        """Persist a post-genesis mandatory protocol-load failure as ABORTED."""
-        if self.phase.phase is not RunPhase.GENESIS:
-            raise RuntimeError('protocol-load abort is only valid before parameter resolution')
-        text=require_nonempty_text('protocol load abort reason',reason)
-        self.clock_journal.append('PROTOCOL_LOAD_ABORT',self._snapshot_fn(),WorkState.META)
-        self._reindex_journals();self.phase.abort(text);self.refresh_brief()
+        raise RuntimeError('Alpha 9 has no born run with an unresolved protocol load')
 
     def resolve_parameters(self,semantic_normalizations=None)->ParameterResolution:
         if self.phase.phase is not RunPhase.GENESIS:raise RuntimeError('parameter resolution only allowed at GENESIS')
@@ -223,24 +212,24 @@ class LiveDIGRRun:
         # Strategy Genesis is real task work.  The run must already be in MAIN/
         # EXECUTING so it cannot be silently performed in META calibration.
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('strategy is task work and requires EXECUTING phase')
-        out=self.strategy.save(state);self.refresh_brief();return out
+        out=self.strategy.save(state);return out
     def save_candidate(self,item:CandidateSnapshot):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('candidate requires EXECUTING phase')
-        out=self.candidates.save(item);self.refresh_brief();return out
+        out=self.candidates.save(item);return out
 
     def open_source(self,source_id:str,objective:str,current_direction:str|None=None):
         if self.phase.phase is not RunPhase.EXECUTING or not self.strategy.has_state:
             raise RuntimeError('source work requires EXECUTING phase after Strategy Genesis')
-        out=self.sources.open(source_id,objective,current_direction);self.refresh_brief();return out
+        out=self.sources.open(source_id,objective,current_direction);return out
     def revise_source(self,source_id:str,**changes):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('source revision requires EXECUTING phase')
-        out=self.sources.revise(source_id,**changes);self.refresh_brief();return out
+        out=self.sources.revise(source_id,**changes);return out
     def close_source(self,source_id:str,finding_summary:str):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('source close requires EXECUTING phase')
-        out=self.sources.close(source_id,finding_summary);self.refresh_brief();return out
+        out=self.sources.close(source_id,finding_summary);return out
     def reopen_source(self,source_id:str,*,current_direction:str|None=None,reason:str):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('source reopen requires EXECUTING phase')
-        out=self.sources.reopen(source_id,current_direction=current_direction,reason=reason);self.refresh_brief();return out
+        out=self.sources.reopen(source_id,current_direction=current_direction,reason=reason);return out
 
     def transition(self,state:WorkState,at:ClockSnapshot,*,active_source_ids:Iterable[str]=()):
         if self.ledger is None:raise RuntimeError('freeze contract before execution')
@@ -259,7 +248,7 @@ class LiveDIGRRun:
         elif ids:raise ValueError('active_source_ids only valid for SOURCE')
         self.ledger.transition(state,at);ev=self.clock_journal.append('STATE',at,state)
         if state is WorkState.SOURCE:self.source_activity.append(ev.record_hash,ids)
-        self._reindex_journals();self.refresh_brief()
+        self.checkpoint()
 
     def open_work_lease(self,at:ClockSnapshot):
         """Persist permission for current formal work to cross one host/process boundary."""
@@ -280,7 +269,7 @@ class LiveDIGRRun:
         self.ledger.mark(at)
         ev=self.clock_journal.append('WORK_LEASE_OPEN',at,state)
         if state is WorkState.SOURCE:self.source_activity.append(ev.record_hash,source_ids)
-        self._reindex_journals();self.refresh_brief();return ev
+        self.checkpoint();return ev
 
     def _event_context(self, expected_state: WorkState):
         if self.phase.phase is not RunPhase.EXECUTING:
@@ -302,14 +291,14 @@ class LiveDIGRRun:
     def record_main_evolution(self,summary,action,result,*,evidence_refs=()):
         c,s,r=self._event_context(WorkState.MAIN)
         e=self.events._append(EvolutionKind.MAIN_EVOLUTION,'MAIN',summary,action,result,evidence_refs=evidence_refs,clock_event_ref=c,strategy_revision=s,candidate_revision=r)
-        self._reindex_journals();self.refresh_brief();return e
+        self.checkpoint();return e
 
     def record_source_evolution(self,source_id,summary,action,result,*,evidence_refs=()):
         if not self.sources.exists(source_id):raise ValueError('unknown source workspace')
         c,s,r=self._event_context(WorkState.SOURCE);self._require_source_active(source_id,c)
         source_rev=self.sources.latest(source_id).revision
         e=self.events._append(EvolutionKind.SOURCE_EVOLUTION,f'S:{source_id}',summary,action,result,evidence_refs=evidence_refs,clock_event_ref=c,strategy_revision=s,candidate_revision=r,source_id=source_id,source_revision=source_rev)
-        self._reindex_journals();self.refresh_brief();return e
+        self.checkpoint();return e
 
     def record_main_reentry(self,candidate_before:int,challenge,action,outcome,*,candidate_after:int|None=None,retained:bool=False,evidence_refs=()):
         require_nonnegative_int('candidate_before',candidate_before);before=self.candidates.get(candidate_before);c,s,_=self._event_context(WorkState.MAIN)
@@ -331,7 +320,7 @@ class LiveDIGRRun:
             if after.revision!=current.revision:raise ValueError('candidate_after must be the current candidate')
             if after.revision<=before.revision:raise ValueError('candidate_after must be newer')
         e=self.events._append(EvolutionKind.MAIN_REENTRY,'MAIN',challenge,action,outcome,evidence_refs=evidence_refs,clock_event_ref=c,strategy_revision=s,candidate_revision=before.revision,candidate_after_revision=after.revision if after else None,retained=retained)
-        self._reindex_journals();self.refresh_brief();return e
+        self.checkpoint();return e
 
     def record_source_reentry(self,source_id,source_before_revision:int,challenge,action,outcome,*,source_after_revision:int|None=None,retained:bool=False,evidence_refs=()):
         if not self.sources.exists(source_id):raise ValueError('unknown source workspace')
@@ -354,7 +343,7 @@ class LiveDIGRRun:
             if after.revision!=current.revision:raise ValueError('source_after_revision must be the current source revision')
             if after.revision<=before.revision:raise ValueError('source_after_revision must be newer')
         e=self.events._append(EvolutionKind.SOURCE_REENTRY,f'S:{source_id}',challenge,action,outcome,evidence_refs=evidence_refs,clock_event_ref=c,strategy_revision=s,candidate_revision=candidate_context,source_id=source_id,source_revision=before.revision,source_after_revision=after.revision if after else None,retained=retained)
-        self._reindex_journals();self.refresh_brief();return e
+        self.checkpoint();return e
 
     def write_d_packet(self,packet_id:str,direction:str,payload:Any)->str:
         if self.phase.phase is not RunPhase.EXECUTING or not self.strategy.has_state:
@@ -375,19 +364,19 @@ class LiveDIGRRun:
         if r.L_actual is not None and r.L_actual>=2:
             self.workspace.require_indexed_artifact(r.input_packet_ref,kind='d-input-packet')
             if r.output_packet_ref is not None:self.workspace.require_indexed_artifact(r.output_packet_ref,kind='d-output-packet')
-        out=self.dictator.add_isolation(r);self.refresh_brief();return out
+        out=self.dictator.add_isolation(r);return out
 
     def create_d_intervention(self,intervention_id:str,isolation_receipt_id:str,proposal:str,reason:str='initial gambit'):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('D intervention requires EXECUTING phase')
         if not self.strategy.has_state:raise RuntimeError('Strategy Genesis must exist before D intervention')
         if self.contract is None:raise RuntimeError('D intervention requires a frozen contract')
-        out=self.dictator.create(intervention_id,isolation_receipt_id,proposal,reason);self.refresh_brief();return out
+        out=self.dictator.create(intervention_id,isolation_receipt_id,proposal,reason);return out
     def revise_d_proposal(self,intervention_id:str,proposal:str,reason:str):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('D proposal revision requires EXECUTING phase')
-        out=self.dictator.revise_proposal(intervention_id,proposal,reason);self.refresh_brief();return out
+        out=self.dictator.revise_proposal(intervention_id,proposal,reason);return out
     def decree_d(self,intervention_id:str,text:str,proposal_revision:int|None=None):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('D decree requires EXECUTING phase')
-        out=self.dictator.decree(intervention_id,text,proposal_revision);self.refresh_brief();return out
+        out=self.dictator.decree(intervention_id,text,proposal_revision);return out
     def record_d_execution(self,intervention_id:str,summary:str,evidence_refs=()):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('D execution receipt requires EXECUTING phase')
         item=self.dictator.latest(intervention_id);iso=self.dictator.isolation(item.isolation_receipt_id)
@@ -398,7 +387,7 @@ class LiveDIGRRun:
         if iso.mode=='background' and state not in (WorkState.MAIN,WorkState.SOURCE):
             raise RuntimeError('background D execution requires concurrent MAIN/SOURCE foreground work')
         clock_ref=self.clock_journal.events[-1].record_hash
-        out=self.dictator.record_execution(intervention_id,summary,evidence_refs,clock_event_ref=clock_ref);self.refresh_brief();return out
+        out=self.dictator.record_execution(intervention_id,summary,evidence_refs,clock_event_ref=clock_ref);return out
     def record_d_result(self,intervention_id:str,summary:str,evidence_refs=(),*,output_packet_ref:str|None=None):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('D result receipt requires EXECUTING phase')
         item=self.dictator.latest(intervention_id);iso=self.dictator.isolation(item.isolation_receipt_id)
@@ -414,7 +403,7 @@ class LiveDIGRRun:
         elif output_packet_ref is not None:
             self.workspace.require_indexed_artifact(output_packet_ref,kind='d-output-packet')
         clock_ref=self.clock_journal.events[-1].record_hash
-        out=self.dictator.record_result(intervention_id,summary,evidence_refs,output_packet_ref=output_packet_ref,clock_event_ref=clock_ref);self.refresh_brief();return out
+        out=self.dictator.record_result(intervention_id,summary,evidence_refs,output_packet_ref=output_packet_ref,clock_event_ref=clock_ref);return out
     def reintegrate_d(self,intervention_id:str,*,accepted:str,rejected:str,main_consequence:str,strategy_revision:int|None=None,candidate_revision:int|None=None,candidate_before_revision:int|None=None):
         if self.phase.phase is not RunPhase.EXECUTING:raise RuntimeError('D reintegration requires EXECUTING phase')
         if self.ledger is None or self.ledger.foreground_state is not WorkState.MAIN:
@@ -427,7 +416,7 @@ class LiveDIGRRun:
         if strategy_revision is not None and strategy_revision>=len(self.strategy.items):raise ValueError('strategy_revision does not exist')
         if candidate_revision is not None and candidate_revision>=len(self.candidates.items):raise ValueError('candidate_revision does not exist')
         receipt=ReintegrationReceipt(candidate_before_revision,current.results[-1].revision,accepted,rejected,main_consequence,strategy_revision,candidate_revision,self.clock_journal.events[-1].record_hash)
-        out=self.dictator.reintegrate(intervention_id,receipt);self.refresh_brief();return out
+        out=self.dictator.reintegrate(intervention_id,receipt);return out
 
     def finish_time(self,at:ClockSnapshot):
         if self.ledger is None:raise RuntimeError('no active ledger')
