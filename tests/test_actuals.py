@@ -11,8 +11,8 @@ from tests.helpers import authority,FakeClock,protocol_load_receipt
 
 class TestActuals(unittest.TestCase):
     def start(self,td,contract,msg='DIGR：x'):
-        c=FakeClock();r=LiveDIGRRun.start(authority(),msg,Path(td),c,run_id='digr-12345678')
-        r.bind_protocol_load(protocol_load_receipt());r.resolve_parameters();r.freeze_u0('x');r.freeze_contract(contract)
+        c=FakeClock();r=LiveDIGRRun.start(authority(),msg,Path(td),c,run_id='digr-12345678',protocol_load=protocol_load_receipt())
+        r.resolve_parameters();r.freeze_u0('x');r.freeze_contract(contract)
         r.transition(WorkState.MAIN,c());r.save_strategy(StrategyState(0,'model','route'));return r,c
 
     def test_no_event_no_d_actuals_are_zero(self):
