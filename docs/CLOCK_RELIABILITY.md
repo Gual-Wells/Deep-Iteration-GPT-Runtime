@@ -1,27 +1,11 @@
-# Clock Reliability — Alpha 8
+# Clock Reliability — Alpha 9
 
-Every EXECUTING run establishes >=3 compatible monotonic samples before parameter resolution, U0 or task work. The append-only clock journal records provider/session/boot identity, monotonic/wall readings, event type and semantic work state.
+Clock readiness starts only after package/protocol preflight.
 
-Three facts remain distinct:
+A run may contain multiple trusted epochs. On continuity failure: close old attributable work at the last persisted old snapshot, record a zero-credit continuity gap, establish >=3 internally consistent samples for a new epoch, then optionally restart a leased semantic state.
 
-1. observed duration;
-2. hard clock verification of counted intervals;
-3. semantic-time coverage.
+Verified intervals before and after the break remain valid. The cross-epoch gap is never counted.
 
-B/b=1 is a lower-bound claim over **counted hard-verifiable intervals**. Complete coverage is not required to prove a minimum because unattributed gaps are excluded rather than estimated. A gap therefore reduces the proved lower bound but cannot inflate it.
+Work leases still allow same-epoch bridge credit; they never authorize waiting, padding, META or cross-epoch guessed time.
 
-## Cross-host work leases
-
-Before known MAIN/SOURCE/D_EXCLUSIVE work leaves the runtime for another host/process/tool, a work lease can carry that semantic state through the next verified same-provider/same-boot resume. SOURCE leases carry active source IDs.
-
-Without a lease, the interval becomes a CoverageGap and receives no T/t credit. It remains visible for audit.
-
-## Accounting
-
-- T = counted MAIN + SOURCE + D_EXCLUSIVE
-- t = counted SOURCE
-- META/IDLE do not count
-- parallel sources share the SOURCE time union
-
-Waiting, sleep, padding, logging and mechanical query must not be converted into formal time merely by opening a lease.
-
+T = MAIN + SOURCE + D_EXCLUSIVE; t = SOURCE. Hard actuals are sums of individually hard-verifiable counted intervals. Coverage completeness remains diagnostic.
