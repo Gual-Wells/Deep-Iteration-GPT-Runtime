@@ -28,6 +28,7 @@ def _blob(data:bytes)->str:
     return sha1(f'blob {len(data)}\0'.encode('ascii')+data).hexdigest()
 
 def _tree_map(tree:Mapping[str,Any])->dict[str,str]:
+    if tree.get('truncated') is True: raise ValueError('recursive Git tree is truncated')
     raw=tree.get('tree')
     if not isinstance(raw,list): raise ValueError('recursive Git tree JSON requires tree[]')
     out={}

@@ -35,7 +35,7 @@ def build(output: Path, commit_sha: str) -> str:
     members=[];payloads={}
     for rel in paths:
         data=(ROOT/rel).read_bytes()
-        members.append({"path":rel,"byte_length":len(data),"git_blob_sha":git_blob_sha(data)})
+        members.append({"path":rel,"sha256":hashlib.sha256(data).hexdigest(),"byte_length":len(data),"git_blob_sha":git_blob_sha(data)})
         payloads[rel]=data
     index={"schema_version":2,"version":manifest["version"],"protocol":manifest["protocol"],"commit_sha":commit_sha,
         "manifest":{"sha256":hashlib.sha256(manifest_bytes).hexdigest(),"git_blob_sha":git_blob_sha(manifest_bytes),"byte_length":len(manifest_bytes)},
