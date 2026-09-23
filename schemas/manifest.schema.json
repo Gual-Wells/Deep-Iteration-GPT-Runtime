@@ -36,8 +36,6 @@
     "execution_bundle_schema",
     "execution_protocol_load_schema",
     "execution_bundle",
-    "execution_commitment_schema",
-    "execution_attempt_schema",
     "runtime_distribution_schema",
     "runtime_distribution"
   ],
@@ -236,12 +234,6 @@
     },
     "bootstrap_index": {
       "const": "bootstrap/INDEX.md"
-    },
-    "execution_commitment_schema": {
-      "const": 1
-    },
-    "execution_attempt_schema": {
-      "const": 1
     },
     "runtime_distribution_schema": {
       "const": 3
