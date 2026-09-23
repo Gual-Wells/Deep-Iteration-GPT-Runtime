@@ -300,7 +300,7 @@ class RunWorkspace:
         return rec
 
     def index_existing_many(self, specs) -> tuple[ArtifactRecord,...]:
-        """Update several existing authoritative artifacts with one index rewrite."""
+        """Append several authoritative artifact identities with one fsynced WAL write."""
         vals=tuple(specs)
         if not vals:return ()
         out=[]

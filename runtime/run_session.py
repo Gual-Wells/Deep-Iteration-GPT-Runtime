@@ -498,7 +498,14 @@ class LiveDIGRRun:
         if not stop.minima_satisfied or not self.completion.ready:
             raise RuntimeError('FINISHED is forbidden when delivery readiness is false')
         summary={'run_id':self.run_id,'authority':self.startup.authority.to_dict(),'invocation':self.startup.invocation.to_dict(),'phase':'FINISHED','U0':self.U0.to_dict() if self.U0 else None,'contract':self.contract.to_dict(),'actuals':actual.__dict__,'provenance':prov.__dict__,'mechanical_checks':stop.__dict__,'mechanical_minima_satisfied':True,'semantic_completion_assessed':self.completion.semantically_assessed,'blocking_open_gaps':len(self.completion.blocking_open),'delivery_ready':True,'clock_journal_events':len(self.clock_journal.events)}
-        self.workspace.write_json('final/run-summary.json',summary,kind='run-summary');self.phase.transition(RunPhase.FINISHED,'final summary persisted');self.workspace.compact_artifact_index();self.refresh_brief();return summary
+        self.workspace.write_json('final/run-summary.json',summary,kind='run-summary')
+        # Pay the complete artifact-integrity scan once, at the delivery boundary,
+        # rather than on every resume or semantic write.
+        self.workspace.compact_artifact_index()
+        self.workspace.verify_artifact_index()
+        self.phase.transition(RunPhase.FINISHED,'final summary persisted and artifact integrity verified')
+        self.workspace.compact_artifact_index()
+        self.refresh_brief();return summary
     def delivery_ready(self):
         if self.phase.phase not in (RunPhase.FINALIZING,RunPhase.FINISHED) or self.ledger is None or not self.ledger.finished:return False
         return self.stop_check().minima_satisfied and self.completion.ready
