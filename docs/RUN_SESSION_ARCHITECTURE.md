@@ -1,17 +1,15 @@
-# Run Session Architecture — Alpha 9
+# Run Session Architecture — Alpha 10
 
-Preflight occurs before the live lifecycle:
-
+Preflight:
 `PINNED → PACKAGE_ATTESTED → PROTOCOL_READY`
 
-No live run exists yet. Only after preflight succeeds does the persistent lifecycle begin:
-
+Live lifecycle:
 `GENESIS → PARAMETER_RESOLVED → U0_FROZEN → CONTRACT_FROZEN → EXECUTING → FINALIZING → FINISHED`
 
 ABORTED is terminal.
 
-During EXECUTING, work may span multiple trusted clock epochs. A same-epoch work lease may receive bridge credit. If clock continuity changes, the bridge receives no time credit, a continuity gap is retained, and a leased semantic state may restart at the new trusted epoch. The run itself survives.
+A normal continuation never begins with full workspace verification. Fast resume repairs transactional residue, self-verifies append-only journals, performs one batched journal-index refresh, loads semantic stores once, then restores same-epoch continuity or opens a new trusted epoch.
 
-Authoritative journals and immutable revision state remain on the persistence path. Derived run-brief/latest views are rebuildable caches and may lag between coarse checkpoints such as lifecycle transitions, work-lease boundaries, resume and finalization.
+Derived latest views are rebuildable caches outside the global artifact index. Full recovery scans immutable histories only after the fast path detects inconsistency.
 
-FINISH is the durable formal-time commit. Recovery may repair FINISH→FINALIZING and valid-summary→FINISHED crash windows, but never reopens timing.
+FINISH remains durable. Recovery of a committed final summary is an exceptional path and validates the final state before repairing FINISHED.

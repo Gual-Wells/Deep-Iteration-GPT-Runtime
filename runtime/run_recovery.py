@@ -184,7 +184,7 @@ def recover_run_workspace(root: Path, run_id: str) -> dict:
         tag=sha256(scope.encode()).hexdigest()[:10]
         rel=f'state/est-{safe}-{tag}-latest.json'
         if not _json_equal(ws,rel,value):
-            ws.write_json(rel,value,kind='est-latest',revision=rev)
+            ws.write_cache_json(rel,value)
             actions.append(f'rebuilt:{rel}')
 
     # completion.json is a summary of immutable gap revisions plus assessment

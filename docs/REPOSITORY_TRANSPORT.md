@@ -1,20 +1,12 @@
-# Repository transport
+# Repository Transport — Alpha 10
 
-Alpha 8 keeps repository transport outside task-execution semantics.
+Mutable stable authority remains connector branch HEAD or direct REST branch/ref consensus. After pinning, every read uses the same immutable SHA.
 
-## Mutable authority
+EXECUTING no longer verifies helpers one by one. Startup obtains:
+1. one recursive Git tree for the pinned SHA;
+2. the exact pinned `runtime/runtime_package.py` verifier;
+3. the exact-commit runtime archive.
 
-- an already-connected GitHub connector may resolve the current public `stable` branch HEAD directly;
-- direct HTTPS mode corroborates Branches and Git-ref endpoints;
-- search/index/crawl snapshots are never mutable-ref authority.
+The verifier checks manifest, VERSION, every helper, execution bundle, and every bundle member against the Git tree in one operation. The verified bundle then yields ExecutingProtocolLoadReceipt before Genesis.
 
-After one full SHA is pinned, all later reads use that SHA.
-
-## Staged startup
-
-Read manifest/VERSION, then bootstrap_index and the remaining startup slice. For EXECUTING, Clock Genesis precedes the manifest-declared execution bundle. The current bundle transports one entrypoint plus 18 core logical members and produces the ExecutingProtocolLoadReceipt required before parameter resolution.
-
-Runtime-distribution artifacts are transport only. Their members must match the exact pinned Git tree and cannot redefine P_run.
-
-Transport receipts do not define versioned parameter, timing, stop or proof semantics.
-
+There is no mandatory repository transport after Genesis. Search/index snapshots are never mutable-ref authority.

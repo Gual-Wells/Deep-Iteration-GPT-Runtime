@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - stable
-      - alpha9-liveness-convergence
+      - alpha10-liveness-contraction
   workflow_dispatch:
 
 permissions:
@@ -36,7 +36,7 @@ jobs:
           cmp -s FILE_TREE.txt /tmp/digr-release-work/FILE_TREE.txt || { echo "stable FILE_TREE drift"; exit 1; }
           cmp -s SHA256SUMS.txt /tmp/digr-release-work/SHA256SUMS.txt || { echo "stable SHA256SUMS drift"; exit 1; }
       - name: Import validated generated metadata on development branch
-        if: github.ref_name == 'alpha9-liveness-convergence'
+        if: github.ref_name == 'alpha10-liveness-contraction'
         run: |
           cp /tmp/digr-release-work/bundle/EXECUTION_PROTOCOL.json bundle/EXECUTION_PROTOCOL.json
           cp /tmp/digr-release-work/FILE_TREE.txt FILE_TREE.txt
@@ -81,8 +81,8 @@ jobs:
                 [ -n "$tag" ] || continue
                 gh release delete "$tag" --repo "${GITHUB_REPOSITORY}" --yes --cleanup-tag
               done
-      - name: Commit validated generated metadata on Alpha 9 branch
-        if: github.ref_name == 'alpha9-liveness-convergence'
+      - name: Commit validated generated metadata on Alpha 10 branch
+        if: github.ref_name == 'alpha10-liveness-contraction'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

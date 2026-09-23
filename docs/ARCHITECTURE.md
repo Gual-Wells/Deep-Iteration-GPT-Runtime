@@ -1,13 +1,21 @@
-# DIGR 5.0 Alpha 9 Architecture
+# DIGR 5.0 Alpha 10 Architecture
 
-Alpha 9 makes liveness a first-class invariant without weakening authority.
+Alpha 10 is a liveness contraction: keep semantic guarantees, remove repeated reliability work.
 
-1. Repository preflight: pin P_run, deliver/attest exact runtime package, verify complete protocol.
-2. Genesis/contract: only after preflight, establish clock, persist Genesis + protocol receipt, resolve parameters and freeze U0/contract.
-3. Mutable task state: Strategy, Candidate, EST, Source, D, completion.
-4. Time/evidence: append-only journals, per-interval hard verification, work leases, continuity gaps across clock epochs.
-5. Recovery/audit: authoritative revisions/journals plus checkpointed derived caches.
+## Normal path
+`stable→SHA → manifest/VERSION/INDEX/STARTUP → one package attestation → compact protocol load → clock Genesis → contract → native work → FINISH`
 
-Genesis is the point after which no mandatory repository/runtime transport remains. Clock identity may change; that forfeits only the unverifiable bridge, not the run. Derived cache maintenance is not a semantic hot-path obligation.
+The package attestation uses one pinned verifier, one recursive pinned Git tree and one exact-commit runtime archive. It replaces per-helper fetching/interrogation.
 
-P_run/U0/contract identity, implementation identity, evidence bindings, revision monotonicity and FINISH durability remain strict.
+Execution authority is entrypoint + seven core modules. Deterministic helpers remain implementation, not model reasoning.
+
+## Persistence
+Authoritative revisions/journals persist incrementally. Latest pointers/run-brief are unindexed caches. STATE/WorkLease do not trigger global checkpoints. Journal index refresh is batched.
+
+## Resume
+Ordinary resume repairs pending write, verifies/reindexes journals once, loads stores once, and resumes/re-epochs the clock. Full workspace audit is reserved for anomaly recovery or explicit audit.
+
+## Workload
+B/b default soft. Omitted D=0. Source is REQUIRED only by task necessity. Compact D lifecycle is preferred.
+
+The architecture target is constant/coarse reliability overhead per meaningful boundary, not repeated full-history verification.

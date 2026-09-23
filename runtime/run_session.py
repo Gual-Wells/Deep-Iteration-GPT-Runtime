@@ -146,8 +146,9 @@ class LiveDIGRRun:
             elif phase.phase is not RunPhase.FINALIZING:
                 raise RunResumeError(f'FINISH journal is incompatible with phase {phase.phase.value}')
             if ws.path('final/run-summary.json').is_file():
-                # The summary write may have committed before the FINALIZING->FINISHED phase write.
-                # verify_run_workspace already validated any present summary against authoritative stores.
+                # FINISH/final-summary crash recovery is exceptional: validate the
+                # committed summary before repairing the terminal phase.
+                verify_run_workspace(root,run_id)
                 obj.phase.transition(RunPhase.FINISHED,'recovered committed final summary after crash')
             obj.refresh_brief();return obj
         if phase.phase is RunPhase.FINALIZING:

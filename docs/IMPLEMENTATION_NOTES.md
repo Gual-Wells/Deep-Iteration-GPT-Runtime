@@ -1,12 +1,15 @@
-# Alpha 9 Implementation Notes
+# Alpha 10 Implementation Notes
 
-Alpha 9 is a liveness-convergence release over Alpha 8.
+Alpha 10 contracts reliability cost rather than weakening semantic guarantees.
 
-- Runtime distribution embeds the generated execution bundle; RUNTIME-INDEX schema 2 binds manifest, VERSION, helper identities and bundle.
-- Full protocol verification occurs before LiveDIGRRun.start creates Genesis. Post-Genesis protocol bind/abort paths are retired.
-- Resume first tries same-epoch continuity; on failure ClockJournal opens EPOCH_ANCHOR / EPOCH_PROBE / EPOCH_READY rather than aborting.
-- Cross-epoch time is uncredited; prior/later verified intervals remain usable.
-- run-brief is derived cache state and no longer rewrites synchronously after each semantic evolution/source/R/D event.
-- B/b return to 0; explicit B=1/b=1 remains strict.
+- execution authority reduced from 18 core modules to 7;
+- one package verifier + recursive Git tree replaces per-helper verification;
+- omitted D defaults to 0; explicit D() can still request semantic completion;
+- SourceDisposition is chosen by task necessity, not blanket presumption;
+- ordinary resume skips full workspace audit;
+- journal reindex is batched;
+- STATE/WorkLease no longer trigger global checkpoint;
+- latest Strategy/Candidate/Source/D/EST/phase/run-brief files are unindexed rebuildable caches;
+- ordinary completed D can persist as one compact lifecycle revision.
 
-Exact implementation identity, P_run/U0/contract, Source/R/D semantics and FINISH durability remain unchanged.
+Full recovery, granular D revisioning and full workspace audit remain available when they have real value.
