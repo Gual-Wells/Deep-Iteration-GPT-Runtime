@@ -448,8 +448,15 @@ class LiveDIGRRun:
         main_event=self.clock_journal.events[-1]
         if main_event.event not in ('STATE','WORK_LEASE_OPEN') or main_event.state is not WorkState.MAIN:
             raise RuntimeError('compact D reintegration requires a current MAIN foreground clock event')
-        d_event=next((e for e in reversed(self.clock_journal.events[:-1]) if e.event in ('STATE','WORK_LEASE_OPEN') and e.state is WorkState.D_EXCLUSIVE),None)
-        if d_event is None:raise RuntimeError('compact D completion requires prior D_EXCLUSIVE work')
+        used_d_refs={
+            ev.clock_event_ref for item in self.dictator.items for ev in item.execution_events
+            if ev.clock_event_ref is not None
+        }
+        d_event=next((
+            e for e in reversed(self.clock_journal.events[:-1])
+            if e.event in ('STATE','WORK_LEASE_OPEN') and e.state is WorkState.D_EXCLUSIVE and e.record_hash not in used_d_refs
+        ),None)
+        if d_event is None:raise RuntimeError('compact D completion requires distinct unused D_EXCLUSIVE work')
         cand=self.candidates.current.revision if self.candidates.has_state else None
         reintegration=ReintegrationReceipt(cand,0,accepted,rejected,main_consequence,self.strategy.current.revision,cand,main_event.record_hash)
         return self.dictator.complete_compact(

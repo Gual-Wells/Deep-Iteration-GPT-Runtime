@@ -8,6 +8,6 @@ Source work uses SOURCE state plus active source binding. Source r follows the s
 
 D is a disruptive intervention minimum, not a required ceremony. Omitted D=0. D_EXCLUSIVE counts T, not t, and reintegration returns to MAIN.
 
-For an ordinary completed D, the preferred persistence path is one **compact completed lifecycle** containing proposal, decree, execution evidence, result and reintegration in one immutable D revision after the semantic work has occurred. Fine-grained proposal/decree/result revisions are reserved for cases where intermediate durability or revision history has real value.
+For an ordinary completed D, the preferred persistence path is one **compact completed lifecycle** containing proposal, decree, execution evidence, result and reintegration in one immutable D revision after the semantic work has occurred. Each completed compact D must bind a distinct, previously unused D_EXCLUSIVE clock reference; compact persistence cannot reuse one intervention's work to inflate D(actual). Fine-grained proposal/decree/result revisions are reserved for cases where intermediate durability or revision history has real value.
 
 ABG rejects mechanical paraphrase, counter inflation, source-count fetishism and protocol theatre.
