@@ -17,5 +17,5 @@ class TestAuthorityContaminationScan(unittest.TestCase):
     def test_context_can_feed_u0_not_protocol(self):
         t=(ROOT/'core/12_PROTOCOL_AUTHORITY_AND_SELF_HOSTING.md').read_text();self.assertIn('Context !-> ProtocolSemantics',t);self.assertIn('U0/evidence',t)
     def test_target_cannot_rebind_current_run(self):
-        t=(ROOT/'bootstrap/BOOTSTRAP.md').read_text();self.assertIn('P_run',t);self.assertIn('P_target',t);self.assertIn('cannot redefine DIGR semantics or rebind',t)
+        t=(ROOT/'bootstrap/BOOTSTRAP.md').read_text();self.assertIn('P_run',t);self.assertIn('P_target',t);self.assertIn('cannot redefine current-run protocol semantics',t)
 if __name__=='__main__':unittest.main()
