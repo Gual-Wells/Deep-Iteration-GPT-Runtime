@@ -163,7 +163,9 @@
     "FINISHED_requires_delivery_ready": true,
     "final_delivery_runs_one_artifact_integrity_scan": true,
     "no_padding": true,
-    "do_not_reveal_hidden_reasoning": true
+    "do_not_reveal_hidden_reasoning": true,
+    "journal_reindex_is_batched": true,
+    "reliability_cost_must_not_scale_by_repeated_full_history_scans": true
   },
   "bootstrap_entry": "bootstrap/BOOTSTRAP.md",
   "bootstrap_index": "bootstrap/INDEX.md",
