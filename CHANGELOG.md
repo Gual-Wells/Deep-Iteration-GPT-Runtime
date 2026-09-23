@@ -1,5 +1,17 @@
 # Changelog
 
+## 5.0.0-alpha.9 — liveness convergence
+
+Alpha 9 addresses the systemic long-run liveness regression exposed by real DIGR runs.
+
+- All mandatory runtime delivery and full execution-protocol verification move before Genesis; failed preflight creates no born run.
+- The exact-commit runtime artifact embeds the execution bundle and RUNTIME-INDEX schema 2 attests commit/manifest/VERSION/helpers/bundle as one package boundary.
+- Clock-continuity failure rolls to a fresh trusted epoch instead of aborting the run; the cross-epoch gap receives no T/t credit.
+- Verified formal intervals may accumulate across multiple trusted epochs.
+- Derived run-brief/cache persistence leaves the per-semantic-event hot path and moves to coarse checkpoints.
+- B/b fixed defaults return to 0; hard timing is explicit opt-in with B=1/b=1.
+- Immutable P_run/U0/contract, exact implementation identity, Source/R/D evidence semantics and durable FINISH remain fail-closed.
+
 ## 5.0.0-alpha.8 — convergence and crash recovery
 
 Alpha 8 is a convergence pass over Alpha 7. It reduces reliability overhead while tightening mechanical correctness.
