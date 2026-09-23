@@ -1,9 +1,8 @@
-"""Comprehensive DIGR 5.0 Alpha 8 workspace integrity/recovery verification.
+"""Comprehensive DIGR 5.0 Alpha 9 workspace integrity/recovery verification.
 
 Verification proves persisted structure and cross-store bindings.  It deliberately
 separates *workspace integrity* from *future clock continuity*: LiveDIGRRun.resume
-must establish a fresh, same-boot monotonic bridge before a nonterminal run may
-continue.
+tries a same-epoch bridge first; if continuity changed, it establishes a fresh trusted epoch and continues without crediting the discontinuity.
 """
 from __future__ import annotations
 from hashlib import sha256
@@ -53,8 +52,10 @@ def _derived_actuals(events, sources, activity, dstore, timeline) -> ContractAct
     t_rel=[x for x in timeline.intervals if x.state is WorkState.SOURCE]
     T_gaps=[x for x in timeline.gaps if x.state in (WorkState.MAIN,WorkState.SOURCE,WorkState.D_EXCLUSIVE)]
     t_gaps=[x for x in timeline.gaps if x.state is WorkState.SOURCE]
-    T_coverage_complete=not T_gaps
-    t_coverage_complete=not t_gaps
+    T_continuity=[x for x in timeline.continuity_gaps if x.state in (WorkState.MAIN,WorkState.SOURCE,WorkState.D_EXCLUSIVE)]
+    t_continuity=[x for x in timeline.continuity_gaps if x.state is WorkState.SOURCE]
+    T_coverage_complete=not T_gaps and not T_continuity
+    t_coverage_complete=not t_gaps and not t_continuity
     return ContractActuals(
         N=events.count(EvolutionKind.MAIN_EVOLUTION,'MAIN'),
         T_seconds=sum(x.observed_ns for x in T_rel)/1e9,
@@ -182,7 +183,7 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
     run_id=validate_run_id(run_id)
     ws=RunWorkspace.open_existing(root,run_id)
     required=(
-        'authority.json','invocation.json','startup.json','time/clock.journal.ndjson',
+        'authority.json','invocation.json','startup.json','protocol-load.json','time/clock.journal.ndjson',
         'state/artifact-index.json','state/run-phase.json',
     )
     missing=[x for x in required if not ws.path(x).is_file()]
@@ -336,7 +337,7 @@ def verify_run_workspace(root: Path, run_id: str) -> dict:
     for item in dstore.items:
         iso=dstore.isolation(item.isolation_receipt_id)
         if iso.L_target!=1:
-            raise ValueError('Alpha 8 D isolation must use internal L1')
+            raise ValueError('Alpha 9 D isolation must use internal L1')
         if iso.L_actual is not None and iso.L_actual>=2:
             ws.require_indexed_artifact(iso.input_packet_ref,kind='d-input-packet')
         if iso.output_packet_ref is not None:
