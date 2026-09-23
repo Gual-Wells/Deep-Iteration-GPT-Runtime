@@ -113,6 +113,7 @@ runtime/strategy_store.py
 runtime/task_startup.py
 runtime/validation.py
 runtime/workspace.py
+schemas/artifact-index-delta.schema.json
 schemas/artifact-index.schema.json
 schemas/candidate-snapshot.schema.json
 schemas/clock-journal-event.schema.json
