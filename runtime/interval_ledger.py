@@ -1,4 +1,4 @@
-"""Formal Active Time ledger for DIGR 5.0 Alpha 8.
+"""Formal Active Time ledger for DIGR 5.0 Alpha 9.
 
 MAIN, SOURCE and D_EXCLUSIVE all contribute to T.  SOURCE additionally
 contributes to t.  Cross-host attribution gaps are preserved explicitly; hard
@@ -49,6 +49,17 @@ class CoverageGap:
         if observed_elapsed_ns(self.start,self.end)!=self.observed_ns: raise ValueError('observed_ns does not match snapshots')
         require_bool('hard_verified',self.hard_verified)
 
+@dataclass(frozen=True)
+class ContinuityGap:
+    state:WorkState
+    before:ClockSnapshot
+    after:ClockSnapshot
+    reason:str='clock-epoch-discontinuity'
+    def __post_init__(self):
+        if not isinstance(self.state,WorkState): object.__setattr__(self,'state',WorkState(self.state))
+        if not isinstance(self.before,ClockSnapshot) or not isinstance(self.after,ClockSnapshot): raise TypeError('before/after must be ClockSnapshot')
+        if not isinstance(self.reason,str) or not self.reason.strip(): raise ValueError('continuity gap requires reason')
+
 
 def sum_interval_durations_ns(items:Iterable[WorkInterval])->int:
     items=tuple(items)
@@ -63,21 +74,22 @@ class FormalTimeLedger:
         self._hard_T=require_bool('hard_T',hard_T); self._hard_t=require_bool('hard_t',hard_t)
         self._hard_required=self._hard_T or self._hard_t
         self._state:WorkState|None=None; self._start:ClockSnapshot|None=None
-        self._last_event=startup.clock.probe; self._intervals:list[WorkInterval]=[]; self._gaps:list[CoverageGap]=[]; self._finished=False
+        self._last_event=startup.clock.probe; self._intervals:list[WorkInterval]=[]; self._gaps:list[CoverageGap]=[]; self._continuity_gaps:list[ContinuityGap]=[]; self._finished=False
 
     @classmethod
-    def resume_from_timeline(cls,startup:TaskStartupReceipt,intervals,gaps,last_snapshot:ClockSnapshot,*,open_state=None,open_start=None,finished:bool=False,hard_T:bool=False,hard_t:bool=False):
+    def resume_from_timeline(cls,startup:TaskStartupReceipt,intervals,gaps,last_snapshot:ClockSnapshot,*,continuity_gaps=(),open_state=None,open_start=None,finished:bool=False,hard_T:bool=False,hard_t:bool=False):
         obj=cls(startup,hard_T=hard_T,hard_t=hard_t)
-        vals=list(intervals); gap_vals=list(gaps)
+        vals=list(intervals); gap_vals=list(gaps); continuity_vals=list(continuity_gaps)
         if any(not isinstance(x,WorkInterval) for x in vals): raise TypeError('all resumed intervals must be WorkInterval')
         if any(not isinstance(x,CoverageGap) for x in gap_vals): raise TypeError('all resumed gaps must be CoverageGap')
+        if any(not isinstance(x,ContinuityGap) for x in continuity_vals): raise TypeError('all resumed continuity gaps must be ContinuityGap')
         if not isinstance(last_snapshot,ClockSnapshot): raise TypeError('last_snapshot must be ClockSnapshot')
         if open_state is not None and not isinstance(open_state,WorkState): open_state=WorkState(open_state)
         if (open_state is None)!=(open_start is None): raise ValueError('open_state/open_start must be paired')
         if open_start is not None and not isinstance(open_start,ClockSnapshot): raise TypeError('open_start must be ClockSnapshot')
         require_bool('finished',finished)
         if finished and (open_state is not None or open_start is not None): raise ValueError('finished ledger cannot restore an open work state')
-        obj._intervals=vals; obj._gaps=gap_vals; obj._state=open_state; obj._start=open_start; obj._last_event=last_snapshot; obj._finished=finished
+        obj._intervals=vals; obj._gaps=gap_vals; obj._continuity_gaps=continuity_vals; obj._state=open_state; obj._start=open_start; obj._last_event=last_snapshot; obj._finished=finished
         return obj
 
     @property
@@ -92,6 +104,8 @@ class FormalTimeLedger:
     def intervals(self)->tuple[WorkInterval,...]: return tuple(self._intervals)
     @property
     def coverage_gaps(self)->tuple[CoverageGap,...]: return tuple(self._gaps)
+    @property
+    def continuity_gaps(self)->tuple[ContinuityGap,...]: return tuple(self._continuity_gaps)
 
     def _require_open(self):
         if self._finished: raise RuntimeError('ledger is finished')
@@ -121,7 +135,7 @@ class FormalTimeLedger:
     def _clone_open(self):
         obj=FormalTimeLedger(self._startup,hard_T=self._hard_T,hard_t=self._hard_t)
         obj._state=self._state; obj._start=self._start; obj._last_event=self._last_event
-        obj._intervals=list(self._intervals); obj._gaps=list(self._gaps); obj._finished=self._finished
+        obj._intervals=list(self._intervals); obj._gaps=list(self._gaps); obj._continuity_gaps=list(self._continuity_gaps); obj._finished=self._finished
         return obj
 
     def preview_finish(self,at:ClockSnapshot)->'FormalTimeLedger':
@@ -136,8 +150,8 @@ class FormalTimeLedger:
     def formal_t_ns(self)->int: return sum(x.observed_ns for x in self._intervals if x.state in _FORMAL_t)
     def unattributed_T_ns(self)->int: return sum(x.observed_ns for x in self._gaps if x.state in _FORMAL_T)
     def unattributed_t_ns(self)->int: return sum(x.observed_ns for x in self._gaps if x.state in _FORMAL_t)
-    def T_coverage_complete(self)->bool: return self.unattributed_T_ns()==0
-    def t_coverage_complete(self)->bool: return self.unattributed_t_ns()==0
+    def T_coverage_complete(self)->bool: return self.unattributed_T_ns()==0 and not any(x.state in _FORMAL_T for x in self._continuity_gaps)
+    def t_coverage_complete(self)->bool: return self.unattributed_t_ns()==0 and not any(x.state in _FORMAL_t for x in self._continuity_gaps)
     def T_hard_verified(self)->bool:
         # Formal targets are lower bounds. Unattributed gaps are excluded from
         # counted time; they cannot inflate the verified lower bound.
@@ -153,6 +167,7 @@ class FormalTimeLedger:
             'foreground_state':self._state.value if self._state else None,
             'intervals':[{'state':x.state.value,'start':x.start.to_dict(),'end':x.end.to_dict(),'observed_ns':x.observed_ns,'hard_verified':x.hard_verified} for x in self._intervals],
             'coverage_gaps':[{'state':x.state.value,'start':x.start.to_dict(),'end':x.end.to_dict(),'observed_ns':x.observed_ns,'hard_verified':x.hard_verified} for x in self._gaps],
+            'continuity_gaps':[{'state':x.state.value,'before':x.before.to_dict(),'after':x.after.to_dict(),'reason':x.reason} for x in self._continuity_gaps],
             'T_actual_seconds':self.formal_T_ns()/1e9,'t_actual_seconds':self.formal_t_ns()/1e9,
             'T_actual_ns':self.formal_T_ns(),'t_actual_ns':self.formal_t_ns(),
             'unattributed_T_ns':self.unattributed_T_ns(),'unattributed_t_ns':self.unattributed_t_ns(),
