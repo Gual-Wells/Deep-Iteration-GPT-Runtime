@@ -42,10 +42,9 @@ def best_schema(rel: str, mapping: dict[str, str]):
 class TestWorkspaceSchemaConformance(unittest.TestCase):
     def build_full_workspace(self, td):
         c = FakeClock()
-        run = LiveDIGRRun.start(authority(), 'DIGR(D):x', Path(td), c, run_id='digr-12345678')
-        run.bind_protocol_load(protocol_load_receipt())
+        run = LiveDIGRRun.start(authority(), 'DIGR(D):x', Path(td), c, run_id='digr-12345678', protocol_load=protocol_load_receipt())
         run.resolve_parameters(); run.freeze_u0('x')
-        run.freeze_contract(EffectiveContract(1, 0, 1, 1, SourceContract(1, 0, 1, 1), 1, SourceDisposition.REQUIRED))
+        run.freeze_contract(EffectiveContract(1, 0, 1, 0, SourceContract(1, 0, 1, 0), 1, SourceDisposition.REQUIRED))
         run.transition(WorkState.MAIN, c())
         run.save_strategy(StrategyState(0, 'task model', 'primary route', ('alternative',), 'source route', 'validate', 'tools'))
         run.record_main_evolution('architecture changed', 'implemented', 'better')
