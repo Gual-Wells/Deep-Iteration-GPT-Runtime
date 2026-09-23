@@ -177,9 +177,8 @@ class LiveDIGRRun:
         obj.refresh_brief();return obj
 
     def _reindex_journals(self):
-        for rel,kind in [('time/clock.journal.ndjson','clock-journal'),('time/source-activity.ndjson','source-activity'),('events.ndjson','event-log')]:
-            p=self.workspace.path(rel)
-            if p.is_file():self.workspace.index_existing(rel,kind=kind)
+        specs=[(rel,kind) for rel,kind in [('time/clock.journal.ndjson','clock-journal'),('time/source-activity.ndjson','source-activity'),('events.ndjson','event-log')] if self.workspace.path(rel).is_file()]
+        self.workspace.index_existing_many(specs)
 
     def refresh_brief(self):
         brief=build_run_brief(self);self.workspace.write_cache_json('state/run-brief.json',brief);return brief
@@ -436,6 +435,29 @@ class LiveDIGRRun:
         if candidate_revision is not None and candidate_revision>=len(self.candidates.items):raise ValueError('candidate_revision does not exist')
         receipt=ReintegrationReceipt(candidate_before_revision,current.results[-1].revision,accepted,rejected,main_consequence,strategy_revision,candidate_revision,self.clock_journal.events[-1].record_hash)
         out=self.dictator.reintegrate(intervention_id,receipt);return out
+
+    def complete_d_intervention_compact(self,intervention_id:str,isolation_receipt_id:str,*,proposal:str,decree:str,
+                                        execution_summary:str,result_summary:str,accepted:str,rejected:str,main_consequence:str,
+                                        proposal_reason:str='compact committed gambit',execution_evidence_refs=(),result_evidence_refs=(),
+                                        output_packet_ref:str|None=None):
+        """Commit one completed ordinary D intervention in one D-state revision."""
+        if self.phase.phase is not RunPhase.EXECUTING or self.ledger is None or self.ledger.foreground_state is not WorkState.MAIN:
+            raise RuntimeError('compact D completion requires EXECUTING MAIN reintegration state')
+        if not self.strategy.has_state:raise RuntimeError('compact D completion requires Strategy state')
+        main_event=self.clock_journal.events[-1]
+        if main_event.event not in ('STATE','WORK_LEASE_OPEN') or main_event.state is not WorkState.MAIN:
+            raise RuntimeError('compact D reintegration requires a current MAIN foreground clock event')
+        d_event=next((e for e in reversed(self.clock_journal.events[:-1]) if e.event in ('STATE','WORK_LEASE_OPEN') and e.state is WorkState.D_EXCLUSIVE),None)
+        if d_event is None:raise RuntimeError('compact D completion requires prior D_EXCLUSIVE work')
+        cand=self.candidates.current.revision if self.candidates.has_state else None
+        reintegration=ReintegrationReceipt(cand,0,accepted,rejected,main_consequence,self.strategy.current.revision,cand,main_event.record_hash)
+        return self.dictator.complete_compact(
+            intervention_id,isolation_receipt_id,proposal=proposal,proposal_reason=proposal_reason,decree=decree,
+            execution_summary=execution_summary,execution_clock_event_ref=d_event.record_hash,
+            result_summary=result_summary,result_clock_event_ref=d_event.record_hash,
+            reintegration=reintegration,execution_evidence_refs=execution_evidence_refs,
+            result_evidence_refs=result_evidence_refs,output_packet_ref=output_packet_ref,
+        )
 
     def finish_time(self,at:ClockSnapshot):
         if self.ledger is None:raise RuntimeError('no active ledger')

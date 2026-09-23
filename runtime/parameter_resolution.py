@@ -1,4 +1,4 @@
-"""Deterministic parameter-format resolution for DIGR 5.0 Alpha 9.
+"""Deterministic parameter-format resolution for DIGR 5.0 Alpha 10.
 
 Public order is N < T < R < B < S < D.  L is no longer a public parameter:
 D isolation uses an internal fixed L1 baseline.  A bare numeric token can never
@@ -264,7 +264,7 @@ def resolve_parameter_surface(surface:str|None,semantic_normalizations:Mapping[s
         tokens=_split_top(inner)
     except ValueError as exc:
         return ParameterResolution(ResolutionStatus.INVALID,normalized_surface=normalize_header_surface(surface or ''),diagnostics=(str(exc),))
-    if not tokens:return ParameterResolution(ResolutionStatus.RESOLVED,normalized_surface=normalized)
+    if not tokens:return ParameterResolution(ResolutionStatus.RESOLVED,D_s=0,normalized_surface=normalized)
 
     boundary=next((i for i,tok in enumerate(tokens) if _tail_anchor(tok)),None)
     if boundary is None:
@@ -297,10 +297,12 @@ def resolve_parameter_surface(surface:str|None,semantic_normalizations:Mapping[s
         elif any((_parse_marker(x) or ('',None))[0]=='S' for x in tail_tokens[1:]):
             return ParameterResolution(ResolutionStatus.INVALID,normalized_surface=normalized,diagnostics=('S marker is out of canonical order',))
 
+    d_explicit=bool(tail_tokens)
     d_status,D_s,dwhy=_resolve_d_tail(tail_tokens,semantic_normalizations=semantic_normalizations)
     if d_status is not ResolutionStatus.RESOLVED:
         return ParameterResolution(d_status,normalized_surface=normalized,diagnostics=((dwhy or 'D tail mapping failed'),))
 
+    if D_s is None and not d_explicit:D_s=0
     S=SourceParameterResolution(n=svals.get('n'),t_seconds=svals.get('t'),r=svals.get('r'),b=svals.get('b',0))
     used=[]
     if semantic_normalizations:

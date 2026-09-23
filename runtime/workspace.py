@@ -253,6 +253,27 @@ class RunWorkspace:
         items=self._load_index(); items[rel]=rec.to_dict(); self._write_index(items)
         return rec
 
+    def index_existing_many(self, specs) -> tuple[ArtifactRecord,...]:
+        """Update several existing authoritative artifacts with one index rewrite."""
+        vals=tuple(specs)
+        if not vals:return ()
+        items=self._load_index();out=[]
+        for spec in vals:
+            if len(spec)==2:
+                rel,kind=spec;revision=None;last_event_ref=None
+            elif len(spec)==4:
+                rel,kind,revision,last_event_ref=spec
+            else:
+                raise ValueError('index spec must be (rel,kind) or (rel,kind,revision,last_event_ref)')
+            rel=require_nonempty_text('artifact path',rel);kind=require_nonempty_text('artifact kind',kind)
+            if revision is not None:require_nonnegative_int('revision',revision)
+            p=self.path(rel)
+            if not p.is_file():raise FileNotFoundError(p)
+            rec=ArtifactRecord(rel,sha256_bytes(p.read_bytes()),kind,revision,last_event_ref)
+            items[rel]=rec.to_dict();out.append(rec)
+        self._write_index(items)
+        return tuple(out)
+
     def artifact_records(self) -> tuple[ArtifactRecord,...]:
         items=self._load_index()
         return tuple(ArtifactRecord(**items[k]) for k in sorted(items))

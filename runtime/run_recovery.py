@@ -97,12 +97,14 @@ def recover_run_workspace_fast(root: Path, run_id: str) -> dict:
         ('time/source-activity.ndjson','source-activity',lambda p: SourceActivityLog.load(p).verify()),
         ('events.ndjson','event-log',lambda p: EvolutionEventLog.load(p).verify()),
     )
+    index_specs=[]
     for rel,kind,verify in journal_specs:
         p=ws.path(rel)
         if p.is_file():
             verify(p)
-            ws.index_existing(rel,kind=kind)
+            index_specs.append((rel,kind))
             actions.append(f'reindexed:{rel}')
+    ws.index_existing_many(index_specs)
     return {'run_id':run_id,'recovery_actions':tuple(actions),'mode':'fast'}
 
 def recover_run_workspace(root: Path, run_id: str) -> dict:
@@ -121,12 +123,14 @@ def recover_run_workspace(root: Path, run_id: str) -> dict:
         ('time/source-activity.ndjson','source-activity',lambda p: SourceActivityLog.load(p).verify()),
         ('events.ndjson','event-log',lambda p: EvolutionEventLog.load(p).verify()),
     )
+    index_specs=[]
     for rel,kind,verify in journal_specs:
         p=ws.path(rel)
         if p.is_file():
             verify(p)
-            ws.index_existing(rel,kind=kind)
+            index_specs.append((rel,kind))
             actions.append(f'reindexed:{rel}')
+    ws.index_existing_many(index_specs)
 
     def repair_pointer(source_rel,target_rel,kind,revision):
         value=ws.read_json(source_rel)
