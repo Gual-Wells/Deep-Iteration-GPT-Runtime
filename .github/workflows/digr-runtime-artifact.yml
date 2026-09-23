@@ -75,8 +75,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release list --repo "${GITHUB_REPOSITORY}" --limit 100 --json tagName --jq '.[].tagName' \
-            | grep '^runtime-' \
+          gh release list --repo "${GITHUB_REPOSITORY}" --limit 100 --json tagName \
+            --jq '.[] | select(.tagName | startswith("runtime-")) | .tagName' \
             | while read -r tag; do
                 [ -n "$tag" ] || continue
                 gh release delete "$tag" --repo "${GITHUB_REPOSITORY}" --yes --cleanup-tag
