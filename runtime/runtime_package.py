@@ -84,7 +84,9 @@ def attest_runtime_package(archive:Path,*,expected_commit_sha:str,git_tree:Mappi
     verify_meta('VERSION',index['version_file'])
     helpers=manifest.get('deterministic_helpers')
     members=index.get('members')
-    if not isinstance(helpers,list) or not isinstance(members,list) or [x.get('path') for x in members]!=helpers:
+    if not isinstance(helpers,list) or len(helpers)!=len(set(helpers)):
+        raise ValueError('manifest deterministic_helpers must be a unique list')
+    if not isinstance(members,list) or [x.get('path') for x in members]!=helpers:
         raise ValueError('runtime helper list does not equal manifest deterministic_helpers')
     for meta in members: verify_meta(_safe(meta['path']),meta)
 
@@ -95,6 +97,11 @@ def attest_runtime_package(archive:Path,*,expected_commit_sha:str,git_tree:Mappi
     verify_meta(bundle_path,bmeta)
     bundle=json.loads(payload[bundle_path].decode('utf-8'))
     expected=[manifest['entrypoint'],*manifest['core']]
+    bundle_meta=manifest.get('execution_bundle',{})
+    if bundle_meta.get('schema')!=1 or bundle_meta.get('members')!=expected:
+        raise ValueError('manifest execution-bundle identity is inconsistent')
+    if bundle.get('schema_version')!=bundle_meta['schema'] or bundle.get('version')!=version or bundle.get('protocol')!=manifest.get('protocol'):
+        raise ValueError('execution bundle schema/version/protocol mismatch')
     raw_members=bundle.get('members')
     if not isinstance(raw_members,list) or [x.get('path') for x in raw_members]!=expected:
         raise ValueError('execution bundle does not match entrypoint/core order')
