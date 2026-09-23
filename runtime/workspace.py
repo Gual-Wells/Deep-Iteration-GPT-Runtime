@@ -1,7 +1,6 @@
-"""Safe explicit run-workspace storage for DIGR 5.0 Alpha 8.
+"""Safe explicit run-workspace storage for DIGR 5.0 Alpha 9.
 
-The workspace is a persistence substrate, not a decision engine.  Alpha 8 retains
-an integrity index so recovery can detect revision/hash drift between stores.
+The workspace is a persistence substrate, not a decision engine. Alpha 9 retains the integrity index while allowing rebuildable derived caches to lag between coarse checkpoints.
 """
 from __future__ import annotations
 from dataclasses import dataclass
