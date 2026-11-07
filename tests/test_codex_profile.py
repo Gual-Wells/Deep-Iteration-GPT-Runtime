@@ -10,7 +10,7 @@ import unittest
 
 from runtime.codex_profile import (
     ActiveContext, CAPABILITY_NAMES, decide_boundary, capability_report,
-    instruction_text, verify_distribution,
+    instruction_text, verify_distribution, depth_preferences,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -96,6 +96,12 @@ class CodexDistributionTests(unittest.TestCase):
             instruction_text(ROOT, 'light'),
             (ROOT / 'codex/AGENTS.light.md').read_text(encoding='utf-8'),
         )
+
+    def test_default_depth_is_the_user_selected_high_investment_policy(self):
+        preference = depth_preferences(ROOT)
+        self.assertEqual(preference['implicit_deep'], {'N': 12, 'R': 4, 'D': 3, 'V': 3, 'L': 3})
+        self.assertEqual(preference['unit_semantics'], 'codex/PARAMETERS.md')
+        self.assertTrue(preference['complex_tasks_raise_investment'])
 
     def test_changed_instruction_is_detected(self):
         with tempfile.TemporaryDirectory() as td:

@@ -10,10 +10,15 @@ bootstrap/BOOTSTRAP.md
 bundle/EXECUTION_PROTOCOL.json
 codex/AGENTS.light.md
 codex/HELP.md
+codex/PARAMETERS.md
 codex/PROTOCOL.md
 codex/ROUTER.experimental.txt
 codex/STARTUP.md
 codex/VERSION
+codex/WORKBENCH.md
+codex/examples/UNIT_RESPONSIBILITY.md
+codex/examples/assembly/WORK.md
+codex/examples/assembly/reader-example.html
 codex/manifest.json
 core/00_RESULT_SOVEREIGNTY.md
 core/05_TASK_COMMITMENT.md
@@ -35,6 +40,8 @@ core/80_STOP_AND_PROOF.md
 docs/ARCHITECTURE.md
 docs/CLOCK_RELIABILITY.md
 docs/CODEX_ADAPTATION.md
+docs/CODEX_QUALITY_DESIGN.md
+docs/CODEX_TRIAL_RESULTS.md
 docs/ENGINEERING_VALIDATION_LOG.md
 docs/IMPLEMENTATION_NOTES.md
 docs/INVOCATION_PARAMETERS.md
@@ -92,6 +99,7 @@ runtime/candidate_store.py
 runtime/clock_journal.py
 runtime/clock_probe.py
 runtime/codex_profile.py
+runtime/codex_workbench.py
 runtime/completion_state.py
 runtime/d_intervention.py
 runtime/duration.py
@@ -163,6 +171,7 @@ tests/test_clock_genesis_stress.py
 tests/test_clock_journal.py
 tests/test_clock_probe.py
 tests/test_codex_profile.py
+tests/test_codex_workbench.py
 tests/test_d_intervention.py
 tests/test_duration.py
 tests/test_effective_contract.py
@@ -195,6 +204,7 @@ tests/test_workspace_schema_conformance.py
 tests/validate_repo.py
 tools/build_release.py
 tools/codex_profile.py
+tools/codex_workbench.py
 tools/smoke_repository_transport.py
 workspace/RUN_WORKSPACE_SPEC.md
 workspace/layout-v2.json

@@ -15,7 +15,7 @@ from typing import Any, Mapping
 
 from .routing import candidate_route_key
 
-PROFILE_PROTOCOL = 'digr-codex-native-v1'
+PROFILE_PROTOCOL = 'digr-codex-native-v2'
 PROFILE_FILES = (
     'codex/VERSION',
     'codex/AGENTS.light.md',
@@ -23,6 +23,8 @@ PROFILE_FILES = (
     'codex/STARTUP.md',
     'codex/PROTOCOL.md',
     'codex/HELP.md',
+    'codex/PARAMETERS.md',
+    'codex/WORKBENCH.md',
 )
 CAPABILITY_NAMES = (
     'files', 'shell', 'persistent_workspace', 'repository_transport',
@@ -153,6 +155,8 @@ def verify_distribution(root: Path) -> dict[str, Any]:
         raise ValueError('Codex manifest/VERSION identity mismatch')
     if manifest.get('entrypoint') != 'codex/PROTOCOL.md':
         raise ValueError('unexpected Codex entrypoint')
+    if manifest.get('core') != ['codex/PARAMETERS.md']:
+        raise ValueError('Codex execution must load parameter responsibility semantics')
     if manifest.get('startup_slice') != ['codex/STARTUP.md']:
         raise ValueError('unexpected Codex startup slice')
     if manifest.get('help') != 'codex/HELP.md':
@@ -190,3 +194,10 @@ def instruction_text(root: Path, layer: str) -> str:
     if layer not in paths:
         raise ValueError('layer must be light or experimental-router')
     return (Path(root) / paths[layer]).read_text(encoding='utf-8')
+
+
+def depth_preferences(root: Path) -> dict[str, Any]:
+    """Return the user's declared investment policy, not a workload scheduler."""
+    verify_distribution(root)
+    manifest = json.loads((Path(root) / 'codex/manifest.json').read_text(encoding='utf-8'))
+    return manifest['depth_preferences']

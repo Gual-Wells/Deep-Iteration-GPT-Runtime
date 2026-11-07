@@ -1,7 +1,7 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "0.1.0",
-  "protocol": "digr-codex-native-v1",
+  "version": "0.2.0",
+  "protocol": "digr-codex-native-v2",
   "status": "experimental_not_installed",
   "language": "zh-CN",
   "version_path": "codex/VERSION",
@@ -9,7 +9,9 @@
     "codex/STARTUP.md"
   ],
   "entrypoint": "codex/PROTOCOL.md",
-  "core": [],
+  "core": [
+    "codex/PARAMETERS.md"
+  ],
   "help": "codex/HELP.md",
   "light_instructions": "codex/AGENTS.light.md",
   "experimental_router": "codex/ROUTER.experimental.txt",
@@ -29,11 +31,31 @@
     "paid_api_or_agent_authorization_implied": false
   },
   "file_sha256": {
-    "codex/VERSION": "e9dd8507f4bf0c6f42458e41aea833ad0bd3f6127272335eee9bf4d58541ed67",
-    "codex/AGENTS.light.md": "f5371bc093a2b00feca549eba98b54c991b5cd7e8e2c56559b1eb54f0f775640",
+    "codex/VERSION": "1f930dd1f133c1f97a94fe3acb8db34372cf4c01ffdb2b3ff4ca72f9494121e9",
+    "codex/AGENTS.light.md": "6cdbdd48b54d8b1232ad61df2338f3f1de85615c1893dd7a5a14588312f86660",
     "codex/ROUTER.experimental.txt": "e92425ca907a9d78960457a82aedf6b94f6cf41393e1fe9eb611595ae2fb00c3",
-    "codex/STARTUP.md": "71a917854472da10ec7f48160a47bfb1f6fce7418f69ed83fe3027939bd343d4",
-    "codex/PROTOCOL.md": "b018a1ba2bdf2035c9657d6935666b19f109b7134413e08d420dbacfe881329f",
-    "codex/HELP.md": "bb46d47bd265bb98ae2877006e707cf91bd95424184c6cc4d837ab6d460f4387"
+    "codex/STARTUP.md": "ddc06a44ce52e693cea0d6fae5487a41eb5e2208d9933d9a10440fb05f3df2e7",
+    "codex/PROTOCOL.md": "568c0ab11bedab5444df97448e5e93940c36d568dc9998e67850bfe32505af42",
+    "codex/HELP.md": "27fde4ce35be8efa6882751f5e9ea67a7db4b1c7dc8a90e57fd62f5c3c4cc86d",
+    "codex/PARAMETERS.md": "676d438ae2e72c83a1ffd8e82236d174020184266afcba38bc4047f16ab09b82",
+    "codex/WORKBENCH.md": "1dfa8d52cd6c6069e165aec7205b758e1aabe13638d71574a6b20e9dd497bc28"
+  },
+  "workbench_guide": "codex/WORKBENCH.md",
+  "depth_preferences": {
+    "implicit_deep": {
+      "N": 12,
+      "R": 4,
+      "D": 3,
+      "V": 3,
+      "L": 3
+    },
+    "complex_tasks_raise_investment": true,
+    "unit_semantics": "codex/PARAMETERS.md",
+    "source_default": "REQUIRED",
+    "time_default": "SOFT",
+    "explicit_values_take_precedence": true,
+    "agent_authorization_implied": false,
+    "calibration": "upward_from_starting_values",
+    "units_keep_responsibility_scope": true
   }
 }

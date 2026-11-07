@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>原片段组装演练样例</title>
+<style>
+.reader-navigation{margin:0 0 18px;padding:16px 20px;border:1px solid #a8b5c4;background:#fafbfd;color:#182b40;font-family:Arial,sans-serif}
+.reader-navigation .reader-title{margin:0 0 8px;font-size:20px;font-weight:bold}
+.reader-navigation ol{margin:0;padding-left:24px}
+.reader-navigation li{margin:6px 0}
+.reader-navigation a,.reader-return a{color:#174e84}
+.reader-return{margin:10px 0 20px;font:14px Arial,sans-serif}
+.reader-navigation a:focus-visible,.reader-return a:focus-visible{outline:2px solid #174e84;outline-offset:3px}
+</style>
+<style data-source="one.html">.source-one{color:#133857;background:#f1f5fa;padding:20px}.source-one pre{white-space:pre-wrap}</style>
+<style data-source="two.html">.source-two{font-family:Georgia,serif;color:#492b15;background:#fff5df;padding:16px}.source-two .formula{border-left:3px solid #a65;padding-left:8px}</style>
+<style data-source="three.html">.source-three{font-family:Arial,sans-serif;color:#1b4824;background:#effbef;padding:18px}.source-three table{border-collapse:collapse}.source-three td{border:1px solid #597;padding:6px}</style>
+</head>
+<body>
+<header class="reader-navigation" id="reader-top">
+<p class="reader-title">模型部署阅读片段</p>
+<nav aria-label="阅读目录">
+<ol>
+<li><a href="#source-one">从模型到计算图</a></li>
+<li><a href="#source-two">量化误差的阅读片段</a></li>
+<li><a href="#source-three">性能测量片段</a></li>
+</ol>
+</nav>
+</header>
+<main>
+<article class="source-one" id="source-one"><h1>从模型到计算图</h1><p data-keep="p1">输入 x∈R^(N×C)，权重 W∈R^(C×K)，输出 y=xW。这里必须先确认维度与数据布局，再谈部署。</p><pre data-keep="code1">auto output = session.Run(input);
+// 保留此处原代码，不要换成教程摘要。</pre><p>后面的精度比较必须回到本节的浮点参考输出。</p></article>
+<p class="reader-return"><a href="#reader-top">返回目录</a></p>
+<aside style="margin:12px 0;padding:10px;border-left:3px solid #986;color:#453b2a"><strong>读者说明（非原文）</strong>：给定的量化片段未实际提供 s、z 的定义。原文保持原样；阅读此段需要对应原章节的定义与上下文。</aside>
+<section class="source-two" id="source-two"><h1>量化误差的阅读片段</h1><p data-keep="p2">本节承接前一节的浮点参考输出，不能只报告模型文件变小。</p><div class="formula" data-keep="formula2">q = clamp(round(x / s) + z, q_min, q_max)</div><p>比较时记录误差与实际任务指标；符号 s、z 的定义保留在本片段。</p></section>
+<p class="reader-return"><a href="#reader-top">返回目录</a></p>
+<section class="source-three" id="source-three"><h1>性能测量片段</h1><p data-keep="p3">报告单次延迟前，明确输入规模、预热、运行次数及计时范围。</p><table data-keep="table3"><tr><td>输入</td><td>批量1</td></tr><tr><td>比较</td><td>同一模型与同一设备</td></tr></table><p>精度和性能结论需要相同使用条件下才能解释。</p></section>
+<p class="reader-return"><a href="#reader-top">返回目录</a></p>
+</main>
+</body>
+</html>

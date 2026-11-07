@@ -13,7 +13,7 @@ if str(ROOT) not in sys.path:
 
 from runtime.codex_profile import (
     ActiveContext, capability_report, decide_boundary,
-    instruction_text, verify_distribution,
+    instruction_text, verify_distribution, depth_preferences,
 )
 
 
@@ -21,6 +21,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     sub = ap.add_subparsers(dest='command', required=True)
     sub.add_parser('check', help='verify local instruction identity and bytes')
+    sub.add_parser('depth', help='show user-selected depth and unit-responsibility references')
     ins = sub.add_parser('instructions', help='print a layer; never install it')
     ins.add_argument('layer', choices=('light', 'experimental-router'))
     boundary = sub.add_parser('boundary', help='preview an explicitly supplied host event')
@@ -31,6 +32,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == 'check':
             result = verify_distribution(ROOT)
+        elif args.command == 'depth':
+            result = depth_preferences(ROOT)
         elif args.command == 'instructions':
             print(instruction_text(ROOT, args.layer), end='')
             return 0
