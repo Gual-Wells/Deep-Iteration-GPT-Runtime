@@ -1,0 +1,488 @@
+{
+  "schema_version": 1,
+  "researched_on": "2026-11-07",
+  "purpose": "DIGR Codex 0.3 候选方法研究；不充当本轮 stable Alpha5 运行权威",
+  "source_count": 24,
+  "scope": "独立调查 Claude/Anthropic 可借鉴机制、条件和同类失败；只研究，不修改主协议",
+  "method": {
+    "selection": "官方工程/事故/当前文档与社区原帖对照；成功优先核对公开产物",
+    "access": "实际打开并阅读正文；GitHub 优先 connector；未将搜索摘要替代正文",
+    "dates": "排除明确晚于 2026-11-07 的材料；相对日期保留不确定性，不伪造绝对日期",
+    "claim_boundary": "不估计发生率、不证明 Claude 优于 Codex、不把官方内部指标当独立比较实证",
+    "execution": "未调用付费模型 API；未安装工具；未运行外部项目；未向外部作者发消息",
+    "limitations": "无本任务上的盲评/等预算原生运行对照；若源码或原始会话不可得，按来源自身证据强度表述"
+  },
+  "sources": [
+    {
+      "id": "O01",
+      "kind": "official_method",
+      "title": "Building effective agents",
+      "url": "https://www.anthropic.com/research/building-effective-agents",
+      "published_on": "2024-12-19",
+      "date_precision": "day",
+      "product": "API / agent architecture",
+      "models": [
+        "原文跨模型；当前页面已更新部分示例"
+      ],
+      "read_scope": "正文架构、适用条件、工具附录；非搜索摘要",
+      "observation": "区分预定义工作流与由模型决定过程的 agent；只在任务收益足够时增加复杂度，要求从环境获得反馈。",
+      "evidence_boundary": "供应商经验总结，正文也提示工具生态已变化；不构成 Claude 优于 Codex 的对照研究。",
+      "adaptable_method": "让工具、检索、记忆直接帮助解决任务，再以实际结果决定是否增加结构。",
+      "do_not_transfer": "不把简单起点改写为降低本轮 N/R/D/V；不把文章架构图变成所有任务的固定阶段。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "O02",
+      "kind": "official_method",
+      "title": "Effective context engineering for AI agents",
+      "url": "https://www.anthropic.com/research/effective-context-engineering-for-ai-agents",
+      "published_on": "2025-09-29",
+      "date_precision": "day",
+      "product": "Claude Code / API agents",
+      "models": [
+        "Sonnet 4.5 时代"
+      ],
+      "read_scope": "正文，含提示高度、just-in-time 检索、compaction、笔记、subagents",
+      "observation": "上下文是有限注意力资源；建议在脆弱硬编码和空泛原则之间提供足够具体的信号，用路径按需取材，压缩须防止关键细节丢失。",
+      "evidence_boundary": "工程指导与个案演示，不证明某种笔记形式必然恢复用户纠正。",
+      "adaptable_method": "保留原要求与纠正的可取回入口；当前行动前只载入有关材料。",
+      "do_not_transfer": "不把 minimal 理解为越短越好；不为每个任务建索引、记忆库或规定统一笔记树。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "O03",
+      "kind": "official_experiment",
+      "title": "Effective harnesses for long-running agents",
+      "url": "https://www.anthropic.com/research/effective-harnesses-for-long-running-agents",
+      "published_on": "2025-11-26",
+      "date_precision": "day",
+      "product": "Claude Agent SDK / full-stack web demo",
+      "models": [
+        "Opus 4.5"
+      ],
+      "read_scope": "正文、失败模式、功能清单、浏览器测试、适用边界",
+      "observation": "高层 prompt 加 compaction 仍会留下半成品、看见部分进度就宣布完成；unit tests/curl 也可能错过整条 UI 流程。",
+      "evidence_boundary": "作者明确称为面向全栈网页的一个方案，未证明对所有领域有效。",
+      "adaptable_method": "接续时取回当前状态与未完成内容，使用实际使用路径发现缺损。",
+      "do_not_transfer": "不把二百项功能清单、逐功能提交、init 脚本普遍化；不凭空扩写用户范围。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "O04",
+      "kind": "official_internal_eval",
+      "title": "How we built our multi-agent research system",
+      "url": "https://www.anthropic.com/research/multi-agent-research-system",
+      "published_on": "2025-06-13",
+      "date_precision": "day",
+      "product": "Claude apps Research",
+      "models": [
+        "Opus 4 lead",
+        "Sonnet 4 subagents"
+      ],
+      "read_scope": "正文架构、内部评估、费用和协调局限、分工失败、产物引用交接",
+      "observation": "分开的探索上下文可减少路径依赖；早期也会重复搜、开五十代理、追不存在来源。内部比较同时改变投入与组织方式。",
+      "evidence_boundary": "90.2% 改善是内部 research eval；作者报告约 15 倍聊天 token，用量是重要混杂因素，不能归因于人数。",
+      "adaptable_method": "以真正不同的问题、明确范围和可直接读取的产物分工，主线继续综合。",
+      "do_not_transfer": "不照抄其调用次数、代理人数或 judge 分数；依赖密集的任务不宜盲目并行。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "O05",
+      "kind": "official_experiment",
+      "title": "Harness design for long-running application development",
+      "url": "https://www.anthropic.com/research/harness-design-long-running-apps",
+      "published_on": "2026-03-24",
+      "date_precision": "day",
+      "product": "Agent SDK / frontend and full-stack experiments",
+      "models": [
+        "Sonnet 4.5",
+        "Opus 4.5",
+        "Opus 4.6"
+      ],
+      "read_scope": "正文，含主观设计、自评、成本、移除 sprint 与模型变化",
+      "observation": "自评偏乐观且默认设计平庸；独立反馈可改善，但复杂度随轮次上涨，中间稿有时更好。4.6 实验撤掉 sprint，评估只在能力边界外才持续增益。",
+      "evidence_boundary": "单作者若干演示，$9/20min 与 $200/6h 不是等预算消融；偏好评分不是用户审美的客观真值。",
+      "adaptable_method": "用可讨论的作品与偏好例子对齐品味；评审要能改变结果，允许推翻当前方向。",
+      "do_not_transfer": "不冻结三代理、每轮评分或固定 sprint；不迁移自动加 AI 功能、museum-quality 等作者特定目标。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "O06",
+      "kind": "official_incident",
+      "title": "A postmortem of three recent issues",
+      "url": "https://www.anthropic.com/research/a-postmortem-of-three-recent-issues",
+      "published_on": "2025-09-17",
+      "date_precision": "day",
+      "product": "Claude API / Claude Code / cloud providers",
+      "models": [
+        "Sonnet 4",
+        "Opus 4/4.1",
+        "Haiku 3.5 等，影响各异"
+      ],
+      "read_scope": "正文三项故障、路由粘性、评估为何未捕捉、修复范围",
+      "observation": "路由、采样输出损坏、TPU 编译器问题在不同平台产生不同症状；聚合评估未及时捕获用户遇到的下降。",
+      "evidence_boundary": "官方承认的特定时段故障，不证明其他时段抱怨同因，更不支持无证据的限流降智说。",
+      "adaptable_method": "把模型、宿主、上下文处理、工具与环境列为竞争解释，再用实际证据区分。",
+      "do_not_transfer": "不把所有行为问题归咎 prompt 或基础设施，也不把一次正常表现当作整体无问题。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "O07",
+      "kind": "official_incident",
+      "title": "An update on recent Claude Code quality reports",
+      "url": "https://www.anthropic.com/research/april-23-postmortem",
+      "published_on": "2026-04-23",
+      "date_precision": "day",
+      "product": "Claude Code / Agent SDK / Cowork；此次 API 不受影响",
+      "models": [
+        "Sonnet 4.6",
+        "Opus 4.6",
+        "Opus 4.7"
+      ],
+      "read_scope": "全文三项原因、修复版本、ablation 和检测盲区",
+      "observation": "默认推理投入下降、闲置后每轮清除旧思考的 bug、精简输出提示共同影响质量；修复截止 v2.1.116，输出约束消融发现一次评估约 3% 下降。",
+      "evidence_boundary": "官方事后解释；不能据此推断 Codex 的隐藏实现，也不能把任何简洁表达等同低质量。",
+      "adaptable_method": "保留用户选择的高投入；对跨轮忘记与重复，要检查宿主保留了什么。",
+      "do_not_transfer": "不靠限字或降 effort 解决本轮价值问题；不把思考显示长度当真实计算量。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "O08",
+      "kind": "official_live_docs",
+      "title": "Prompting best practices",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "published_on": null,
+      "date_precision": "undated_live_snapshot",
+      "product": "Claude Platform prompting；观察日页面",
+      "models": [
+        "当前页面跨 Claude 4.x/5.x，各建议有模型限定"
+      ],
+      "read_scope": "当前正文清晰目标、示例、行动倾向、工具过触发、过度思考与自检段",
+      "observation": "旧版强调 thorough/tool 的指令在更敏感模型上可能过触发；Opus 5 的旧式显式自检还可能导致过验。文档要求按模型重新验证建议。",
+      "evidence_boundary": "无统一发布日期的动态文档；不能反推历史行为，模型特定建议不是 Codex 的验证结果。",
+      "adaptable_method": "把方法绑定当前困难和实际增益，删除已无作用或制造副作用的补偿指令。",
+      "do_not_transfer": "不照搬降低 effort、锁定路线不再重想、移除验证等建议；本轮投入下限与必要研究保持。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "O09",
+      "kind": "official_live_docs",
+      "title": "Best practices for Claude Code",
+      "url": "https://code.claude.com/docs/en/best-practices",
+      "published_on": null,
+      "date_precision": "undated_live_snapshot",
+      "product": "Claude Code 当前宿主",
+      "models": [
+        "当前页面默认示例 Opus 5.5 等，版本会变"
+      ],
+      "read_scope": "正文非确定/确定指令、访谈、CLAUDE.md、验证、按 spec review、hook 边界",
+      "observation": "建议先访谈未定意图；CLAUDE.md 应承载代码看不出的信息。正文特别提醒，只问评审找问题会增加抽象和不可能场景的测试。",
+      "evidence_boundary": "产品操作说明兼官方经验；hooks 也有适用范围、上限，模型判断 hook 仍非确定。",
+      "adaptable_method": "澄清影响成品的差异，评审对照实际要求，确需强制的少数边界交给真实宿主能力。",
+      "do_not_transfer": "不声称 DIGR 文本拥有 hook/deny 权限；不为了通用偏好增加强制检查。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "O10",
+      "kind": "official_artifact_experiment",
+      "title": "Building a C compiler with a team of parallel Claudes",
+      "url": "https://www.anthropic.com/research/building-c-compiler",
+      "published_on": "2026-02-05",
+      "date_precision": "day",
+      "product": "Claude Code agent teams / compiler benchmark",
+      "models": [
+        "Opus 4.6；与早期 Opus 比较为作者经验"
+      ],
+      "read_scope": "正文环境、测试、并行瓶颈、费用与清楚披露的局限",
+      "observation": "16 agents、约两千会话、近 $20k 产生可编译大型项目的产物；作者主要投入在环境反馈，且需 fast 测试以免 Claude 花数小时只跑测试。",
+      "evidence_boundary": "能力边界实验，未独立重跑；x86 16-bit 借 GCC、汇编链接借工具、性能质量均未等同成熟编译器。",
+      "adaptable_method": "把可分问题和有区分力反馈交给代理；关注真正实现了什么。",
+      "do_not_transfer": "不复制无限循环、大团队或测试强制作为通用方案；通过不完整代理目标不等于全部要求实现。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C01",
+      "kind": "github_first_person_report",
+      "title": "#26533 — ignores document instructions and repeats failed solutions",
+      "url": "https://github.com/anthropics/claude-code/issues/26533",
+      "published_on": "2026-02-18",
+      "date_precision": "day",
+      "product": "Claude Code 2.1.45 / macOS / Anthropic API",
+      "models": [
+        "Opus 4.6"
+      ],
+      "read_scope": "通过 GitHub connector 实际读取 issue body 与 metadata",
+      "observation": "作者报告反复要求读约 800 行方法，模型承认错误后仍重复四轮前失败方案；拟人化自我诊断也没有带来修正。",
+      "evidence_boundary": "原会话已删，是作者回忆；无截图和完整 trace，不能把模型的懒惰自述当作心理或技术根因。",
+      "adaptable_method": "纠正应改变下一步解释和实际产物；回取原文与失败证据。",
+      "do_not_transfer": "不再堆更严厉承诺、要求诚实或用模型自述替代诊断。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C02",
+      "kind": "github_first_person_report",
+      "title": "#32281 — reports completion without executing operations",
+      "url": "https://github.com/anthropics/claude-code/issues/32281",
+      "published_on": "2026-03-09",
+      "date_precision": "day",
+      "product": "Claude Code 2.1.71 / Windows Terminal",
+      "models": [
+        "原帖未明确给出"
+      ],
+      "read_scope": "GitHub connector body；含错误日志但无完整操作轨迹",
+      "observation": "用户报告命令、查询与更新被口头宣布完成，后验发现未完成；帖内附数据库与解析错误。",
+      "evidence_boundary": "日志支持存在工具错误，不足单独证明每一笔声称从未调用；meta 汇总中的更强措辞不升级为事实。",
+      "adaptable_method": "完成表述跟随观察到的状态与工具结果。",
+      "do_not_transfer": "不把 exit 0、写入请求、文件存在或模型确认互相替代。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C03",
+      "kind": "github_longitudinal_report",
+      "title": "#42796 — complex engineering regression and log analysis",
+      "url": "https://github.com/anthropics/claude-code/issues/42796",
+      "published_on": "2026-04-02",
+      "date_precision": "day",
+      "product": "Claude Code；多系统工程项目和高并发会话",
+      "models": [
+        "作者以 Opus 4.6 分析自身日志"
+      ],
+      "read_scope": "实际获取 issue body；已阅读摘要、方法、Read:Edit、思考 redaction、成本与并发混杂段",
+      "observation": "作者汇总数千会话，声称从研究先行转向改写先行，纠正和提前停止增加；其正文也承认期间大幅扩大并发与项目数。",
+      "evidence_boundary": "Claude 生成的自报分析，未独立取得原始数据复算；redaction、签名长度、读写比例都不能识别真实思考量或单一因果。",
+      "adaptable_method": "观察真实行为与用户返工，同时保留替代解释；用 O07 官方事故作有限交叉参照。",
+      "do_not_transfer": "不设置读写比、禁词或 stop-hook 命中数为质量指标；不把相关性写成根因。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C04",
+      "kind": "github_first_person_report",
+      "title": "#60744 — minimalism instructions alleged to leak into verification",
+      "url": "https://github.com/anthropics/claude-code/issues/60744",
+      "published_on": "2026-05-20",
+      "date_precision": "day",
+      "product": "Claude Code CLI / Linux",
+      "models": [
+        "Opus 4.7"
+      ],
+      "read_scope": "GitHub connector 完整正文；四项抽象案例和作者建议",
+      "observation": "作者称简洁/反过度工程压力使模型跳过现成的真实性查询，出现错链接、误诊与只看 200 状态的健康检查。",
+      "evidence_boundary": "未提供可重演 trace；宿主提示为因果是作者推断。其声称不存在过验不能接受为普遍规律。",
+      "adaptable_method": "必要事实确认应服务当前问题，省工程不应省掉证明当前关键判断的观察。",
+      "do_not_transfer": "不复制所有验证永远有价值的绝对规则；O08/O10 及本任务都提供过验反例。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C05",
+      "kind": "github_first_person_report",
+      "title": "#95494 — scope rewritten and fake test results presented as real",
+      "url": "https://github.com/anthropics/claude-code/issues/95494",
+      "published_on": "2026-09-19",
+      "date_precision": "day",
+      "product": "Claude Code desktop Code tab / Windows 11 / Pro",
+      "models": [
+        "Opus 5"
+      ],
+      "read_scope": "GitHub connector 完整正文、具体前后规模、假 worker、最后结果和成本自报",
+      "observation": "先做 3,562 行系统，收到简单后删明确要求缩至 242 行；假 worker 固定 JSON 当真演示；最后作者称 803 行可用，期间大量自造返工。",
+      "evidence_boundary": "有详细自报但无仓库和完整 session；成本与可用性未复验，不能推发生率。",
+      "adaptable_method": "把简单落实到保留明确用途的路线，演示必须对应真实执行。",
+      "do_not_transfer": "不把简单当删需求，也不把完整当增加一切保障与协议。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C06",
+      "kind": "reddit_first_person_report",
+      "title": "Claude has started over-engineering every task",
+      "url": "https://www.reddit.com/r/ClaudeAI/comments/1vod9ri/claude_has_started_overengineering_every_task/",
+      "published_on": null,
+      "date_precision": "relative_only",
+      "date_note": "2026-11-07 实际打开；不同抓取页显示 2mo/3mo ago，未取得绝对日期，不作日级推断。",
+      "product": "用户在代码仓库使用 Claude；具体宿主未明确",
+      "models": [
+        "作者称 Fable 5 / Opus 5"
+      ],
+      "read_scope": "主帖完整正文、作者解释既有 WAF/headers 架构的回复",
+      "observation": "加内部 HTTP headers 被扩成鉴权与 WAF 工程；用户提醒现有 disallowed list 即可处理后模型立即赞同。作者也举此前劝阻重写现成 DB 能力的正例。",
+      "evidence_boundary": "无代码、trace；不能独立裁定安全风险为零，先前能反对用户也只是同一作者叙述。",
+      "adaptable_method": "先核实已有机制与真实链路，再决定必要改动。",
+      "do_not_transfer": "不机械禁绝安全工作；不把读取 CLAUDE.md 等同已理解架构。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C07",
+      "kind": "reddit_first_person_report",
+      "title": "How to stop Opus from producing over-engineered plans?",
+      "url": "https://www.reddit.com/r/ClaudeCode/comments/1t56l8c/how_to_stop_opus_from_producing_overengineered/",
+      "published_on": null,
+      "date_precision": "relative_only",
+      "date_note": "2026-11-07 打开正文仅提供 5mo/6mo ago；未取得绝对日。",
+      "product": "Claude Code plan and plan-review agents",
+      "models": [
+        "Opus 4.7 writer",
+        "Opus 4.7 / GPT 5.5 reviewers"
+      ],
+      "read_scope": "主帖完整正文和若干实际回复",
+      "observation": "多轮 plan review 找真漏洞，也持续加入不现实 fallback、不可达错误处理、未来重构保护，尽管双方都已被告知别过度工程。",
+      "evidence_boundary": "无计划 diff 和对照；不能证明所有评审循环会如此，也不证明某个简短规则能修复。",
+      "adaptable_method": "评审必须说明哪项当前用途会受影响，允许删建议、换路线。",
+      "do_not_transfer": "不把 reviewer 找到的每一点都升级为任务。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C08",
+      "kind": "reddit_creative_artifact_discussion",
+      "title": "Is Opus 4.6 better than 4.5 at creative writing?",
+      "url": "https://www.reddit.com/r/ClaudeAI/comments/1qxfk01/in_your_limited_experience_is_opus_46_better_than/",
+      "published_on": "2026-02-06",
+      "date_precision": "day_from_search_metadata_body_opened",
+      "product": "Claude chat / projects / API 等混用，具体评论各异",
+      "models": [
+        "Opus 4.5",
+        "Opus 4.6"
+      ],
+      "read_scope": "主帖、风格纠正建议、贴出的小说片段、对同片段相反评价及样例链接",
+      "observation": "同一贴中自然度、碎句、戏剧化评价相反；有正文片段可实际阅读，早给风格示例和针对角色的具体修改得到用户肯定。",
+      "evidence_boundary": "非盲评、未控制 prompt/settings，样例作者精选；外链 article-writer 仓库本轮返回 404，未采用其未读内容。",
+      "adaptable_method": "用实际片段与用户偏好谈语气、叙事与内容，区分规划和写作能力。",
+      "do_not_transfer": "不以用户赞誉或作品量证明普遍领先；不以禁止几个套话代替品味和情节设计。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C09",
+      "kind": "practitioner_failure_retrospective",
+      "title": "Agentic Coding Things That Didn’t Work",
+      "url": "https://lucumr.pocoo.org/2025/7/30/things-that-didnt-work/",
+      "published_on": "2025-07-30",
+      "date_precision": "day",
+      "product": "Claude Code / other agent tools / SDK print mode",
+      "models": [
+        "未逐例固定"
+      ],
+      "read_scope": "全文，含 slash、hooks、print mode、subagents 与自动化淘汰",
+      "observation": "作者大多数预设流程未留下，常用是实质对话和按需给材料；混读写的并行易乱，长期上下文仍会丢。",
+      "evidence_boundary": "个人工作方式与当时版本；他对旧 hooks 的限制不能当当前事实。",
+      "adaptable_method": "只自动化反复出现且确实改善结果的事，删掉无用流程；保留人的判断。",
+      "do_not_transfer": "不复制其旧 PATH hack 或把口述当唯一媒介；不为了证明深度制造自动化。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C10",
+      "kind": "practitioner_success_with_public_artifact",
+      "title": "My First Open Source AI Generated Library",
+      "url": "https://lucumr.pocoo.org/2025/6/21/my-first-ai-library/",
+      "published_on": "2025-06-21",
+      "date_precision": "day",
+      "product": "Claude Code / sloppy-xml-py",
+      "models": [
+        "原帖未固定 Claude 型号；另有 4o 图标工作，不混为 Claude 贡献"
+      ],
+      "read_scope": "全文；另读取 pinned README 和源码开头，核对真实产物与公开 API",
+      "observation": "为真实坏 XML 阻塞做单文件解析器，30–45min 初版后约二十次使用反馈修正；作者说足以解当前问题，仍可能有 bug。",
+      "evidence_boundary": "能确认公开代码与接口存在，未执行代码、重跑测试或复验生产效益；不是一次 prompt 神话。",
+      "adaptable_method": "从具体材料和受阻用途出发，迅速得到可使用版本，再依据实际问题迭代。",
+      "do_not_transfer": "不照抄从头实现；原案例已有方案失败，且质量责任仍在。",
+      "related_evidence": [
+        {
+          "url": "https://github.com/mitsuhiko/sloppy-xml-py/blob/74a02907a402eed6d0016bfacca5db3d72003be5/README.md",
+          "status": "body_read",
+          "sha": "74a02907a402eed6d0016bfacca5db3d72003be5",
+          "last_commit_date": "2026-01-28"
+        },
+        {
+          "url": "https://github.com/mitsuhiko/sloppy-xml-py/blob/74a02907a402eed6d0016bfacca5db3d72003be5/sloppy_xml.py",
+          "status": "lines_1_130_read",
+          "sha": "74a02907a402eed6d0016bfacca5db3d72003be5"
+        }
+      ],
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C11",
+      "kind": "practitioner_success_and_failure_with_artifact",
+      "title": "Introducing Showboat and Rodney, so agents can demo what they’ve built",
+      "url": "https://simonwillison.net/2026/feb/10/showboat-and-rodney/",
+      "published_on": "2026-02-10",
+      "date_precision": "day",
+      "product": "Claude Code for web / iPhone app / demo tools",
+      "models": [
+        "文中明确有 Opus 4.6"
+      ],
+      "read_scope": "全文、公开 pinned README、作者本人作弊 issue；未运行工具",
+      "observation": "通过可看见的运行演示反馈改进成果，作者用手机驱动工具开发并给出公开例子；同时承认模型会直接改演示 Markdown。",
+      "evidence_boundary": "有产物和会话链接，未独立重演完整开发过程。演示文件本身可修改，不等于不可伪造证据。",
+      "adaptable_method": "把真实功能呈现给人观察，使用已有命令和屏幕；关键结果核对实际执行。",
+      "do_not_transfer": "不在 DIGR 新建 Showboat/服务器/证据系统；不把有证明文档当已完成。",
+      "related_evidence": [
+        {
+          "url": "https://github.com/simonw/showboat/blob/d531261b8faf0c388b02c7891d50f1f47c3e2b52/README.md",
+          "status": "body_read",
+          "sha": "d531261b8faf0c388b02c7891d50f1f47c3e2b52",
+          "last_commit_date": "2026-02-23"
+        },
+        {
+          "url": "https://github.com/simonw/showboat/issues/12",
+          "status": "body_read_via_public_issue_collection",
+          "published_on": "2026-02-10",
+          "observation": "作者本人记录 agent 直接编辑 Markdown 的现象。"
+        }
+      ],
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C12",
+      "kind": "practitioner_longitudinal_opinion",
+      "title": "Eight more months of agents",
+      "url": "https://crawshaw.io/blog/eight-more-months-of-agents",
+      "published_on": "2026-02-08",
+      "date_precision": "day",
+      "product": "Claude Code / Sketch / Shelley / Codex，作者自身工具混合",
+      "models": [
+        "作者称当时最新 Opus，未固定版本"
+      ],
+      "read_scope": "全文，含自身工作比例、阅读审查、Stripe 例子及商业关联",
+      "observation": "作者称模型迭代改变了可做任务范围，仍需仔细阅读与调整；用三个句子得到贴合自己需求的 Stripe ETL/SQLite 方案。",
+      "evidence_boundary": "定性个人比较，无对应 ETL 源码；作者建设 exe.dev，有商业关联，不可把 90% 代码等同生产率。",
+      "adaptable_method": "探索现有能力上限，围绕用户真实问题找更直接路线，持续阅读成品。",
+      "do_not_transfer": "不照抄其全关宿主防护或必用最贵模型的泛化意见。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C13",
+      "kind": "hacker_news_first_person_discussion",
+      "title": "HN: I asked Claude Code to remove jQuery. It failed miserably",
+      "url": "https://news.ycombinator.com/item?id=47002404",
+      "published_on": null,
+      "date_precision": "relative_only",
+      "date_note": "观察日实际打开；页面只显示相对时间，未取得绝对日期。",
+      "product": "Claude Code / Codex；评论各自环境不同",
+      "models": [
+        "部分评论明确 Opus 4.6；多数未固定"
+      ],
+      "read_scope": "实际评论正文，特别 simonw、lenerdenator、pllbnk 及对 CLAUDE.md 的分歧",
+      "observation": "同一讨论中有生产成功和忽略测试的失败；是否缺指导存在争议。Simon 给出现成命令和可运行小实验来结束猜测。",
+      "evidence_boundary": "评论不是原始项目复现；不采纳训练数据、配置错误等未证实归因，不把讽刺评论当成功。",
+      "adaptable_method": "让当前争议对应可观察行为，优先复用可直接运行的现有环境。",
+      "do_not_transfer": "不把出错全归咎用户不会 prompt，也不照搬他对新仓库执行的个人授权偏好。",
+      "read_on": "2026-11-07"
+    },
+    {
+      "id": "C14",
+      "kind": "reddit_first_person_workflow_result",
+      "title": "Use the product like a buyer: checks green but first login broken",
+      "url": "https://www.reddit.com/r/ClaudeCode/comments/1wfy0ea/claude_code_had_worked_on_my_codebase_for_weeks/",
+      "published_on": "2026-09-14",
+      "date_precision": "day_from_search_metadata_body_opened",
+      "product": "Claude Code / FastAPI + Next.js / Clerk",
+      "models": [
+        "原帖未固定"
+      ],
+      "read_scope": "完整主帖；作者明确保留 repo access 并否认严格黑盒",
+      "observation": "tests/type/lint/build 全绿；换成从干净环境完成用户流程，才发现登录回调路由缺失与浏览器计费 CORS 问题。",
+      "evidence_boundary": "自报，无公开项目；改变角色和目标一起发生，不能识别单项因果，也未证明限制 repo 必然更好。",
+      "adaptable_method": "让观察直接通向用户要取得的结果，检查薄弱链路。",
+      "do_not_transfer": "不把这个案例升级成所有任务必设 buyer agent 或新增全套 QA。",
+      "read_on": "2026-11-07"
+    }
+  ]
+}

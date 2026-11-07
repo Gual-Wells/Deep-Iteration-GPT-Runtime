@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from runtime.codex_workbench import create_workbench, context_packet, topic_index
+from runtime.codex_workbench import create_workbench, context_packet, topic_index, record_work
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -21,6 +21,12 @@ def main(argv: list[str] | None = None) -> int:
     init.add_argument('--work', type=Path, required=True)
     topics = sub.add_parser('topics', help='locate substantive research sections')
     topics.add_argument('--work', type=Path, required=True)
+    record = sub.add_parser('record', help='append a useful public summary to an existing work topic')
+    record.add_argument('--work', type=Path, required=True)
+    record.add_argument('--topic', default='研究、竞争解释与方案')
+    record.add_argument('--kind', default='发现与后果', help='free-form label, not a workflow state')
+    record.add_argument('--text-file', type=Path, required=True)
+    record.add_argument('--ref', action='append', default=[])
     for command in ('focus', 'challenge'):
         item = sub.add_parser(command)
         item.add_argument('--work', type=Path, required=True)
@@ -43,6 +49,11 @@ def main(argv: list[str] | None = None) -> int:
             print(args.work.resolve().as_posix())
         elif args.command == 'topics':
             print(topic_index(args.work), end='')
+        elif args.command == 'record':
+            print(record_work(
+                args.work, args.text_file.read_text(encoding='utf-8-sig'),
+                topic=args.topic, kind=args.kind, refs=args.ref,
+            ))
         else:
             print(context_packet(
                 args.work, question=args.question, topic=getattr(args, 'topic', None),
@@ -57,6 +68,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == '__main__':
-    if hasattr(sys.stdout, 'reconfigure'):
-        sys.stdout.reconfigure(encoding='utf-8')
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8')
     raise SystemExit(main())

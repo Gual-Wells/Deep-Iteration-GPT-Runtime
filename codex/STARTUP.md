@@ -1,4 +1,4 @@
-# DIGR Codex 0.2 — 启动与宿主边界
+# DIGR Codex 0.3 — 启动与宿主边界
 
 本文件只在用户明确选用 Codex 候选通道，且已经真实取得该通道的不可变仓库 pin 后生效。`codex/manifest.json` 与 `codex/VERSION` 必须属于同一 SHA、版本一致。根目录 Alpha 5 协议与此 profile 是两个入口，不能混用参数解析器、时钟前提或证明格式。
 

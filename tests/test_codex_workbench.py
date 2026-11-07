@@ -8,7 +8,7 @@ import unittest
 
 from runtime.codex_workbench import (
     GOAL, DELIVERY, STEERING, QUESTION, RESEARCH, RESULT, NEXT,
-    create_workbench, context_packet, read_material, sections, topic_index,
+    create_workbench, context_packet, read_material, sections, topic_index, record_work,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -110,6 +110,38 @@ class WorkbenchTests(unittest.TestCase):
         self.assertNotIn('暂不选入', packet)
         self.assertEqual(notes.read_text(encoding='utf-8'), text)
 
+    def test_record_retrieves_a_real_correction_without_replacing_goal_or_result(self):
+        original = self.work.read_text(encoding='utf-8')
+        self.work.write_bytes(original.replace('\n', '\r\n').encode('utf-8-sig'))
+        record_work(self.work, '父节通用判断，不属于任何单独路线。')
+        note = '收到返回：不能重写原文。\n## 这只是返回中的标题\nMain决定保留原页；组装尚未执行。'
+        location = record_work(self.work, note, topic='原页路线', kind='返回与取舍', refs=('source.pdf:12',))
+        raw = self.work.read_bytes()
+        self.assertTrue(raw.startswith(b'\xef\xbb\xbf'))
+        self.assertNotIn(b'\n', raw.replace(b'\r\n', b''))
+        packet = context_packet(self.work, topic='原页路线')
+        self.assertIn(self.request, packet)
+        self.assertIn('不需要手机适配', packet)
+        self.assertIn('组装尚未执行', packet)
+        self.assertIn('source.pdf:12', packet)
+        self.assertNotIn('父节通用判断', packet)
+        self.assertNotIn('父节通用判断', context_packet(self.work, topic='搁置路线'))
+        self.assertIn('父节通用判断', context_packet(self.work))
+        self.assertEqual([s.title for s in sections(original)], [s.title for s in sections(raw.decode('utf-8-sig'))])
+        self.assertTrue(location.startswith(self.work.as_posix()+':'))
+        self.assertEqual(
+            next(s.text for s in sections(original) if s.title == RESULT),
+            next(s.text for s in sections(raw.decode('utf-8-sig')) if s.title == RESULT),
+        )
+
+    def test_record_does_not_guess_between_duplicate_or_missing_topics(self):
+        self.work.write_text(self.work.read_text(encoding='utf-8')+'\n## 原页路线\n另一处材料\n', encoding='utf-8')
+        before = self.work.read_bytes()
+        for topic in ('原页路线', '不存在的小节'):
+            with self.subTest(topic=topic), self.assertRaisesRegex(ValueError, '唯一匹配'):
+                record_work(self.work, '不应写入错误位置。', topic=topic)
+            self.assertEqual(before, self.work.read_bytes())
+
     def test_cli_creates_then_reads_work_and_preserves_existing_notes(self):
         cli = [sys.executable, '-B', str(ROOT / 'tools/codex_workbench.py')]
         request = self.root / 'request.txt'
@@ -121,6 +153,12 @@ class WorkbenchTests(unittest.TestCase):
         result = subprocess.run(cli+['focus', '--work', str(output)], capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn(self.request, result.stdout)
+        note = self.root / 'return.txt'
+        note.write_text('已收到研究；尚未组装，继续保留原文。', encoding='utf-8')
+        result = subprocess.run(cli+['record', '--work', str(output), '--text-file', str(note), '--kind', '返回'], capture_output=True, text=True, encoding='utf-8')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('尚未组装', context_packet(output))
+        original = output.read_bytes()
         result = subprocess.run(cli+['init', '--request', str(request), '--work', str(output)], capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(result.returncode, 2)
         self.assertEqual(original, output.read_bytes())

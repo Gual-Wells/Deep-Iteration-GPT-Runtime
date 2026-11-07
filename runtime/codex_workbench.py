@@ -8,6 +8,7 @@ thinking, dispatch agents or certify work counts.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 import re
 from typing import Iterable
@@ -185,3 +186,46 @@ def topic_index(work: Path) -> str:
     work = Path(work).resolve()
     found = sections(work.read_text(encoding='utf-8-sig'))
     return '\n'.join(f'{work.as_posix()}:{s.start}-{s.end}  {s.title}' for s in found)+'\n'
+
+
+def record_work(
+    work: Path, text: str, *, topic: str = RESEARCH, kind: str = '发现与后果',
+    refs: Iterable[str] = (),
+) -> str:
+    """Append a public work summary to an existing section, not a second ledger.
+
+    The timestamp records this edit only. Entries do not infer adoption, task
+    completion, effective work time or DIGR counts. Ordinary editing is valid.
+    One writer owns the editable workbench; this is not a concurrent journal.
+    """
+    if not text.strip() or not kind.strip() or '\n' in kind or '\r' in kind:
+        raise ValueError('记录需要非空正文和单行标题')
+    refs = tuple(refs)
+    if any(not ref.strip() or '\n' in ref or '\r' in ref for ref in refs):
+        raise ValueError('引用需要非空单行位置')
+    work = Path(work).resolve()
+    raw = work.read_bytes()
+    encoding = 'utf-8-sig' if raw.startswith(b'\xef\xbb\xbf') else 'utf-8'
+    original = raw.decode(encoding)
+    found = sections(original)
+    matches = [s for s in found if s.title == topic]
+    if len(matches) != 1:
+        raise ValueError(f'记录小节必须唯一匹配：{topic}')
+    lines = original.splitlines(keepends=True)
+    selected = matches[0]
+    # A parent's trailing text belongs to its last child in Markdown. Keep a
+    # general parent note in the parent's own body, before the first child.
+    boundary = next((s.start-1 for s in found if selected.start < s.start <= selected.end), selected.end)
+    prefix, suffix = ''.join(lines[:boundary]), ''.join(lines[boundary:])
+    newline = '\r\n' if '\r\n' in original else '\n'
+    timestamp = datetime.now().astimezone().isoformat(timespec='seconds')
+    # Quoting permits arbitrary Markdown in a note without creating new topics.
+    body = '\n'.join('> '+line for line in text.strip().splitlines())
+    entry = f'**{kind.strip()} · 记录于 {timestamp}**\n\n{body}\n'
+    if refs:
+        entry += '\n引用：'+'；'.join(refs)+'\n'
+    entry = entry.replace('\n', newline)
+    gap = newline if prefix.endswith(newline) else newline+newline
+    updated = prefix+gap+entry+newline+suffix
+    work.write_bytes(updated.encode(encoding))
+    return f'{work.as_posix()}:{len((prefix+gap).splitlines())+1}'
