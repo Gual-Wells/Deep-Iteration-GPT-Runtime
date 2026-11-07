@@ -6,7 +6,7 @@ DIGR 5.0 is a reliability exoskeleton around native model intelligence. It does 
 
 ## Experimental Codex profile
 
-This stable-derived branch ships the independently versioned [Codex 0.3 profile](docs/CODEX_ADAPTATION.md): useful work traces, correction-to-action, actual delegation outcomes, creative production and autonomous method/resource choices. Read the [current research and changes](docs/CODEX_QUALITY_DESIGN.md) for the evidence and tradeoffs. Explicit DIGR keeps the user-selected N12/R4/D3/V3 floors, with detailed [unit responsibilities](codex/PARAMETERS.md), and may autonomously raise effort. Start at [codex/manifest.json](codex/manifest.json). The root Alpha 5 protocol remains unchanged; the candidate does not install itself or change the production `stable` route.
+This stable-derived branch ships the independently versioned [Codex 0.4 profile](docs/CODEX_ADAPTATION.md): actual independent L3 interventions/viewpoints, visible initialization and per-unit progress, useful work traces and result-focused judgment. Read the [previous-run review](docs/CODEX_RUN_REVIEW_20261107.md) for the registered N/R/S/D work and the limits of its L1/V records. Explicit DIGR keeps the user-selected N12/R4/D3/V3 floors and may raise effort; [unit responsibilities and output formats](codex/PARAMETERS.md) define the behavior. Start at [codex/manifest.json](codex/manifest.json). The package does not install itself or modify production `stable`; local Codex activation is a separate routing configuration.
 
 ## Alpha 5 hard-default timing change
 

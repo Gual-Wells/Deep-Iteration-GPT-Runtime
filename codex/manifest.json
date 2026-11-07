@@ -1,8 +1,8 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "0.3.0",
-  "protocol": "digr-codex-native-v3",
-  "status": "experimental_not_installed",
+  "version": "0.4.0",
+  "protocol": "digr-codex-native-v4",
+  "status": "experimental",
   "language": "zh-CN",
   "version_path": "codex/VERSION",
   "startup_slice": [
@@ -28,18 +28,19 @@
     "local_helper_provides_live_routing": false,
     "local_helper_provides_final_gate": false,
     "local_helper_provides_canonical_attestation": false,
-    "paid_api_or_agent_authorization_implied": false,
-    "prior_resource_authorization_persists": true
+    "prior_resource_authorization_persists": true,
+    "native_delegation_authorized_for_deep": true,
+    "new_paid_api_budget_implied": false
   },
   "file_sha256": {
-    "codex/VERSION": "d915cc95d6ca8f47ae297713ed46d4e5c5d99ddd29fc3c61e263bdf305f2b5b0",
-    "codex/AGENTS.light.md": "acc2bf0b48e9c2ea9c71989b1a44cfbb7aeb839734910bb34e1dee6c65667e63",
+    "codex/VERSION": "40b8eb4000a913a7791090535f291d3d369874162a89ef3c9e3d4e887a1b9e79",
+    "codex/AGENTS.light.md": "0fb9b615398ce0df611c210da9ef9513497f09dee3c5bdcbf7ba690e386dd27e",
     "codex/ROUTER.experimental.txt": "e92425ca907a9d78960457a82aedf6b94f6cf41393e1fe9eb611595ae2fb00c3",
-    "codex/STARTUP.md": "221af31b0880c1530ce16c9cdd856bcb96819e0c935a73ec01e6e3822b757c52",
-    "codex/PROTOCOL.md": "7838031846f1233fcae2aeea84888c313617dabac75dde0c23bf08f01075a05b",
-    "codex/HELP.md": "898d61b5e7f983845240649aa40f1f0e566ef6e5c96c632a07ca80a242a0fd90",
-    "codex/PARAMETERS.md": "3b1f4be2f9091abb106bcc7e4ab62e46313f33e255c9e5ca085e9b21284a74ad",
-    "codex/WORKBENCH.md": "8721819bce3dc7e2188721268245e5df757ebf23912aa6d3b282c3c72c953b0a"
+    "codex/STARTUP.md": "bef7b33ef84ad0ef4542a1d621f7e5539bbafaddded32bb1b518a92fa2006d7b",
+    "codex/PROTOCOL.md": "a2f12b8b8c48f32892a4eca66160e122c2fa9a05b237feba7e2a98c090864dc9",
+    "codex/HELP.md": "b047a9d07b1654266f46459534b59b329bf1b219cb6c59c7fe0a2f6078130cd9",
+    "codex/PARAMETERS.md": "30d1aed7f2b38befce67984714998022d1fe494c26ba42723caeb215eba3b6f5",
+    "codex/WORKBENCH.md": "75f40d650d81067f7464f3652d659db315c15066139f8cf54938309bf1442f73"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {
@@ -55,9 +56,12 @@
     "source_default": "REQUIRED",
     "time_default": "SOFT",
     "explicit_values_take_precedence": true,
-    "agent_authorization_implied": false,
+    "agent_authorization_implied": true,
     "calibration": "upward_from_starting_values",
     "units_keep_responsibility_scope": true,
-    "autonomous_downshift": false
+    "autonomous_downshift": false,
+    "isolation_mode": "L3_ONLY",
+    "low_isolation_fallback": false,
+    "progress_stream": "USER_COMMENTARY_PER_UNIT"
   }
 }

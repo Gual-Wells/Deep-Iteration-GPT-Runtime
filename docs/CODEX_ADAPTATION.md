@@ -1,17 +1,17 @@
-# Codex 候选适配 0.3
+# Codex 专用通道 0.4
 
-本分支从 stable Alpha 5 建立，参考 main Berta2。0.3结合本对话、跨厂商官方材料和社区案例，改进纠正之后的实际操作、价值性留痕、分工成果采用、正向创作与自主资源选择。默认轻量与显式深执行同步。显式 DIGR 无参数下限 N12/R4/D3/V3 只自主上调，真实能力和授权允许时优先 L3。
+本分支从stable Alpha5建立，参考main Berta2。0.4在0.3的内容与方法改进上，修正Codex宿主选择：D/V固定真实独立代理与L3，取消低L默认和兜底；初始化与各轮自举按固定格式在用户可见流报告。显式DIGR无参数下限N12/R4/D3/V3只自主上调，默认轻量保留普通任务的范围。
 
-了解结论和理由只需先读[当前研究与改动说明](CODEX_QUALITY_DESIGN.md)。下面是使用入口，不要求逐份通读内部材料。
+先读[上一轮记录、D/V局限及本次修订](CODEX_RUN_REVIEW_20261107.md)，可以直接看到各参数的已登记行为。0.3的[历史研究与设计依据](CODEX_QUALITY_DESIGN.md)保留，不把历史L1或三条来源分工追认为新的L3/V3。
 
 ## 从哪里看
 
 | 入口 | 内容 |
 | --- | --- |
-| [执行协议](../codex/PROTOCOL.md) | 深入研究问题、竞争解释、路线比较、代表性试作、持续改进成品及原生判断 |
-| [参数单位责任](../codex/PARAMETERS.md) | 每一个 N/R/D/V 负责的范围与效果；L 的实际信息边界；禁止通过碎片化缩小单位重量 |
+| [执行协议](../codex/PROTOCOL.md) | 内容与方法、真实L3分工、当场输出及主线处理 |
+| [参数单位责任与输出格式](../codex/PARAMETERS.md) | N/R/D/V单位重量、Codex固定L3、INIT/START/RETURN/END/ADJUST模板 |
 | [工作台指南](../codex/WORKBENCH.md) | 用一份有内容的笔记聚焦当前问题、按需取回原材料、准备 D/V 输入 |
-| [研究与设计依据](CODEX_QUALITY_DESIGN.md) | 本轮当前入口：具体机制、官方/社区证据、已采用后果、资源与实际观察 |
+| [历史0.3研究](CODEX_QUALITY_DESIGN.md) | 官方/社区材料、条件化方法及当时实物观察 |
 | [单位应用演练](../codex/examples/UNIT_RESPONSIBILITY.md) | 搜索、局部复查、非局部试作、持续观察等工作的责任区分 |
 | [历史0.2任务演练](CODEX_TRIAL_RESULTS.md) | 上一版两条件成果、共同缺口和当时修改；不冒充0.3的效果证据 |
 
@@ -34,7 +34,9 @@ python -B tools/codex_workbench.py challenge --kind D --work D:/task/WORK.md --q
 
 独立入口是 `codex/manifest.json` 和 `codex/VERSION`；根目录仍保留 Alpha 5 原协议，不混用其参数解析器。实验路由模板是 [ROUTER.experimental.txt](../codex/ROUTER.experimental.txt)，只承担真实获取、不可变 pin 和版本交接，不复制执行语义。
 
-本分支更新不会自动写入全局 AGENTS/config 或改变 stable/main。选择实验通道时，用实验路由替换既有 DIGR 路由段，避免两个入口并存；保留用户既有的存储、预算、隐私与项目偏好。已明确选择通道之后，常规任务无需重复审批。
+仓库更新自身不会写入全局AGENTS/config或改变stable/main。本用户本轮已要求本机Codex固定高L，应使用专用路由替换原stable路由段，不能只修改候选文件又让本机继续进旧通道。全局仅保存真实获取、pin和路径交接；L与输出格式仍从同SHA仓库加载，不复制到本地路由。其它存储、预算、隐私与项目偏好保留，安装过程另有D盘原件备份。
+
+OpenAI Docs说明AGENTS指令在运行开始时构建，新运行/会话读取更新，已有运行不视为自动热更新。[官方加载说明](https://learn.chatgpt.com/docs/agent-configuration/agents-md)。文件已配置与某个现存会话已加载是不同事实，最终以实际路由和INIT的pin/参数为准。离线check中的global_install_performed=false只表示该检查函数不安装，不是全机安装状态检测。
 
 ## 核查范围
 

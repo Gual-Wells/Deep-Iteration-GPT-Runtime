@@ -102,6 +102,9 @@ class CodexDistributionTests(unittest.TestCase):
         self.assertEqual(preference['implicit_deep'], {'N': 12, 'R': 4, 'D': 3, 'V': 3, 'L': 3})
         self.assertEqual(preference['unit_semantics'], 'codex/PARAMETERS.md')
         self.assertTrue(preference['complex_tasks_raise_investment'])
+        self.assertEqual(preference['isolation_mode'], 'L3_ONLY')
+        self.assertFalse(preference['low_isolation_fallback'])
+        self.assertEqual(preference['progress_stream'], 'USER_COMMENTARY_PER_UNIT')
 
     def test_changed_instruction_is_detected(self):
         with tempfile.TemporaryDirectory() as td:
