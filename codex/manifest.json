@@ -1,7 +1,7 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "0.4.0",
-  "protocol": "digr-codex-native-v4",
+  "version": "0.5.0",
+  "protocol": "digr-codex-native-v5",
   "status": "experimental",
   "language": "zh-CN",
   "version_path": "codex/VERSION",
@@ -33,14 +33,14 @@
     "new_paid_api_budget_implied": false
   },
   "file_sha256": {
-    "codex/VERSION": "40b8eb4000a913a7791090535f291d3d369874162a89ef3c9e3d4e887a1b9e79",
+    "codex/VERSION": "a0ad50640139a524f86591157145bf1d4674ea9c065bfea21558f0f7b04430c8",
     "codex/AGENTS.light.md": "0fb9b615398ce0df611c210da9ef9513497f09dee3c5bdcbf7ba690e386dd27e",
     "codex/ROUTER.experimental.txt": "e92425ca907a9d78960457a82aedf6b94f6cf41393e1fe9eb611595ae2fb00c3",
-    "codex/STARTUP.md": "bef7b33ef84ad0ef4542a1d621f7e5539bbafaddded32bb1b518a92fa2006d7b",
-    "codex/PROTOCOL.md": "a2f12b8b8c48f32892a4eca66160e122c2fa9a05b237feba7e2a98c090864dc9",
-    "codex/HELP.md": "b047a9d07b1654266f46459534b59b329bf1b219cb6c59c7fe0a2f6078130cd9",
-    "codex/PARAMETERS.md": "30d1aed7f2b38befce67984714998022d1fe494c26ba42723caeb215eba3b6f5",
-    "codex/WORKBENCH.md": "75f40d650d81067f7464f3652d659db315c15066139f8cf54938309bf1442f73"
+    "codex/STARTUP.md": "6852392ec29832393eeaeb7fa4567127267bf21f11e7895e1caf36e599868694",
+    "codex/PROTOCOL.md": "fecda66e3e87a35abb5da342410f6e5f2d0f000441d963e64b3f486e58741917",
+    "codex/HELP.md": "a46d493cb0f6ab8ef2d9ab65640b1d4d12e7dd9f639f61c3e17a4b48e4fdf769",
+    "codex/PARAMETERS.md": "fc0f195bc9f0e2898eb8c6e13b8fe709d2d174be62e4ba8cd120b7667a03ecee",
+    "codex/WORKBENCH.md": "ac2799e03c7d8c8f3922e3e728558e3fd7e24dd895eff7c2443feac58ecf847f"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {

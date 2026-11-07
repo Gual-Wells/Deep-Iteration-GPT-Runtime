@@ -15,7 +15,7 @@ from typing import Any, Mapping
 
 from .routing import candidate_route_key
 
-PROFILE_PROTOCOL = 'digr-codex-native-v4'
+PROFILE_PROTOCOL = 'digr-codex-native-v5'
 PROFILE_FILES = (
     'codex/VERSION',
     'codex/AGENTS.light.md',
