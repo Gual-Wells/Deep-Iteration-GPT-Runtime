@@ -1,0 +1,2 @@
+# Test-only dependency. The runtime and Codex profile use the standard library.
+jsonschema>=4.18,<5

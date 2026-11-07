@@ -4,6 +4,10 @@
 
 DIGR 5.0 is a reliability exoskeleton around native model intelligence. It does not replace the model with a planner/search controller. An explicitly invoked high-investment task receives pinned protocol authority, early trusted timing, immutable U0/contract commitments, revisable strategy/source/candidate state, disruptive interventions, evidence, persistence and recovery.
 
+## Experimental Codex profile
+
+This stable-derived branch also ships an independently versioned [Codex profile](docs/CODEX_ADAPTATION.md): light delivery defaults for ordinary tasks, and explicit model-native DIGR execution with honest capability-dependent attestation. Start at [codex/manifest.json](codex/manifest.json). The root Alpha 5 protocol remains unchanged; the candidate does not install itself or change the production `stable` route.
+
 ## Alpha 5 hard-default timing change
 
 Alpha 5 is a narrow semantic-default release over the Alpha 4 black-box corrected architecture. Omitted `B` and `b` now resolve to `1`, so semantically completed or explicitly supplied T/t targets are hard lower bounds by default. Soft timing remains available by explicitly selecting `B=0` and/or `b=0`.
@@ -80,11 +84,11 @@ NATIVE | HELP | INVALID | EXECUTING
 
 ## Validation
 
-Run:
+Use a test environment with `requirements-test.txt` installed (the runtime itself has no third-party dependencies). Run with UTF-8 enabled, including on Windows:
 
 ```bash
-python -m unittest discover -s tests -p 'test_*.py'
-python tests/validate_repo.py
+python -X utf8 -m unittest discover -s tests -p 'test_*.py'
+python -X utf8 tests/validate_repo.py
 ```
 
 Deterministic release:

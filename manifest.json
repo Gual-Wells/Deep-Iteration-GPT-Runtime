@@ -1,6 +1,12 @@
 {
   "name": "Deep Iteration GPT Runtime",
   "short_name": "DIGR",
+  "experimental_host_profiles": {
+    "codex": {
+      "manifest": "codex/manifest.json",
+      "status": "separate_opt_in_candidate_not_active"
+    }
+  },
   "version": "5.0.0-alpha.5",
   "protocol": "digr-v5.0",
   "language": "zh-CN",

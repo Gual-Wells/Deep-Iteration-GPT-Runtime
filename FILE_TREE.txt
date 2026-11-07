@@ -1,3 +1,4 @@
+.gitattributes
 .gitignore
 CHANGELOG.md
 FILE_TREE.txt
@@ -7,6 +8,13 @@ SHA256SUMS.txt
 VERSION
 bootstrap/BOOTSTRAP.md
 bundle/EXECUTION_PROTOCOL.json
+codex/AGENTS.light.md
+codex/HELP.md
+codex/PROTOCOL.md
+codex/ROUTER.experimental.txt
+codex/STARTUP.md
+codex/VERSION
+codex/manifest.json
 core/00_RESULT_SOVEREIGNTY.md
 core/05_TASK_COMMITMENT.md
 core/10_INVOCATION_AND_U0.md
@@ -26,6 +34,7 @@ core/77_ISOLATION_LEVELS.md
 core/80_STOP_AND_PROOF.md
 docs/ARCHITECTURE.md
 docs/CLOCK_RELIABILITY.md
+docs/CODEX_ADAPTATION.md
 docs/ENGINEERING_VALIDATION_LOG.md
 docs/IMPLEMENTATION_NOTES.md
 docs/INVOCATION_PARAMETERS.md
@@ -76,11 +85,13 @@ local-personalization/CHATGPT_LOCAL_PERSONALIZATION_FULL.txt
 local-personalization/README.md
 manifest.json
 pyproject.toml
+requirements-test.txt
 runtime/__init__.py
 runtime/actuals.py
 runtime/candidate_store.py
 runtime/clock_journal.py
 runtime/clock_probe.py
+runtime/codex_profile.py
 runtime/completion_state.py
 runtime/d_intervention.py
 runtime/duration.py
@@ -151,6 +162,7 @@ tests/test_clock_cross_process.py
 tests/test_clock_genesis_stress.py
 tests/test_clock_journal.py
 tests/test_clock_probe.py
+tests/test_codex_profile.py
 tests/test_d_intervention.py
 tests/test_duration.py
 tests/test_effective_contract.py
@@ -182,6 +194,7 @@ tests/test_workspace_and_state.py
 tests/test_workspace_schema_conformance.py
 tests/validate_repo.py
 tools/build_release.py
+tools/codex_profile.py
 tools/smoke_repository_transport.py
 workspace/RUN_WORKSPACE_SPEC.md
 workspace/layout-v2.json

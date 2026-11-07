@@ -44,19 +44,19 @@ class TestReleaseBuilder(unittest.TestCase):
 
 
     def test_casefold_collision_rejected(self):
-        with tempfile.TemporaryDirectory() as td:
-            root=Path(td); (root/'A.txt').write_text('a\n',encoding='utf-8'); (root/'a.txt').write_text('b\n',encoding='utf-8')
-            with self.assertRaises(RuntimeError): br.release_files(root)
+        # A Windows filesystem aliases these names before release_files can
+        # observe both. Exercise the same portability boundary without relying
+        # on the host filesystem being case-sensitive.
+        with self.assertRaises(RuntimeError):
+            br._assert_portable_unique(['A.txt', 'a.txt'])
 
     def test_windows_reserved_name_rejected(self):
-        with tempfile.TemporaryDirectory() as td:
-            root=Path(td); (root/'CON.txt').write_text('x\n',encoding='utf-8')
-            with self.assertRaises(ValueError): br.release_files(root)
+        with self.assertRaises(ValueError):
+            br._safe_rel('CON.txt')
 
     def test_windows_trailing_dot_rejected(self):
-        with tempfile.TemporaryDirectory() as td:
-            root=Path(td); (root/'name.').write_text('x\n',encoding='utf-8')
-            with self.assertRaises(ValueError): br.release_files(root)
+        with self.assertRaises(ValueError):
+            br._safe_rel('name.')
 
     def test_personalization_export_inside_source_rejected(self):
         with tempfile.TemporaryDirectory() as td:

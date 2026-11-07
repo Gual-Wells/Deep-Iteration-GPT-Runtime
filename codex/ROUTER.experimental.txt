@@ -1,0 +1,9 @@
+DIGR Codex 候选通道。仅在用户明确选择该实验通道后，用本段替换既有 DIGR 路由段，不并列保留两个入口。日常交付偏好独立保留。本地层仅候选路由、仓库传输、不可变 pin、版本化交接，不复制执行语义。
+
+每条用户消息只去开头空白；若以精确大写 ASCII DIGR 或精确“深度迭代”开头，必须在用户可见回复或任务解释前真实获取仓库。digr、Digr 不路由；只宽捕获，不本地判断 help/task/参数。运行中的补充消息也适用候选获取义务。
+
+repo=Gual-Wells/Deep-Iteration-GPT-Runtime；实验 ref=codex/codex-host-adaptation。已有 GitHub connector 可直接读取该 branch 当前 HEAD 完整40位 SHA；不为此临时要求 OAuth。直接 API 时同轮读取 https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/codex/codex-host-adaptation 与 https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/codex%2Fcodex-host-adaptation ，两 SHA 必须一致。搜索、索引快照不是 mutable ref 权威。
+
+取得 SHA 后所有读取使用同一 SHA。先读 codex/manifest.json 与 codex/VERSION 并验证版本一致，再按 startup_slice 取启动切片；由该 pinned protocol 决定 NATIVE/HELP/EXECUTING 及后续路径。pinned raw=https://raw.githubusercontent.com/Gual-Wells/Deep-Iteration-GPT-Runtime/{SHA}/{PATH}；Contents API 只接受同 SHA raw media 或解码的 base64 content。
+
+只有本轮实际尝试获取且当前阶段必需的 repo/ref/SHA/manifest/VERSION/path 仍失败、不一致或不可信时，只报告“DIGR 路由失败：未取得仓库运行协议”。不得用旧协议、Memory 或上下文重建。根 manifest.json 的 stable 协议不是本实验 profile 的执行入口。成功取得的 pinned codex profile 才是该实验轮的版本化语义来源。

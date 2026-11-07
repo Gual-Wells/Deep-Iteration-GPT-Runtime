@@ -1,0 +1,39 @@
+{
+  "name": "DIGR Codex Native Profile",
+  "version": "0.1.0",
+  "protocol": "digr-codex-native-v1",
+  "status": "experimental_not_installed",
+  "language": "zh-CN",
+  "version_path": "codex/VERSION",
+  "startup_slice": [
+    "codex/STARTUP.md"
+  ],
+  "entrypoint": "codex/PROTOCOL.md",
+  "core": [],
+  "help": "codex/HELP.md",
+  "light_instructions": "codex/AGENTS.light.md",
+  "experimental_router": "codex/ROUTER.experimental.txt",
+  "design_sources": {
+    "repository": "Gual-Wells/Deep-Iteration-GPT-Runtime",
+    "base_stable_sha": "6fdde982c2c804efe9702fd4cdd2f715b0aaf421",
+    "reference_main_sha": "165c95bbbd96d2171687bba073774b211920ef81"
+  },
+  "host_contract": {
+    "ordinary_mode": "LIGHT",
+    "explicit_mode": "MODEL_NATIVE",
+    "new_turn_non_sticky": true,
+    "steer_preserves_task_unless_goal_changes": true,
+    "local_helper_provides_live_routing": false,
+    "local_helper_provides_final_gate": false,
+    "local_helper_provides_canonical_attestation": false,
+    "paid_api_or_agent_authorization_implied": false
+  },
+  "file_sha256": {
+    "codex/VERSION": "e9dd8507f4bf0c6f42458e41aea833ad0bd3f6127272335eee9bf4d58541ed67",
+    "codex/AGENTS.light.md": "f5371bc093a2b00feca549eba98b54c991b5cd7e8e2c56559b1eb54f0f775640",
+    "codex/ROUTER.experimental.txt": "c149c5e4a5be65855459947637ebc3ab81d1014dcc953ddfe4af7bc8bb5687c9",
+    "codex/STARTUP.md": "71a917854472da10ec7f48160a47bfb1f6fce7418f69ed83fe3027939bd343d4",
+    "codex/PROTOCOL.md": "b018a1ba2bdf2035c9657d6935666b19f109b7134413e08d420dbacfe881329f",
+    "codex/HELP.md": "bb46d47bd265bb98ae2877006e707cf91bd95424184c6cc4d837ab6d460f4387"
+  }
+}
