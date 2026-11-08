@@ -24,11 +24,41 @@ class TestReleaseBuilder(unittest.TestCase):
             except OSError: self.skipTest('symlink unavailable')
             with self.assertRaises(RuntimeError): br.release_files(root)
 
+    def test_private_cache_is_excluded_and_preserved(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            cache = root / '.cache'
+            cache.mkdir()
+            note = cache / 'private.txt'
+            note.write_text('local user material', encoding='utf-8')
+            (cache / '__pycache__').mkdir()
+            (cache / '__pycache__/private.pyc').write_bytes(b'private')
+            (root / 'public.md').write_text('release', encoding='utf-8')
+            (root / '.git').write_text('gitdir: private-worktree-location', encoding='utf-8')
+            self.assertEqual(br.release_files(root), [Path('public.md')])
+            br.clean_caches(root)
+            self.assertEqual(note.read_text(encoding='utf-8'), 'local user material')
+            self.assertTrue((cache / '__pycache__/private.pyc').exists())
+
     def test_checksum_path_traversal_rejected(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td); self.seed(root)
             (root/br.SUMS_FILE).write_text('0'*64+'  ../escape\n',encoding='utf-8')
             with self.assertRaises((ValueError,RuntimeError)): br.verify_tree_and_hashes(root)
+
+    def test_release_cleanup_keeps_git_database(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            git = root / '.git'
+            (git / 'objects').mkdir(parents=True)
+            original = git / 'objects' / 'keep'
+            original.write_bytes(b'original repository data')
+            (root / '__pycache__').mkdir()
+            (root / '__pycache__/temporary.pyc').write_bytes(b'cache')
+            br.clean_caches(root)
+            self.assertEqual(original.read_bytes(), b'original repository data')
+            self.assertFalse((root / '__pycache__').exists())
+            self.assertEqual(br.release_files(root), [])
 
     def test_output_inside_source_rejected(self):
         with tempfile.TemporaryDirectory() as td:

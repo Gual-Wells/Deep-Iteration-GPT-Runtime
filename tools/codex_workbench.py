@@ -31,9 +31,12 @@ def main(argv: list[str] | None = None) -> int:
         item = sub.add_parser(command)
         item.add_argument('--work', type=Path, required=True)
         item.add_argument('--request', type=Path, help='reuse any existing work document with a separate actual request')
-        item.add_argument('--question')
+        item.add_argument('--goal-topic', help='use the exact title of an existing original-goal section')
+        item.add_argument('--corrections-topic', action='append', default=[], help='also retain this exact existing correction section')
+        item.add_argument('--question', help='optional research entry point; D/V may first scout a problem or develop a field')
         item.add_argument('--material', action='append', default=[])
         item.add_argument('--candidate', action='append', default=[])
+        item.add_argument('--experience', action='append', default=[], help='explicitly select an optional source-bound history candidate')
         item.add_argument('--max-chars', type=int, default=24000)
         if command == 'focus':
             item.add_argument('--topic')
@@ -60,6 +63,8 @@ def main(argv: list[str] | None = None) -> int:
                 materials=args.material, candidates=args.candidate,
                 kind=getattr(args, 'kind', 'focus'), max_chars=args.max_chars,
                 request=args.request,
+                goal_topic=args.goal_topic, corrections_topics=args.corrections_topic,
+                experiences=args.experience,
             ), end='')
         return 0
     except (ValueError, OSError) as error:

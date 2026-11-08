@@ -1,7 +1,7 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "0.5.1",
-  "protocol": "digr-codex-native-v5",
+  "version": "0.6.0",
+  "protocol": "digr-codex-native-v6",
   "status": "experimental",
   "language": "zh-CN",
   "version_path": "codex/VERSION",
@@ -10,7 +10,10 @@
   ],
   "entrypoint": "codex/PROTOCOL.md",
   "core": [
-    "codex/PARAMETERS.md"
+    "codex/CHARACTER.md",
+    "codex/PARAMETERS.md",
+    "codex/COLLABORATION.md",
+    "codex/PERMISSIONS.md"
   ],
   "help": "codex/HELP.md",
   "light_instructions": "codex/AGENTS.light.md",
@@ -30,17 +33,28 @@
     "local_helper_provides_canonical_attestation": false,
     "prior_resource_authorization_persists": true,
     "native_delegation_authorized_for_deep": true,
-    "new_paid_api_budget_implied": false
+    "new_paid_api_budget_implied": false,
+    "live_acquisition_tool": "tools/codex.py acquire",
+    "task_scope_authorization_advice": "runtime/codex_permissions.py",
+    "agent_scheduling": "MODEL_NATIVE",
+    "clock_scope": "EXPLICIT_ACTIVITY_INTERVALS_WITH_DOMAIN_IDENTITY",
+    "session_tool_is_not_executor": true,
+    "automatic_global_memory_write": false,
+    "local_helper_provides_live_acquisition": true
   },
   "file_sha256": {
-    "codex/VERSION": "aba951626c8690ce493cbc8f018205bb468003f61fbf00fd3d3c71cebabc0177",
-    "codex/AGENTS.light.md": "0fb9b615398ce0df611c210da9ef9513497f09dee3c5bdcbf7ba690e386dd27e",
+    "codex/VERSION": "97a5d6e540a6120d09c39ddb667e0e8e2bac7fcc2ffef813b82e08fd60365bce",
+    "codex/AGENTS.light.md": "f2965cf01525c675ead3fefcaecdf9d447b0e0665b127650b00900e9c3c4153c",
     "codex/ROUTER.experimental.txt": "e92425ca907a9d78960457a82aedf6b94f6cf41393e1fe9eb611595ae2fb00c3",
-    "codex/STARTUP.md": "04f5240a57adaef19dc4db01d6eb141773976298c8875d3386226723051be0ac",
-    "codex/PROTOCOL.md": "bc8dc123d9a15dbe0f51ec386c3dc773cac16f9bba3f65c6e19007b83b7576c5",
-    "codex/HELP.md": "547f7864e3062db1d54e2497641708a7496799bd3b7c52f4cc6c9aff24498d75",
-    "codex/PARAMETERS.md": "f116ca782d24d0e746c7f3ac9387f2ae04a25782f4b067da2775fdc988186e10",
-    "codex/WORKBENCH.md": "ac2799e03c7d8c8f3922e3e728558e3fd7e24dd895eff7c2443feac58ecf847f"
+    "codex/STARTUP.md": "e1612cf13f55f3999f915c305d067ea5ec26b85a0eeda2ffed79991c9657114c",
+    "codex/PROTOCOL.md": "6bc5a85b5980dddab2c00563da9a5a9755bc9ecf45219b520eeb9de95c89b99e",
+    "codex/HELP.md": "1918142f66c1d9ba47e994135b59b84a5a29460f379c242a420865194b451063",
+    "codex/PARAMETERS.md": "288acc8b354d5ab6dd8c52041b554f56b08cd91268960a35a4e2e651608a2f5c",
+    "codex/WORKBENCH.md": "7cf283f78c6b6622b6d56056992acb9a866cd542920b87f5cd27708209ed3c3d",
+    "codex/CHARACTER.md": "c0565f52bdf585d8ba24da51e6354493d9d7acdb5938ab9848f12eed736eb932",
+    "codex/COLLABORATION.md": "ca16fa57253564a1e2e1ed43a31856c949d83d92e22023c7a77e9c12f2905b96",
+    "codex/PERMISSIONS.md": "af506ba19c733743a74df263a808c2b3beb5c69c21743f5c802946d4ed339f68",
+    "codex/EXECUTION_PROTOCOL.json": "b8b5e220c0eed907da0386edafa11378b46fc6061bcb7afbe0121d2516792809"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {
@@ -49,7 +63,8 @@
       "R": 4,
       "D": 3,
       "V": 3,
-      "L": 3
+      "L": 3,
+      "M": 1
     },
     "complex_tasks_raise_investment": true,
     "unit_semantics": "codex/PARAMETERS.md",
@@ -63,5 +78,16 @@
     "isolation_mode": "L3_ONLY",
     "low_isolation_fallback": false,
     "progress_stream": "USER_COMMENTARY_PER_UNIT"
+  },
+  "execution_bundle": {
+    "path": "codex/EXECUTION_PROTOCOL.json",
+    "schema": 1,
+    "members": [
+      "codex/PROTOCOL.md",
+      "codex/CHARACTER.md",
+      "codex/PARAMETERS.md",
+      "codex/COLLABORATION.md",
+      "codex/PERMISSIONS.md"
+    ]
   }
 }

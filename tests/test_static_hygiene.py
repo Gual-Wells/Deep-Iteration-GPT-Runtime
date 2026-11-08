@@ -1,21 +1,29 @@
 import ast
 import re
 import unittest
+import sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from tools.build_release import release_files
+
+
+def source_files():
+    return (ROOT / rel for rel in release_files(ROOT))
 
 class TestStaticHygiene(unittest.TestCase):
     def test_python_310_syntax_gate(self):
-        for p in ROOT.rglob('*.py'):
-            if '__pycache__' in p.parts: continue
+        for p in source_files():
+            if p.suffix != '.py': continue
             src=p.read_text(encoding='utf-8')
             with self.subTest(path=str(p.relative_to(ROOT))):
                 ast.parse(src,filename=str(p),feature_version=(3,10))
 
     def test_text_utf8_lf_and_no_hidden_c0(self):
         text_suffix={'.md','.txt','.py','.json','.toml'}
-        for p in ROOT.rglob('*'):
-            if not p.is_file() or p.suffix not in text_suffix or '__pycache__' in p.parts: continue
+        for p in source_files():
+            if p.suffix not in text_suffix: continue
             data=p.read_bytes()
             with self.subTest(path=str(p.relative_to(ROOT))):
                 self.assertFalse(data.startswith(b'\xef\xbb\xbf'))
@@ -28,8 +36,7 @@ class TestStaticHygiene(unittest.TestCase):
 
     def test_release_tree_has_no_casefold_path_collisions(self):
         seen={}
-        for p in ROOT.rglob('*'):
-            if not p.is_file() or '__pycache__' in p.parts: continue
+        for p in source_files():
             rel=p.relative_to(ROOT).as_posix()
             key=rel.casefold()
             self.assertNotIn(key,seen,f'case-insensitive path collision: {seen.get(key)} vs {rel}')
@@ -37,7 +44,8 @@ class TestStaticHygiene(unittest.TestCase):
 
     def test_local_markdown_relative_links_exist(self):
         pat=re.compile(r'\[[^\]]*\]\(([^)]+)\)')
-        for p in ROOT.rglob('*.md'):
+        for p in source_files():
+            if p.suffix != '.md': continue
             text=p.read_text(encoding='utf-8')
             for target in pat.findall(text):
                 if '://' in target or target.startswith('#') or target.startswith('mailto:'):

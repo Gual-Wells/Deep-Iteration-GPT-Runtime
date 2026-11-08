@@ -82,14 +82,34 @@ def create_workbench(request: str) -> str:
 
 def _required_and_selected(
     text: str, topic: str | None, *, challenge: bool, request: str | None = None,
+    goal_topic: str | None = None, corrections_topics: Iterable[str] = (),
 ) -> list[tuple[str, str]]:
     found = sections(text)
     top = {s.title: s.text for s in found if s.level == 2}
-    goal = request if request is not None else top.get(GOAL)
+
+    def explicit_section(title: str, purpose: str) -> Section:
+        matches = [s for s in found if s.title == title]
+        if len(matches) != 1:
+            raise ValueError(f'{purpose}小节必须唯一匹配：{title}')
+        return matches[0]
+
+    if request is not None and goal_topic is not None:
+        raise ValueError('--request 与 --goal-topic 请选择一个原始目标来源，不能静默覆盖')
+    goal = (
+        explicit_section(goal_topic, '目标').text if goal_topic is not None
+        else request if request is not None else top.get(GOAL)
+    )
     if not goal or not goal.strip():
-        raise ValueError(f'请通过 --request 提供原始委托，或在工作笔记保留“{GOAL}”节')
+        raise ValueError(f'请通过 --request 或 --goal-topic 提供原始委托，或在工作笔记保留“{GOAL}”节')
     selected = [(GOAL, _quoted_request(goal) if request is not None else goal)]
     selected += [(label, top[label]) for label in (DELIVERY, STEERING) if top.get(label)]
+    for title in dict.fromkeys(corrections_topics):
+        item = explicit_section(title, '纠正')
+        if title == STEERING and top.get(STEERING):
+            continue
+        if not item.text.strip():
+            raise ValueError(f'明确选入的纠正小节为空：{title}')
+        selected.append((f'{STEERING}：{title}', item.text))
     if not challenge:
         for label in (QUESTION, RESULT, NEXT):
             if top.get(label):
@@ -145,17 +165,21 @@ def context_packet(
     kind: str = 'focus',
     max_chars: int = 24000,
     request: Path | None = None,
+    goal_topic: str | None = None,
+    corrections_topics: Iterable[str] = (),
+    experiences: Iterable[str | Path] = (),
 ) -> str:
     if kind not in ('focus', 'D', 'V'):
         raise ValueError('kind 必须为 focus、D 或 V')
     if max_chars <= 0:
         raise ValueError('max_chars 必须为正数')
-    if kind != 'focus' and (not question or not question.strip()):
-        raise ValueError('D/V 输入需要说明具体研究问题或介入设想')
     work = Path(work).resolve()
     original = work.read_text(encoding='utf-8-sig')
     request_text = Path(request).read_text(encoding='utf-8-sig') if request is not None else None
-    pairs = _required_and_selected(original, topic, challenge=kind != 'focus', request=request_text)
+    pairs = _required_and_selected(
+        original, topic, challenge=kind != 'focus', request=request_text,
+        goal_topic=goal_topic, corrections_topics=corrections_topics,
+    )
     heading = '# 当前问题工作上下文' if kind == 'focus' else f'# {kind} 研究输入'
     parts = [heading, f'工作台：{work.as_posix()}']
     if question:
@@ -164,15 +188,25 @@ def context_packet(
         parts += ['## '+title, body]
     if kind != 'focus':
         instruction = (
-            '围绕介入设想深入研究或试作，返回有内容的方案、材料和对主线的后果。'
+            '从用户用途、关键事实和明确选入的材料自主侦察，寻找值得改变主线的机会。'
+            '具体反叛对象与旗帜可以由研究形成；已有问题也是可修订的研究入口。'
+            '可取得新材料、创造确有用途的方法或工具，试作足以竞争的成果，返回中心主张与实际后果。'
             if kind == 'D' else
-            '持续发展这一不同视角，保留自己的问题和发现，随重要进展继续研究；返回非重复的实质发现。'
+            '从实际材料与实践研究可能被主线忽视的价值领域；领域身份可以在研究讨论中形成或修订。'
+            '自主发展问题、方法、研究资产与代表成果，随实质进展持续研究。'
+            '必要交流默认经Main保留原意转交，不读取其它V完整私人历史；返回非重复发现和可继续使用的能力或成果。'
         )
         parts += ['## 工作要求', instruction]
     for title, specs in (('明确选入的候选', candidates), ('明确选入的材料', materials)):
         for spec in specs:
             location, content = read_material(spec, base=work.parent)
             parts += ['## '+title, location, '```text\n'+content+'\n```']
+    experience_paths = tuple(Path(spec) for spec in experiences)
+    if experience_paths:
+        # Imported only for this optional feature; source capture reuses read_material.
+        from runtime.codex_experience import render_candidates
+        selected_experiences = [path if path.is_absolute() else work.parent / path for path in experience_paths]
+        parts.append(render_candidates(selected_experiences).rstrip())
     packet = '\n\n'.join(parts).rstrip()+'\n'
     if len(packet) > max_chars:
         raise ValueError(

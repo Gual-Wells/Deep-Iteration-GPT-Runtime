@@ -99,7 +99,7 @@ class CodexDistributionTests(unittest.TestCase):
 
     def test_default_depth_is_the_user_selected_high_investment_policy(self):
         preference = depth_preferences(ROOT)
-        self.assertEqual(preference['implicit_deep'], {'N': 12, 'R': 4, 'D': 3, 'V': 3, 'L': 3})
+        self.assertEqual(preference['implicit_deep'], {'N': 12, 'R': 4, 'D': 3, 'V': 3, 'L': 3, 'M': 1})
         self.assertEqual(preference['unit_semantics'], 'codex/PARAMETERS.md')
         self.assertTrue(preference['complex_tasks_raise_investment'])
         self.assertEqual(preference['isolation_mode'], 'L3_ONLY')
@@ -114,6 +114,23 @@ class CodexDistributionTests(unittest.TestCase):
                 f.write('\nchanged\n')
             with self.assertRaisesRegex(ValueError, 'hash mismatch'):
                 verify_distribution(root)
+
+    def test_combined_host_export_preserves_layers_and_existing_files(self):
+        combined = instruction_text(ROOT, 'codex-agents')
+        self.assertTrue(combined.startswith(instruction_text(ROOT, 'experimental-router').rstrip()))
+        self.assertTrue(combined.endswith(instruction_text(ROOT, 'light')))
+        cli = [sys.executable, '-B', str(ROOT / 'tools/codex.py')]
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td) / 'new' / 'AGENTS.txt'
+            result = subprocess.run([*cli, 'profile', 'export', 'codex-agents', '--out', str(out)],
+                                    capture_output=True, text=True, encoding='utf-8')
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertFalse(json.loads(result.stdout)['global_install_performed'])
+            self.assertEqual(out.read_text(encoding='utf-8'), combined)
+            again = subprocess.run([*cli, 'profile', 'export', 'codex-agents', '--out', str(out)],
+                                   capture_output=True, text=True, encoding='utf-8')
+            self.assertEqual(again.returncode, 2)
+            self.assertEqual(out.read_text(encoding='utf-8'), combined)
 
     def test_incomplete_hash_set_or_version_mismatch_is_rejected(self):
         with tempfile.TemporaryDirectory() as td:

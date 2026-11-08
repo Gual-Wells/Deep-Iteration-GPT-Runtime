@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and cold-validate a deterministic DIGR 5.0.0-alpha.4 source ZIP.
+"""Build and cold-validate a deterministic DIGR source ZIP.
 
 Standard-library only.  The builder rejects symlinks/path traversal, tests the
 source before cache cleanup, regenerates FILE_TREE/SHA256SUMS, writes a sorted
@@ -21,7 +21,8 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-EXCLUDED_DIRS = {'.git', '.pytest_cache', '.mypy_cache', '.ruff_cache', '__pycache__'}
+CLEANABLE_DIRS = {'.pytest_cache', '.mypy_cache', '.ruff_cache', '__pycache__'}
+EXCLUDED_DIRS = {'.git', '.cache', *CLEANABLE_DIRS}
 EXCLUDED_SUFFIXES = {'.pyc', '.pyo'}
 TREE_FILE = 'FILE_TREE.txt'
 SUMS_FILE = 'SHA256SUMS.txt'
@@ -36,7 +37,10 @@ _WINDOWS_INVALID_CHARS = set('<>:\"|?*')
 
 
 def run(cmd: list[str], cwd: Path) -> None:
-    subprocess.run(cmd, cwd=cwd.resolve(), check=True)
+    # Legacy source checks use default text decoding. Make the release's
+    # declared UTF-8 explicit on Windows without changing machine settings.
+    env = {**os.environ, 'PYTHONUTF8': '1', 'PYTHONDONTWRITEBYTECODE': '1'}
+    subprocess.run(cmd, cwd=cwd.resolve(), env=env, check=True)
 
 
 def _safe_rel(text: str) -> PurePosixPath:
@@ -84,30 +88,47 @@ def _assert_portable_unique(paths: list[str]) -> None:
 
 def clean_caches(root: Path) -> None:
     root = root.resolve()
-    for p in sorted(root.rglob('*'), key=lambda x: len(x.parts), reverse=True):
-        if p.is_symlink():
-            continue
-        if p.is_dir() and p.name in EXCLUDED_DIRS:
-            shutil.rmtree(p)
-        elif p.is_file() and p.suffix in EXCLUDED_SUFFIXES:
-            p.unlink()
+    for current, directories, names in os.walk(root, followlinks=False):
+        keep = []
+        for name in directories:
+            path = Path(current) / name
+            if name in {'.git', '.cache'} or path.is_symlink() or getattr(path, 'is_junction', lambda: False)():
+                continue
+            if name in CLEANABLE_DIRS:
+                # Verify the actual absolute target before recursive cleanup.
+                if not path.resolve().is_relative_to(root):
+                    raise ValueError(f'cache cleanup escapes source root: {path}')
+                shutil.rmtree(path)
+            else:
+                keep.append(name)
+        directories[:] = keep
+        for name in names:
+            path = Path(current) / name
+            if path.suffix in EXCLUDED_SUFFIXES and not path.is_symlink():
+                path.unlink()
 
 
 def release_files(root: Path) -> list[Path]:
     root = root.resolve()
     out: list[Path] = []
-    for p in root.rglob('*'):
-        if p.is_symlink():
-            raise RuntimeError(f'symlink is not allowed in release tree: {p.relative_to(root)}')
-        if not p.is_file():
-            continue
-        rel = p.relative_to(root)
-        _safe_rel(rel.as_posix())
-        if any(part in EXCLUDED_DIRS for part in rel.parts):
-            continue
-        if p.suffix in EXCLUDED_SUFFIXES:
-            continue
-        out.append(rel)
+    for current, directories, names in os.walk(root, followlinks=False):
+        # Private experiments are neither release input nor cleanup targets.
+        directories[:] = [name for name in directories if name not in EXCLUDED_DIRS]
+        for name in directories:
+            path = Path(current) / name
+            if path.is_symlink():
+                raise RuntimeError(f'symlink is not allowed in release tree: {path.relative_to(root)}')
+        for name in names:
+            if name in EXCLUDED_DIRS:
+                continue
+            p = Path(current) / name
+            if p.is_symlink():
+                raise RuntimeError(f'symlink is not allowed in release tree: {p.relative_to(root)}')
+            if p.suffix in EXCLUDED_SUFFIXES:
+                continue
+            rel = p.relative_to(root)
+            _safe_rel(rel.as_posix())
+            out.append(rel)
     out = sorted(out, key=lambda x: x.as_posix())
     _assert_portable_unique([p.as_posix() for p in out])
     return out
@@ -261,6 +282,10 @@ def build_release(root: Path, output: Path) -> str:
     root = root.resolve()
     output = output.resolve()
     write_execution_bundle(root)
+    if (root / 'codex/manifest.json').is_file():
+        sys.path.insert(0, str(root))
+        from runtime.codex_profile import refresh_distribution
+        refresh_distribution(root)
     run([sys.executable, '-m', 'unittest', 'discover', '-s', 'tests', '-q'], root)
     run([sys.executable, 'tests/validate_repo.py'], root)
     clean_caches(root)

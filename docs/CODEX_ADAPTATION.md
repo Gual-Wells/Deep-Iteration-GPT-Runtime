@@ -1,133 +1,86 @@
-# Codex 专用通道 0.5.1：有身份、有层次的工作显示
+# DIGR Codex 0.6.0：执行语义、真实工具与宿主接入
 
-初始化统一为“参数符号（生效值）”，不带实际值；结束为“参数符号（目标/实际）”，B/b开关保持单值。中途采用用户选定的色块图标、粗体身份和分层过程：N蓝、R紫、D橙、V绿、来源研究黄。独立返回缩进，Main反馈回正文，必要时间放块末。保留N12/R4/D3/V3、真实L3及V独立边界，不新增执行层或每条必填表。
+本实验分支的使用入口是[根README](../README.md)，执行权威是本轮真实取得的同SHA `codex/manifest.json` 与所声明原文。根stable继续保持5.0.0-alpha.5，Python项目基础版本也保留该身份；Codex是独立版本化的原生模型profile，不是将stable执行器换名为0.6。
 
-本页是当前使用与设计入口。[0.5研究实作、各线返回与后续显示修订](research/codex-identity-20261108/WORK.md)保留真实工作与边界；[上一轮回看](CODEX_RUN_REVIEW_20261107.md)及[0.3历史研究](CODEX_QUALITY_DESIGN.md)仍可取回，不追认旧L1或按来源分工为L3/V3。
+## 这次改变的中心
 
-## 初始化和每轮身份怎么读
+研究者气质进入真正读取的主正文与普通偏好：兴趣指向具体材料、现象与作品，敢形成偏爱，也让陌生材料改变什么值得追。D先自主侦察再形成强替代；V先研究形成分域，持续发展自己的材料、问题与作品；Main主动做强候选，必要时更换整体路线和具体生产主导。M新增为完整独立主进度数量，默认1，每线完整履行自己的责任。
 
-以下将**早前0.5研究的真实内容按0.5.1外观整理为示例**，不是原始流逐字回放，不重启INIT，也不声称当时按新格式执行。那次P_run是0.4@`1c5665b91cc1209eb20bd9b058c9e28bc4a44827`；历史逐项时刻不补造。
+这不是把所有任务改成更大管理系统。工作工具只补足实际传输、取材、接续和计时；经验保存自愿按需使用，不自动生成稳定偏好或给模型权重训练背书。分线包与只读汇总代替常驻行政计时管理员，实际作者、必要交流和最终综合仍由模型承担。
 
-```text
-[DIGR INIT OK] 生效配置：
-DIGR（N（12），T（75min），R（4），B（0），
-S（n（3），t（30min），r（1），b（0）），D（3），V（3），L（3））
-历史起点=2026-11-08 01:15:26+08:00 | 墙钟=0s | T/t=软目标 | source=REQUIRED
-P_run=0.4@1c5665b91cc1209eb20bd9b058c9e28bc4a44827 | clock=实际UTC采样，有效T/t未验证
+## 实际加载路径
+
+```mermaid
+flowchart TD
+    A[用户消息] --> B{精确候选前缀}
+    B -->|普通新任务| C[本地轻量偏好]
+    B -->|DIGR / 深度迭代| D[真实HEAD与同SHA manifest / VERSION]
+    D --> E[最小STARTUP分类]
+    E -->|NATIVE| C
+    E -->|HELP| H[同pin HELP]
+    E -->|EXECUTING| F[执行正文及全部core原文]
+    F --> G[模型Main / 独立M与D/V]
+    G --> I[按用途研究和实际制作]
+    G --> J[可选文件 / 材料 / 计时工具]
 ```
 
-🟦 **N03｜主线推进：持续身份与生命周期**
+本地路由不解析参数或复制执行语义。已有真实GitHub connector可直接取分支HEAD；直接REST使用同轮ref/branch一致SHA。每条精确前缀新消息都真实获取；同一任务已有P_run冻结。CLI的continue-from仅用于同次获取阶段接续，不是新调用的在线路由。
 
-**✓ 已完成（历史回看）**
+执行原文逻辑分文件维护，传输可聚合：
 
-研究一次有效返回会不会提前关闭V；C1保留同线再入，贡献合格与线路关闭分开。
-
-🟪 **R01｜整体重开：C1是否只是给状态栏加名字**
-
-**▶ 开始（历史回看）**
-
-Main重研整套初始化、身份、独立返回与反馈；让呈现替代承担实际比较，不预定新排版胜出。
-
-🟧 **D01｜试作全流程内容先行，挑战字段主导**
-
-**▶ 开始（历史回看）**
-
-真实执行者=identity_reader_view；比较同一批事实的两种完整写法，寻找统一替换的反例。
-
-**↩ 独立返回 → 主线｜当时待处理**
-
-> **返回摘要**：两稿都能承载工作；INIT还有直接核对合同的用途。原主张收窄，不支持整套统一内容先行；未测读者效果。
-
-**◆ 主线处理｜已落实**
-
-接受INIT合同先行、过程工作先行、状态紧邻发现；因为各消息用途不同，顺序本身不能证明理解改善。
-已写入C2，随后保留到C4与目标规则；不采用强制全对话，不把先前采纳阶段动词算作本D已完成。
-
-🟩 **V03.2｜协作语义：不同阶段的结论如何综合**
-
-**↻ 继续研究（历史回看）**
-
-实际收到C4，研究它与先前所答C1的相关变化；没有阅读其它V笔记。
-
-**↩ 独立返回 → 主线｜当时待处理**
-
-> **返回摘要**：可保留C4；不要把持续再入变成每次改稿全员同步，Main的应用判断不等于原作者已复核。
-
-**◆ 主线处理｜已落实**
-
-接受：按相关实质变化再入。已写进必读规则；V02研究过C3，不代称它已读C4或最终0.5。
-
-示例里N/R是Main的工作单元；D有可被反证的强替代；V有持续立场及新问题。它们不是固定演员。实际运行仍在各边界附真实时间、累计与必要执行者信息；本整理只说明内容怎样接起来，不代替现场输出。
-
-结束显示沿用已记录数量作为例子，有效时长未知处不补造：
-
-```text
-DIGR（N（12/12），T（75min/?），R（4/4），B（0），
-S（n（3/3），t（30min/?），r（1/1），b（0）），D（3/3），V（3/3），L（3/3））
-```
-
-只有结束报告使用括号内斜线，左为生效目标，右为实际。中途保留有用的身份和阶段，不重播整份参数表；以上只是显示，不改变调用解析语法。
-
-N/R的短名随当前职责与目的建立；D说清干预对象、替代主张和实际行动；V说清认识前提/价值关注与当前问题。方向可以由Main提出，结论不预填。反证后沿用同一问题身份，不换名重算；V可以有据赞同，也可以改变结论，不必表演反对。
-
-## 三项实际介入改变了什么
-
-| 介入 | 实际工作与所得 | Main的中心取舍 |
-| --- | --- | --- |
-| D01：过程呈现的重心 | 同内容两种完整样稿＋反例；INIT不宜强制和过程同一重心 | 采用用途分工，保留紧凑状态，拒绝全对话；已进入规则 |
-| D02：身份与研究组织 | 原始Decree→工人TASK→作品对照、完整任务包与同材料试作；发现介入原题在委派时被缩小 | 保留整体组织；让研究问题进入实际委托，制作是方法，不能用工人履约补齐原题 |
-| D03：返回的回应关系 | 比较轻量、强响应门及收窄方案，运行有限合成反例；匹配字段不能证明落实 | 有歧义时必须说清所答对象；自然语言可满足，不建设控制器或空ACK流程 |
-
-三项均由已有但相互分离的真实代理上下文实际承担，Main读完产物后分别处理。合成反例不是本机异步故障测试，两份任务包不是两个已运行代理条件；没有据此宣称成功率或读者效果提升。
-
-持续V也有实际不同问题：V01关心用户能否沿内容理解成品变化；V02关心研究者是否仍拥有原问题与反例；V03关心消息、所答材料与Main后果是否关联。它们初轮研究后，V02再入C3，V01/V03再入C4；Main综合相关结论，不要求它们互相看笔记或全部复核最终版。
-
-## 依据与没有照搬的部分
-
-仓库对照固定为[stable Alpha5](https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/tree/6fdde982c2c804efe9702fd4cdd2f715b0aaf421)和[main Berta2](https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/tree/165c95bbbd96d2171687bba073774b211920ef81)：复用公共顺序、调用与目标/实际骨架、D的实际介入及Main回归、V的独立持续责任。main观点store的合格终态不移植成Codex首次贡献后关闭；main的canonical seal与交付闸门也不因格式相似而获得。
-
-官方[OpenAI多代理工具说明](https://developers.openai.com/api/docs/guides/responses-multi-agent)区分消息排队与启动/恢复；[Anthropic多代理研究经验](https://www.anthropic.com/research/multi-agent-research-system)强调具体委托及边界。本次原件又显示：委托即使清楚，也可能清楚地丢掉原题，所以要把身份连到实际问题和动作。
-
-社区原始报告[Codex通信不可见](https://github.com/openai/codex/issues/32753)、[桌面运行状态滞后](https://github.com/openai/codex/issues/38478)、[Claude纠正延迟](https://github.com/anthropics/claude-code/issues/99111)提供有环境条件的失效情境，不证明本机同样故障。32753因重复关闭而非修复；实际摘要不能替代机械派发记录。采用这些问题所揭示的语义区别，没有照搬审计平台、广播、评分或新服务器。
-
-## 从哪里看
-
-| 入口 | 内容 |
+| 文件 | 职责 |
 | --- | --- |
-| [执行协议](../codex/PROTOCOL.md) | 内容与方法、真实L3分工、当场输出及主线处理 |
-| [参数单位责任与输出格式](../codex/PARAMETERS.md) | N/R/D/V单位重量、Codex固定L3、INIT/START/RETURN/END/ADJUST模板 |
-| [工作台指南](../codex/WORKBENCH.md) | 用一份有内容的笔记聚焦当前问题、按需取回原材料、准备 D/V 输入 |
-| [历史0.3研究](CODEX_QUALITY_DESIGN.md) | 官方/社区材料、条件化方法及当时实物观察 |
-| [单位应用演练](../codex/examples/UNIT_RESPONSIBILITY.md) | 搜索、局部复查、非局部试作、持续观察等工作的责任区分 |
-| [历史0.2任务演练](CODEX_TRIAL_RESULTS.md) | 上一版两条件成果、共同缺口和当时修改；不冒充0.3的效果证据 |
+| codex/STARTUP.md | pin后分类、宿主事件、执行版本持续和停止 |
+| codex/PROTOCOL.md | 问题、研究、创造、实际制作及收敛的主线 |
+| codex/CHARACTER.md | 正向气质、材料如何改变眼光和有内容的范例 |
+| codex/PARAMETERS.md | 单位责任、M、时间、调用和公开过程格式 |
+| codex/COLLABORATION.md | Main竞争、D侦察/成熟介入、V分域续研、独立多Main |
+| codex/PERMISSIONS.md | 持续任务授权、真实能力、费用与停止 |
+| codex/EXECUTION_PROTOCOL.json | 上述执行正文和全部core的完整UTF-8原文与成员散列，不是摘要 |
+| codex/WORKBENCH.md | 按需操作手册；不占每次最小启动切片 |
 
-## 使用方式
+## 代码按能力分工
 
-普通任务合并 [轻量交付偏好](../codex/AGENTS.light.md) 后使用；复杂任务把主要投入放在核心问题、真实内容和产物上。显式 DIGR 取得 pinned 候选协议后，读取 PROTOCOL 与 PARAMETERS；辅助工具按实际任务需要使用。
+| 模块 | 实际提供的能力 |
+| --- | --- |
+| runtime/codex_profile.py | 离线分发检查/明确重建、宿主事件预览、轻量指令导出；不启动任务 |
+| runtime/codex_transport.py | 实验通道真实ref解析、同pin分阶段读取、聚合原文校验与接续导出 |
+| runtime/codex_workbench.py | 原始目标、自由标题纠正、研究节和显式材料选择；D/V可从无预设问题开始 |
+| runtime/codex_experience.py | 可选保存当时选中的原片段，取回时提示原位置变化；不自动推断适用性 |
+| runtime/codex_session.py | 每线完整参数、候选、笔记和未处理事项；真实活动边界、缺口及同域并集 |
+| runtime/codex_permissions.py | 根据明确供给的任务授权和能力给建议，区分继续、查能力和预算等 |
+| tools/codex.py | 统一CLI；原三个CLI兼容保留，不要求先装插件或启动服务 |
 
-```text
-python -B tools/codex_profile.py depth
-python -B tools/codex_workbench.py init --request D:/task/request.txt --work D:/task/WORK.md
-python -B tools/codex_workbench.py focus --work D:/task/WORK.md --topic "当前研究问题"
-python -B tools/codex_workbench.py challenge --kind D --work D:/task/WORK.md --question "这项非局部介入应实际研究什么？" --candidate D:/task/current.md
-```
+复用根模块中的路径、HTTPS、聚合原文验证等通用机制，不复用stable的参数解析、默认硬时间、Run Genesis或canonical最终闸门。脚本不会给N/R/D/V思想打分，不认证完整M已执行，也不冒称可更改宿主权限。
 
-工作台支持的是材料与问题取用。它不替模型执行语义判断、自动派代理或调用付费模型 API。函数/CLI 的功能检查仅检查相关行为；模型实际效果由任务内容和成品判断。
+## M怎样在当前宿主成立
 
-已有公开摘要需要插入时可选 `record --work D:/task/WORK.md --topic "当前研究问题" --text-file D:/task/note.txt`；直接编辑同一笔记照常有效。它没有新建日志数据库，也不自动判断采纳、统计参数或认证执行。已有工具/代理/API授权按实际范围持续有效，资源选择由模型负责。
+各M独立拿到原始目标、已确认要求、同一P_run及必要共同事实，再各自配置、研究制作与收敛。4槽可以先后/分批履行，不把一份N/R/D/V总额平分。root会收到代理返回；从头独立多线时宜由root做公共综合、独立上下文发展初稿；已有真实候选再扩线时root可兼原Main。交流后的修订承认影响，不能假称初期互未见答案。
 
-## 版本与安装状态
+每线普通文件与现有原生消息承载工作；注册几个包不等于实际M。共同用户纠正及时转交，恢复先看真实产物与最新要求；旧本线计划保持作者记录身份。可选经验也不能把某次气质纠正误学成所有工程都不做，或把论文例子误学成永不查论文。
 
-独立入口是 `codex/manifest.json` 和 `codex/VERSION`；根目录仍保留 Alpha 5 原协议，不混用其参数解析器。实验路由模板是 [ROUTER.experimental.txt](../codex/ROUTER.experimental.txt)，只承担真实获取、不可变 pin 和版本交接，不复制执行语义。
+## 时钟和授权的实际边界
 
-仓库更新自身不会写入全局AGENTS/config或改变stable/main。本机此前已配置Codex候选路由，本轮实际核对仍指向`codex/codex-host-adaptation`，不重复安装或复制新执行语义到全局。下一次实际获取新的pin后，才按取得版本开始新执行；本轮继续原P_run。其它存储、预算、隐私与项目偏好保留。
+Windows显式存活进程PID+创建时间可建立跨短命CLI时钟域；Linux取boot_id。真实单调读数与操作者在明确边界声明连续活动分别记录。恢复丢弃开放尾段，COMMON仅入全局，同域取并集，多域不盲加；无计时能力仍可继续制作。时钟域不证明模型持续工作。
 
-OpenAI Docs说明AGENTS指令在运行开始时构建，新运行/会话读取更新，已有运行不视为自动热更新。[官方加载说明](https://learn.chatgpt.com/docs/agent-configuration/agents-md)。文件已配置与某个现存会话已加载是不同事实，最终以实际路由和INIT的pin/参数为准。离线check中的global_install_performed=false只表示该检查函数不安装，不是全机安装状态检测。
+授权来自真实用户目标与已有决定，能力来自宿主实际状态，执行与效果另看事实。普通任务内必要动作延续授权，原生分工按既有范围自主进行；新付款、代发消息、不可恢复大删除需相应授权。权限工具可不用，既不每次审批也不改OS沙箱。当前余额和限制须真实核对，不把旧API金额当新预算。
 
-## 核查范围
+## 从0.5.1迁移
 
-保留必要的版本/文件检查和 Windows LF 配置作为分发维护工作，不把这些表述为交付质量。运行 `python -B tools/codex_profile.py check` 可检查本地分发，不能据此声明模型已完成任务。原稳定执行器保持原有语义；本轮针对新工作台与候选改动完成相关核查即可。
+- 实验ref不变，本地薄路由不复制新参数。下次前缀调用取得新HEAD才使用新语义；进行中的0.5.1保持原P_run。
+- 普通轻量文件新增正向气质，需合并到实际读取的AGENTS轻量块；路由和其它个人约定分别保留。导出CLI只打印，不假称安装。
+- 完整执行从PROTOCOL+PARAMETERS改为PROTOCOL加四份core；manifest声明完整聚合包，减少传输往返，源文件仍独立可读。
+- 旧workbench和profile命令兼容；新工具用统一入口。自由标题可显式选取，无需重整用户笔记或用户原件。
+- 修改正文后运行profile refresh；发布器同时生成两套分发材料。私有.cache、Git入口与测试缓存不进入发布，也不为通过源码检查改写私有原件。
 
-0.5本轮已通过14项既有profile测试及8份入口文件的版本/哈希核查，未新增测试框架。实际D/V研究与试作提供本次设计依据，尚未观察一轮完整0.5任务的长期行为或用户阅读效果。
+历史研究：[0.5.1适配说明](https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/blob/11631eec1cbf3397a2b4d6d7cc24190188c0d2d6/docs/CODEX_ADAPTATION.md)、[M前期设计](MULTI_MAIN_PROPOSAL.md)、[气质与迁移研究](DV_AUTONOMY_UPDATE_PREPARATION.md)。本次取舍和实际落实见[升级工作笔记](research/codex-upgrade-20261108/WORK.md)。
 
-0.5.1仅修订显示及对应示例；14项既有profile测试同样通过，没有新增测试框架或执行流程。
+已实现的工具、已发生的试作、实际发布和后续任务效果分别报告。协议优化没有改变基础模型权重或宿主采样参数；跨任务质量收益仍由实际使用观察。
+
+## 本轮宿主原始资料对照
+
+[官方AGENTS说明](https://learn.chatgpt.com/docs/agent-configuration/agents-md)确认全局与目录层级的合并/覆盖及大小上限；本机实际使用D:/CodexData/AGENTS.md，已经只同步普通轻量块并逐字节保留路由和其它个人约定。新AGENTS内容也实际进入了本轮宿主消息。执行正文继续按pin读取，不整套塞入全局指令。
+
+[官方Subagents说明](https://learn.chatgpt.com/docs/agent-configuration/subagents)区分独立上下文、父级权限继承与共享编辑协调；[Responses Multi-agent说明](https://developers.openai.com/api/docs/guides/responses-multi-agent)描述本轮所用同类原生协调动作。它们支持采用原生能力，不能把不同产品的默认并发数当成本机配置。本轮工具实际为含root共4槽，fork_turns=none建立受控历史；协议中的槽位安排是条件化建议。
+
+因此没有安装固定的全局D/V角色模板，也没有另外创建代理调度服务。动态分域与介入使用现有原生工具，明确编辑所有权并实际处理返回。文件或角色指令不能替代理改父级权限；本轮没有通过提示词宣称取消宿主限制。

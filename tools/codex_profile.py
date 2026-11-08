@@ -13,7 +13,7 @@ if str(ROOT) not in sys.path:
 
 from runtime.codex_profile import (
     ActiveContext, capability_report, decide_boundary,
-    instruction_text, verify_distribution, depth_preferences,
+    instruction_text, verify_distribution, depth_preferences, refresh_distribution,
 )
 
 
@@ -21,9 +21,13 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     sub = ap.add_subparsers(dest='command', required=True)
     sub.add_parser('check', help='verify local instruction identity and bytes')
+    sub.add_parser('refresh', help='explicitly regenerate local bundle and profile hashes')
     sub.add_parser('depth', help='show user-selected depth and unit-responsibility references')
     ins = sub.add_parser('instructions', help='print a layer; never install it')
-    ins.add_argument('layer', choices=('light', 'experimental-router'))
+    ins.add_argument('layer', choices=('light', 'experimental-router', 'codex-agents'))
+    export = sub.add_parser('export', help='create a new instruction file; never overwrite or install global AGENTS')
+    export.add_argument('layer', choices=('light', 'experimental-router', 'codex-agents'))
+    export.add_argument('--out', required=True, type=Path)
     boundary = sub.add_parser('boundary', help='preview an explicitly supplied host event')
     boundary.add_argument('--input', required=True, type=Path, help='UTF-8 JSON input')
     caps = sub.add_parser('capabilities', help='report declared availability, not run proof')
@@ -32,11 +36,20 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == 'check':
             result = verify_distribution(ROOT)
+        elif args.command == 'refresh':
+            result = refresh_distribution(ROOT)
         elif args.command == 'depth':
             result = depth_preferences(ROOT)
         elif args.command == 'instructions':
             print(instruction_text(ROOT, args.layer), end='')
             return 0
+        elif args.command == 'export':
+            content = instruction_text(ROOT, args.layer)
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            with args.out.open('x', encoding='utf-8', newline='\n') as stream:
+                stream.write(content)
+            result = {'exported': args.out.resolve().as_posix(), 'layer': args.layer,
+                      'global_install_performed': False, 'run_started': False}
         else:
             data = json.loads(args.input.read_text(encoding='utf-8-sig'))
             if not isinstance(data, dict):

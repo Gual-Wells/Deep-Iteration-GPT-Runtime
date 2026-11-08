@@ -1,9 +1,13 @@
 from __future__ import annotations
 import ast
 import json
+import sys
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from tools.build_release import release_files
 VERSION='5.0.0-alpha.5'
 INTERFACES={
     'routing_schema':4,
@@ -139,15 +143,15 @@ def main() -> None:
 
     # The release claims Python >=3.10, so every Python file must parse under
     # that grammar rather than only under the builder's current interpreter.
-    for p in sorted(ROOT.rglob('*.py')):
-        if any(x in p.parts for x in ('.git','__pycache__')):continue
+    files = [ROOT / rel for rel in release_files(ROOT)]
+    for p in files:
+        if p.suffix != '.py':continue
         try:ast.parse(p.read_text(encoding='utf-8'),filename=str(p),feature_version=(3,10))
         except Exception as exc:fail(f'Python 3.10 parse failure {p.relative_to(ROOT)}: {exc}')
 
     # Text release files are canonical UTF-8/LF. This also prevents platform
     # newline drift from defeating deterministic builds.
-    for p in sorted(ROOT.rglob('*')):
-        if not p.is_file() or any(x in p.parts for x in ('.git','__pycache__')):continue
+    for p in files:
         if p.suffix.lower() not in {'.py','.md','.txt','.json'} and p.name not in {'VERSION'}:continue
         raw=p.read_bytes()
         if b'\r' in raw:fail(f'CR line ending in {p.relative_to(ROOT)}')

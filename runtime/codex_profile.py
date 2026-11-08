@@ -1,4 +1,4 @@
-"""Small, offline Codex profile utilities; not a DIGR executor or host gate.
+"""Offline Codex profile utilities; not a DIGR executor or host gate.
 
 The active router still has to acquire a live immutable repository pin. This
 module neither acquires one nor treats local file hashes/capability declarations
@@ -14,8 +14,14 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from .routing import candidate_route_key
+from .codex_transport import profile_layout
+from .execution_protocol import verify_execution_bundle
 
-PROFILE_PROTOCOL = 'digr-codex-native-v5'
+PROFILE_PROTOCOL = 'digr-codex-native-v6'
+PROFILE_CORE = (
+    'codex/CHARACTER.md', 'codex/PARAMETERS.md',
+    'codex/COLLABORATION.md', 'codex/PERMISSIONS.md',
+)
 PROFILE_FILES = (
     'codex/VERSION',
     'codex/AGENTS.light.md',
@@ -25,6 +31,10 @@ PROFILE_FILES = (
     'codex/HELP.md',
     'codex/PARAMETERS.md',
     'codex/WORKBENCH.md',
+    'codex/CHARACTER.md',
+    'codex/COLLABORATION.md',
+    'codex/PERMISSIONS.md',
+    'codex/EXECUTION_PROTOCOL.json',
 )
 CAPABILITY_NAMES = (
     'files', 'shell', 'persistent_workspace', 'repository_transport',
@@ -155,14 +165,15 @@ def verify_distribution(root: Path) -> dict[str, Any]:
         raise ValueError('Codex manifest/VERSION identity mismatch')
     if manifest.get('entrypoint') != 'codex/PROTOCOL.md':
         raise ValueError('unexpected Codex entrypoint')
-    if manifest.get('core') != ['codex/PARAMETERS.md']:
-        raise ValueError('Codex execution must load parameter responsibility semantics')
+    if manifest.get('core') != list(PROFILE_CORE):
+        raise ValueError('Codex execution must load character, responsibility, collaboration and permissions')
     if manifest.get('startup_slice') != ['codex/STARTUP.md']:
         raise ValueError('unexpected Codex startup slice')
     if manifest.get('help') != 'codex/HELP.md':
         raise ValueError('unexpected Codex help')
     if manifest.get('light_instructions') != 'codex/AGENTS.light.md':
         raise ValueError('unexpected Codex light instructions')
+    layout = profile_layout(manifest, version)
     hashes = manifest.get('file_sha256', {})
     if not isinstance(hashes, dict) or set(hashes) != set(PROFILE_FILES):
         raise ValueError('profile hash set must exactly cover the declared instruction files')
@@ -174,6 +185,10 @@ def verify_distribution(root: Path) -> dict[str, Any]:
         raw.decode('utf-8')
         if sha256(raw).hexdigest() != hashes[rel]:
             raise ValueError(f'profile file hash mismatch: {rel}')
+    # This validates local transport bytes, not a live repository acquisition.
+    verify_execution_bundle((root / layout['execution_bundle']).read_bytes(),
+        commit_sha='0' * 40, manifest_bytes=(root / 'codex/manifest.json').read_bytes(),
+        expected_paths=[manifest['entrypoint'], *manifest['core']])
     return {
         'protocol': manifest['protocol'],
         'version': version,
@@ -185,14 +200,46 @@ def verify_distribution(root: Path) -> dict[str, Any]:
     }
 
 
+def refresh_distribution(root: Path) -> dict[str, Any]:
+    """Explicitly regenerate the local execution bundle and declared hashes."""
+    root = Path(root).resolve()
+    path = root / 'codex/manifest.json'
+    manifest = json.loads(path.read_text(encoding='utf-8'))
+    version = (root / 'codex/VERSION').read_text(encoding='utf-8').strip()
+    if manifest.get('protocol') != PROFILE_PROTOCOL or manifest.get('version') != version:
+        raise ValueError('Codex manifest/VERSION identity mismatch')
+    expected = ['codex/PROTOCOL.md', *PROFILE_CORE]
+    if manifest.get('core') != list(PROFILE_CORE) or manifest.get('execution_bundle') != {
+        'path': 'codex/EXECUTION_PROTOCOL.json', 'schema': 1, 'members': expected,
+    }:
+        raise ValueError('unexpected local execution bundle layout')
+    members = []
+    for rel in expected:
+        raw = (root / rel).read_bytes()
+        members.append({'path': rel, 'sha256': sha256(raw).hexdigest(),
+                        'byte_length': len(raw), 'content': raw.decode('utf-8')})
+    bundle = {'schema_version': 1, 'version': version, 'protocol': PROFILE_PROTOCOL, 'members': members}
+    (root / 'codex/EXECUTION_PROTOCOL.json').write_text(
+        json.dumps(bundle, ensure_ascii=False, sort_keys=True, separators=(',', ':')) + '\n',
+        encoding='utf-8', newline='\n')
+    manifest['file_sha256'] = {rel: sha256((root / rel).read_bytes()).hexdigest() for rel in PROFILE_FILES}
+    path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')
+    return verify_distribution(root)
+
+
 def instruction_text(root: Path, layer: str) -> str:
     verify_distribution(root)
+    if layer == 'codex-agents':
+        # A ready-to-merge thin host layer. Choosing/exporting this text does
+        # not install it, and it carries no deep execution semantics.
+        return ((Path(root) / 'codex/ROUTER.experimental.txt').read_text(encoding='utf-8').rstrip()
+                + '\n\n' + (Path(root) / 'codex/AGENTS.light.md').read_text(encoding='utf-8'))
     paths = {
         'light': 'codex/AGENTS.light.md',
         'experimental-router': 'codex/ROUTER.experimental.txt',
     }
     if layer not in paths:
-        raise ValueError('layer must be light or experimental-router')
+        raise ValueError('layer must be light, experimental-router or codex-agents')
     return (Path(root) / paths[layer]).read_text(encoding='utf-8')
 
 

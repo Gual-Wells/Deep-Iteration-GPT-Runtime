@@ -1,5 +1,20 @@
 # Changelog
 
+## Codex 0.6.0 — autonomous research and production, with usable native tools
+
+Experimental ref remains `codex/codex-host-adaptation`; root stable identity stays 5.0.0-alpha.5.
+
+- Positive researcher/author character becomes actual core input and ordinary light guidance. D can scout before forming a mature rival route; V domains develop from research and may continue from their own materials and works. Main competes and may adopt a stronger whole production route.
+- M defaults to1; each independent main line initializes, advances and converges with its own complete responsibilities. The profile describes real host message/slot constraints rather than counting folders as completed teams.
+- Unified `tools/codex.py` connects profile, workbench, optional experience, resumable task/lines, explicit clocks, task authorization advice and actual repository acquisition. Old CLIs remain supported.
+- Live Codex transport separates direct REST consensus from native connector HEAD acquisition, pins every read, and supports same-acquisition continuation. Full logical core is also carried as a validated immutable execution bundle.
+- Workbench supports existing free headings and open D/V exploration. Optional experience preserves selected source excerpts and detects source-location changes, without automatic preference promotion or global Memory writes.
+- Per-line work packages keep original request bytes, latest shared corrections, binary/directory candidates, parameter revisions and pending work. Windows live-process clock anchors support explicit cross-call boundaries, recovery gaps and comparable-domain interval unions; COMMON never fills individual lines.
+- Task authorization persists separately from host capability and costs. The advice tool neither executes operations nor changes permissions; no new paid API budget is implied.
+- Release input excludes private `.cache`, Git/worktree entries and compiler caches; source checks use that same scope, and release subprocesses use UTF-8 on Windows. Private originals are preserved. README and adaptation documentation now describe the Codex branch as the primary experimental entry.
+
+The code/tool observations and small candidate exercises do not establish a general improvement of target-model behavior or cross-task transfer. Current execution pins do not hot-swap during this source upgrade.
+
 ## 5.0.0-alpha.5 — hard-by-default timing policy
 
 Alpha 5 is a narrow semantic-default correction over Alpha 4. Omitted `B` and `b` now resolve to `1` rather than `0`, so T/t are hard lower bounds by default once their values are explicitly supplied or semantically completed. Explicit `B=0` / `b=0` remains the supported opt-in soft timing policy. Alpha 4 authority, source, D/L, clock, workspace and transport architecture is otherwise preserved.

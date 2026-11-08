@@ -16,7 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class WorkbenchTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        cache = ROOT / '.cache'
+        cache.mkdir(exist_ok=True)
+        self.temp = tempfile.TemporaryDirectory(prefix='workbench-test-', dir=cache)
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.work = self.root / 'WORK.md'
@@ -74,8 +76,63 @@ class WorkbenchTests(unittest.TestCase):
         self.assertIn('从真实阅读过程持续研究依赖关系', packet)
         self.assertIn(self.request, packet)
         self.assertNotIn('当前候选：保留原页', packet)
-        with self.assertRaisesRegex(ValueError, '具体研究问题'):
-            context_packet(self.work, kind='V')
+        scout = context_packet(self.work, kind='V')
+        self.assertIn('领域身份可以在研究讨论中形成或修订', scout)
+        self.assertIn(self.request, scout)
+        self.assertNotIn('用代表内容研究直接组合', scout)
+        disruptive = context_packet(self.work, kind='D')
+        self.assertIn('具体反叛对象与旗帜可以由研究形成', disruptive)
+        self.assertNotIn('检验关键材料是否适合原页组合', disruptive)
+
+    def test_explicit_sections_preserve_existing_freeform_goal_and_corrections(self):
+        existing = self.root / 'existing-work.md'
+        original = (
+            '# 原有项目笔记\n\n## 用户目标 U0\n````text\n做实际工程升级。\n````\n\n'
+            '## 已有用户决定与纠正\n语言气质的纠正不能取消明确的工程委托。\n\n'
+            '## 本轮原话\n这是举例，不必专门定位那篇论文。\n\n'
+            '## 当前关键问题\n主线认为应再建一套流程。\n\n'
+            '## 研究、竞争解释与方案\n主线尚未验证的整套解释。\n\n'
+            '## 值得继续的工作\n不应灌入独立者的主线下一步。\n'
+        )
+        existing.write_text(original, encoding='utf-8')
+        packet = context_packet(
+            existing, kind='D', goal_topic='用户目标 U0',
+            corrections_topics=('已有用户决定与纠正', '本轮原话'),
+        )
+        for fragment in ('做实际工程升级', '不能取消明确的工程委托', '不必专门定位那篇论文'):
+            self.assertIn(fragment, packet)
+        for fragment in ('主线认为应再建', '主线尚未验证', '不应灌入独立者'):
+            self.assertNotIn(fragment, packet)
+        self.assertEqual(existing.read_text(encoding='utf-8'), original)
+
+    def test_explicit_goal_does_not_silently_compete_with_request_or_ambiguous_section(self):
+        request = self.root / 'another-request.txt'
+        request.write_text('另一个来源中的原始委托。', encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, '请选择一个原始目标来源'):
+            context_packet(self.work, request=request, goal_topic=GOAL)
+        self.work.write_text(self.work.read_text(encoding='utf-8')+'\n### 同名纠正\nA\n\n## 同名纠正\nB\n', encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, '纠正小节必须唯一匹配'):
+            context_packet(self.work, corrections_topics=('同名纠正',))
+        with self.assertRaisesRegex(ValueError, '目标小节必须唯一匹配'):
+            context_packet(self.work, goal_topic='不存在')
+
+    def test_selected_experience_is_optional_and_does_not_replace_current_correction(self):
+        from runtime.codex_experience import capture_candidate, write_candidate
+        source = self.root / 'earlier-feedback.txt'
+        source.write_text('原话：缺激情指语言、行为和策略气质。\n', encoding='utf-8')
+        candidate = self.root / 'history.json'
+        write_candidate(candidate, capture_candidate(
+            '历史解释：气质批评不能只用组织机制回答。条件不同仍须实施本次工程。',
+            sources=['earlier-feedback.txt'], base=self.root,
+        ))
+        default = context_packet(self.work)
+        self.assertNotIn('历史解释', default)
+        selected = context_packet(self.work, kind='V', experiences=('history.json',))
+        self.assertIn('不需要手机适配', selected)
+        self.assertIn('条件不同仍须实施本次工程', selected)
+        self.assertNotIn('用代表内容研究直接组合', selected)
+        with self.assertRaisesRegex(ValueError, '不会被静默截断'):
+            context_packet(self.work, experiences=('history.json',), max_chars=len(default)+10)
 
     def test_context_budget_does_not_silently_truncate_or_change_work(self):
         before = self.work.read_bytes()
@@ -162,6 +219,25 @@ class WorkbenchTests(unittest.TestCase):
         result = subprocess.run(cli+['init', '--request', str(request), '--work', str(output)], capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(result.returncode, 2)
         self.assertEqual(original, output.read_bytes())
+
+    def test_cli_uses_existing_sections_for_open_research_without_main_rationale(self):
+        cli = [sys.executable, '-B', str(ROOT / 'tools/codex_workbench.py')]
+        existing = self.root / 'custom.md'
+        existing.write_text(
+            '# 自由笔记\n## 真实原始委托\n完成代码升级。\n\n'
+            '## 用户已说清的事\n论文只是例子，仍需研究真实方法。\n\n'
+            '## 研究、竞争解释与方案\n不应默认转交的Main解释。\n', encoding='utf-8',
+        )
+        result = subprocess.run(
+            cli+['challenge', '--work', str(existing), '--kind', 'V',
+                 '--goal-topic', '真实原始委托', '--corrections-topic', '用户已说清的事'],
+            capture_output=True, text=True, encoding='utf-8',
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('完成代码升级', result.stdout)
+        self.assertIn('论文只是例子', result.stdout)
+        self.assertIn('领域身份可以在研究讨论中形成或修订', result.stdout)
+        self.assertNotIn('不应默认转交的Main解释', result.stdout)
 
 
 if __name__ == '__main__':
