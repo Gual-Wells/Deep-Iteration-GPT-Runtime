@@ -1,6 +1,8 @@
-# DIGR Codex 0.6.0 使用说明
+# DIGR Codex 0.7.0 使用说明
 
 普通任务采用轻量交付偏好；显式 DIGR 启动高投入的问题研究、方案探索与实际制作。默认 N12/R4/D3/V3/L3/M1，只自主上调和改变方法；时间按任务补齐为软目标，来源默认 REQUIRED。
+
+新任务先按[FOUNDATION](FOUNDATION.md)独立研究用途、成品、处理粒度、已有基础、依赖与投入，展示可纠偏说明并问答；用户明确决定后才正式初始化并全面执行。前置独立预算/计时，调用参数留给正式任务，前置没有固定高投入下限。已确认续做只讨论重要变化，常规操作不重新审批。
 
 | 调用 | 行为 |
 | --- | --- |
@@ -21,7 +23,7 @@
 - **M** 各自完整推进。文件目录和脚本不会自动替代真正独立的Main。
 - **授权** 延续已有任务与资源决定；能力、预算、执行效果分别看，不为常规任务内操作反复申请。
 
-[PROTOCOL](PROTOCOL.md)、[CHARACTER](CHARACTER.md)、[PARAMETERS](PARAMETERS.md)、[COLLABORATION](COLLABORATION.md)、[PERMISSIONS](PERMISSIONS.md) 为执行正文，可从同pin聚合包一次读取。[WORKBENCH](WORKBENCH.md) 是按需使用的工具手册。
+[PROTOCOL](PROTOCOL.md)、[FOUNDATION](FOUNDATION.md)、[CHARACTER](CHARACTER.md)、[PARAMETERS](PARAMETERS.md)、[COLLABORATION](COLLABORATION.md)、[PERMISSIONS](PERMISSIONS.md) 为执行正文，可从同pin聚合包一次读取。[WORKBENCH](WORKBENCH.md) 是按需使用的工具手册。
 
 ## 实际使用工具
 

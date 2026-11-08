@@ -17,8 +17,9 @@ from .routing import candidate_route_key
 from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 
-PROFILE_PROTOCOL = 'digr-codex-native-v6'
+PROFILE_PROTOCOL = 'digr-codex-native-v7'
 PROFILE_CORE = (
+    'codex/FOUNDATION.md',
     'codex/CHARACTER.md', 'codex/PARAMETERS.md',
     'codex/COLLABORATION.md', 'codex/PERMISSIONS.md',
 )
@@ -28,6 +29,7 @@ PROFILE_FILES = (
     'codex/ROUTER.experimental.txt',
     'codex/STARTUP.md',
     'codex/PROTOCOL.md',
+    'codex/FOUNDATION.md',
     'codex/HELP.md',
     'codex/PARAMETERS.md',
     'codex/WORKBENCH.md',
@@ -166,7 +168,7 @@ def verify_distribution(root: Path) -> dict[str, Any]:
     if manifest.get('entrypoint') != 'codex/PROTOCOL.md':
         raise ValueError('unexpected Codex entrypoint')
     if manifest.get('core') != list(PROFILE_CORE):
-        raise ValueError('Codex execution must load character, responsibility, collaboration and permissions')
+        raise ValueError('Codex execution must load foundation, character, responsibility, collaboration and permissions')
     if manifest.get('startup_slice') != ['codex/STARTUP.md']:
         raise ValueError('unexpected Codex startup slice')
     if manifest.get('help') != 'codex/HELP.md':

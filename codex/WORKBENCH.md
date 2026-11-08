@@ -35,6 +35,31 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 
 ## 2. 一份普通笔记与按需材料
 
+### 新任务先形成可供决定的完整说明
+
+0.7起的新会话默认要求前置任务说明；旧会话仍保留其真实状态。显式flag也可用于旧版本工具调用。模型先研究实际材料与原话，再提供proposal；脚本不自动识别意图。
+
+```text
+python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run 0.7.0@<实际SHA> --require-foundation
+python -B tools/codex.py clock begin --root D:/task/session --owner COMMON --scope FOUNDATION --state SOURCE
+python -B tools/codex.py foundation propose --root D:/task/session --input D:/task/proposal.json --reason "原件调查后的完整候选"
+python -B tools/codex.py foundation show --root D:/task/session
+```
+
+proposal示例见codex/examples/foundation/proposal.json：内容涵盖目标、成品范围、粒度、真实基础、依赖、路线/最早整体结果、资源和完成条件。内部字段不等于用户问卷；对用户展示连贯说明、必要原件与关键问题。等待用户期间关闭活动段，不算研究。
+
+```text
+python -B tools/codex.py foundation answer --root D:/task/session --id Q1 --revision <实际所答版本> --reply-file D:/task/actual-reply.txt --source <真实消息引用> --effect "说明与下一行动的实际变化"
+python -B tools/codex.py foundation confirm --root D:/task/session --revision <已展示当前版本> --reply-file D:/task/actual-go-ahead.txt --source <真实明确决定>
+python -B tools/codex.py clock end --root D:/task/session --owner COMMON --continued
+```
+
+answer不自动确认整体。模型理解真实答复：用户已看完整说明并明确要求改后执行，可按该决定记录，无需固定口令；提出新重要取舍则先讨论。material修订默认使旧确认不再覆盖当前稿；纯文字或无实质影响事实更新可用propose --change-kind non_material，并给出真实理由，保留原确认来源及继承说明。改问题或选项后不沿用旧答案。
+
+确认后才补齐正式参数，line create仍只是准备文件。正式clock begin默认EXECUTION；未确认时MAIN/SOURCE及独占D/V均拒绝，失效后的checkpoint也拒绝，end/recover始终可用。task report的foundation_timing单列前置，timing只算正式，不把前置分钟冲抵T/t。恢复包自动带当前任务说明与决定；无重要变化不重新盘问。
+
+这些命令只检查被管理的入口和记录一致性，不拦截宿主所有工具，也不认证用户真实同意或解释质量。真语义及新纠正仍由模型依据会话处理。短任务可直接对话完成前置，不强制落这些文件。
+
 ```text
 python -B tools/codex.py workbench init --request D:/task/request.txt --work D:/task/WORK.md
 python -B tools/codex.py workbench topics --work D:/task/WORK.md

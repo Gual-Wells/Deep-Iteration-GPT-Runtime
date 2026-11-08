@@ -16,6 +16,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from runtime.codex_permissions import assess_operation
+from runtime.codex_foundation import (
+    answer_foundation, confirm_foundation, foundation_packet, propose_foundation,
+)
 from runtime.codex_session import (
     ACTIVITY_STATES, activity, create_line, create_session, line_packet,
     session_report, set_clock_anchor, set_line_parameters, update_line,
@@ -56,8 +59,29 @@ def main(argv: list[str] | None = None) -> int:
     create.add_argument('--explicit', type=Path, help='original explicit parameter declarations, if any')
     create.add_argument('--anchor-pid', type=int)
     create.add_argument('--m', type=int)
+    create.add_argument('--require-foundation', action='store_true', default=None,
+                        help='prepare research first; managed execution waits for the current user decision')
     report = ts.add_parser('report')
     report.add_argument('--root', required=True, type=Path)
+    foundation = sub.add_parser('foundation', help='research-authored task brief, dialogue and execution decision')
+    fs = foundation.add_subparsers(dest='action', required=True)
+    for action in ('propose', 'show', 'answer', 'confirm'):
+        command = fs.add_parser(action)
+        command.add_argument('--root', required=True, type=Path)
+        if action == 'propose':
+            command.add_argument('--input', required=True, type=Path)
+            command.add_argument('--reason', required=True)
+            command.add_argument('--change-kind', choices=('material', 'non_material'), default='material')
+        elif action in ('answer', 'confirm'):
+            command.add_argument('--reply-file', required=True, type=Path, help='actual user words; no secret confirmation keyword')
+            command.add_argument('--source', required=True, help='actual message or decision reference')
+            if action == 'answer':
+                command.add_argument('--id', required=True)
+                command.add_argument('--revision', required=True, type=int)
+                command.add_argument('--effect', required=True, help='actual consequence; interpretation is model-owned')
+                command.add_argument('--change-kind', choices=('material', 'non_material'), default='material')
+            else:
+                command.add_argument('--revision', required=True, type=int)
     line = sub.add_parser('line', help='create, resume or update one complete work line')
     ls = line.add_subparsers(dest='action', required=True)
     for action in ('create', 'packet', 'update', 'parameters'):
@@ -92,6 +116,7 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument('--owner', required=True, help='M01, M02, ... or COMMON')
         if action == 'begin':
             command.add_argument('--state', choices=sorted(ACTIVITY_STATES), required=True)
+            command.add_argument('--scope', choices=('FOUNDATION', 'EXECUTION'), default='EXECUTION')
         if action in ('checkpoint', 'end'):
             command.add_argument('--continued', action='store_true',
                                  help='declare genuine continuous activity since the previous boundary')
@@ -122,9 +147,23 @@ def main(argv: list[str] | None = None) -> int:
                 result = create_session(args.out, request=args.request, p_run=args.p_run,
                     decisions=args.decisions,
                     explicit_parameters=read_object(args.explicit) if args.explicit else None,
-                    anchor_pid=args.anchor_pid, m_target=args.m)
+                    anchor_pid=args.anchor_pid, m_target=args.m, require_foundation=args.require_foundation)
             else:
                 result = session_report(args.root)
+        elif args.command == 'foundation':
+            if args.action == 'show':
+                print(foundation_packet(args.root), end='')
+                return 0
+            if args.action == 'propose':
+                result = propose_foundation(args.root, read_object(args.input),
+                    reason=args.reason, change_kind=args.change_kind)
+            elif args.action == 'answer':
+                result = answer_foundation(args.root, args.id,
+                    revision=args.revision, user_text=args.reply_file.read_text(encoding='utf-8-sig'),
+                    source=args.source, effect=args.effect, change_kind=args.change_kind)
+            else:
+                result = confirm_foundation(args.root, revision=args.revision,
+                    user_text=args.reply_file.read_text(encoding='utf-8-sig'), source=args.source)
         elif args.command == 'line':
             if args.action == 'create':
                 result = create_line(args.root, args.id, parameters=read_object(args.parameters),
@@ -154,7 +193,8 @@ def main(argv: list[str] | None = None) -> int:
             result = set_clock_anchor(args.root, anchor_pid=args.pid, reason=args.reason)
         else:
             result = activity(args.root, args.owner, args.action,
-                state=getattr(args, 'state', None), continued=getattr(args, 'continued', False), reason=args.reason)
+                state=getattr(args, 'state', None), continued=getattr(args, 'continued', False),
+                reason=args.reason, scope=getattr(args, 'scope', None))
         print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
         return 0
     except (ValueError, TypeError, OSError, KeyError, RuntimeError) as error:

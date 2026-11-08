@@ -1,4 +1,4 @@
-# DIGR Codex 0.6.0：执行语义、真实工具与宿主接入
+# DIGR Codex 0.7.0：执行语义、真实工具与宿主接入
 
 本实验分支的使用入口是[根README](../README.md)，执行权威是本轮真实取得的同SHA `codex/manifest.json` 与所声明原文。根stable继续保持5.0.0-alpha.5，Python项目基础版本也保留该身份；Codex是独立版本化的原生模型profile，不是将stable执行器换名为0.6。
 

@@ -12,6 +12,7 @@ codex/AGENTS.light.md
 codex/CHARACTER.md
 codex/COLLABORATION.md
 codex/EXECUTION_PROTOCOL.json
+codex/FOUNDATION.md
 codex/HELP.md
 codex/PARAMETERS.md
 codex/PERMISSIONS.md
@@ -24,6 +25,7 @@ codex/examples/CREATIVE_ROUTE.md
 codex/examples/UNIT_RESPONSIBILITY.md
 codex/examples/assembly/WORK.md
 codex/examples/assembly/reader-example.html
+codex/examples/foundation/proposal.json
 codex/manifest.json
 core/00_RESULT_SOVEREIGNTY.md
 core/05_TASK_COMMITMENT.md
@@ -71,6 +73,10 @@ docs/research/codex-identity-20261108/WORK.md
 docs/research/codex-identity-20261108/coordination-view.md
 docs/research/codex-identity-20261108/pluralism-view.md
 docs/research/codex-identity-20261108/reader-view.md
+docs/research/codex-task-foundation-20261109/WORK.md
+docs/research/codex-task-foundation-20261109/dialogue.md
+docs/research/codex-task-foundation-20261109/engineering.md
+docs/research/codex-task-foundation-20261109/resources.md
 docs/research/codex-upgrade-20261108/WORK.md
 docs/research/codex-value-20261107/WORK.md
 docs/research/codex-value-20261107/claude-field.md
@@ -127,6 +133,7 @@ runtime/candidate_store.py
 runtime/clock_journal.py
 runtime/clock_probe.py
 runtime/codex_experience.py
+runtime/codex_foundation.py
 runtime/codex_permissions.py
 runtime/codex_profile.py
 runtime/codex_session.py
@@ -204,6 +211,7 @@ tests/test_clock_journal.py
 tests/test_clock_probe.py
 tests/test_codex_cli.py
 tests/test_codex_experience.py
+tests/test_codex_foundation.py
 tests/test_codex_permissions.py
 tests/test_codex_profile.py
 tests/test_codex_session.py

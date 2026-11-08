@@ -192,7 +192,8 @@ def capture_clock(anchor: Mapping[str, Any] | None = None) -> dict[str, Any]:
 
 def create_session(root: Path, *, request: Path, p_run: str,
                    decisions: Path | None = None, explicit_parameters: Mapping[str, Any] | None = None,
-                   anchor_pid: int | None = None, m_target: int | None = None) -> dict[str, Any]:
+                   anchor_pid: int | None = None, m_target: int | None = None,
+                   require_foundation: bool | None = None) -> dict[str, Any]:
     """Prepare storage from an already-acquired P_run; do not start execution."""
     if not isinstance(p_run, str) or not re.fullmatch(r'[^@\s]+@[0-9a-f]{40}', p_run):
         raise ValueError('P_run must be version@full-40-character-SHA')
@@ -201,6 +202,14 @@ def create_session(root: Path, *, request: Path, p_run: str,
     if not raw.decode('utf-8-sig').strip():
         raise ValueError('original request is empty')
     explicit = dict(explicit_parameters or {})
+    version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)', p_run.split('@', 1)[0])
+    profile_requires_foundation = bool(version and tuple(map(int, version.groups())) >= (0, 7, 0))
+    if require_foundation is None:
+        require_foundation = profile_requires_foundation
+    if type(require_foundation) is not bool:
+        raise TypeError('require_foundation must be boolean')
+    if profile_requires_foundation and not require_foundation:
+        raise ValueError('Codex 0.7+ sessions require the task foundation; old sessions retain their actual state')
     explicit = json.loads(json.dumps(explicit, ensure_ascii=False, allow_nan=False))
     target = explicit.get('M', 1) if m_target is None else m_target
     require_nonnegative_int('M target', target)
@@ -219,7 +228,8 @@ def create_session(root: Path, *, request: Path, p_run: str,
                 'request_origin': request.as_posix(), 'request_sha256': sha256(raw).hexdigest(),
                 'decisions': decisions.as_posix() if decisions is not None else None,
                 'explicit_parameters': explicit, 'clock_anchor': anchor, 'clock_issue': clock_issue,
-                'created_wall_ns': time.time_ns(), 'execution_started_by_helper': False}
+                'created_wall_ns': time.time_ns(), 'execution_started_by_helper': False,
+                'foundation_required': require_foundation}
     root.mkdir(parents=True, exist_ok=False)
     (root / 'lines').mkdir()
     (root / 'common').mkdir()
@@ -355,7 +365,10 @@ def derive_activity(events: list[dict[str, Any]], *, expose_tail: bool = True) -
                 raise ValueError('open activity requires end or recover before another begin')
             if event.get('state') not in ACTIVITY_STATES:
                 raise ValueError('unknown activity state')
-            active = {'state': event['state'], 'start': at}
+            scope = event.get('scope', 'EXECUTION')
+            if scope not in {'FOUNDATION', 'EXECUTION'}:
+                raise ValueError('unknown activity scope')
+            active = {'state': event['state'], 'scope': scope, 'start': at}
         elif action == 'recover':
             if active is not None:
                 gaps.append({'reason': event.get('reason') or 'recovery-discarded-open-tail',
@@ -372,11 +385,11 @@ def derive_activity(events: list[dict[str, Any]], *, expose_tail: bool = True) -
                           and type(start.get('monotonic_ns')) is int and type(at.get('monotonic_ns')) is int
                           and 0 <= start['monotonic_ns'] <= at['monotonic_ns'])
             if comparable:
-                spans.append({'state': active['state'], 'start': start, 'end': at,
+                spans.append({'state': active['state'], 'scope': active['scope'], 'start': start, 'end': at,
                               'activity_basis': 'caller-declared-at-explicit-boundary'})
             else:
                 gaps.append({'reason': 'clock-domain-or-boundary-unverifiable', 'start': start, 'end': at})
-            active = {'state': active['state'], 'start': at} if action == 'checkpoint' else None
+            active = {'state': active['state'], 'scope': active['scope'], 'start': at} if action == 'checkpoint' else None
         else:
             raise ValueError(f'unknown activity action: {action}')
     if expose_tail and active is not None:
@@ -406,7 +419,8 @@ def _read_activity(path: Path) -> list[dict[str, Any]]:
 
 
 def activity(root: Path, owner: str, action: str, *, state: str | None = None,
-             continued: bool = False, reason: str | None = None) -> dict[str, Any]:
+              continued: bool = False, reason: str | None = None,
+              scope: str | None = None) -> dict[str, Any]:
     """Append a genuine current boundary to this one owner's activity file."""
     root, metadata = _session(root)
     if owner == 'COMMON':
@@ -420,22 +434,37 @@ def activity(root: Path, owner: str, action: str, *, state: str | None = None,
         raise ValueError('begin requires a known activity state')
     if action != 'begin' and state is not None:
         raise ValueError('state applies only to begin')
+    if action != 'begin' and scope is not None:
+        raise ValueError('scope applies only to begin; checkpoint inherits its actual scope')
+    if action == 'begin':
+        scope = scope or 'EXECUTION'
+        if scope not in {'FOUNDATION', 'EXECUTION'}:
+            raise ValueError('scope must be FOUNDATION or EXECUTION')
+        if scope == 'EXECUTION' and state not in {'META', 'IDLE'} and metadata.get('foundation_required'):
+            from .codex_foundation import require_foundation_ready
+            require_foundation_ready(root, owner=owner)
     event = {'action': action, 'at': capture_clock(metadata.get('clock_anchor'))}
     if state is not None:
         event['state'] = state
+        event['scope'] = scope
     if continued:
         event['declared_continuity'] = True
     if reason is not None:
         event['reason'] = require_nonempty_text('activity reason', reason)
     path = folder / 'activity.jsonl'
     events = _read_activity(path)
+    if action == 'checkpoint' and metadata.get('foundation_required'):
+        opened = derive_activity(events, expose_tail=False)['active']
+        if opened and opened['scope'] == 'EXECUTION' and opened['state'] not in {'META', 'IDLE'}:
+            from .codex_foundation import require_foundation_ready
+            require_foundation_ready(root, owner=owner)
     derive_activity(events + [event])
     with path.open('a', encoding='utf-8', newline='\n') as stream:
         stream.write(json.dumps(event, ensure_ascii=False, sort_keys=True, allow_nan=False) + '\n')
     return event
 
 
-def summarize_activity(streams: Mapping[str, list[dict[str, Any]]]) -> dict[str, Any]:
+def summarize_activity(streams: Mapping[str, list[dict[str, Any]]], *, scope: str = 'EXECUTION') -> dict[str, Any]:
     """Merge per-domain spans; incomparable domains are never added as union."""
     lines, by_domain = {}, defaultdict(lambda: {'T': [], 't': []})
     all_gaps = []
@@ -443,7 +472,7 @@ def summarize_activity(streams: Mapping[str, list[dict[str, Any]]]) -> dict[str,
         facts = derive_activity(events)
         own = defaultdict(lambda: {'T': [], 't': []})
         for span in facts['spans']:
-            if span['state'] not in {'MAIN', 'SOURCE'}:
+            if span['scope'] != scope or span['state'] not in {'MAIN', 'SOURCE'}:
                 continue
             start, stop = span['start'], span['end']
             pair = (start['monotonic_ns'], stop['monotonic_ns'])
@@ -467,7 +496,7 @@ def summarize_activity(streams: Mapping[str, list[dict[str, Any]]]) -> dict[str,
     totals = {domain: {key + '_ns': union_ns(pairs) for key, pairs in group.items()}
               for domain, group in by_domain.items()}
     only = next(iter(totals.values())) if len(totals) == 1 else None
-    return {'lines': lines, 'global_known_by_clock_domain': totals, 'global_known_union_ns': only,
+    return {'lines': lines, 'activity_scope': scope, 'global_known_by_clock_domain': totals, 'global_known_union_ns': only,
             'single_comparable_domain': len(totals) == 1, 'has_recorded_gaps': bool(all_gaps),
             'gaps': all_gaps, 'COMMON_scope': 'global union only; never credited to an M line',
             'scope': 'recorded activity only; not whole-task completeness or semantic attestation'}
@@ -520,6 +549,7 @@ def session_report(root: Path) -> dict[str, Any]:
     if path.exists():
         read_activity('COMMON', path)
     timing = summarize_activity(streams)
+    foundation_timing = summarize_activity(streams, scope='FOUNDATION')
     timing['available_global_known_union_ns'] = timing['global_known_union_ns']
     timing['available_single_comparable_domain'] = timing['single_comparable_domain']
     timing['unreadable_activity_owners'] = sorted(unavailable)
@@ -531,7 +561,13 @@ def session_report(root: Path) -> dict[str, Any]:
         timing['global_known_union_ns'] = None
         timing['single_comparable_domain'] = None
         timing['scope'] = 'readable activity subset only; unreadable owners are unknown, not zero'
+        foundation_timing['available_global_known_union_ns'] = foundation_timing['global_known_union_ns']
+        foundation_timing['global_known_union_ns'] = None
+        foundation_timing['single_comparable_domain'] = None
+        foundation_timing['unreadable_activity_owners'] = sorted(unavailable)
+        foundation_timing['scope'] = 'readable foundation activity subset only; excluded owner scope unknown'
     return {'session': metadata, 'line_packages': packages, 'timing': timing,
+            'foundation_timing': foundation_timing,
             'registered_line_count': len(packages), 'effective_M_count': None,
             'report_status': 'PARTIAL_READ' if issues else 'READABLE', 'issues': issues,
             'report_scope': 'registered packages and readable activity only; not whole-task completeness',
@@ -561,6 +597,11 @@ def line_packet(root: Path, line_id: str, *, topic: str | None = None,
         topic=topic, max_chars=max_chars,
         corrections_topics=[*selection.get('corrections_topics', []), *corrections_topics],
         experiences=[*selection.get('experiences', []), *experiences]))
+    if (root / 'foundation.json').exists():
+        from .codex_foundation import foundation_packet
+        parts += ['## 当前任务说明与执行决定', foundation_packet(root)]
+    elif metadata.get('foundation_required'):
+        parts += ['## 前置任务说明待形成', '尚不能全面执行。先研究实际材料并与用户明确关键决定。']
     if package['candidate'] is not None:
         reference = _artifact_ref(Path(package['candidate']))
         parts += ['## 本线当前可检查产物入口', json.dumps(reference, ensure_ascii=False, indent=2),

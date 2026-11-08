@@ -1,5 +1,15 @@
 # Changelog
 
+## Codex 0.7.0 — researched task foundation before full execution
+
+- A mandatory FOUNDATION core separates immutable original words from a research-authored, revisable task explanation. It covers usable outcomes, scope, granularity, actual assets and dependencies, competing delivery routes, resources and completion.
+- User dialogue and explicit decisions precede full execution. Partial answers do not imply full consent; meaningful changes are discussed, while unchanged continuation and editorial maintenance keep valid decisions.
+- Front-stage research uses a separate dynamic budget and activity scope, without spending the formal invocation's parameters. New 0.7 sessions require the foundation at managed substantive begin/checkpoint, including exclusive D/V; end/recover remain available.
+- A small foundation module and unified CLI preserve current briefs, real reply references and decisions in the existing session. Recovery carries the current explanation; scripts do not infer intent, authenticate users or intercept every host tool.
+- Behavioral fixtures and a constructed readable example exercise correction, partial answers, stale decisions, continuation, scope-separated timing and unreadable-log limits. They do not establish general semantic alignment or downstream task success.
+
+Root stable remains 5.0.0-alpha.5; current executing pins do not hot-swap.
+
 ## Codex 0.6.0 — autonomous research and production, with usable native tools
 
 Experimental ref remains `codex/codex-host-adaptation`; root stable identity stays 5.0.0-alpha.5.
