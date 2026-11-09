@@ -264,6 +264,16 @@ class KnowledgePoolTests(unittest.TestCase):
             k.revise_use(self.root,correction,expected_revision=4,operation_id='bad-correction')
         self.assertEqual((self.root/'pool.json').read_bytes(),before)
 
+    def test_cli_utf8_is_independent_of_parent_encoding(self):
+        self.analysis['questions'][1]['label']='剩余工作 −1² 与下一步'
+        self.ingest()
+        cli=Path(__file__).resolve().parents[1]/'tools/codex.py'
+        env={**os.environ,'PYTHONIOENCODING':'ascii','PYTHONUTF8':'0'}
+        result=subprocess.run([sys.executable,'-B',str(cli),'knowledge','--pool',str(self.root),'questionnaire'],
+            env=env,capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr.decode('utf-8'))
+        self.assertIn('剩余工作 −1² 与下一步',result.stdout.decode('utf-8'))
+
     def test_real_cli_correction_and_checkpoint_change_the_snapshot(self):
         self.ingest()
         old=k.load(self.root)['concepts']['queue.work']

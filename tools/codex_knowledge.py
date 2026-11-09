@@ -11,6 +11,9 @@ MUTATION_ACTIONS=('ingest','select','explanation','evidence','finish','migrate-v
 
 
 def main(argv=None):
+    # This command's text/JSON interface is UTF-8 even in a Windows GBK parent.
+    for stream in (sys.stdout,sys.stderr):
+        if hasattr(stream,'reconfigure'):stream.reconfigure(encoding='utf-8')
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--pool',required=True,type=Path)
     sub=parser.add_subparsers(dest='action',required=True)
