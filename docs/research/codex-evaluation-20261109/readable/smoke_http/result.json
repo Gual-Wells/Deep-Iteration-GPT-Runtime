@@ -1,0 +1,80 @@
+{
+  "returncode": 0,
+  "elapsed_seconds": 9.414594599977136,
+  "command": [
+    "codex",
+    "--no-daemon",
+    "exec",
+    "--ignore-user-config",
+    "--ephemeral",
+    "--json",
+    "--skip-git-repo-check",
+    "--color",
+    "never",
+    "-C",
+    "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\smoke_http",
+    "-s",
+    "read-only",
+    "-m",
+    "gpt-6.1-sol",
+    "-c",
+    "model_reasoning_effort=\"max\"",
+    "-c",
+    "project_doc_max_bytes=0",
+    "-c",
+    "memories.use_memories=false",
+    "-c",
+    "memories.generate_memories=false",
+    "-c",
+    "web_search=\"disabled\"",
+    "-c",
+    "model_provider=\"study_http\"",
+    "-c",
+    "model_providers.study_http.name=\"Study HTTPS-only OpenAI\"",
+    "-c",
+    "model_providers.study_http.requires_openai_auth=true",
+    "-c",
+    "model_providers.study_http.supports_websockets=false",
+    "-c",
+    "model_providers.study_http.wire_api=\"responses\"",
+    "-c",
+    "model_providers.study_http.stream_max_retries=0",
+    "--disable",
+    "apps",
+    "--disable",
+    "plugins",
+    "--disable",
+    "multi_agent",
+    "-c",
+    "developer_instructions=\"This is a connectivity check. Do not use tools. Reply exactly READY.\"",
+    "-"
+  ],
+  "events": [
+    {
+      "type": "thread.started",
+      "thread_id": "01a1bf14-946a-73c3-a2e9-1540749826aa"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_0",
+        "type": "agent_message",
+        "text": "READY"
+      }
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 14129,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 21,
+        "reasoning_output_tokens": 14
+      }
+    }
+  ],
+  "stderr": "2026-11-09T06:52:41.106262Z  WARN codex_core::shell_snapshot: Failed to create shell snapshot for powershell: Shell snapshot not supported yet for PowerShell\n"
+}

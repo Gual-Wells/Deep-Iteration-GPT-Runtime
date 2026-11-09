@@ -1,0 +1,22 @@
+{
+  "task1_history/output/choice.json": {
+    "bytes": 56,
+    "sha256": "293d0d70ce52549ae0680eac4b2e81b33c10b5cb8738a65ca2cb42471ec83408"
+  },
+  "task1_history/output/reader.zip": {
+    "bytes": 1515,
+    "sha256": "f55841dfdf4c76113221069ee4183f399cd63e0a6cec5361ef8198345c355b71"
+  },
+  "task2_budget/output/budget.py": {
+    "bytes": 1906,
+    "sha256": "599962e3fc5e3bb230a69f1e717ccd42b9f64f16b9ab71f2070554bb055da686"
+  },
+  "task3_evidence/output/screen.json": {
+    "bytes": 3344,
+    "sha256": "54cdcaa6c829fe6fcbb8cda3f33c5a4d9b32b59ceca96e4b862e54dbaaf89346"
+  },
+  "task4_retry/output/queue_payload.py": {
+    "bytes": 1016,
+    "sha256": "32aeb0dd6060f35e83ef9a4b0f428798b51e3379e439302365d3a3140420d59e"
+  }
+}

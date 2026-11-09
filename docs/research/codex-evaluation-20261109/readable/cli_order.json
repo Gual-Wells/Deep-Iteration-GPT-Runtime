@@ -1,0 +1,22 @@
+[
+  {
+    "condition": "native",
+    "repeat": 2,
+    "label": "a01"
+  },
+  {
+    "condition": "light",
+    "repeat": 2,
+    "label": "a02"
+  },
+  {
+    "condition": "native",
+    "repeat": 1,
+    "label": "a03"
+  },
+  {
+    "condition": "light",
+    "repeat": 1,
+    "label": "a04"
+  }
+]

@@ -1,0 +1,296 @@
+{
+  "synthetic": true,
+  "as_of": "2026-11-09",
+  "packets": [
+    {
+      "job_id": "J01",
+      "fictional_company": "Synthetic Company J01",
+      "title": "后端开发实习生",
+      "work_city": "上海",
+      "duty_tags": [
+        "software_development"
+      ],
+      "sources": [
+        {
+          "source_id": "J01-O1",
+          "authority": "official_public",
+          "observed_on": "2026-11-05",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": true,
+            "deadline": "2026-11-09"
+          }
+        },
+        {
+          "source_id": "J01-O2",
+          "authority": "official_public",
+          "observed_on": "2026-11-08",
+          "permission": "allowed",
+          "claims": {
+            "current_recruiting_action": true,
+            "recruiting_action_on": "2026-11-08"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "J02",
+      "fictional_company": "Synthetic Company J02",
+      "title": "嵌入式开发实习生",
+      "work_city": "苏州",
+      "duty_tags": [
+        "embedded_firmware_development"
+      ],
+      "sources": [
+        {
+          "source_id": "J02-O1",
+          "authority": "official_public",
+          "observed_on": "2026-11-06",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": false,
+            "deadline": null
+          }
+        },
+        {
+          "source_id": "J02-R1",
+          "authority": "repost",
+          "observed_on": "2026-11-08",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": true,
+            "deadline": "2026-11-30"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "J03",
+      "fictional_company": "Synthetic Company J03",
+      "title": "机器学习工程实习生",
+      "work_city": "上海",
+      "duty_tags": [
+        "ml_engineering"
+      ],
+      "sources": [
+        {
+          "source_id": "J03-O1",
+          "authority": "official_public",
+          "observed_on": "2026-10-25",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": true,
+            "deadline": "2026-11-08"
+          }
+        },
+        {
+          "source_id": "J03-O2",
+          "authority": "official_public",
+          "observed_on": "2026-11-10",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": true,
+            "deadline": "2026-11-30"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "J04",
+      "fictional_company": "Synthetic Company J04",
+      "title": "后端开发实习生",
+      "work_city": "北京",
+      "duty_tags": [
+        "software_development"
+      ],
+      "sources": [
+        {
+          "source_id": "J04-O1",
+          "authority": "official_public",
+          "observed_on": "2026-11-07",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": true,
+            "deadline": "2026-12-01"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "J05",
+      "fictional_company": "Synthetic Company J05",
+      "title": "AI 人才运营实习生",
+      "work_city": "苏州",
+      "duty_tags": [
+        "content_writing",
+        "candidate_sourcing"
+      ],
+      "sources": [
+        {
+          "source_id": "J05-O1",
+          "authority": "official_public",
+          "observed_on": "2026-11-07",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": true,
+            "deadline": null
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "J06",
+      "fictional_company": "Synthetic Company J06",
+      "title": "测试开发实习生",
+      "work_city": "苏州",
+      "duty_tags": [
+        "automated_test_development"
+      ],
+      "sources": [
+        {
+          "source_id": "J06-O1",
+          "authority": "official_public",
+          "observed_on": "2026-11-07",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": true,
+            "deadline": "2026-11-25"
+          }
+        },
+        {
+          "source_id": "J06-C1",
+          "authority": "candidate_self_report",
+          "observed_on": "2026-11-08",
+          "permission": "allowed",
+          "claims": {
+            "interview_occurred": true,
+            "interview_on": "2026-11-08",
+            "remaining_hc": 10,
+            "hc_as_of": "2026-11-08"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "J07",
+      "fictional_company": "Synthetic Company J07",
+      "title": "数据工程实习生",
+      "work_city": "上海",
+      "duty_tags": [
+        "data_pipeline_development"
+      ],
+      "sources": [
+        {
+          "source_id": "J07-O1",
+          "authority": "official_public",
+          "observed_on": "2026-10-10",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": true,
+            "deadline": null
+          }
+        },
+        {
+          "source_id": "J07-C1",
+          "authority": "candidate_self_report",
+          "observed_on": "2026-11-02",
+          "permission": "allowed",
+          "claims": {
+            "interview_occurred": true,
+            "interview_on": "2026-11-02"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "J08",
+      "fictional_company": "Synthetic Company J08",
+      "title": "固件开发实习生",
+      "work_city": "苏州",
+      "duty_tags": [
+        "embedded_firmware_development"
+      ],
+      "sources": [
+        {
+          "source_id": "J08-R1",
+          "authority": "repost",
+          "observed_on": "2026-11-08",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": true,
+            "deadline": "2026-12-01"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "J09",
+      "fictional_company": "Synthetic Company J09",
+      "title": "视觉算法工程实习生",
+      "work_city": "上海",
+      "duty_tags": [
+        "ml_engineering",
+        "software_development"
+      ],
+      "sources": [
+        {
+          "source_id": "J09-O1",
+          "authority": "official_public",
+          "observed_on": "2026-11-04",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": true,
+            "deadline": "2026-12-01"
+          }
+        },
+        {
+          "source_id": "J09-H1",
+          "authority": "official_authorized_private",
+          "observed_on": "2026-11-08",
+          "permission": "allowed",
+          "claims": {
+            "remaining_hc": 2,
+            "hc_as_of": "2026-11-08",
+            "current_recruiting_action": true,
+            "recruiting_action_on": "2026-11-07"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "J10",
+      "fictional_company": "Synthetic Company J10",
+      "title": "前端开发实习生",
+      "work_city": "苏州",
+      "duty_tags": [
+        "software_development"
+      ],
+      "sources": [
+        {
+          "source_id": "J10-O1",
+          "authority": "official_public",
+          "observed_on": "2026-11-01",
+          "permission": "allowed",
+          "claims": {
+            "accepting_applications": true,
+            "deadline": "2026-11-30"
+          }
+        },
+        {
+          "source_id": "J10-X1",
+          "authority": "official_authorized_private",
+          "observed_on": "2026-11-08",
+          "permission": "not_granted",
+          "claims": {
+            "accepting_applications": false,
+            "deadline": null,
+            "remaining_hc": 0,
+            "hc_as_of": "2026-11-08",
+            "current_recruiting_action": true,
+            "recruiting_action_on": "2026-11-08"
+          }
+        }
+      ]
+    }
+  ]
+}

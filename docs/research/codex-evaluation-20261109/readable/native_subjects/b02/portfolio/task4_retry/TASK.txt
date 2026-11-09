@@ -1,0 +1,30 @@
+任务四：冻结图片备注，并使未知结果重试复用原快照
+
+starter/queue_payload.py 是有缺陷的种子实现。输出完整 output/queue_payload.py，
+只用 Python 标准库。导出 prepare(image_bytes, description) 与
+retry(snapshot, live_description)，函数及导入不得做 I/O。
+
+prepare 输入 image_bytes 必须是 bytes（可为空），description 必须是 str 或 None。
+None 视为空串。先把 CRLF 转为 LF，再把剩余 CR 转为 LF；除此之外不修改文本。
+保留前后空白、空行、制表符和 Unicode 字符，不 strip，不做 NFC 等其他归一化。
+随后按 Unicode 码点数限制为至多 2000（含2000），不是 UTF-8 字节数，也不是
+用户可见字形数。超限或 prepare 的输入类型不符必须抛 ValueError。
+
+prepare 返回以下严格 JSON 可序列化 schema，不额外添加键：
+{
+  "schema": 1,
+  "image": {"base64": "RFC4648标准base64字符串，无换行",
+            "sha256": "原始图片bytes的UTF-8小写64位hex SHA256"},
+  "description": {"text": "上述规范化后的完整文本",
+                  "sha256": "text按UTF-8编码后的SHA256小写64位hex"}
+}
+image.sha256 是 bytes 本身的摘要；这里的 hex 字符串是文本，不要先把图片解码。
+图片字段与描述字段共同构成已经提交、结果未知的冻结快照。
+
+retry 的 snapshot 保证是有效 prepare 结果或它的 JSON 往返结果。必须返回该
+snapshot 的独立深拷贝，逐字段复用冻结图片、描述与两个hash，不参考当前表单的
+live_description。即使 live_description 已变化、为 None 或超过2000码点也忽略；
+不得重新 prepare 或重新验证 live_description。不得修改 snapshot 的任何层级。
+返回对象任一层级的后续修改不得改变原 snapshot。
+
+不要求为非法 snapshot 或 description 中非法的孤立代理码点定义新行为。

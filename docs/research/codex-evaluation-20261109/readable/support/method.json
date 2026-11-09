@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "status": "method_review_for_small_pilot_not_a_model_run",
+  "pinned_object": {
+    "version": "0.7.0",
+    "sha": "b258276632054f7f8d1d8a060e01b98b9c7aa3be",
+    "activated_for_this_review": false,
+    "reviewed": [
+      "codex/manifest.json",
+      "codex/VERSION",
+      "codex/STARTUP.md",
+      "codex/PROTOCOL.md",
+      "codex/FOUNDATION.md",
+      "codex/PARAMETERS.md",
+      "codex/COLLABORATION.md",
+      "codex/CHARACTER.md",
+      "codex/PERMISSIONS.md",
+      "codex/AGENTS.light.md"
+    ]
+  },
+  "executable_design": {
+    "common_rules": [
+      "Freeze the four-task portfolio, starting artifacts, scorer, prompts and resource caps before the first treatment artifact; record hashes.",
+      "Every arm gets the same useful task statement, facts, constraints, tools, model and reasoning effort. Native receives normal strong Codex instructions and full resource authorization; do not manufacture a weak prompt.",
+      "Do not tell solvers the desired winner, other-arm outputs, hidden test cases or scores. Keep scorer files outside solver input paths and randomize anonymized artifact labels when judging non-executable criteria.",
+      "Never reuse a solved portfolio across arms in the same model history. Use fresh contexts and isolated copies; record order to expose warm-cache or order effects.",
+      "Call resource control SAME CAPS, not equal realized tokens. Report actual consumption and completion separately. Prompt/protocol reading, U0, helper use and retries count toward all-in treatment cost."
+    ],
+    "experiment_A": {
+      "harness": "Native collaboration, fork_turns=none; all arms on the same model and reasoning effort",
+      "arms": {
+        "N": "Native base instructions plus common task and resource envelope.",
+        "L": "N plus the literal pinned AGENTS.light.md.",
+        "S": "Pinned profile with explicit standard parameters N2/R1/D0/V0/L3/M1; source AUTO; simulated U0 decision."
+      },
+      "repeats": 2,
+      "total_runs": 6,
+      "interpretation": "Three-arm exploratory comparison of native, light and explicitly selected low profile. S is not the default full treatment. Four tasks within one shared run are a clustered portfolio, not four independent replications. Previous CLI READY probes are instrumentation only, not efficacy observations."
+    },
+    "experiment_B": {
+      "harness": "Native collaboration, fork_turns=none",
+      "arms": {
+        "N_extra": "Native with the same complete task and extra-resource caps as F.",
+        "F_default_capped": "Pinned complete profile requesting N12/R4/D3/V3/L3/M1, subject to the same externally imposed cap."
+      },
+      "repeats": 1,
+      "caps": {
+        "wall_clock_minutes": 15,
+        "main_agents": 1,
+        "unique_helpers": 3,
+        "helper_turns_total": 6,
+        "helper_concurrency": 2
+      },
+      "slot_plan": [
+        "Evaluator root plus one solver Main leaves two helper slots in a four-slot host. Finish methodology agents before starting timed solver episodes.",
+        "Use helper cohorts sequentially; preserve each helper identity/history for follow-up. V domains must emerge from actual exploration rather than three prefabricated generic roles.",
+        "Three initial domain turns plus three relevant-candidate follow-ups can support three sustained V lines. Those turns do not automatically establish three D interventions.",
+        "A helper may produce a genuine nonlocal alternative only when actual research supports it. Record its distinct claim, comparative artifact/evidence and Main consequence before crediting D.",
+        "N_extra gets the same optional helpers and turns and may allocate them freely. Do not shorten N_extra to pay for F counting duties."
+      ],
+      "interpretation": "One paired, cap-constrained case study. If F misses substantive obligations, report a truncated/incomplete default-profile run, not completed full DIGR. Do not compare raw results with experiment A as if host and tools were held fixed."
+    }
+  },
+  "resources_and_observations": {
+    "primary_outcomes": [
+      "Frozen behavioral pass/fail and requirement/scope failures on delivered artifacts, evaluated after solver termination without giving results back to the solver.",
+      "All-in wall clock from prompt delivery through the observed final artifact, including U0/protocol overhead; separate solver deadline, harness setup and scoring.",
+      "Actual input, cached input, output and reasoning tokens only where the event schema exposes them; total all participating solver sessions, including helper follow-ups.",
+      "Tool calls by category only where directly observable, retries/failures, helper identities/turns and concurrency; mark incomplete instrumentation as unknown or partial. Current native log extraction must remain within the explicit metadata whitelist."
+    ],
+    "caveats": [
+      "A same-model evaluator can create and run objective tests, but self-authored prose ratings are not independent human validation. Grade observable artifacts, not elaborate traces or stated parameter compliance.",
+      "Same wall-clock/concurrency caps do not prove equal compute. No unsupported hard-token cap, subscription dollars or effective-work time may be inferred.",
+      "Full-profile input length is part of cost. Count cached tokens separately; do not add reasoning tokens twice when they are already included in output tokens.",
+      "A first successful answer and a final improved answer are different outcomes; preserve checkpoint artifacts if assessing useful latency.",
+      "If only an additional-resource N/F pair is run, the extra-resource effect of L remains unmeasured."
+    ]
+  },
+  "narrow_usage_collection": {
+    "verified_by_reviewer": false,
+    "supplied_current_root": {
+      "id": "01a1bf03-197e-78e0-8ad1-08021e30ab92",
+      "path": "D:/CodexData/sessions/2026/11/09/rollout-2026-11-09T14-33-35-01a1bf03-197e-78e0-8ad1-08021e30ab92.jsonl"
+    },
+    "procedure": [
+      "Use exact selected native sessions for current trials. CLI READY transport probes produced no task artifacts and are excluded from efficacy outcomes; do not keep retrying unavailable transport for this pilot.",
+      "For native trials, record each spawn task_name, returned agent_id and start timestamp in the experiment ledger. A canonical task name is not assumed to be a rollout filename or session ID.",
+      "Snapshot only today's session filenames before/after spawning. For newly created candidate files read only the first session_meta record and retain whitelisted id, timestamp and source.subagent.spawn.parent_thread_id.",
+      "Select only the explicit trial solver IDs or a proven parent-ID chain from that solver to its helpers. Do not select every descendant of the research root, which includes design/scoring agents.",
+      "If identity matching fails, report native usage as unavailable; do not search private historical message bodies for the task name.",
+      "Within exact selected files, project only session_meta, turn_context model/effort and event_msg token_count info.total_token_usage. Ignore all reasoning/messages/tool arguments and outputs.",
+      "Take the last cumulative usage snapshot per distinct solver session, or final-minus-start for a reused session; do not sum cumulative snapshots. Check monotonicity, missing final snapshots and possible counter resets.",
+      "Keep evaluator/root/scorer usage separate. Verify whether parent usage includes child usage before aggregation; do not double-count by assumption.",
+      "Under the current metadata-only whitelist, local tool-call counts are not established. Use live trial telemetry or CLI structured item categories; otherwise mark them unknown. A future explicit whitelist could extract only function type/name from exact trial logs, never arguments or outputs."
+    ]
+  },
+  "faithfulness": {
+    "record_independently_of_quality": [
+      "Exact pinned version/SHA, manifest/VERSION agreement, full entrypoint/core reads and hash-verification scope. Routing/acquisition success is separate from task-quality benefit.",
+      "Original task and explicit parameters, U0 researched brief and actual or explicitly simulated decision provenance, separate foundation/execution boundary and all-in cost.",
+      "Effective init configuration, real helper identities and fork_none inputs, actual context boundaries and later information flows.",
+      "For N: a meaningful problem and artifact/understanding change. For R: a complete candidate reexamined under a different consequential question, with actual reconsideration and synthesis.",
+      "For each D: independent nonlocal claim, researched alternative, returned choice-ready material, Main answer and implemented or justified rejection consequences.",
+      "For each V: research-formed domain, its own materials/problems/work, initial contribution and genuine later continuation when relevant candidate changes.",
+      "Source responsibility, authentic activity boundaries and clock domains if reported. Wall clock is not T/t; unobserved effective time stays unknown.",
+      "Per-unit user-visible boundaries required by the object protocol, final actual-versus-target facts, unresolved scope/permission/stop issues."
+    ],
+    "insufficient_for_full_execution": [
+      "Protocol tests pass, files hash correctly, runtime can be loaded, or requested counts are printed.",
+      "Six agents or six turns, role labels, a one-shot critique, three generic reviews, or automatic D/V double-credit.",
+      "Full-history forks, identical model roleplay in one history, or the Main claiming an independent agent checked an unseen revision.",
+      "Splitting commands/tests/log entries into N, checking four files as R4, or calling four task components four whole-candidate restarts.",
+      "Pre-U0 work counted toward formal obligations, a confirmed JSON file mistaken for a real user decision, or a cap-stopped run relabeled complete."
+    ],
+    "simulated_U0": "Allowed as a declared system benchmark intervention: freeze a user persona/decision policy, send the same scripted decision and corrections to all applicable arms, record the transcript as SIMULATED. It cannot demonstrate real-user alignment, decision burden, natural clarification quality or genuine user-selected standard mode."
+  },
+  "adversarial_cases_and_uncertainty": {
+    "highest_value_cases": [
+      "Narrow source/version boundary: restore or assemble exactly requested historical material; hidden checks detect unsolicited rewriting and collateral edits.",
+      "A deterministic state/race/retry case with an initially plausible wrong explanation; verify actual behavior and preservation of frozen submission identity.",
+      "Conflicting frozen evidence with attractive unsupported conclusions; grade source fidelity, missing uncertainty and required facts.",
+      "A meaningful mid-task correction delivered at a common candidate checkpoint; check changed action and correction of already-created artifacts, not acknowledgment.",
+      "A simple negative-control task to reveal overhead, plus an unavailable-capability case to detect false D/V/completion claims; keep efficacy and failure-behavior analyses separate."
+    ],
+    "minimum_practical_reporting": [
+      "The planned two repeated portfolio runs per N/L/S arm and one native N/F pair are a feasibility pilot, not a general causal proof.",
+      "Report every task-by-arm outcome, repeat variability, paired discordances, all-in costs, timeout/incomplete runs and treatment deviations. Do not silently drop failed transport or protocol runs.",
+      "Do not call eight task results eight independent trials when they share a portfolio/context. With four distinct tasks and tiny replication, uncertainty is large; use raw paired counts and ranges instead of a misleading single significance claim.",
+      "A promising follow-up should add genuinely new task instances and independent repeats, ideally at least six distinct tasks and two repeats per arm, before broad value claims.",
+      "A frozen-case counterexample can falsify an absolute claim that the profile always improves results. A few wins cannot establish general benefit; a null result under a short cap cannot show a fully executed profile has no benefit."
+    ]
+  }
+}

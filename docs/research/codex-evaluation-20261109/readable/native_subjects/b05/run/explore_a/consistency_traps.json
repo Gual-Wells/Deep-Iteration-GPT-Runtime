@@ -1,0 +1,53 @@
+{
+  "actual_head_pairwise_consistency_trap": {
+    "commit": "ed6c24ba96f4b5e6bde4db45c7c9018598a168ba",
+    "html_paragraphs_match_its_own_original": true,
+    "html_paragraphs_match_reference": false,
+    "source_label_unchanged": true,
+    "changed_claim": {
+      "reference": "the timetable was not a promise.",
+      "head": "the timetable guaranteed arrival."
+    }
+  },
+  "actual_internal_jump_consistency_trap": {
+    "commit": "154c6c71bcb1573f350a25f702adb952cfde6dff",
+    "jump_json_matches_nav": true,
+    "all_destinations_exist": false,
+    "missing_destinations": [
+      "p9"
+    ]
+  },
+  "constructed_note_binding_counterexample": {
+    "fixture_modified": false,
+    "notes_text_inventory_preserved": true,
+    "note_id_inventory_preserved": true,
+    "target_id_inventory_preserved": true,
+    "bindings_preserved": false,
+    "constructed_notes": [
+      {
+        "id": "n1",
+        "paragraph": "p2",
+        "text": "A deliberate choice retains intention; it does not mean an accident."
+      },
+      {
+        "id": "n2",
+        "paragraph": "p1",
+        "text": "Small print gives the stated reason for keeping the ticket."
+      }
+    ]
+  },
+  "actual_safe_presentation_change": {
+    "older": "bea68ce517a670aa862fb597fadcd664a08eb50e",
+    "newer": "3e68f52cec21d59778233a547d051125cd107820",
+    "source_html_jumps_notes_identical": true,
+    "css_changed": true,
+    "newer_tracked_files": [
+      "index.html",
+      "jumps.json",
+      "notes.json",
+      "original.txt",
+      "reader.css",
+      "release.txt"
+    ]
+  }
+}

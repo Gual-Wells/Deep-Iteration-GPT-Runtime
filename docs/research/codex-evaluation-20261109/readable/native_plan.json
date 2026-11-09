@@ -1,0 +1,59 @@
+{
+  "prepared_at_utc": "2026-11-09T07:01:51.099164+00:00",
+  "order_reason": "Single baseline before and after collaborative comparison; full and resource-matched native are fresh histories, all prompts fixed before native outputs.",
+  "records": [
+    {
+      "label": "b01",
+      "condition": "host_native_single",
+      "repeat": 1,
+      "cap": 480,
+      "prompt_sha256": "1c590df0a538520f059889c2c637f364a1781184810ee8593aa6a47cfa0f00f0",
+      "workspace": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_subjects\\b01",
+      "prompt_file": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_prompts\\b01.txt"
+    },
+    {
+      "label": "b05",
+      "condition": "full_profile_default_capped",
+      "repeat": 1,
+      "cap": 900,
+      "prompt_sha256": "a92c3ee7d317bf4c7f59a95286bed2bbc83cf2c36c73418169d0f71afea5325d",
+      "workspace": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_subjects\\b05",
+      "prompt_file": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_prompts\\b05.txt"
+    },
+    {
+      "label": "b03",
+      "condition": "host_native_extra",
+      "repeat": 1,
+      "cap": 900,
+      "prompt_sha256": "48851c3f295d2099df8246a2a1a6f0313fbc34bdd63d7ee0a36781c43a0b28f3",
+      "workspace": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_subjects\\b03",
+      "prompt_file": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_prompts\\b03.txt"
+    },
+    {
+      "label": "b04",
+      "condition": "host_native_single",
+      "repeat": 2,
+      "cap": 480,
+      "prompt_sha256": "bebadc821b49fd535b33204c816ca251e3793c58d4217cf4a689c3ffb4bed5ea",
+      "workspace": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_subjects\\b04",
+      "prompt_file": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_prompts\\b04.txt"
+    }
+  ],
+  "excluded_records": [
+    {
+      "label": "b02",
+      "condition": "full_profile_default_capped",
+      "repeat": 1,
+      "cap": 900,
+      "prompt_sha256": "1c07be883464e304ceb252bda8a8f798f8e56bfe4280f90a3dbd74c4fa30ae55",
+      "workspace": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_subjects\\b02",
+      "prompt_file": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_prompts\\b02.txt",
+      "excluded_reason": "Preproduction context contamination via global list_agents showing baseline final answer; interrupted without simulated execution confirmation."
+    }
+  ],
+  "visibility_repair": {
+    "at_utc": "2026-11-09T07:11:46.378759+00:00",
+    "reason": "Global list_agents exposes completed sibling answers even when histories are fork_none.",
+    "changes": "Explicitly enforce the already-declared no-other-subjects boundary for future parents/helpers. No task inputs, evaluator, acceptance rules or outcome targets changed."
+  }
+}

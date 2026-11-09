@@ -1,0 +1,27 @@
+{
+  "protocol": "0.7.0@b258276632054f7f8d1d8a060e01b98b9c7aa3be",
+  "original_task_source": "Parent controlled experiment assignment plus immutable portfolio/TASK.txt and four child TASK.txt; raw messages remain in this line conversation.",
+  "u0": "Read all four task definitions, actual source/reference packets, starters and Git history before requesting explicit simulated decision. Preserve exact original identity and output boundaries; no network, installation or API.",
+  "decision_source": "Parent message explicitly marked 实验操作者给出的模拟用户决定，不是真实用户业务确认",
+  "decision": "Begin the four fixed outputs with described granularity and route; retain N12/R4/D3/V3/L3/M1, soft T8min/t3min; 900s all-in, <=3 identities, <=2 active helpers, <=6 helper turns.",
+  "preliminary_clock": "First material read completed 2026-11-09 07:12:41 UTC; formal boundary 07:14:51 UTC. Exact Main start and continuous monotonic T/t not available.",
+  "parameters": {
+    "N": 12,
+    "T_soft_minutes": 8,
+    "R": 4,
+    "S": {
+      "n": 1,
+      "t_soft_minutes": 3,
+      "r": 1,
+      "b": 0
+    },
+    "D": 3,
+    "V": 3,
+    "L": 3,
+    "M": 1
+  },
+  "sources": "Four local task material surfaces; manifest/startup/entrypoint/all core/VERSION were read and file digests checked against frozen manifest.",
+  "candidate": "All four task outputs formed; selected history commit 3e68f52cec21d59778233a547d051125cd107820 and six exact tracked blobs; roles selected J01,J06,J07,J09,J10.",
+  "verification": "142 crafted record permutations; duplicate zero expense/reference basis; invalid amounts in all types; Unicode and normalized-newline length; hashes; JSON roundtrip frozen copy mutation isolation; ten exact evidence rows; archive exact blobs; history HEAD, status and tracked bytes unchanged.",
+  "open": "Independent initial explorations and candidate re-entry pending; no D/V completion inferred from identity or labels. Formal depth shortfalls must remain visible."
+}

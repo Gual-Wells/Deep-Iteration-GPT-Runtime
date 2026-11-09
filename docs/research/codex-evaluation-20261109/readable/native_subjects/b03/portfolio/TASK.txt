@@ -1,0 +1,15 @@
+四项本地合成任务（全部数据均为虚构）
+
+本目录是一份固定 portfolio。完成下列四个任务；各目录 TASK.txt 是具体规范。
+不需要网络、外部服务、第三方 Python 包或真实个人资料。不得访问 support、
+外部评分器、参考答案或其他被试目录。不得改变输入、规范或 history 当前工作树。
+除各任务的 output/ 外，不要写入或修改本 portfolio 的文件。可读取本地 Git 历史。
+
+交付入口：
+1. task1_history/output/reader.zip 与 output/choice.json
+2. task2_budget/output/budget.py
+3. task3_evidence/output/screen.json
+4. task4_retry/output/queue_payload.py
+
+Python 模块须能在 Python 3.11+ 直接导入；只用标准库，不执行网络或额外安装。
+可自行核对输出，但不得把自写说明或测试结果代替上述交付物。四题彼此独立。

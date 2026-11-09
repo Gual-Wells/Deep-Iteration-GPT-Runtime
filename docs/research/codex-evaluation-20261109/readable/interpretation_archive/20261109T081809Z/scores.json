@@ -1,0 +1,301 @@
+{
+  "suite_sha256": "cfd363cabfe680242a91c70cbd0ff3611d22648bb2a40c1bb2c08c097cd448ba",
+  "finished_labels": [
+    "b01",
+    "b05",
+    "b03",
+    "b04"
+  ],
+  "records": [
+    {
+      "label": "b01",
+      "grade": {
+        "task1_history": {
+          "passed": true,
+          "checks": {
+            "selected_latest_complete_commit": true,
+            "archive_exact_selected_tree": true,
+            "current_history_working_tree_preserved": true,
+            "current_history_head_preserved": true
+          },
+          "details": {}
+        },
+        "task2_budget": {
+          "passed": true,
+          "checks": {
+            "catalog_zeroes_and_transfer_count": true,
+            "candidate_deduplication": true,
+            "ambiguity_before_catalog_filter": true,
+            "refund_inherits_category_and_can_be_negative": true,
+            "complete_expense_list_and_order_invariance": true,
+            "duplicate_expense_id_is_not_unique": true,
+            "only_expense_records_can_match_refund": true,
+            "ambiguous_refund_goes_negative_unassigned": true,
+            "pure_inputs_independent_calls_and_output": true,
+            "nonnegative_integer_validation_and_zero": true
+          },
+          "details": {}
+        },
+        "task3_evidence": {
+          "passed": true,
+          "checks": {
+            "json_schema": true,
+            "J01_evidence_decision": true,
+            "J02_evidence_decision": true,
+            "J03_evidence_decision": true,
+            "J04_evidence_decision": true,
+            "J05_evidence_decision": true,
+            "J06_evidence_decision": true,
+            "J07_evidence_decision": true,
+            "J08_evidence_decision": true,
+            "J09_evidence_decision": true,
+            "J10_evidence_decision": true,
+            "selected_ids_exact": true
+          },
+          "details": {}
+        },
+        "task4_retry": {
+          "passed": true,
+          "checks": {
+            "exact_json_snapshot_and_binary_image": true,
+            "normalize_mixed_newlines_before_hash": true,
+            "preserve_whitespace_and_blank_lines": true,
+            "none_is_empty_string": true,
+            "normalized_2000_boundary": true,
+            "unicode_codepoints_not_bytes_or_graphemes": true,
+            "prepare_invalid_types_raise_valueerror": true,
+            "retry_ignores_live_form_and_preserves_frozen_fields": true,
+            "retry_does_not_mutate_snapshot": true,
+            "retry_is_an_independent_deep_copy": true
+          },
+          "details": {}
+        },
+        "input_integrity": {
+          "passed": true,
+          "checks": {
+            "protected_input_files_preserved": true
+          },
+          "details": {}
+        }
+      }
+    },
+    {
+      "label": "b05",
+      "grade": {
+        "task1_history": {
+          "passed": true,
+          "checks": {
+            "selected_latest_complete_commit": true,
+            "archive_exact_selected_tree": true,
+            "current_history_working_tree_preserved": true,
+            "current_history_head_preserved": true
+          },
+          "details": {}
+        },
+        "task2_budget": {
+          "passed": true,
+          "checks": {
+            "catalog_zeroes_and_transfer_count": true,
+            "candidate_deduplication": true,
+            "ambiguity_before_catalog_filter": true,
+            "refund_inherits_category_and_can_be_negative": true,
+            "complete_expense_list_and_order_invariance": true,
+            "duplicate_expense_id_is_not_unique": true,
+            "only_expense_records_can_match_refund": true,
+            "ambiguous_refund_goes_negative_unassigned": true,
+            "pure_inputs_independent_calls_and_output": true,
+            "nonnegative_integer_validation_and_zero": true
+          },
+          "details": {}
+        },
+        "task3_evidence": {
+          "passed": true,
+          "checks": {
+            "json_schema": true,
+            "J01_evidence_decision": true,
+            "J02_evidence_decision": true,
+            "J03_evidence_decision": true,
+            "J04_evidence_decision": true,
+            "J05_evidence_decision": true,
+            "J06_evidence_decision": true,
+            "J07_evidence_decision": true,
+            "J08_evidence_decision": true,
+            "J09_evidence_decision": true,
+            "J10_evidence_decision": true,
+            "selected_ids_exact": true
+          },
+          "details": {}
+        },
+        "task4_retry": {
+          "passed": true,
+          "checks": {
+            "exact_json_snapshot_and_binary_image": true,
+            "normalize_mixed_newlines_before_hash": true,
+            "preserve_whitespace_and_blank_lines": true,
+            "none_is_empty_string": true,
+            "normalized_2000_boundary": true,
+            "unicode_codepoints_not_bytes_or_graphemes": true,
+            "prepare_invalid_types_raise_valueerror": true,
+            "retry_ignores_live_form_and_preserves_frozen_fields": true,
+            "retry_does_not_mutate_snapshot": true,
+            "retry_is_an_independent_deep_copy": true
+          },
+          "details": {}
+        },
+        "input_integrity": {
+          "passed": false,
+          "checks": {
+            "protected_input_files_preserved": false
+          },
+          "details": {
+            "protected_input_files_preserved": "AssertionError: file added outside output/"
+          }
+        }
+      }
+    },
+    {
+      "label": "b03",
+      "grade": {
+        "task1_history": {
+          "passed": true,
+          "checks": {
+            "selected_latest_complete_commit": true,
+            "archive_exact_selected_tree": true,
+            "current_history_working_tree_preserved": true,
+            "current_history_head_preserved": true
+          },
+          "details": {}
+        },
+        "task2_budget": {
+          "passed": true,
+          "checks": {
+            "catalog_zeroes_and_transfer_count": true,
+            "candidate_deduplication": true,
+            "ambiguity_before_catalog_filter": true,
+            "refund_inherits_category_and_can_be_negative": true,
+            "complete_expense_list_and_order_invariance": true,
+            "duplicate_expense_id_is_not_unique": true,
+            "only_expense_records_can_match_refund": true,
+            "ambiguous_refund_goes_negative_unassigned": true,
+            "pure_inputs_independent_calls_and_output": true,
+            "nonnegative_integer_validation_and_zero": true
+          },
+          "details": {}
+        },
+        "task3_evidence": {
+          "passed": true,
+          "checks": {
+            "json_schema": true,
+            "J01_evidence_decision": true,
+            "J02_evidence_decision": true,
+            "J03_evidence_decision": true,
+            "J04_evidence_decision": true,
+            "J05_evidence_decision": true,
+            "J06_evidence_decision": true,
+            "J07_evidence_decision": true,
+            "J08_evidence_decision": true,
+            "J09_evidence_decision": true,
+            "J10_evidence_decision": true,
+            "selected_ids_exact": true
+          },
+          "details": {}
+        },
+        "task4_retry": {
+          "passed": true,
+          "checks": {
+            "exact_json_snapshot_and_binary_image": true,
+            "normalize_mixed_newlines_before_hash": true,
+            "preserve_whitespace_and_blank_lines": true,
+            "none_is_empty_string": true,
+            "normalized_2000_boundary": true,
+            "unicode_codepoints_not_bytes_or_graphemes": true,
+            "prepare_invalid_types_raise_valueerror": true,
+            "retry_ignores_live_form_and_preserves_frozen_fields": true,
+            "retry_does_not_mutate_snapshot": true,
+            "retry_is_an_independent_deep_copy": true
+          },
+          "details": {}
+        },
+        "input_integrity": {
+          "passed": true,
+          "checks": {
+            "protected_input_files_preserved": true
+          },
+          "details": {}
+        }
+      }
+    },
+    {
+      "label": "b04",
+      "grade": {
+        "task1_history": {
+          "passed": true,
+          "checks": {
+            "selected_latest_complete_commit": true,
+            "archive_exact_selected_tree": true,
+            "current_history_working_tree_preserved": true,
+            "current_history_head_preserved": true
+          },
+          "details": {}
+        },
+        "task2_budget": {
+          "passed": true,
+          "checks": {
+            "catalog_zeroes_and_transfer_count": true,
+            "candidate_deduplication": true,
+            "ambiguity_before_catalog_filter": true,
+            "refund_inherits_category_and_can_be_negative": true,
+            "complete_expense_list_and_order_invariance": true,
+            "duplicate_expense_id_is_not_unique": true,
+            "only_expense_records_can_match_refund": true,
+            "ambiguous_refund_goes_negative_unassigned": true,
+            "pure_inputs_independent_calls_and_output": true,
+            "nonnegative_integer_validation_and_zero": true
+          },
+          "details": {}
+        },
+        "task3_evidence": {
+          "passed": true,
+          "checks": {
+            "json_schema": true,
+            "J01_evidence_decision": true,
+            "J02_evidence_decision": true,
+            "J03_evidence_decision": true,
+            "J04_evidence_decision": true,
+            "J05_evidence_decision": true,
+            "J06_evidence_decision": true,
+            "J07_evidence_decision": true,
+            "J08_evidence_decision": true,
+            "J09_evidence_decision": true,
+            "J10_evidence_decision": true,
+            "selected_ids_exact": true
+          },
+          "details": {}
+        },
+        "task4_retry": {
+          "passed": true,
+          "checks": {
+            "exact_json_snapshot_and_binary_image": true,
+            "normalize_mixed_newlines_before_hash": true,
+            "preserve_whitespace_and_blank_lines": true,
+            "none_is_empty_string": true,
+            "normalized_2000_boundary": true,
+            "unicode_codepoints_not_bytes_or_graphemes": true,
+            "prepare_invalid_types_raise_valueerror": true,
+            "retry_ignores_live_form_and_preserves_frozen_fields": true,
+            "retry_does_not_mutate_snapshot": true,
+            "retry_is_an_independent_deep_copy": true
+          },
+          "details": {}
+        },
+        "input_integrity": {
+          "passed": true,
+          "checks": {
+            "protected_input_files_preserved": true
+          },
+          "details": {}
+        }
+      }
+    }
+  ]
+}

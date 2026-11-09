@@ -1,0 +1,55 @@
+任务三：筛选招聘证据（每条公司、岗位与证据均为虚构）
+
+固定截至日期：2026-11-09。packets.json 含十个 source packet，不上网、不猜测。
+全部判断严格按本规范与结构化证据字段，不按标题中的 AI 等词推断岗位性质。
+
+岗位范围：work_city 恰为“上海”或“苏州”才 city_eligible=true。
+duty_tags 至少一个是以下值才 technical=true：software_development、
+data_pipeline_development、automated_test_development、embedded_firmware_development、
+ml_engineering。其他标签不属于实际技术工作。岗位元数据本身已获准用于本任务。
+
+证据权限及强弱：仅 permission="allowed" 且 observed_on <= 2026-11-09 的来源可用。
+permission="not_granted" 的资料即使出现在包内也不得据以输出判断或引用证据 id。
+未来来源不可用。official_public 与 official_authorized_private 均是官方来源；
+repost 和 candidate_self_report 不是官方，不得覆盖官方状态或证明剩余 HC。
+
+status：只考察可用官方来源中 claims 含 accepting_applications 的记录，取
+observed_on 最新的一条（日期不会并列）。没有则 unknown，status_evidence=null。
+false -> closed；true 但 deadline 是截至日前的日期 -> closed；其余 true -> open。
+deadline=null 表示此来源未给期限；期限当天仍 open。官方关闭可覆盖较新的转载，
+网页仍显示 open 也不能覆盖已过的 deadline。status_evidence 填所取官方来源 id。
+
+recent_recruitment：考察 2026-11-03 至 2026-11-09（首尾都含）的事件。
+可用官方来源同时有 current_recruiting_action=true 和区间内 recruiting_action_on，
+则 official_confirmed；否则，可用 candidate_self_report 有 interview_occurred=true
+且 interview_on 在区间内，则 self_report_only；否则 none。对应证据取该类可用
+来源中 observed_on 最新的一条，填 recent_recruitment_evidence；none 时填 null。
+发布或仍在线本身不证明近期招聘动作。候选人声称面试不等于官方确认。
+
+hc：只取可用官方来源中含 remaining_hc 与 hc_as_of（且 hc_as_of<=截至日）的最新
+一条，按 observed_on 排序。remaining_hc>0 -> confirmed_available；=0 ->
+confirmed_zero；没有 -> unknown。hc_evidence 填该条 id 或 null。页面在线、面试
+自报和 candidate_self_report 中的 remaining_hc 均不证明 HC。
+
+selected = city_eligible and technical and status=="open"。HC 未知不自动排除；它必须
+如实显示 unknown，近期动作也单独显示。不要把仅在线等同于近期活跃或有剩余 HC。
+
+输出 output/screen.json，严格只有以下顶层键；roles 按 J01..J10 排序，selected_ids
+也按 id 排序。每条 role 严格只有以下字段，不加文字结论或额外字段：
+{
+  "as_of": "2026-11-09",
+  "roles": [{
+    "job_id": "J01",
+    "city_eligible": true,
+    "technical": true,
+    "status": "open|closed|unknown",
+    "status_evidence": "来源id或null",
+    "recent_recruitment": "official_confirmed|self_report_only|none",
+    "recent_recruitment_evidence": "来源id或null",
+    "hc": "confirmed_available|confirmed_zero|unknown",
+    "hc_evidence": "来源id或null",
+    "selected": true
+  }],
+  "selected_ids": ["所有且仅有selected=true的岗位id"]
+}
+上述 | 形式表示枚举选择，null 是 JSON null，不是字符串。

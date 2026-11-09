@@ -1,0 +1,497 @@
+{
+  "generated_at_utc": "2026-11-09T08:19:34.416078+00:00",
+  "pin": "0.7.0@b258276632054f7f8d1d8a060e01b98b9c7aa3be",
+  "status": "CORRECTED: default-profile inferences withdrawn",
+  "default_profile_efficacy_evaluable": false,
+  "conclusion": "原实验没有正确检验默认DIGR：保留默认目标，却在函数头外另加时限与代理配额；参数未完成不能据此归咎于协议。撤回“默认深执行偏重”和对最低次数的负面判断。局部代码改进与原始观测保留。",
+  "correction": {
+    "corrected_at_utc": "2026-11-09T08:18:09.177696+00:00",
+    "user_correction_verbatim": "你只给那么点时间肯定完不成参数啊，如果你想控制的话应该显式调用函数头才对嘛",
+    "archive_relative": "interpretation_archive/20261109T081809Z",
+    "status": "Prior inferences about default DIGR investment design and full-run efficiency are withdrawn.",
+    "confirmed_design_errors": [
+      "b05 retained default N12/R4/D3/V3 but separately imposed 900 seconds including U0, at most three helper identities and six helper turns; adequacy for completing those responsibilities was not established.",
+      "Protocol text was injected into a simulated task rather than using an actual explicit DIGR(...) invocation declaring a controlled configuration.",
+      "Parameter shortfalls after this externally imposed cutoff were used to question default depth and minimum counts; that inference is unsupported.",
+      "The observed cost of a truncated trajectory was compared with completed native runs; it is not the cost of completing the default protocol.",
+      "An external all-in wall limit was conflated with protocol timing; formal T/t, preliminary work and exclusive D/V work have distinct scopes in this pinned profile."
+    ],
+    "withdrawn_judgments": [
+      "当前默认深执行配置偏重",
+      "本次实验支持怀疑刚性的最低次数",
+      "未完成默认参数或超出研究者外部900秒限制构成DIGR本身的负面表现证据",
+      "该模拟组的观测成本足以评价完整默认DIGR的投入产出"
+    ],
+    "retained_observations": [
+      "All four functional artifacts passed the frozen acceptance checks in each accepted episode.",
+      "A bounded-state budget implementation was actually adopted and has a measured auxiliary-allocation benefit on the declared exploratory synthetic workloads.",
+      "Recorded wall time and token counters describe observed trajectories; they are not complete-default cost estimates.",
+      "The extra starter Python cache is a task-scope violation independent of the parameter/cutoff error; original input bytes were unchanged."
+    ],
+    "valid_future_comparison_requirements": [
+      "For default-profile efficacy, invoke the actual default profile and allow its complete responsibilities to finish before comparing outcome and total resource use.",
+      "For a controlled configuration, declare the N/T/R/S/D/V/L/M choices in the function header before execution, run that declared configuration to completion, and freeze the control beforehand.",
+      "In pinned 0.7.0 target=15min is a soft target and min=15min requests a lower bound; neither is an upper cutoff. A real external stop creates a censored observation.",
+      "Do not backfill a function header with the already observed N6/R2/D1/V3 and relabel the old run as completed."
+    ],
+    "rerun_performed_in_this_correction": false,
+    "raw_data_mutated": false
+  },
+  "rows": [
+    {
+      "label": "b01",
+      "name": "现有 Codex，单代理①",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": true,
+      "all_task_and_scope_requirements_passed": true,
+      "wall_seconds": 217.691,
+      "model_threads": 1,
+      "model_visible_tool_calls": 7,
+      "usage": {
+        "input_tokens": 258785,
+        "cached_input_tokens": 237184,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 7888,
+        "reasoning_output_tokens": 1325,
+        "total_tokens": 266673
+      },
+      "uncached_input_plus_output": 29489,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ],
+      "evaluation_status": "completed native reference observation"
+    },
+    {
+      "label": "b05",
+      "name": "默认目标文本＋外部裁剪的模拟运行",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": false,
+      "all_task_and_scope_requirements_passed": false,
+      "wall_seconds": 932.604,
+      "model_threads": 4,
+      "model_visible_tool_calls": 70,
+      "usage": {
+        "input_tokens": 4224875,
+        "cached_input_tokens": 4101504,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 56967,
+        "reasoning_output_tokens": 19952,
+        "total_tokens": 4281842
+      },
+      "uncached_input_plus_output": 180338,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ],
+      "evaluation_status": "externally censored simulation; default-profile efficacy not evaluable"
+    },
+    {
+      "label": "b03",
+      "name": "现有 Codex，同协作上限",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": true,
+      "all_task_and_scope_requirements_passed": true,
+      "wall_seconds": 304.585,
+      "model_threads": 3,
+      "model_visible_tool_calls": 18,
+      "usage": {
+        "input_tokens": 664241,
+        "cached_input_tokens": 610304,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 15916,
+        "reasoning_output_tokens": 5335,
+        "total_tokens": 680157
+      },
+      "uncached_input_plus_output": 69853,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ],
+      "evaluation_status": "completed native reference observation"
+    },
+    {
+      "label": "b04",
+      "name": "现有 Codex，单代理②",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": true,
+      "all_task_and_scope_requirements_passed": true,
+      "wall_seconds": 246.858,
+      "model_threads": 1,
+      "model_visible_tool_calls": 9,
+      "usage": {
+        "input_tokens": 332103,
+        "cached_input_tokens": 309760,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 8357,
+        "reasoning_output_tokens": 2301,
+        "total_tokens": 340460
+      },
+      "uncached_input_plus_output": 30700,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ],
+      "evaluation_status": "completed native reference observation"
+    }
+  ],
+  "descriptive_prefix_ratios_only": {
+    "full_vs_single_baseline_mean_wall": 4.015094209652803,
+    "full_vs_single_baseline_mean_uncached_plus_output": 5.992390636162754,
+    "full_vs_extra_wall": 3.061884203096016,
+    "full_vs_extra_uncached_plus_output": 2.581678668060069,
+    "full_vs_extra_output_tokens": 3.5792284493591353
+  },
+  "ratio_interpretation": "These ratios compare an observed truncated trajectory with completed reference trajectories, not complete-default cost or efficiency.",
+  "fidelity": {
+    "user_facing_conclusion": "原实验没有正确检验默认DIGR：保留默认目标，却在函数头外另加时限与代理配额；参数未完成不能据此归咎于协议。撤回“默认深执行偏重”和对最低次数的负面判断。局部代码改进与原始观测保留。",
+    "default_profile_completed": false,
+    "responsibilities": {
+      "targets": {
+        "N": 12,
+        "R": 4,
+        "D": 3,
+        "V": 3
+      },
+      "main_self_report": {
+        "N": 6,
+        "R": 2,
+        "D": 1,
+        "V": 3
+      }
+    },
+    "findings": [
+      "设计错误：保留N12/R4/D3/V3，却另加900秒、三个helper身份和六次helper turn的外部限制；未先用显式函数头声明适配的受控配置。",
+      "原来的“默认配置偏重、最低次数值得怀疑”判断撤回。N6/R2/D1/V3只描述被外部截断时的自报停点，不是默认协议负担或效果的证据。",
+      "932.604秒及token仍是这段模拟运行的观测值，不能标为完成默认配置所需资源；超过研究者的900秒不能算违反协议T/t。",
+      "独立研究与预算索引改进有实际材料、采用记录和性能探针支持；该局部事实保留，但不构成完整默认DIGR的对照结论。",
+      "新增1662字节starter缓存违反写入边界，原件字节未改。该事实独立保留，不扩大为默认配置负面结论。"
+    ],
+    "review": "support/fidelity-review.json",
+    "measurement_limits": [
+      "默认目标被外部时限和代理配额截断，且没有显式函数头建立受控配置；这次不能评判默认参数或完整默认协议的效果。",
+      "原开销比例只描述已观察的片段，不能当作完整默认配置成本。真实默认责任全部履行后的结果尚未观测。",
+      "四个合成题型存在验收天花板，全部条件共享轻量AGENTS，不是完整裸模型消融。",
+      "原生委托字段在落盘日志中加密，无法明文回读全部任务上下文；没有尝试解密。",
+      "有效T/t缺乏连续证据，不能把包含前置与独立代理的全程墙钟当作正式协议T/t。"
+    ],
+    "default_profile_efficacy_evaluable": false,
+    "parameter_shortfall_is_negative_efficacy_evidence": false,
+    "controlled_function_header_invoked": false,
+    "observation_censored_by_experimenter_design": true,
+    "correction_record": "interpretation_correction.json"
+  },
+  "artifact_performance": {
+    "status": "posthoc exploratory, not preregistered primary efficacy",
+    "reason": "Full-profile D returned a bounded per-id index; compare all accepted artifacts rather than ignore a concrete improvement because binary acceptance is tied.",
+    "python": "3.14.4 (tags/v3.14.4:23116f9, Apr  7 2026, 14:10:54) [MSC v.1944 64 bit (AMD64)]",
+    "method": "Five timed runs per artifact/scenario, shuffled order, warmup, gc.collect before runs; separate tracemalloc peak allocation; input construction, oracle, imports and input storage excluded.",
+    "scope": "Synthetic in-process functions, not agent latency, monetary cost, actual user workload or a repeated causal trial of the protocol.",
+    "rows": [
+      {
+        "scenario": "mostly_unique",
+        "expenses": 30000,
+        "refunds": 15000,
+        "distinct_expense_ids": 30000,
+        "measurements": [
+          {
+            "label": "b01",
+            "correct": true,
+            "median_ms": 150.35660000285134,
+            "all_ms": [
+              112.19089999212883,
+              133.45769999432378,
+              150.35660000285134,
+              153.98269999423064,
+              208.96660001017153
+            ],
+            "peak_auxiliary_python_bytes": 3602376
+          },
+          {
+            "label": "b05",
+            "correct": true,
+            "median_ms": 76.68940001167357,
+            "all_ms": [
+              82.56779998191632,
+              58.58410001383163,
+              76.68940001167357,
+              53.979899996193126,
+              128.21450000046752
+            ],
+            "peak_auxiliary_python_bytes": 1377200
+          },
+          {
+            "label": "b03",
+            "correct": true,
+            "median_ms": 101.7578000028152,
+            "all_ms": [
+              68.32239998038858,
+              116.84620002051815,
+              96.3093000173103,
+              101.7578000028152,
+              102.96359998756088
+            ],
+            "peak_auxiliary_python_bytes": 3602336
+          },
+          {
+            "label": "b04",
+            "correct": true,
+            "median_ms": 115.2167999825906,
+            "all_ms": [
+              158.94429999752901,
+              97.85340001690201,
+              115.2167999825906,
+              100.06779999821447,
+              190.0084000080824
+            ],
+            "peak_auxiliary_python_bytes": 3602424
+          }
+        ]
+      },
+      {
+        "scenario": "many_duplicate_ids",
+        "expenses": 80000,
+        "refunds": 20000,
+        "distinct_expense_ids": 10,
+        "measurements": [
+          {
+            "label": "b01",
+            "correct": true,
+            "median_ms": 343.9891999878455,
+            "all_ms": [
+              583.7728999904357,
+              399.9074999883305,
+              343.9891999878455,
+              282.0396999886725,
+              235.22579998825677
+            ],
+            "peak_auxiliary_python_bytes": 673664
+          },
+          {
+            "label": "b05",
+            "correct": true,
+            "median_ms": 144.93389998096973,
+            "all_ms": [
+              416.4792999799829,
+              313.0107000179123,
+              144.93389998096973,
+              141.02889999048784,
+              143.6325999966357
+            ],
+            "peak_auxiliary_python_bytes": 1320
+          },
+          {
+            "label": "b03",
+            "correct": true,
+            "median_ms": 300.68970000138506,
+            "all_ms": [
+              361.6376999998465,
+              300.68970000138506,
+              307.1078000066336,
+              173.91489999135956,
+              173.15220000455156
+            ],
+            "peak_auxiliary_python_bytes": 673712
+          },
+          {
+            "label": "b04",
+            "correct": true,
+            "median_ms": 300.3446999937296,
+            "all_ms": [
+              539.0820000029635,
+              473.0793999915477,
+              283.86239998508245,
+              300.3446999937296,
+              264.6474000066519
+            ],
+            "peak_auxiliary_python_bytes": 673712
+          }
+        ]
+      },
+      {
+        "scenario": "mostly_orphan_refunds",
+        "expenses": 100,
+        "refunds": 100000,
+        "distinct_expense_ids": 100,
+        "measurements": [
+          {
+            "label": "b01",
+            "correct": true,
+            "median_ms": 89.28960000048392,
+            "all_ms": [
+              89.28960000048392,
+              111.03450000518933,
+              78.47010000841692,
+              86.76750000449829,
+              97.51529997447506
+            ],
+            "peak_auxiliary_python_bytes": 13224
+          },
+          {
+            "label": "b05",
+            "correct": true,
+            "median_ms": 67.3483999853488,
+            "all_ms": [
+              88.89350001118146,
+              67.3483999853488,
+              51.166399993235245,
+              59.54570000176318,
+              78.01080000353977
+            ],
+            "peak_auxiliary_python_bytes": 5680
+          },
+          {
+            "label": "b03",
+            "correct": true,
+            "median_ms": 85.92070001759566,
+            "all_ms": [
+              92.84520000801422,
+              85.0161999987904,
+              85.92070001759566,
+              65.09610000648536,
+              98.21640001609921
+            ],
+            "peak_auxiliary_python_bytes": 13248
+          },
+          {
+            "label": "b04",
+            "correct": true,
+            "median_ms": 88.24069998809136,
+            "all_ms": [
+              109.32769998908043,
+              88.24069998809136,
+              86.2720999866724,
+              91.37729997746646,
+              70.35719999112189
+            ],
+            "peak_auxiliary_python_bytes": 13272
+          }
+        ]
+      }
+    ]
+  },
+  "historical_harness_checks": {
+    "scope": "Measured execution and input boundaries only; semantic N/R/D/V review is separate. Requested-prompt hashes use canonical LF text; Windows on-disk files contain CRLF. Native transport message fields are encrypted in saved logs, so plaintext task-message readback is unavailable; do not interpret the requested-prompt check as full prompt attestation.",
+    "overall": {
+      "evaluator_unchanged": true,
+      "all_inherited_AGENTS_exactly_same": true
+    },
+    "episodes": [
+      {
+        "label": "b01",
+        "checks": {
+          "protected_inputs_match": true,
+          "canonical_requested_prompt_file_matches": true,
+          "main_completed": true,
+          "all_model_effort_tags_match": true,
+          "no_global_listing_in_accepted_episode": true,
+          "helper_identity_limit": true,
+          "helper_completed_turn_limit": true,
+          "main_wall_cap_observed": true
+        },
+        "passed": true,
+        "helper_identities": 0,
+        "helper_terminal_events": 0,
+        "helper_unique_context_turns": 0
+      },
+      {
+        "label": "b05",
+        "checks": {
+          "protected_inputs_match": true,
+          "canonical_requested_prompt_file_matches": true,
+          "main_completed": true,
+          "all_model_effort_tags_match": true,
+          "no_global_listing_in_accepted_episode": true,
+          "helper_identity_limit": true,
+          "helper_completed_turn_limit": true,
+          "main_wall_cap_observed": false
+        },
+        "passed": false,
+        "helper_identities": 3,
+        "helper_terminal_events": 6,
+        "helper_unique_context_turns": 6
+      },
+      {
+        "label": "b03",
+        "checks": {
+          "protected_inputs_match": true,
+          "canonical_requested_prompt_file_matches": true,
+          "main_completed": true,
+          "all_model_effort_tags_match": true,
+          "no_global_listing_in_accepted_episode": true,
+          "helper_identity_limit": true,
+          "helper_completed_turn_limit": true,
+          "main_wall_cap_observed": true
+        },
+        "passed": true,
+        "helper_identities": 2,
+        "helper_terminal_events": 2,
+        "helper_unique_context_turns": 2
+      },
+      {
+        "label": "b04",
+        "checks": {
+          "protected_inputs_match": true,
+          "canonical_requested_prompt_file_matches": true,
+          "main_completed": true,
+          "all_model_effort_tags_match": true,
+          "no_global_listing_in_accepted_episode": true,
+          "helper_identity_limit": true,
+          "helper_completed_turn_limit": true,
+          "main_wall_cap_observed": true
+        },
+        "passed": true,
+        "helper_identities": 0,
+        "helper_terminal_events": 0,
+        "helper_unique_context_turns": 0
+      }
+    ],
+    "passed": false
+  },
+  "harness_check_interpretation": "Original external-cap checks are historical instrument checks, not DIGR T/t compliance or protocol failure.",
+  "artifact_sha256": {
+    "scores.json": "85935ee52a7e94fdd7674d804baebf7dd2281b0c3cce95239ea806c5d0249d9b",
+    "telemetry.json": "2afa1b57688a3ea2a5fec521ebcfc6bc53bdd119bd32a46c215c13635665f15b",
+    "artifact_performance.json": "3048b7fd3c37480af745a4a5bca4b510f1028311beb3154fc08da4b94499db7e",
+    "preregistration.json": "30f61810863f0b914011cf1064d0cf260ae7615e63208ff38a7a49fae527b889",
+    "native_plan.json": "766c932b73be0e79ef3865bd13ec415b3b1bf57f188605757736401a965efe4a",
+    "interpretation_correction.json": "863d145f61f4b0f7b153d35c3260414554aed733d0f040991ef06cbaa3e5e9cf",
+    "fidelity.json": "788efe7eb9a21674ae5c4e36d8dabd1f5a50af851a0d0852219ca1bf0cb902bc",
+    "support/suite.py": "cfd363cabfe680242a91c70cbd0ff3611d22648bb2a40c1bb2c08c097cd448ba",
+    "support/fidelity-review.json": "5435c3119353c7a2178e54410e877a961f7136ef50205654962b842ea846dfcc",
+    "build_report.py": "849c0a68e35b748a2e96047d69c7fd12d21d95277c201102e6946d2861fc209e",
+    "build_corrected_report.py": "324b9dd26c92faf6b974fd1e753f154016fc3be43375dad4b4153b0f46dc2b99"
+  }
+}

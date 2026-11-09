@@ -1,0 +1,189 @@
+{
+  "status": "posthoc exploratory, not preregistered primary efficacy",
+  "reason": "Full-profile D returned a bounded per-id index; compare all accepted artifacts rather than ignore a concrete improvement because binary acceptance is tied.",
+  "python": "3.14.4 (tags/v3.14.4:23116f9, Apr  7 2026, 14:10:54) [MSC v.1944 64 bit (AMD64)]",
+  "method": "Five timed runs per artifact/scenario, shuffled order, warmup, gc.collect before runs; separate tracemalloc peak allocation; input construction, oracle, imports and input storage excluded.",
+  "scope": "Synthetic in-process functions, not agent latency, monetary cost, actual user workload or a repeated causal trial of the protocol.",
+  "rows": [
+    {
+      "scenario": "mostly_unique",
+      "expenses": 30000,
+      "refunds": 15000,
+      "distinct_expense_ids": 30000,
+      "measurements": [
+        {
+          "label": "b01",
+          "correct": true,
+          "median_ms": 150.35660000285134,
+          "all_ms": [
+            112.19089999212883,
+            133.45769999432378,
+            150.35660000285134,
+            153.98269999423064,
+            208.96660001017153
+          ],
+          "peak_auxiliary_python_bytes": 3602376
+        },
+        {
+          "label": "b05",
+          "correct": true,
+          "median_ms": 76.68940001167357,
+          "all_ms": [
+            82.56779998191632,
+            58.58410001383163,
+            76.68940001167357,
+            53.979899996193126,
+            128.21450000046752
+          ],
+          "peak_auxiliary_python_bytes": 1377200
+        },
+        {
+          "label": "b03",
+          "correct": true,
+          "median_ms": 101.7578000028152,
+          "all_ms": [
+            68.32239998038858,
+            116.84620002051815,
+            96.3093000173103,
+            101.7578000028152,
+            102.96359998756088
+          ],
+          "peak_auxiliary_python_bytes": 3602336
+        },
+        {
+          "label": "b04",
+          "correct": true,
+          "median_ms": 115.2167999825906,
+          "all_ms": [
+            158.94429999752901,
+            97.85340001690201,
+            115.2167999825906,
+            100.06779999821447,
+            190.0084000080824
+          ],
+          "peak_auxiliary_python_bytes": 3602424
+        }
+      ]
+    },
+    {
+      "scenario": "many_duplicate_ids",
+      "expenses": 80000,
+      "refunds": 20000,
+      "distinct_expense_ids": 10,
+      "measurements": [
+        {
+          "label": "b01",
+          "correct": true,
+          "median_ms": 343.9891999878455,
+          "all_ms": [
+            583.7728999904357,
+            399.9074999883305,
+            343.9891999878455,
+            282.0396999886725,
+            235.22579998825677
+          ],
+          "peak_auxiliary_python_bytes": 673664
+        },
+        {
+          "label": "b05",
+          "correct": true,
+          "median_ms": 144.93389998096973,
+          "all_ms": [
+            416.4792999799829,
+            313.0107000179123,
+            144.93389998096973,
+            141.02889999048784,
+            143.6325999966357
+          ],
+          "peak_auxiliary_python_bytes": 1320
+        },
+        {
+          "label": "b03",
+          "correct": true,
+          "median_ms": 300.68970000138506,
+          "all_ms": [
+            361.6376999998465,
+            300.68970000138506,
+            307.1078000066336,
+            173.91489999135956,
+            173.15220000455156
+          ],
+          "peak_auxiliary_python_bytes": 673712
+        },
+        {
+          "label": "b04",
+          "correct": true,
+          "median_ms": 300.3446999937296,
+          "all_ms": [
+            539.0820000029635,
+            473.0793999915477,
+            283.86239998508245,
+            300.3446999937296,
+            264.6474000066519
+          ],
+          "peak_auxiliary_python_bytes": 673712
+        }
+      ]
+    },
+    {
+      "scenario": "mostly_orphan_refunds",
+      "expenses": 100,
+      "refunds": 100000,
+      "distinct_expense_ids": 100,
+      "measurements": [
+        {
+          "label": "b01",
+          "correct": true,
+          "median_ms": 89.28960000048392,
+          "all_ms": [
+            89.28960000048392,
+            111.03450000518933,
+            78.47010000841692,
+            86.76750000449829,
+            97.51529997447506
+          ],
+          "peak_auxiliary_python_bytes": 13224
+        },
+        {
+          "label": "b05",
+          "correct": true,
+          "median_ms": 67.3483999853488,
+          "all_ms": [
+            88.89350001118146,
+            67.3483999853488,
+            51.166399993235245,
+            59.54570000176318,
+            78.01080000353977
+          ],
+          "peak_auxiliary_python_bytes": 5680
+        },
+        {
+          "label": "b03",
+          "correct": true,
+          "median_ms": 85.92070001759566,
+          "all_ms": [
+            92.84520000801422,
+            85.0161999987904,
+            85.92070001759566,
+            65.09610000648536,
+            98.21640001609921
+          ],
+          "peak_auxiliary_python_bytes": 13248
+        },
+        {
+          "label": "b04",
+          "correct": true,
+          "median_ms": 88.24069998809136,
+          "all_ms": [
+            109.32769998908043,
+            88.24069998809136,
+            86.2720999866724,
+            91.37729997746646,
+            70.35719999112189
+          ],
+          "peak_auxiliary_python_bytes": 13272
+        }
+      ]
+    }
+  ]
+}

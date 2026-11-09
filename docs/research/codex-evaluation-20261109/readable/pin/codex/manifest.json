@@ -1,0 +1,99 @@
+{
+  "name": "DIGR Codex Native Profile",
+  "version": "0.7.0",
+  "protocol": "digr-codex-native-v7",
+  "status": "experimental",
+  "language": "zh-CN",
+  "version_path": "codex/VERSION",
+  "startup_slice": [
+    "codex/STARTUP.md"
+  ],
+  "entrypoint": "codex/PROTOCOL.md",
+  "core": [
+    "codex/FOUNDATION.md",
+    "codex/CHARACTER.md",
+    "codex/PARAMETERS.md",
+    "codex/COLLABORATION.md",
+    "codex/PERMISSIONS.md"
+  ],
+  "help": "codex/HELP.md",
+  "light_instructions": "codex/AGENTS.light.md",
+  "experimental_router": "codex/ROUTER.experimental.txt",
+  "design_sources": {
+    "repository": "Gual-Wells/Deep-Iteration-GPT-Runtime",
+    "base_stable_sha": "6fdde982c2c804efe9702fd4cdd2f715b0aaf421",
+    "reference_main_sha": "165c95bbbd96d2171687bba073774b211920ef81"
+  },
+  "host_contract": {
+    "ordinary_mode": "LIGHT",
+    "explicit_mode": "MODEL_NATIVE",
+    "new_turn_non_sticky": true,
+    "steer_preserves_task_unless_goal_changes": true,
+    "local_helper_provides_live_routing": false,
+    "local_helper_provides_final_gate": false,
+    "local_helper_provides_canonical_attestation": false,
+    "prior_resource_authorization_persists": true,
+    "native_delegation_authorized_for_deep": true,
+    "new_paid_api_budget_implied": false,
+    "live_acquisition_tool": "tools/codex.py acquire",
+    "task_scope_authorization_advice": "runtime/codex_permissions.py",
+    "agent_scheduling": "MODEL_NATIVE",
+    "clock_scope": "EXPLICIT_ACTIVITY_INTERVALS_WITH_DOMAIN_IDENTITY",
+    "session_tool_is_not_executor": true,
+    "automatic_global_memory_write": false,
+    "local_helper_provides_live_acquisition": true,
+    "task_foundation": "RESEARCHED_BRIEF_AND_EXPLICIT_USER_DECISION",
+    "foundation_budget_separate": true,
+    "foundation_helper_gate": "MANAGED_EXECUTION_BEGIN_AND_CHECKPOINT_ONLY"
+  },
+  "file_sha256": {
+    "codex/VERSION": "967d9afb101346667166f2e76e81910bc190488d7d41d50ca0072e9d92f00e32",
+    "codex/AGENTS.light.md": "f2965cf01525c675ead3fefcaecdf9d447b0e0665b127650b00900e9c3c4153c",
+    "codex/ROUTER.experimental.txt": "e92425ca907a9d78960457a82aedf6b94f6cf41393e1fe9eb611595ae2fb00c3",
+    "codex/STARTUP.md": "bfc17286f164e34c91d1bec58a044b654771d998e5ba789449aafc7e750bc72f",
+    "codex/PROTOCOL.md": "18100bd8f4910b5e43880ba560fa93d5d12a7d20024f127c55d7b4e00cb16c37",
+    "codex/FOUNDATION.md": "f5d82f837c394cc326bd4c581fd7c2470a9e55f12a63f9867533d4b355b77fe5",
+    "codex/HELP.md": "e5269cbf91d4adfda41bcbee62827d8920fe56a2e8ecac021d6c0ab55aefa26b",
+    "codex/PARAMETERS.md": "5b4e36f7e230dba1fbe85455d7dc135f2c8d8c6a9e826af91708b867cbe285b8",
+    "codex/WORKBENCH.md": "3c105eccebb277bc9534c4e9dabe80fd7ef0eb5b219bba9fb7069d198ababfaa",
+    "codex/CHARACTER.md": "c0565f52bdf585d8ba24da51e6354493d9d7acdb5938ab9848f12eed736eb932",
+    "codex/COLLABORATION.md": "40bac20c5efad996ed453cfca495aff1130a8534d965c8de6282868352ce1b55",
+    "codex/PERMISSIONS.md": "af506ba19c733743a74df263a808c2b3beb5c69c21743f5c802946d4ed339f68",
+    "codex/EXECUTION_PROTOCOL.json": "b1106fce0640abebc7b8712de395fd5c1143a4ea4a3cd5c2d2d80139146da7b3"
+  },
+  "workbench_guide": "codex/WORKBENCH.md",
+  "depth_preferences": {
+    "implicit_deep": {
+      "N": 12,
+      "R": 4,
+      "D": 3,
+      "V": 3,
+      "L": 3,
+      "M": 1
+    },
+    "complex_tasks_raise_investment": true,
+    "unit_semantics": "codex/PARAMETERS.md",
+    "source_default": "REQUIRED",
+    "time_default": "SOFT",
+    "explicit_values_take_precedence": true,
+    "agent_authorization_implied": true,
+    "calibration": "upward_from_starting_values",
+    "units_keep_responsibility_scope": true,
+    "autonomous_downshift": false,
+    "isolation_mode": "L3_ONLY",
+    "low_isolation_fallback": false,
+    "progress_stream": "USER_COMMENTARY_PER_UNIT"
+  },
+  "execution_bundle": {
+    "path": "codex/EXECUTION_PROTOCOL.json",
+    "schema": 1,
+    "members": [
+      "codex/PROTOCOL.md",
+      "codex/FOUNDATION.md",
+      "codex/CHARACTER.md",
+      "codex/PARAMETERS.md",
+      "codex/COLLABORATION.md",
+      "codex/PERMISSIONS.md"
+    ]
+  }
+}

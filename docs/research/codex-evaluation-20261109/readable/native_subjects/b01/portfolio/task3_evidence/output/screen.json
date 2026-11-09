@@ -1,0 +1,132 @@
+{
+  "as_of": "2026-11-09",
+  "roles": [
+    {
+      "job_id": "J01",
+      "city_eligible": true,
+      "technical": true,
+      "status": "open",
+      "status_evidence": "J01-O1",
+      "recent_recruitment": "official_confirmed",
+      "recent_recruitment_evidence": "J01-O2",
+      "hc": "unknown",
+      "hc_evidence": null,
+      "selected": true
+    },
+    {
+      "job_id": "J02",
+      "city_eligible": true,
+      "technical": true,
+      "status": "closed",
+      "status_evidence": "J02-O1",
+      "recent_recruitment": "none",
+      "recent_recruitment_evidence": null,
+      "hc": "unknown",
+      "hc_evidence": null,
+      "selected": false
+    },
+    {
+      "job_id": "J03",
+      "city_eligible": true,
+      "technical": true,
+      "status": "closed",
+      "status_evidence": "J03-O1",
+      "recent_recruitment": "none",
+      "recent_recruitment_evidence": null,
+      "hc": "unknown",
+      "hc_evidence": null,
+      "selected": false
+    },
+    {
+      "job_id": "J04",
+      "city_eligible": false,
+      "technical": true,
+      "status": "open",
+      "status_evidence": "J04-O1",
+      "recent_recruitment": "none",
+      "recent_recruitment_evidence": null,
+      "hc": "unknown",
+      "hc_evidence": null,
+      "selected": false
+    },
+    {
+      "job_id": "J05",
+      "city_eligible": true,
+      "technical": false,
+      "status": "open",
+      "status_evidence": "J05-O1",
+      "recent_recruitment": "none",
+      "recent_recruitment_evidence": null,
+      "hc": "unknown",
+      "hc_evidence": null,
+      "selected": false
+    },
+    {
+      "job_id": "J06",
+      "city_eligible": true,
+      "technical": true,
+      "status": "open",
+      "status_evidence": "J06-O1",
+      "recent_recruitment": "self_report_only",
+      "recent_recruitment_evidence": "J06-C1",
+      "hc": "unknown",
+      "hc_evidence": null,
+      "selected": true
+    },
+    {
+      "job_id": "J07",
+      "city_eligible": true,
+      "technical": true,
+      "status": "open",
+      "status_evidence": "J07-O1",
+      "recent_recruitment": "none",
+      "recent_recruitment_evidence": null,
+      "hc": "unknown",
+      "hc_evidence": null,
+      "selected": true
+    },
+    {
+      "job_id": "J08",
+      "city_eligible": true,
+      "technical": true,
+      "status": "unknown",
+      "status_evidence": null,
+      "recent_recruitment": "none",
+      "recent_recruitment_evidence": null,
+      "hc": "unknown",
+      "hc_evidence": null,
+      "selected": false
+    },
+    {
+      "job_id": "J09",
+      "city_eligible": true,
+      "technical": true,
+      "status": "open",
+      "status_evidence": "J09-O1",
+      "recent_recruitment": "official_confirmed",
+      "recent_recruitment_evidence": "J09-H1",
+      "hc": "confirmed_available",
+      "hc_evidence": "J09-H1",
+      "selected": true
+    },
+    {
+      "job_id": "J10",
+      "city_eligible": true,
+      "technical": true,
+      "status": "open",
+      "status_evidence": "J10-O1",
+      "recent_recruitment": "none",
+      "recent_recruitment_evidence": null,
+      "hc": "unknown",
+      "hc_evidence": null,
+      "selected": true
+    }
+  ],
+  "selected_ids": [
+    "J01",
+    "J06",
+    "J07",
+    "J09",
+    "J10"
+  ]
+}

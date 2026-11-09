@@ -1,0 +1,21 @@
+{
+  "repository": "Gual-Wells/Deep-Iteration-GPT-Runtime",
+  "branch": "codex/codex-host-adaptation",
+  "sha": "b258276632054f7f8d1d8a060e01b98b9c7aa3be",
+  "version": "0.7.0",
+  "authority": "GitHub connector GET branch response",
+  "branch_url": "https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/codex/codex-host-adaptation",
+  "files": [
+    "codex/manifest.json",
+    "codex/VERSION",
+    "codex/STARTUP.md",
+    "codex/PROTOCOL.md",
+    "codex/FOUNDATION.md",
+    "codex/CHARACTER.md",
+    "codex/PARAMETERS.md",
+    "codex/COLLABORATION.md",
+    "codex/PERMISSIONS.md",
+    "codex/AGENTS.light.md"
+  ],
+  "purpose": "Evaluation inputs only; this ordinary request did not activate a DIGR execution"
+}

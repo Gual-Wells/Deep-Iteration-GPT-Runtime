@@ -1,0 +1,33 @@
+{
+  "corrected_at_utc": "2026-11-09T08:18:09.177696+00:00",
+  "user_correction_verbatim": "你只给那么点时间肯定完不成参数啊，如果你想控制的话应该显式调用函数头才对嘛",
+  "archive_relative": "interpretation_archive/20261109T081809Z",
+  "status": "Prior inferences about default DIGR investment design and full-run efficiency are withdrawn.",
+  "confirmed_design_errors": [
+    "b05 retained default N12/R4/D3/V3 but separately imposed 900 seconds including U0, at most three helper identities and six helper turns; adequacy for completing those responsibilities was not established.",
+    "Protocol text was injected into a simulated task rather than using an actual explicit DIGR(...) invocation declaring a controlled configuration.",
+    "Parameter shortfalls after this externally imposed cutoff were used to question default depth and minimum counts; that inference is unsupported.",
+    "The observed cost of a truncated trajectory was compared with completed native runs; it is not the cost of completing the default protocol.",
+    "An external all-in wall limit was conflated with protocol timing; formal T/t, preliminary work and exclusive D/V work have distinct scopes in this pinned profile."
+  ],
+  "withdrawn_judgments": [
+    "当前默认深执行配置偏重",
+    "本次实验支持怀疑刚性的最低次数",
+    "未完成默认参数或超出研究者外部900秒限制构成DIGR本身的负面表现证据",
+    "该模拟组的观测成本足以评价完整默认DIGR的投入产出"
+  ],
+  "retained_observations": [
+    "All four functional artifacts passed the frozen acceptance checks in each accepted episode.",
+    "A bounded-state budget implementation was actually adopted and has a measured auxiliary-allocation benefit on the declared exploratory synthetic workloads.",
+    "Recorded wall time and token counters describe observed trajectories; they are not complete-default cost estimates.",
+    "The extra starter Python cache is a task-scope violation independent of the parameter/cutoff error; original input bytes were unchanged."
+  ],
+  "valid_future_comparison_requirements": [
+    "For default-profile efficacy, invoke the actual default profile and allow its complete responsibilities to finish before comparing outcome and total resource use.",
+    "For a controlled configuration, declare the N/T/R/S/D/V/L/M choices in the function header before execution, run that declared configuration to completion, and freeze the control beforehand.",
+    "In pinned 0.7.0 target=15min is a soft target and min=15min requests a lower bound; neither is an upper cutoff. A real external stop creates a censored observation.",
+    "Do not backfill a function header with the already observed N6/R2/D1/V3 and relabel the old run as completed."
+  ],
+  "rerun_performed_in_this_correction": false,
+  "raw_data_mutated": false
+}

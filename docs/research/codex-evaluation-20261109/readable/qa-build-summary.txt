@@ -1,0 +1,136 @@
+{
+  "report": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\report.html",
+  "rows": [
+    {
+      "label": "b01",
+      "name": "现有 Codex，单代理①",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": true,
+      "all_task_and_scope_requirements_passed": true,
+      "wall_seconds": 217.691,
+      "model_threads": 1,
+      "model_visible_tool_calls": 7,
+      "usage": {
+        "input_tokens": 258785,
+        "cached_input_tokens": 237184,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 7888,
+        "reasoning_output_tokens": 1325,
+        "total_tokens": 266673
+      },
+      "uncached_input_plus_output": 29489,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ]
+    },
+    {
+      "label": "b05",
+      "name": "完整 DIGR 默认正文，封顶运行",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": false,
+      "all_task_and_scope_requirements_passed": false,
+      "wall_seconds": 932.604,
+      "model_threads": 4,
+      "model_visible_tool_calls": 70,
+      "usage": {
+        "input_tokens": 4224875,
+        "cached_input_tokens": 4101504,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 56967,
+        "reasoning_output_tokens": 19952,
+        "total_tokens": 4281842
+      },
+      "uncached_input_plus_output": 180338,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ]
+    },
+    {
+      "label": "b03",
+      "name": "现有 Codex，同协作上限",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": true,
+      "all_task_and_scope_requirements_passed": true,
+      "wall_seconds": 304.585,
+      "model_threads": 3,
+      "model_visible_tool_calls": 18,
+      "usage": {
+        "input_tokens": 664241,
+        "cached_input_tokens": 610304,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 15916,
+        "reasoning_output_tokens": 5335,
+        "total_tokens": 680157
+      },
+      "uncached_input_plus_output": 69853,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ]
+    },
+    {
+      "label": "b04",
+      "name": "现有 Codex，单代理②",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": true,
+      "all_task_and_scope_requirements_passed": true,
+      "wall_seconds": 246.858,
+      "model_threads": 1,
+      "model_visible_tool_calls": 9,
+      "usage": {
+        "input_tokens": 332103,
+        "cached_input_tokens": 309760,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 8357,
+        "reasoning_output_tokens": 2301,
+        "total_tokens": 340460
+      },
+      "uncached_input_plus_output": 30700,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ]
+    }
+  ],
+  "ratios": {
+    "full_vs_single_baseline_mean_wall": 4.015094209652803,
+    "full_vs_single_baseline_mean_uncached_plus_output": 5.992390636162754,
+    "full_vs_extra_wall": 3.061884203096016,
+    "full_vs_extra_uncached_plus_output": 2.581678668060069,
+    "full_vs_extra_output_tokens": 3.5792284493591353
+  }
+}

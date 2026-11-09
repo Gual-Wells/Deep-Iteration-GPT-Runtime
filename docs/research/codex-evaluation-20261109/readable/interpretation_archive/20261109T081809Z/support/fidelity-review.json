@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "subject": "native_subjects/b05",
+  "protocol": "0.7.0@b258276632054f7f8d1d8a060e01b98b9c7aa3be",
+  "scope": "Read-only review of this subject's public run records and helper artifacts; no models, executions, global agent/thread lists, other subjects, answers or scores.",
+  "conclusion": "Substantive partial execution of the default profile under a resource cap; not completed full DIGR and not evidence by itself of comparative performance benefit.",
+  "responsibility_evidence": {
+    "self_reported": {
+      "targets": {
+        "N": 12,
+        "R": 4,
+        "D": 3,
+        "V": 3
+      },
+      "actual": {
+        "N": 6,
+        "R": 2,
+        "D": 1,
+        "V": 3
+      }
+    },
+    "independent_review_limit": "Public artifact contents were inspected. Agent identities, separate histories, actual invocation/return chronology, user-visible progress, source re-open counts, N6 and R2 were not independently reconstructed from host events.",
+    "V": [
+      {
+        "line": "A: semantic identity of an annotated historical reading work",
+        "inspected": [
+          "run/explore_a/research.md",
+          "run/explore_a/reentry.md"
+        ],
+        "substance": "Initial historical identity/relationship counterexamples; later direct candidate archive analysis and a separate Git-archive route with stated limitations.",
+        "main_consequence": "WORK.md explicitly retains the verified archive after finding identical payloads; retention has a reason rather than an empty acknowledgment."
+      },
+      {
+        "line": "B: reference cardinality and sufficient relation state",
+        "inspected": [
+          "run/explore_b_findings.md",
+          "run/b_followup_findings.md",
+          "run/b_relation_monoid.py",
+          "run/b_budget_bounded.py",
+          "run/b_verify.py"
+        ],
+        "substance": "Initial order/duplicate/refund counterexamples develop into a mergeable relation-state model, a distinguishing-prefix argument and a separate bounded implementation.",
+        "main_consequence": "WORK.md/final_report.json record adoption of the bounded replacement and later checks."
+      },
+      {
+        "line": "C: authorized claim frontiers and frozen-transaction noninterference",
+        "inspected": [
+          "run/c_exploration/research.md",
+          "run/c_exploration/candidate_probe.py",
+          "run/c_exploration/candidate_facts.json"
+        ],
+        "substance": "Initial permission/date/claim-axis interventions develop into candidate-specific evidence-frontier and deep retry noninterference checks; the static-output counterfactual limitation is explicitly preserved.",
+        "main_consequence": "WORK.md retains the candidate on these grounds and repeats the static-model limitation."
+      }
+    ],
+    "V_judgment": "Three distinguishable lines have concrete research material and candidate re-entry artifacts, supporting V3 at a public-document level. They are more substantial than three one-shot review labels. This does not independently certify L3, timing or the entire responsibility claim.",
+    "D1": {
+      "judgment": "Publicly supported as a researched whole-budget-route alternative with a documented Main adoption consequence; not automatic double-credit for the V material.",
+      "distinction": "The mergeable research model and the adopted two-pass bounded replacement are separate concrete artifacts; the latter removes per-expense category-list storage under the existing list contract.",
+      "checksum_evidence": "The inspected replacement is 1906 bytes, SHA256 599962e3fc5e3bb230a69f1e717ccd42b9f64f16b9ab71f2070554bb055da686; this matches the budget output digest recorded in final_artifacts.json.",
+      "limit": "This review did not open the delivered output or rerun verification. The checksum independently links the inspected replacement to Main's recorded manifest, not to an independently observed deployment. Claimed benchmark numbers remain unreplicated."
+    }
+  },
+  "externally_supplied_observations": {
+    "wall_clock_seconds": 932.604,
+    "assigned_cap_seconds": 900,
+    "overrun_seconds": 32.604,
+    "effective_T_t": "unknown",
+    "scope_failure": "starter/__pycache__/queue_payload.cpython-314.pyc added, 1662 bytes; original file bytes reportedly unchanged.",
+    "provenance": "Supplied by the parent instrumentation/range audit; not independently remeasured here."
+  },
+  "interpretation": [
+    "Retain this run in the comparison and report the added input-tree cache file as an output/scope failure, not an exclusion.",
+    "If the preregistered 900s cap is strict, final artifacts at 932.604s cannot be labeled completed within 900s. Use a genuine saved 900s checkpoint if available; otherwise the deadline result is unavailable or failed under the preregistered rule.",
+    "The run shows that this host produced concrete helper inquiry, a documented alternative/adoption and an honestly incomplete default-profile attempt within approximately this resource envelope.",
+    "It cannot establish full default-profile efficacy, general model improvement, independent human value, or exact effective-work time. A poor result here would not establish that a fully executed profile has no benefit; a good result would not remove the implementation and budget deviations."
+  ],
+  "recommended_result_label": "default-profile requested; substantive partial execution; N/R/D incomplete; V3 and D1 publicly supported; effective time unknown; wall-cap overrun and scope failure retained"
+}

@@ -1,0 +1,31 @@
+{
+  "closed_at_utc": "2026-11-09T07:27:39.355221+00:00",
+  "deliverables": "All four fixed tasks delivered; five entry files under portfolio/*/output.",
+  "actual_responsibility": {
+    "N": 6,
+    "R": 2,
+    "D": 1,
+    "V": 3,
+    "M": "one actual Main; formal depth incomplete",
+    "L": "3 independent controlled histories; fork_turns=none"
+  },
+  "targets_retained": {
+    "N": 12,
+    "R": 4,
+    "D": 3,
+    "V": 3,
+    "L": 3,
+    "M": 1
+  },
+  "helper_resources": {
+    "identities": 3,
+    "initial_plus_followup_turns": 6,
+    "max_active": 2,
+    "all_returned": true
+  },
+  "time": "Preliminary first material sample 07:12:41 UTC; formal activity boundary 07:14:51 UTC; close at closed_at_utc. These wall-clock boundaries do not establish continuous effective T/t. T/t remain unknown; source and exclusive helper intervals not conflated. Parent owns true Main-start/all-in instrumentation.",
+  "cost": "No network, dependencies, model API or external paid service. Model token usage and money not exposed here; use parent instrumentation, not role counts.",
+  "adopted": "B complete bounded-state budget replacement; Main read implementation and reran independent scanning oracle verification after adoption.",
+  "retained": "A Git archive alternative yields identical six payloads; retained already verified exact-blob ZIP. C confirms current evidence/retry candidates, no D claimed.",
+  "limits": "N shortfall6, R shortfall2, D shortfall2; source per-surface re-open minimum not established, reported r actual0. No browser rendering; HTML parsed from actual bytes. Static screen model counterfactuals are not execution of a saved generator."
+}

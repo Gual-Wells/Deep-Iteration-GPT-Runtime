@@ -1,0 +1,116 @@
+{
+  "candidate_commit": "3e68f52cec21d59778233a547d051125cd107820",
+  "checks": {
+    "choice_only_commit_key": true,
+    "commit_is_full_sha": true,
+    "unique_zip_names": true,
+    "no_directory_entries": true,
+    "exact_tree_names": true,
+    "all_file_bytes_equal": true,
+    "reference_original_exact": true,
+    "reference_paragraphs_exact": true,
+    "jumps_exact_and_resolve": true,
+    "notes_exact_and_bound": true,
+    "stylesheet_exists": true,
+    "native_archive_same_commit": true,
+    "native_archive_same_file_bytes": true,
+    "native_archive_has_no_directory_entries": true,
+    "head_unchanged": true,
+    "status_unchanged": true
+  },
+  "six_files_full_read": [
+    {
+      "path": "index.html",
+      "bytes": 511,
+      "sha256": "b6c699661fe7a344aae785c171783f305077064bd5c31e6128f382293631ddff",
+      "git_blob_equal": true,
+      "utf8_content": "<!doctype html>\n<meta charset=\"utf-8\">\n<title>RX-17 Reader</title>\n<link rel=\"stylesheet\" href=\"reader.css\">\n<nav><a id=\"jump-to-first\" href=\"#p1\">First</a> <a id=\"jump-to-second\" href=\"#p2\">Second</a></nav>\n<p id=\"p1\">At 18:10 the last ferry waited while Mira counted the empty seats.\nShe wrote, “A late departure can still be a deliberate choice.”</p>\n<p id=\"p2\">The next morning, the river was quiet; the timetable was not a promise.\nMira kept the ticket because its small print explained the delay.</p>\n"
+    },
+    {
+      "path": "jumps.json",
+      "bytes": 54,
+      "sha256": "c3eb0720bb08aea7e1ff75e7e80e309421693a6565767a5d7d0240ac63446596",
+      "git_blob_equal": true,
+      "utf8_content": "{\n  \"jump-to-first\": \"p1\",\n  \"jump-to-second\": \"p2\"\n}\n"
+    },
+    {
+      "path": "notes.json",
+      "bytes": 256,
+      "sha256": "da6985d8f70350941aed67d99dfcfefb1a8bc5744c289c635a98201e608ff54a",
+      "git_blob_equal": true,
+      "utf8_content": "[\n  {\n    \"id\": \"n1\",\n    \"paragraph\": \"p1\",\n    \"text\": \"A deliberate choice retains intention; it does not mean an accident.\"\n  },\n  {\n    \"id\": \"n2\",\n    \"paragraph\": \"p2\",\n    \"text\": \"Small print gives the stated reason for keeping the ticket.\"\n  }\n]\n"
+    },
+    {
+      "path": "original.txt",
+      "bytes": 318,
+      "sha256": "61a70961f8cc7b4e2acf19087acc9243313c66d43936b9b0c1ee50982e18628d",
+      "git_blob_equal": true,
+      "utf8_content": "Synthetic source RX-17 — exact quotation\n\nAt 18:10 the last ferry waited while Mira counted the empty seats.\nShe wrote, “A late departure can still be a deliberate choice.”\n\nThe next morning, the river was quiet; the timetable was not a promise.\nMira kept the ticket because its small print explained the delay.\n"
+    },
+    {
+      "path": "reader.css",
+      "bytes": 95,
+      "sha256": "5d4d944ce88952b3197a864bef2209d4e4b7d48e0bb0460f51f97f1c534a9d06",
+      "git_blob_equal": true,
+      "utf8_content": "body { max-width: 44rem; margin: 2rem auto; line-height: 1.7; }\np { scroll-margin-top: 2rem; }\n"
+    },
+    {
+      "path": "release.txt",
+      "bytes": 70,
+      "sha256": "30fda783258192b9f1377ce45cec1ba6824c51ee8548879b3df29553381ea7a7",
+      "git_blob_equal": true,
+      "utf8_content": "RX-17 reader: comfortable line spacing and preserved source material.\n"
+    }
+  ],
+  "alternative_route": {
+    "reference_blob_ids": {
+      "original.txt": "f243cc572f3d9bcb83f3d7fa982e688bb67882aa",
+      "jumps.json": "1296e90d77edeba20ed16d6a8188a53ac177c6b9",
+      "notes.json": "b9a405b9feeff157d6b85a3a7c6ff510eabf6d12"
+    },
+    "newest_first_trial": [
+      {
+        "commit": "ed6c24ba96f4b5e6bde4db45c7c9018598a168ba",
+        "reference_blob_match": false,
+        "survivor_semantics_checked": false,
+        "eligible": false
+      },
+      {
+        "commit": "154c6c71bcb1573f350a25f702adb952cfde6dff",
+        "reference_blob_match": false,
+        "survivor_semantics_checked": false,
+        "eligible": false
+      },
+      {
+        "commit": "1eb919e2197feef5fb43b900e245cbcd8d9e923a",
+        "reference_blob_match": false,
+        "survivor_semantics_checked": false,
+        "eligible": false
+      },
+      {
+        "commit": "3e68f52cec21d59778233a547d051125cd107820",
+        "reference_blob_match": true,
+        "survivor_semantics_checked": true,
+        "eligible": true
+      },
+      {
+        "commit": "bea68ce517a670aa862fb597fadcd664a08eb50e",
+        "reference_blob_match": true,
+        "survivor_semantics_checked": true,
+        "eligible": true
+      }
+    ],
+    "selected_commit": "3e68f52cec21d59778233a547d051125cd107820",
+    "native_archive_file_names": [
+      "index.html",
+      "jumps.json",
+      "notes.json",
+      "original.txt",
+      "reader.css",
+      "release.txt"
+    ],
+    "native_archive_size_bytes": 1664,
+    "main_archive_size_bytes": 1515
+  },
+  "limits": "HTML parsed, not visually rendered. Alternative strengthens jumps/notes equality to exact blob bytes; conservative under harmless reformatting and therefore fixture-specific, not an equivalent general selection rule."
+}

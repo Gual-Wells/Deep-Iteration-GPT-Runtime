@@ -1,0 +1,34 @@
+任务二：修复财务汇总纯函数
+
+starter/budget.py 是有缺陷的种子实现。输出完整的 output/budget.py，导出
+summarize(items, categories)。不修改 starter/。函数及导入不得做 I/O。
+
+输入规范：
+* categories 是不同的字符串组成的 list，是本次唯一有效的分类目录，可为空。
+* items 是 dict 的 list。每条有 id（字符串）、type（expense/refund/transfer）和
+  amount。amount 必须是非负的 Python int，bool 不是有效金额；否则抛 ValueError。
+  每一条都须验证金额，transfer 也不例外。其他字段都满足这里的输入规范。
+* expense 有 category_candidates: list[str]，允许重复、未知分类与空列表。
+* refund 有 refund_of: str，可有自己的 category_candidates，但它绝不参与归类。
+* transfer 的分类字段如存在，也完全忽略。允许不同记录具有同一个 id。
+
+严格返回下面的 JSON 可序列化结构，只有这三个顶层键：
+{"used": {每个 categories 中的分类: int}, "unassigned": int,
+ "ignored_transfers": int}
+used 必须含全部目录分类，包括使用额为零的分类。ignored_transfers 是被忽略的
+transfer 记录条数，不是其金额。
+
+规则：
+1. expense 的候选列表先去重。去重后恰好一个候选且它在 categories 中，金额加到
+   该分类。空列表、多个不同候选、唯一但未知的候选，金额均加到 unassigned。
+   不能先丢弃未知分类再判断歧义。
+2. refund 按 refund_of 在本次完整 items 的 expense 记录中按 id 查找。仅当恰好
+   匹配一条 expense，且那条 expense 按规则1能唯一归类，才从该分类减去退款额。
+   否则从 unassigned 减去退款额。重复 id 的两条 expense 即使分类相同也不算唯一。
+   匹配到 refund 或 transfer 不算 expense 匹配。忽略 refund 自己的分类候选。
+3. transfer 不进入 used 或 unassigned，只使 ignored_transfers 加一。
+4. 退款可大于支出，允许分类或 unassigned 的净额为负；不得截为零。
+5. 顺序不改变结果：退款可以先于原支出。不得修改 items、任何嵌套对象或 categories，
+   调用之间不得残留状态。返回对象的后续修改也不得改变输入。
+
+无需为不符合上述类型规范的其他字段设计新行为；金额校验按上述要求执行。

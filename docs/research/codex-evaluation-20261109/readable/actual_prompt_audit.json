@@ -1,0 +1,54 @@
+{
+  "normalization": "CRLF and CR normalized to LF for text comparison; requested SHA is canonical text, not Windows file bytes",
+  "records": [
+    {
+      "label": "b01",
+      "canonical_actual_matches_plan": null,
+      "lengths": [
+        2340,
+        714
+      ],
+      "timestamp": "2026-11-09T07:02:09.688Z",
+      "stored_transport_field_sha256": "422ccdbd837524ce72e6aef39c3caa73bea817fec16a898727bfc68ae534c34a",
+      "actual_plaintext_readback_available": false,
+      "stored_transport_is_opaque_encrypted": true
+    },
+    {
+      "label": "b05",
+      "canonical_actual_matches_plan": null,
+      "lengths": [
+        5644,
+        1866
+      ],
+      "timestamp": "2026-11-09T07:12:21.701Z",
+      "stored_transport_field_sha256": "71cbd2af7659d186b032197b54d1558035ffc13c3c5d0a8658f5c129f119d3ae",
+      "actual_plaintext_readback_available": false,
+      "stored_transport_is_opaque_encrypted": true
+    },
+    {
+      "label": "b03",
+      "canonical_actual_matches_plan": null,
+      "lengths": [
+        3832,
+        1187
+      ],
+      "timestamp": "2026-11-09T07:28:56.429Z",
+      "stored_transport_field_sha256": "0f474fa600ed997732a9344d085587bf57e086a27730b52f7dcd9c49c431b129",
+      "actual_plaintext_readback_available": false,
+      "stored_transport_is_opaque_encrypted": true
+    },
+    {
+      "label": "b04",
+      "canonical_actual_matches_plan": null,
+      "lengths": [
+        3064,
+        942
+      ],
+      "timestamp": "2026-11-09T07:34:32.822Z",
+      "stored_transport_field_sha256": "2c7640e736132a0c8a21c430683284b0e8088ffb47f1b34a6fe4f215bcda5c3b",
+      "actual_plaintext_readback_available": false,
+      "stored_transport_is_opaque_encrypted": true
+    }
+  ],
+  "correction": "Native spawn message fields in saved parent rollouts are encrypted transport values, not plaintext. Earlier false comparisons were a measurement error; no decryption attempted. The on-disk requested input can be verified canonically, not the saved encrypted transport plaintext."
+}

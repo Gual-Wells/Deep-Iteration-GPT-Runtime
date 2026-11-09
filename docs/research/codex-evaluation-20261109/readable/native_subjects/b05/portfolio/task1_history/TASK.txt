@@ -1,0 +1,17 @@
+任务一：选择历史版本，并原样导出（不是修补当前版本）
+
+history/ 是仅有五个提交的本地 Git 仓库，当前 HEAD 也必须保留原状。
+reference/ 给出必须完整保留的原文、跳转与笔记。按线性历史从新到旧，选择仍
+同时满足下列条件的最新提交：
+* original.txt 与 reference/original.txt 字节完全相同；index.html 原样显示两段原文。
+* jumps.json 与 reference/jumps.json 相同；index.html 的目标 id 与两条跳转相符。
+* notes.json 完整保留 reference/notes.json 的笔记，笔记的段落关联正确。
+样式、release.txt 等其他文件可不同，不构成不合格。任何一项缺失或改写即不合格。
+
+输出 output/choice.json，严格只有一个键：{"commit":"完整40位提交SHA"}。
+输出 output/reader.zip，内容必须是所选提交的全部受 Git 追踪文件，路径与每个
+字节原样保留。压缩格式与时间戳不限；不得含 .git、额外外层目录、目录条目、
+重复文件名或任何新增文件。不能只挑选合格文件，也不能拼接不同提交。
+
+history/ 当前文件、文件名与 HEAD 不得改变；不要 checkout、reset 或修复它。
+历史中的 PLAN.md 是当时的过期文档，不是本次要求；本 TASK.txt 定义当前委托。

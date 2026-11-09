@@ -1,0 +1,105 @@
+{
+  "domain": "Claim-local evidence frontiers and intervention invariance",
+  "baseline": {
+    "J01": {
+      "status": "open",
+      "status_evidence": "J01-O1",
+      "recent_recruitment": "official_confirmed",
+      "recent_recruitment_evidence": "J01-O2",
+      "hc": "unknown",
+      "hc_evidence": null
+    },
+    "J03": {
+      "status": "closed",
+      "status_evidence": "J03-O1",
+      "recent_recruitment": "none",
+      "recent_recruitment_evidence": null,
+      "hc": "unknown",
+      "hc_evidence": null
+    },
+    "J06": {
+      "status": "open",
+      "status_evidence": "J06-O1",
+      "recent_recruitment": "self_report_only",
+      "recent_recruitment_evidence": "J06-C1",
+      "hc": "unknown",
+      "hc_evidence": null
+    },
+    "J09": {
+      "status": "open",
+      "status_evidence": "J09-O1",
+      "recent_recruitment": "official_confirmed",
+      "recent_recruitment_evidence": "J09-H1",
+      "hc": "confirmed_available",
+      "hc_evidence": "J09-H1"
+    },
+    "J10": {
+      "status": "open",
+      "status_evidence": "J10-O1",
+      "recent_recruitment": "none",
+      "recent_recruitment_evidence": null,
+      "hc": "unknown",
+      "hc_evidence": null
+    }
+  },
+  "checked_counterexamples": [
+    {
+      "name": "unusable-removal-J03",
+      "observed": "Removing future or ungranted evidence changes no output dimension."
+    },
+    {
+      "name": "unusable-removal-J10",
+      "observed": "Removing future or ungranted evidence changes no output dimension."
+    },
+    {
+      "name": "claim-local-newer-HC",
+      "observed": {
+        "before": {
+          "status": "open",
+          "status_evidence": "J01-O1",
+          "recent_recruitment": "official_confirmed",
+          "recent_recruitment_evidence": "J01-O2",
+          "hc": "unknown",
+          "hc_evidence": null
+        },
+        "after": {
+          "status": "open",
+          "status_evidence": "J01-O1",
+          "recent_recruitment": "official_confirmed",
+          "recent_recruitment_evidence": "J01-O2",
+          "hc": "confirmed_zero",
+          "hc_evidence": "COUNTERFACTUAL-HC"
+        }
+      }
+    },
+    {
+      "name": "permission-is-upstream",
+      "observed": {
+        "without_grant": {
+          "status": "open",
+          "status_evidence": "J10-O1",
+          "recent_recruitment": "none",
+          "recent_recruitment_evidence": null,
+          "hc": "unknown",
+          "hc_evidence": null
+        },
+        "counterfactual_grant": {
+          "status": "closed",
+          "status_evidence": "J10-X1",
+          "recent_recruitment": "official_confirmed",
+          "recent_recruitment_evidence": "J10-X1",
+          "hc": "confirmed_zero",
+          "hc_evidence": "J10-X1"
+        }
+      }
+    }
+  ],
+  "starter_observations": {
+    "preserves_full_text": false,
+    "hash_matches_returned_text": false,
+    "retry_preserves_input": false,
+    "retry_returns_frozen_values": false,
+    "retry_returns_independent_outer_object": false
+  },
+  "next_question": "When independent dimensions select different sources, does the final candidate preserve each frontier and its witness? For retries, does editing any returned nested field leave the submitted snapshot unchanged?"
+}

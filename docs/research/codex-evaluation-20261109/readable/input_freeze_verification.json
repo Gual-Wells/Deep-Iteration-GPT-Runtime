@@ -1,0 +1,22 @@
+[
+  {
+    "label": "b01",
+    "protected_inputs_match": true,
+    "mismatches": []
+  },
+  {
+    "label": "b02",
+    "protected_inputs_match": true,
+    "mismatches": []
+  },
+  {
+    "label": "b03",
+    "protected_inputs_match": true,
+    "mismatches": []
+  },
+  {
+    "label": "b04",
+    "protected_inputs_match": true,
+    "mismatches": []
+  }
+]

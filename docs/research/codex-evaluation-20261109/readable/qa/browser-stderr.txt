@@ -1,0 +1,2 @@
+[8276:4400:1109/161936.259:ERROR:chrome\browser\extensions\external_registry_loader_win.cc:161] File D:\DESKTOP\quark-cloud-drive\resources\assets\extensions\win32\main.crx for key Software\Google\Chrome\Extensions\golbdgciocipijcnkhfjbljaepchclbc does not exist or is not readable.
+339573 bytes written to file D:\CodexStorage\workspaces\digr-codex-evaluation-20261109\qa\report-desktop.png

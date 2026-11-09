@@ -1,0 +1,35 @@
+{
+  "snapshot_byte_restore_verified": true,
+  "replayed_grades_match_original": true,
+  "episodes": [
+    {
+      "label": "b01",
+      "functional_tasks_passed": 4,
+      "scope_passed": true
+    },
+    {
+      "label": "b05",
+      "functional_tasks_passed": 4,
+      "scope_passed": false
+    },
+    {
+      "label": "b03",
+      "functional_tasks_passed": 4,
+      "scope_passed": true
+    },
+    {
+      "label": "b04",
+      "functional_tasks_passed": 4,
+      "scope_passed": true
+    }
+  ],
+  "model_calls_performed": 0,
+  "preserved_expected_scope_failure": "b05",
+  "new_archive_markdown_links_verified": 32,
+  "repository_validator": "passed",
+  "pre_existing_static_hygiene_failure": {
+    "count": 8,
+    "file": "docs/research/codex-task-foundation-20261109/engineering.md",
+    "reason": "Existing absolute local file links contain line suffixes; original file unchanged by this commit."
+  }
+}

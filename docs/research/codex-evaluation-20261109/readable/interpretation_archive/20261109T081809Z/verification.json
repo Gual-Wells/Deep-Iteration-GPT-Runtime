@@ -1,0 +1,78 @@
+{
+  "scope": "Measured execution and input boundaries only; semantic N/R/D/V review is separate. Requested-prompt hashes use canonical LF text; Windows on-disk files contain CRLF. Native transport message fields are encrypted in saved logs, so plaintext task-message readback is unavailable; do not interpret the requested-prompt check as full prompt attestation.",
+  "overall": {
+    "evaluator_unchanged": true,
+    "all_inherited_AGENTS_exactly_same": true
+  },
+  "episodes": [
+    {
+      "label": "b01",
+      "checks": {
+        "protected_inputs_match": true,
+        "canonical_requested_prompt_file_matches": true,
+        "main_completed": true,
+        "all_model_effort_tags_match": true,
+        "no_global_listing_in_accepted_episode": true,
+        "helper_identity_limit": true,
+        "helper_completed_turn_limit": true,
+        "main_wall_cap_observed": true
+      },
+      "passed": true,
+      "helper_identities": 0,
+      "helper_terminal_events": 0,
+      "helper_unique_context_turns": 0
+    },
+    {
+      "label": "b05",
+      "checks": {
+        "protected_inputs_match": true,
+        "canonical_requested_prompt_file_matches": true,
+        "main_completed": true,
+        "all_model_effort_tags_match": true,
+        "no_global_listing_in_accepted_episode": true,
+        "helper_identity_limit": true,
+        "helper_completed_turn_limit": true,
+        "main_wall_cap_observed": false
+      },
+      "passed": false,
+      "helper_identities": 3,
+      "helper_terminal_events": 6,
+      "helper_unique_context_turns": 6
+    },
+    {
+      "label": "b03",
+      "checks": {
+        "protected_inputs_match": true,
+        "canonical_requested_prompt_file_matches": true,
+        "main_completed": true,
+        "all_model_effort_tags_match": true,
+        "no_global_listing_in_accepted_episode": true,
+        "helper_identity_limit": true,
+        "helper_completed_turn_limit": true,
+        "main_wall_cap_observed": true
+      },
+      "passed": true,
+      "helper_identities": 2,
+      "helper_terminal_events": 2,
+      "helper_unique_context_turns": 2
+    },
+    {
+      "label": "b04",
+      "checks": {
+        "protected_inputs_match": true,
+        "canonical_requested_prompt_file_matches": true,
+        "main_completed": true,
+        "all_model_effort_tags_match": true,
+        "no_global_listing_in_accepted_episode": true,
+        "helper_identity_limit": true,
+        "helper_completed_turn_limit": true,
+        "main_wall_cap_observed": true
+      },
+      "passed": true,
+      "helper_identities": 0,
+      "helper_terminal_events": 0,
+      "helper_unique_context_turns": 0
+    }
+  ],
+  "passed": false
+}

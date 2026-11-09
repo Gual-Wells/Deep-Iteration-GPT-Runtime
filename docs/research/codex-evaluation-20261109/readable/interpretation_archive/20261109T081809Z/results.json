@@ -1,0 +1,452 @@
+{
+  "generated_at_utc": "2026-11-09T07:53:32.371975+00:00",
+  "pin": "0.7.0@b258276632054f7f8d1d8a060e01b98b9c7aa3be",
+  "rows": [
+    {
+      "label": "b01",
+      "name": "现有 Codex，单代理①",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": true,
+      "all_task_and_scope_requirements_passed": true,
+      "wall_seconds": 217.691,
+      "model_threads": 1,
+      "model_visible_tool_calls": 7,
+      "usage": {
+        "input_tokens": 258785,
+        "cached_input_tokens": 237184,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 7888,
+        "reasoning_output_tokens": 1325,
+        "total_tokens": 266673
+      },
+      "uncached_input_plus_output": 29489,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ]
+    },
+    {
+      "label": "b05",
+      "name": "完整 DIGR 默认正文，封顶运行",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": false,
+      "all_task_and_scope_requirements_passed": false,
+      "wall_seconds": 932.604,
+      "model_threads": 4,
+      "model_visible_tool_calls": 70,
+      "usage": {
+        "input_tokens": 4224875,
+        "cached_input_tokens": 4101504,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 56967,
+        "reasoning_output_tokens": 19952,
+        "total_tokens": 4281842
+      },
+      "uncached_input_plus_output": 180338,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ]
+    },
+    {
+      "label": "b03",
+      "name": "现有 Codex，同协作上限",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": true,
+      "all_task_and_scope_requirements_passed": true,
+      "wall_seconds": 304.585,
+      "model_threads": 3,
+      "model_visible_tool_calls": 18,
+      "usage": {
+        "input_tokens": 664241,
+        "cached_input_tokens": 610304,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 15916,
+        "reasoning_output_tokens": 5335,
+        "total_tokens": 680157
+      },
+      "uncached_input_plus_output": 69853,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ]
+    },
+    {
+      "label": "b04",
+      "name": "现有 Codex，单代理②",
+      "tasks": {
+        "task1_history": true,
+        "task2_budget": true,
+        "task3_evidence": true,
+        "task4_retry": true
+      },
+      "tasks_passed": 4,
+      "input_integrity": true,
+      "all_task_and_scope_requirements_passed": true,
+      "wall_seconds": 246.858,
+      "model_threads": 1,
+      "model_visible_tool_calls": 9,
+      "usage": {
+        "input_tokens": 332103,
+        "cached_input_tokens": 309760,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 8357,
+        "reasoning_output_tokens": 2301,
+        "total_tokens": 340460
+      },
+      "uncached_input_plus_output": 30700,
+      "model_effort_pairs": [
+        [
+          "gpt-6.1-sol",
+          "max"
+        ]
+      ]
+    }
+  ],
+  "ratios": {
+    "full_vs_single_baseline_mean_wall": 4.015094209652803,
+    "full_vs_single_baseline_mean_uncached_plus_output": 5.992390636162754,
+    "full_vs_extra_wall": 3.061884203096016,
+    "full_vs_extra_uncached_plus_output": 2.581678668060069,
+    "full_vs_extra_output_tokens": 3.5792284493591353
+  },
+  "fidelity": {
+    "user_facing_conclusion": "这轮发现了真实的局部代码改进，但尚未证明完整 DIGR 能提高整体投入产出。四种运行都完成四项功能验收；默认 profile 请求耗时和 token 体量更高，且未完成默认深度责任，并有一处范围失败。",
+    "default_profile_completed": false,
+    "responsibilities": {
+      "targets": {
+        "N": 12,
+        "R": 4,
+        "D": 3,
+        "V": 3
+      },
+      "main_self_report": {
+        "N": 6,
+        "R": 2,
+        "D": 1,
+        "V": 3
+      }
+    },
+    "findings": [
+      "真实过程：Main 读取同一不可变 pin 的全部核心文件，先做 U0；实验操作者明确标识模拟用户决定后，才进入全面生产。三名 fork_none helper 具有各自独立历史和工具循环，合计六个 turn。所有有效被试及 helper 均未调用泄露全局答案的列表工具。",
+      "独立公开材料审查支持三条具体研究及候选再入，并支持一项预算路线替代被 Main 实际采用。它们有真实内容，不是三个角色名。审查不等于重新执行，也未把自报 N6/R2 独立认证为协议完成。",
+      "默认目标 N12/R4/D3/V3 保留；Main 自报实绩 N6/R2/D1/V3，N/R/D 明确不足。因此本轮是请求默认 profile 后的实质部分执行，不能称完整默认 DIGR 已履行，也不能用本轮证明完整执行普遍无效。有效 T/t 缺乏连续活动证据，保持未知。",
+      "实际进程全程墙钟 932.604 秒，超过分配的 900 秒上限 32.604 秒；不能标为严格限时内完成。功能产物最终通过四类外部验收；另在 starter 目录生成了一个 1662 字节 Python 缓存，违反只写 output 的约束。原始输入文件字节未改变，范围失败保留在结果中，不因此排除这一轮。",
+      "预算函数的改进是具体的：原生三个产物都为每个 expense id 保留分类列表，完整组采用每个 id 的有界判定状态，减少额外索引空间。独立的事后性能探针复验了正确性及内存差异；这不是原先预注册的主指标，也不能证明这项优化只有 DIGR 才能得到。"
+    ],
+    "review": "support/fidelity-review.json",
+    "measurement_limits": [
+      "相同资源分配上限不等于相同实际 token；完整组还发生了小幅超时。",
+      "主指标只有四个合成题型、一个完整组和一个协作组，单代理两次重复；存在功能验收天花板，不能作统计等价或跨真实项目外推。",
+      "全部条件共享现有轻量 AGENTS；没有测出轻量层本身对完全裸模型的因果收益。",
+      "落盘的 native 委托 message 字段是加密值，无法对它做明文逐字节回读；保存并核对了请求文本、输入文件及可见的共同 AGENTS 指令，未尝试解密。",
+      "传输路由未计入处理条件；U0 为明确模拟决定，不是实际用户对齐的效果试验。"
+    ]
+  },
+  "artifact_performance": {
+    "status": "posthoc exploratory, not preregistered primary efficacy",
+    "reason": "Full-profile D returned a bounded per-id index; compare all accepted artifacts rather than ignore a concrete improvement because binary acceptance is tied.",
+    "python": "3.14.4 (tags/v3.14.4:23116f9, Apr  7 2026, 14:10:54) [MSC v.1944 64 bit (AMD64)]",
+    "method": "Five timed runs per artifact/scenario, shuffled order, warmup, gc.collect before runs; separate tracemalloc peak allocation; input construction, oracle, imports and input storage excluded.",
+    "scope": "Synthetic in-process functions, not agent latency, monetary cost, actual user workload or a repeated causal trial of the protocol.",
+    "rows": [
+      {
+        "scenario": "mostly_unique",
+        "expenses": 30000,
+        "refunds": 15000,
+        "distinct_expense_ids": 30000,
+        "measurements": [
+          {
+            "label": "b01",
+            "correct": true,
+            "median_ms": 150.35660000285134,
+            "all_ms": [
+              112.19089999212883,
+              133.45769999432378,
+              150.35660000285134,
+              153.98269999423064,
+              208.96660001017153
+            ],
+            "peak_auxiliary_python_bytes": 3602376
+          },
+          {
+            "label": "b05",
+            "correct": true,
+            "median_ms": 76.68940001167357,
+            "all_ms": [
+              82.56779998191632,
+              58.58410001383163,
+              76.68940001167357,
+              53.979899996193126,
+              128.21450000046752
+            ],
+            "peak_auxiliary_python_bytes": 1377200
+          },
+          {
+            "label": "b03",
+            "correct": true,
+            "median_ms": 101.7578000028152,
+            "all_ms": [
+              68.32239998038858,
+              116.84620002051815,
+              96.3093000173103,
+              101.7578000028152,
+              102.96359998756088
+            ],
+            "peak_auxiliary_python_bytes": 3602336
+          },
+          {
+            "label": "b04",
+            "correct": true,
+            "median_ms": 115.2167999825906,
+            "all_ms": [
+              158.94429999752901,
+              97.85340001690201,
+              115.2167999825906,
+              100.06779999821447,
+              190.0084000080824
+            ],
+            "peak_auxiliary_python_bytes": 3602424
+          }
+        ]
+      },
+      {
+        "scenario": "many_duplicate_ids",
+        "expenses": 80000,
+        "refunds": 20000,
+        "distinct_expense_ids": 10,
+        "measurements": [
+          {
+            "label": "b01",
+            "correct": true,
+            "median_ms": 343.9891999878455,
+            "all_ms": [
+              583.7728999904357,
+              399.9074999883305,
+              343.9891999878455,
+              282.0396999886725,
+              235.22579998825677
+            ],
+            "peak_auxiliary_python_bytes": 673664
+          },
+          {
+            "label": "b05",
+            "correct": true,
+            "median_ms": 144.93389998096973,
+            "all_ms": [
+              416.4792999799829,
+              313.0107000179123,
+              144.93389998096973,
+              141.02889999048784,
+              143.6325999966357
+            ],
+            "peak_auxiliary_python_bytes": 1320
+          },
+          {
+            "label": "b03",
+            "correct": true,
+            "median_ms": 300.68970000138506,
+            "all_ms": [
+              361.6376999998465,
+              300.68970000138506,
+              307.1078000066336,
+              173.91489999135956,
+              173.15220000455156
+            ],
+            "peak_auxiliary_python_bytes": 673712
+          },
+          {
+            "label": "b04",
+            "correct": true,
+            "median_ms": 300.3446999937296,
+            "all_ms": [
+              539.0820000029635,
+              473.0793999915477,
+              283.86239998508245,
+              300.3446999937296,
+              264.6474000066519
+            ],
+            "peak_auxiliary_python_bytes": 673712
+          }
+        ]
+      },
+      {
+        "scenario": "mostly_orphan_refunds",
+        "expenses": 100,
+        "refunds": 100000,
+        "distinct_expense_ids": 100,
+        "measurements": [
+          {
+            "label": "b01",
+            "correct": true,
+            "median_ms": 89.28960000048392,
+            "all_ms": [
+              89.28960000048392,
+              111.03450000518933,
+              78.47010000841692,
+              86.76750000449829,
+              97.51529997447506
+            ],
+            "peak_auxiliary_python_bytes": 13224
+          },
+          {
+            "label": "b05",
+            "correct": true,
+            "median_ms": 67.3483999853488,
+            "all_ms": [
+              88.89350001118146,
+              67.3483999853488,
+              51.166399993235245,
+              59.54570000176318,
+              78.01080000353977
+            ],
+            "peak_auxiliary_python_bytes": 5680
+          },
+          {
+            "label": "b03",
+            "correct": true,
+            "median_ms": 85.92070001759566,
+            "all_ms": [
+              92.84520000801422,
+              85.0161999987904,
+              85.92070001759566,
+              65.09610000648536,
+              98.21640001609921
+            ],
+            "peak_auxiliary_python_bytes": 13248
+          },
+          {
+            "label": "b04",
+            "correct": true,
+            "median_ms": 88.24069998809136,
+            "all_ms": [
+              109.32769998908043,
+              88.24069998809136,
+              86.2720999866724,
+              91.37729997746646,
+              70.35719999112189
+            ],
+            "peak_auxiliary_python_bytes": 13272
+          }
+        ]
+      }
+    ]
+  },
+  "verification": {
+    "scope": "Measured execution and input boundaries only; semantic N/R/D/V review is separate. Requested-prompt hashes use canonical LF text; Windows on-disk files contain CRLF. Native transport message fields are encrypted in saved logs, so plaintext task-message readback is unavailable; do not interpret the requested-prompt check as full prompt attestation.",
+    "overall": {
+      "evaluator_unchanged": true,
+      "all_inherited_AGENTS_exactly_same": true
+    },
+    "episodes": [
+      {
+        "label": "b01",
+        "checks": {
+          "protected_inputs_match": true,
+          "canonical_requested_prompt_file_matches": true,
+          "main_completed": true,
+          "all_model_effort_tags_match": true,
+          "no_global_listing_in_accepted_episode": true,
+          "helper_identity_limit": true,
+          "helper_completed_turn_limit": true,
+          "main_wall_cap_observed": true
+        },
+        "passed": true,
+        "helper_identities": 0,
+        "helper_terminal_events": 0,
+        "helper_unique_context_turns": 0
+      },
+      {
+        "label": "b05",
+        "checks": {
+          "protected_inputs_match": true,
+          "canonical_requested_prompt_file_matches": true,
+          "main_completed": true,
+          "all_model_effort_tags_match": true,
+          "no_global_listing_in_accepted_episode": true,
+          "helper_identity_limit": true,
+          "helper_completed_turn_limit": true,
+          "main_wall_cap_observed": false
+        },
+        "passed": false,
+        "helper_identities": 3,
+        "helper_terminal_events": 6,
+        "helper_unique_context_turns": 6
+      },
+      {
+        "label": "b03",
+        "checks": {
+          "protected_inputs_match": true,
+          "canonical_requested_prompt_file_matches": true,
+          "main_completed": true,
+          "all_model_effort_tags_match": true,
+          "no_global_listing_in_accepted_episode": true,
+          "helper_identity_limit": true,
+          "helper_completed_turn_limit": true,
+          "main_wall_cap_observed": true
+        },
+        "passed": true,
+        "helper_identities": 2,
+        "helper_terminal_events": 2,
+        "helper_unique_context_turns": 2
+      },
+      {
+        "label": "b04",
+        "checks": {
+          "protected_inputs_match": true,
+          "canonical_requested_prompt_file_matches": true,
+          "main_completed": true,
+          "all_model_effort_tags_match": true,
+          "no_global_listing_in_accepted_episode": true,
+          "helper_identity_limit": true,
+          "helper_completed_turn_limit": true,
+          "main_wall_cap_observed": true
+        },
+        "passed": true,
+        "helper_identities": 0,
+        "helper_terminal_events": 0,
+        "helper_unique_context_turns": 0
+      }
+    ],
+    "passed": false
+  },
+  "artifact_sha256": {
+    "preregistration.json": "30f61810863f0b914011cf1064d0cf260ae7615e63208ff38a7a49fae527b889",
+    "native_plan.json": "766c932b73be0e79ef3865bd13ec415b3b1bf57f188605757736401a965efe4a",
+    "support/suite.py": "cfd363cabfe680242a91c70cbd0ff3611d22648bb2a40c1bb2c08c097cd448ba",
+    "support/fixture-verification.json": "8b452c7d08ced42077ed7621f645107fedb6f1bdb24dca9fad60e97de41b4498",
+    "pin/provenance.json": "25b7cdaff96ed71c908d3821a37f58b56acd769d2211ebe4780b7007fca0c9a0",
+    "scores.json": "85935ee52a7e94fdd7674d804baebf7dd2281b0c3cce95239ea806c5d0249d9b",
+    "telemetry.json": "2afa1b57688a3ea2a5fec521ebcfc6bc53bdd119bd32a46c215c13635665f15b",
+    "fidelity.json": "c24f903e156e7cfd7d1b96e4aa1c1aa5d3bea556f8740c9bbf4490106f75d471",
+    "artifact_performance.json": "3048b7fd3c37480af745a4a5bca4b510f1028311beb3154fc08da4b94499db7e",
+    "verification.json": "474fd2cc8846652e0238af3087356d95e33b9f004f276f1cacd56b3ab573ea11",
+    "actual_prompt_audit.json": "ef46d0fa1411025966e229c7bd86c73284616cde23781d72ca0ef99bf3c2dfbc",
+    "support/fidelity-review.json": "5435c3119353c7a2178e54410e877a961f7136ef50205654962b842ea846dfcc"
+  },
+  "conclusion_scope": "Configured host increment; inherited light shared by all arms; four synthetic task families, no human creative-quality or long-horizon outcome claims."
+}

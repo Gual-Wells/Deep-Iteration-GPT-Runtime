@@ -1,0 +1,99 @@
+{
+  "study": "The quotation, paragraph, and attachment as one historical reading work",
+  "reference_source_sha256": "61a70961f8cc7b4e2acf19087acc9243313c66d43936b9b0c1ee50982e18628d",
+  "reference_paragraph_count": 2,
+  "newest_first": [
+    {
+      "commit": "ed6c24ba96f4b5e6bde4db45c7c9018598a168ba",
+      "tracked_names": [
+        "PLAN.md",
+        "index.html",
+        "jumps.json",
+        "notes.json",
+        "original.txt",
+        "reader.css",
+        "release.txt"
+      ],
+      "source_bytes_preserved": false,
+      "displayed_paragraphs_preserved": false,
+      "jumps_preserved": true,
+      "actual_anchor_targets_resolve_as_required": true,
+      "notes_preserved_and_bound": true,
+      "eligible": false,
+      "displayed_p2": "The next morning, the river was quiet; the timetable guaranteed arrival.\nMira kept the ticket because its small print explained the delay."
+    },
+    {
+      "commit": "154c6c71bcb1573f350a25f702adb952cfde6dff",
+      "tracked_names": [
+        "index.html",
+        "jumps.json",
+        "notes.json",
+        "original.txt",
+        "reader.css",
+        "release.txt"
+      ],
+      "source_bytes_preserved": true,
+      "displayed_paragraphs_preserved": true,
+      "jumps_preserved": false,
+      "actual_anchor_targets_resolve_as_required": false,
+      "notes_preserved_and_bound": true,
+      "eligible": false,
+      "displayed_p2": "The next morning, the river was quiet; the timetable was not a promise.\nMira kept the ticket because its small print explained the delay."
+    },
+    {
+      "commit": "1eb919e2197feef5fb43b900e245cbcd8d9e923a",
+      "tracked_names": [
+        "index.html",
+        "jumps.json",
+        "original.txt",
+        "reader.css",
+        "release.txt"
+      ],
+      "source_bytes_preserved": true,
+      "displayed_paragraphs_preserved": true,
+      "jumps_preserved": true,
+      "actual_anchor_targets_resolve_as_required": true,
+      "notes_preserved_and_bound": false,
+      "eligible": false,
+      "displayed_p2": "The next morning, the river was quiet; the timetable was not a promise.\nMira kept the ticket because its small print explained the delay."
+    },
+    {
+      "commit": "3e68f52cec21d59778233a547d051125cd107820",
+      "tracked_names": [
+        "index.html",
+        "jumps.json",
+        "notes.json",
+        "original.txt",
+        "reader.css",
+        "release.txt"
+      ],
+      "source_bytes_preserved": true,
+      "displayed_paragraphs_preserved": true,
+      "jumps_preserved": true,
+      "actual_anchor_targets_resolve_as_required": true,
+      "notes_preserved_and_bound": true,
+      "eligible": true,
+      "displayed_p2": "The next morning, the river was quiet; the timetable was not a promise.\nMira kept the ticket because its small print explained the delay."
+    },
+    {
+      "commit": "bea68ce517a670aa862fb597fadcd664a08eb50e",
+      "tracked_names": [
+        "index.html",
+        "jumps.json",
+        "notes.json",
+        "original.txt",
+        "reader.css"
+      ],
+      "source_bytes_preserved": true,
+      "displayed_paragraphs_preserved": true,
+      "jumps_preserved": true,
+      "actual_anchor_targets_resolve_as_required": true,
+      "notes_preserved_and_bound": true,
+      "eligible": true,
+      "displayed_p2": "The next morning, the river was quiet; the timetable was not a promise.\nMira kept the ticket because its small print explained the delay."
+    }
+  ],
+  "head_unchanged": true,
+  "status_unchanged": true,
+  "scope": "research only; not a final output or completion claim"
+}

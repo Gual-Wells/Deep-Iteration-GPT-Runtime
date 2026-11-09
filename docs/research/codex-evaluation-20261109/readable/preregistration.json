@@ -1,0 +1,157 @@
+{
+  "study": "DIGR Codex 0.7.0 outcome and resource pilot",
+  "registered_before_any_task_outputs": true,
+  "date": "2026-11-09",
+  "pin": "b258276632054f7f8d1d8a060e01b98b9c7aa3be",
+  "research_questions": [
+    "Under identical allocated resources, does the light preference block improve useful task outcomes over native Codex?",
+    "When additional work and collaboration are allowed, does the full DIGR profile improve useful outcomes, including against a native control with the same resource ceilings?"
+  ],
+  "user_decisions": {
+    "compare_both_resource_regimes": true,
+    "independent_agents_explicitly_authorized": true,
+    "new_paid_api_purchases_authorized": false
+  },
+  "tasks": [
+    "exact_historical_export",
+    "refund_category_report",
+    "source_bound_job_screening",
+    "normalized_frozen_image_retry"
+  ],
+  "data": "Owned synthetic portfolio; no real customer or applicant data; finite local evidence only",
+  "primary_outcome": "Each task passes all essential external behavioral and artifact checks; also retain individual failures for diagnosis",
+  "secondary_outcomes": [
+    "source integrity",
+    "unrequested work",
+    "wall time",
+    "tool calls",
+    "aggregate model usage including helpers",
+    "protocol faithfulness separate from outcome"
+  ],
+  "host_model": {
+    "requested_or_inherited": "gpt-6.1-sol",
+    "reasoning_effort": "max",
+    "preserve_across_all_arms": true
+  },
+  "single_main_experiment": {
+    "arms": [
+      "native",
+      "light"
+    ],
+    "repeats_per_arm": 2,
+    "wall_ceiling_seconds_per_portfolio": 480,
+    "helpers": 0,
+    "order_seed": 20261109,
+    "host_preference": "CLI if usable; otherwise native fork_none for all arms; never compare across hosts as an isolated protocol effect",
+    "actual_host": "CLI HTTPS-only named provider study_http"
+  },
+  "collaborative_experiment": {
+    "arms": [
+      "native_extra_resources",
+      "full_DIGR_default_profile"
+    ],
+    "repeats_per_arm": 1,
+    "wall_ceiling_seconds_per_portfolio": 900,
+    "max_helper_identities": 3,
+    "max_helper_turns_total": 6,
+    "max_helpers_concurrently_active": 2,
+    "full_configuration": {
+      "N": 12,
+      "R": 4,
+      "D": 3,
+      "V": 3,
+      "L": 3,
+      "M": 1
+    },
+    "same_task_tool_permissions_and_ceiling_for_native": true,
+    "U0": "Full arm may ask for a researched brief decision; a fixed, explicitly labelled experimental simulated-user response will confirm only the frozen portfolio and ceilings. No real user confirmation will be invented.",
+    "faithfulness": "Count real responsibilities, isolation, substantive revisits and adopted consequences separately. Partial execution stays partial. Do not manufacture N/R/D/V to make the study complete.",
+    "baseline_includes_light": true
+  },
+  "controls": [
+    "Each subject gets a fresh history and identical initial task bytes and seed code; only the declared instruction condition differs.",
+    "No subject sees another arm, evaluator code, gold data, interim scores, or a requested winner.",
+    "Freeze acceptance criteria and evaluator before observing outputs. Test seed-bad and correct reference artifacts.",
+    "Allow strong native behavior, autonomous useful review, and the same tools and delegated resources where allocated.",
+    "Do not tune the protocol or tasks after seeing outcomes. Any required evaluator repair applies symmetrically and is disclosed."
+  ],
+  "inference_limits": [
+    "Same ceilings do not imply identical realized token use. Report measured use; do not claim equal-token causality without it.",
+    "Four correlated synthetic task families and two repeats are a pilot, not a representative benchmark or a reliable prevalence estimate.",
+    "Do not count assertions or protocol unit tests as evidence of useful task performance.",
+    "Do not equate more prose, agents, checks or N/R/D/V labels with quality.",
+    "Open creative quality, human preferences, long-running real project success and future model versions are outside this pilot.",
+    "Report improvements, ties, regressions, censored runs and instrumentation failures, including an inconclusive result."
+  ],
+  "amendments_before_task_outputs": [
+    {
+      "reason": "Audit found native fork_none retains user AGENTS light block; HTTPS-only named provider smoke succeeded in 9.4 seconds using existing ChatGPT auth.",
+      "single_main_host": "CLI, project_doc_max_bytes=0, memories false, plugins/apps/multi_agent disabled, fresh session; audit exact injected messages before accepting run.",
+      "collaborative_host": "Native inherited-light host; compare current host baseline with extra resources against full default profile increment; both inherit identical AGENTS.",
+      "standard_arm": "Not included; no claim about standard profile."
+    }
+  ],
+  "amendments_before_valid_native_outputs": [
+    {
+      "reason": "Both native fork_none and shared-CODEX_HOME CLI load global user AGENTS despite project_doc_max_bytes=0. Polluted CLI a01 was stopped and excluded without inspecting efficacy scores. Isolated home smoke removes instructions but primary practical question is the profile increment on this configured host.",
+      "actual_primary_design": "One host-native single-Main baseline repeated before and after; full-default-profile vs native-extra share 900s/3helper/6turn/2concurrent ceilings. All native arms inherit identical user AGENTS light block.",
+      "pure_light_ablation": "Not run as efficacy evidence; no claim of a clean light-vs-bare effect.",
+      "resource_comparisons": "Fixed-ceiling native-extra vs full; extra investment full vs host-native-single, using observed all-in usage and outcomes. Same cap is not equal actual tokens."
+    }
+  ],
+  "actual_native_plan": [
+    {
+      "label": "b01",
+      "condition": "host_native_single",
+      "repeat": 1,
+      "cap": 480,
+      "prompt_sha256": "1c590df0a538520f059889c2c637f364a1781184810ee8593aa6a47cfa0f00f0",
+      "workspace": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_subjects\\b01",
+      "prompt_file": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_prompts\\b01.txt"
+    },
+    {
+      "label": "b05",
+      "condition": "full_profile_default_capped",
+      "repeat": 1,
+      "cap": 900,
+      "prompt_sha256": "a92c3ee7d317bf4c7f59a95286bed2bbc83cf2c36c73418169d0f71afea5325d",
+      "workspace": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_subjects\\b05",
+      "prompt_file": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_prompts\\b05.txt"
+    },
+    {
+      "label": "b03",
+      "condition": "host_native_extra",
+      "repeat": 1,
+      "cap": 900,
+      "prompt_sha256": "48851c3f295d2099df8246a2a1a6f0313fbc34bdd63d7ee0a36781c43a0b28f3",
+      "workspace": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_subjects\\b03",
+      "prompt_file": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_prompts\\b03.txt"
+    },
+    {
+      "label": "b04",
+      "condition": "host_native_single",
+      "repeat": 2,
+      "cap": 480,
+      "prompt_sha256": "bebadc821b49fd535b33204c816ca251e3793c58d4217cf4a689c3ffb4bed5ea",
+      "workspace": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_subjects\\b04",
+      "prompt_file": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_prompts\\b04.txt"
+    }
+  ],
+  "visibility_repair_before_full_production": {
+    "at_utc": "2026-11-09T07:11:46.378759+00:00",
+    "reason": "Global list_agents exposes completed sibling answers even when histories are fork_none.",
+    "changes": "Explicitly enforce the already-declared no-other-subjects boundary for future parents/helpers. No task inputs, evaluator, acceptance rules or outcome targets changed."
+  },
+  "excluded_native_runs": [
+    {
+      "label": "b02",
+      "condition": "full_profile_default_capped",
+      "repeat": 1,
+      "cap": 900,
+      "prompt_sha256": "1c07be883464e304ceb252bda8a8f798f8e56bfe4280f90a3dbd74c4fa30ae55",
+      "workspace": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_subjects\\b02",
+      "prompt_file": "D:\\CodexStorage\\workspaces\\digr-codex-evaluation-20261109\\native_prompts\\b02.txt",
+      "excluded_reason": "Preproduction context contamination via global list_agents showing baseline final answer; interrupted without simulated execution confirmation."
+    }
+  ]
+}

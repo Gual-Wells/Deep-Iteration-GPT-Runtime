@@ -1,0 +1,275 @@
+{
+  "result": "research and candidate confirmation; no D claim",
+  "checks": [
+    {
+      "name": "candidate-frontier-J01",
+      "observation": {
+        "status": "open",
+        "status_evidence": "J01-O1",
+        "recent_recruitment": "official_confirmed",
+        "recent_recruitment_evidence": "J01-O2",
+        "hc": "unknown",
+        "hc_evidence": null
+      }
+    },
+    {
+      "name": "candidate-frontier-J02",
+      "observation": {
+        "status": "closed",
+        "status_evidence": "J02-O1",
+        "recent_recruitment": "none",
+        "recent_recruitment_evidence": null,
+        "hc": "unknown",
+        "hc_evidence": null
+      }
+    },
+    {
+      "name": "candidate-frontier-J03",
+      "observation": {
+        "status": "closed",
+        "status_evidence": "J03-O1",
+        "recent_recruitment": "none",
+        "recent_recruitment_evidence": null,
+        "hc": "unknown",
+        "hc_evidence": null
+      }
+    },
+    {
+      "name": "candidate-frontier-J04",
+      "observation": {
+        "status": "open",
+        "status_evidence": "J04-O1",
+        "recent_recruitment": "none",
+        "recent_recruitment_evidence": null,
+        "hc": "unknown",
+        "hc_evidence": null
+      }
+    },
+    {
+      "name": "candidate-frontier-J05",
+      "observation": {
+        "status": "open",
+        "status_evidence": "J05-O1",
+        "recent_recruitment": "none",
+        "recent_recruitment_evidence": null,
+        "hc": "unknown",
+        "hc_evidence": null
+      }
+    },
+    {
+      "name": "candidate-frontier-J06",
+      "observation": {
+        "status": "open",
+        "status_evidence": "J06-O1",
+        "recent_recruitment": "self_report_only",
+        "recent_recruitment_evidence": "J06-C1",
+        "hc": "unknown",
+        "hc_evidence": null
+      }
+    },
+    {
+      "name": "candidate-frontier-J07",
+      "observation": {
+        "status": "open",
+        "status_evidence": "J07-O1",
+        "recent_recruitment": "none",
+        "recent_recruitment_evidence": null,
+        "hc": "unknown",
+        "hc_evidence": null
+      }
+    },
+    {
+      "name": "candidate-frontier-J08",
+      "observation": {
+        "status": "unknown",
+        "status_evidence": null,
+        "recent_recruitment": "none",
+        "recent_recruitment_evidence": null,
+        "hc": "unknown",
+        "hc_evidence": null
+      }
+    },
+    {
+      "name": "candidate-frontier-J09",
+      "observation": {
+        "status": "open",
+        "status_evidence": "J09-O1",
+        "recent_recruitment": "official_confirmed",
+        "recent_recruitment_evidence": "J09-H1",
+        "hc": "confirmed_available",
+        "hc_evidence": "J09-H1"
+      }
+    },
+    {
+      "name": "candidate-frontier-J10",
+      "observation": {
+        "status": "open",
+        "status_evidence": "J10-O1",
+        "recent_recruitment": "none",
+        "recent_recruitment_evidence": null,
+        "hc": "unknown",
+        "hc_evidence": null
+      }
+    },
+    {
+      "name": "unusable-source-deletion-J01",
+      "observation": "Candidate baseline equals model after removing unusable sources. Static artifact; not a rerun of an unavailable generator."
+    },
+    {
+      "name": "unusable-source-deletion-J02",
+      "observation": "Candidate baseline equals model after removing unusable sources. Static artifact; not a rerun of an unavailable generator."
+    },
+    {
+      "name": "unusable-source-deletion-J03",
+      "observation": "Candidate baseline equals model after removing unusable sources. Static artifact; not a rerun of an unavailable generator."
+    },
+    {
+      "name": "unusable-source-deletion-J04",
+      "observation": "Candidate baseline equals model after removing unusable sources. Static artifact; not a rerun of an unavailable generator."
+    },
+    {
+      "name": "unusable-source-deletion-J05",
+      "observation": "Candidate baseline equals model after removing unusable sources. Static artifact; not a rerun of an unavailable generator."
+    },
+    {
+      "name": "unusable-source-deletion-J06",
+      "observation": "Candidate baseline equals model after removing unusable sources. Static artifact; not a rerun of an unavailable generator."
+    },
+    {
+      "name": "unusable-source-deletion-J07",
+      "observation": "Candidate baseline equals model after removing unusable sources. Static artifact; not a rerun of an unavailable generator."
+    },
+    {
+      "name": "unusable-source-deletion-J08",
+      "observation": "Candidate baseline equals model after removing unusable sources. Static artifact; not a rerun of an unavailable generator."
+    },
+    {
+      "name": "unusable-source-deletion-J09",
+      "observation": "Candidate baseline equals model after removing unusable sources. Static artifact; not a rerun of an unavailable generator."
+    },
+    {
+      "name": "unusable-source-deletion-J10",
+      "observation": "Candidate baseline equals model after removing unusable sources. Static artifact; not a rerun of an unavailable generator."
+    },
+    {
+      "name": "isolated-HC-intervention",
+      "observation": {
+        "expected_change": {
+          "hc": "confirmed_zero",
+          "hc_evidence": "COUNTERFACTUAL-HC"
+        },
+        "preserved": "candidate J01 status and recent axes"
+      }
+    },
+    {
+      "name": "normalization-identity",
+      "observation": "Whitespace, Unicode code points and normalized text hash agree."
+    },
+    {
+      "name": "post-normalization-boundary",
+      "observation": "4000 input code points normalize to 2000 and are accepted."
+    },
+    {
+      "name": "codepoint-not-byte-boundary",
+      "observation": "2000 high Unicode code points are accepted despite 8000 UTF-8 bytes."
+    },
+    {
+      "name": "retry-value-direct",
+      "observation": "Live form variation does not change any frozen field."
+    },
+    {
+      "name": "retry-identity-direct",
+      "observation": "Independent outer, image and description dictionaries."
+    },
+    {
+      "name": "nested-noninterference-direct",
+      "observation": "Mutation of every returned scalar at every mutable level leaves original unchanged."
+    },
+    {
+      "name": "retry-value-direct",
+      "observation": "Live form variation does not change any frozen field."
+    },
+    {
+      "name": "retry-identity-direct",
+      "observation": "Independent outer, image and description dictionaries."
+    },
+    {
+      "name": "nested-noninterference-direct",
+      "observation": "Mutation of every returned scalar at every mutable level leaves original unchanged."
+    },
+    {
+      "name": "retry-value-direct",
+      "observation": "Live form variation does not change any frozen field."
+    },
+    {
+      "name": "retry-identity-direct",
+      "observation": "Independent outer, image and description dictionaries."
+    },
+    {
+      "name": "nested-noninterference-direct",
+      "observation": "Mutation of every returned scalar at every mutable level leaves original unchanged."
+    },
+    {
+      "name": "retry-value-direct",
+      "observation": "Live form variation does not change any frozen field."
+    },
+    {
+      "name": "retry-identity-direct",
+      "observation": "Independent outer, image and description dictionaries."
+    },
+    {
+      "name": "nested-noninterference-direct",
+      "observation": "Mutation of every returned scalar at every mutable level leaves original unchanged."
+    },
+    {
+      "name": "retry-value-json-roundtrip",
+      "observation": "Live form variation does not change any frozen field."
+    },
+    {
+      "name": "retry-identity-json-roundtrip",
+      "observation": "Independent outer, image and description dictionaries."
+    },
+    {
+      "name": "nested-noninterference-json-roundtrip",
+      "observation": "Mutation of every returned scalar at every mutable level leaves original unchanged."
+    },
+    {
+      "name": "retry-value-json-roundtrip",
+      "observation": "Live form variation does not change any frozen field."
+    },
+    {
+      "name": "retry-identity-json-roundtrip",
+      "observation": "Independent outer, image and description dictionaries."
+    },
+    {
+      "name": "nested-noninterference-json-roundtrip",
+      "observation": "Mutation of every returned scalar at every mutable level leaves original unchanged."
+    },
+    {
+      "name": "retry-value-json-roundtrip",
+      "observation": "Live form variation does not change any frozen field."
+    },
+    {
+      "name": "retry-identity-json-roundtrip",
+      "observation": "Independent outer, image and description dictionaries."
+    },
+    {
+      "name": "nested-noninterference-json-roundtrip",
+      "observation": "Mutation of every returned scalar at every mutable level leaves original unchanged."
+    },
+    {
+      "name": "retry-value-json-roundtrip",
+      "observation": "Live form variation does not change any frozen field."
+    },
+    {
+      "name": "retry-identity-json-roundtrip",
+      "observation": "Independent outer, image and description dictionaries."
+    },
+    {
+      "name": "nested-noninterference-json-roundtrip",
+      "observation": "Mutation of every returned scalar at every mutable level leaves original unchanged."
+    }
+  ],
+  "limitation": "screen.json is static; counterfactual source behavior is established in the independent fact model and checked against candidate baseline, not attributed to an unseen generator.",
+  "development": "The two tasks impose different dependency boundaries: evidence conclusions depend on each authorized claim frontier; frozen retries depend solely on the submitted snapshot and are noninterfering with the current form."
+}

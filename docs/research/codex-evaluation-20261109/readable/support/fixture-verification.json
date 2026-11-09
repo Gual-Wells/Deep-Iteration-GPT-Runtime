@@ -1,0 +1,61 @@
+{
+  "selfcheck": {
+    "passed": true,
+    "suite_version": "synthetic-portfolio-1.0.0",
+    "reference_artifacts_all_passed": true,
+    "seeded_bad_rejected_by_task": {
+      "task1_history": true,
+      "task2_budget": true,
+      "task3_evidence": true,
+      "task4_retry": true
+    },
+    "seeded_bad_failed_checks": {
+      "task1_history": [
+        "selected_latest_complete_commit",
+        "archive_exact_selected_tree"
+      ],
+      "task2_budget": [
+        "catalog_zeroes_and_transfer_count",
+        "ambiguity_before_catalog_filter",
+        "refund_inherits_category_and_can_be_negative",
+        "complete_expense_list_and_order_invariance",
+        "duplicate_expense_id_is_not_unique",
+        "only_expense_records_can_match_refund",
+        "ambiguous_refund_goes_negative_unassigned",
+        "pure_inputs_independent_calls_and_output",
+        "nonnegative_integer_validation_and_zero"
+      ],
+      "task3_evidence": [
+        "J02_evidence_decision",
+        "J03_evidence_decision",
+        "J06_evidence_decision",
+        "J10_evidence_decision",
+        "selected_ids_exact"
+      ],
+      "task4_retry": [
+        "normalize_mixed_newlines_before_hash",
+        "preserve_whitespace_and_blank_lines",
+        "normalized_2000_boundary",
+        "unicode_codepoints_not_bytes_or_graphemes",
+        "prepare_invalid_types_raise_valueerror",
+        "retry_ignores_live_form_and_preserves_frozen_fields",
+        "retry_does_not_mutate_snapshot",
+        "retry_is_an_independent_deep_copy"
+      ]
+    },
+    "history_tamper_detected": true
+  },
+  "repeatability": {
+    "same_input_bytes": true,
+    "same_commit_sequence": true,
+    "source_tree_sha": "61d809b18391c0e5d6fc64c3e0cb618ce34a72c8e662859aa53107633c338148",
+    "commit_sequence": [
+      "bea68ce517a670aa862fb597fadcd664a08eb50e",
+      "3e68f52cec21d59778233a547d051125cd107820",
+      "1eb919e2197feef5fb43b900e245cbcd8d9e923a",
+      "154c6c71bcb1573f350a25f702adb952cfde6dff",
+      "ed6c24ba96f4b5e6bde4db45c7c9018598a168ba"
+    ]
+  },
+  "suite_sha256": "cfd363cabfe680242a91c70cbd0ff3611d22648bb2a40c1bb2c08c097cd448ba"
+}
