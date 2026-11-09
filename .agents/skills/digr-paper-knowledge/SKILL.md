@@ -44,6 +44,8 @@ Necessary background can be offered briefly or checked with a small optional que
 
 Prepared lessons are resources, not delivered teaching. Record an `explanation` only after the user actually receives it, with its text and delivery reference. Keep a user's self-report, a worked response, and the agent's interpretation distinct. Evidence names a concrete ability, representation, source context and time; no single status means permanent mastery. A correct example does not authorize every later paper's use.
 
+One question can group multiple source uses. When only part was explained or observed, pass the covered `occurrence_ids` subset in the record. A whole-item default asserts whole-item coverage; do not apply it to a partial lesson or a reply about one role. Inspect the returned unexplained uses before continuing.
+
 When earlier uses are retrieved, compare their source context before shaping the next question: what can carry over, what changed in this paper, and what remains unresolved. Let this comparison change the wording and teaching starting point; returning related IDs alone is not reuse. Continue the same concrete example into its notation when that resolves the actual difficulty.
 
 ## Save, resume and reuse

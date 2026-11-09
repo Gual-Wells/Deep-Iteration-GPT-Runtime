@@ -264,6 +264,28 @@ class KnowledgePoolTests(unittest.TestCase):
             k.revise_use(self.root,correction,expected_revision=4,operation_id='bad-correction')
         self.assertEqual((self.root/'pool.json').read_bytes(),before)
 
+    def test_partial_explanation_within_a_group_does_not_cover_untaught_uses(self):
+        self.analysis['questions'][0]['occurrence_keys']=['work','queue']
+        self.ingest();p=self.response(('A1',))
+        k.select(self.root,p,expected_revision=1,operation_id='choose-group')
+        item=k.resume(self.root)['items'][0]
+        first,second=item['occurrence_ids']
+        lesson={key:p[key] for key in ('session_id','questionnaire_sha256')}
+        lesson.update(item_id='A1',occurrence_ids=[first],source_ref='synthetic partial lesson',
+                      delivered=True,text='Only the work object was explained, not queue dynamics.')
+        k.record(self.root,lesson,kind='explanation',expected_revision=2,operation_id='partial-lesson')
+        state=k.resume(self.root)['items'][0]['learning']
+        self.assertEqual(state['status'],'partially_explained_not_assessed')
+        self.assertEqual(state['unexplained_occurrence_ids'],[second])
+        self.assertEqual(k.show_use(self.root,second)['learning']['status'],'unassessed')
+        self.assertEqual(k.show_use(self.root,first)['learning']['status'],'explained_not_assessed')
+        hidden=next(oid for oid,o in k.load(self.root)['occurrences'].items() if o['concept_id']=='hidden.background')
+        lesson['occurrence_ids']=[hidden]
+        before=(self.root/'pool.json').read_bytes()
+        with self.assertRaisesRegex(ValueError,'scope outside'):
+            k.record(self.root,lesson,kind='explanation',expected_revision=3,operation_id='outside-group')
+        self.assertEqual((self.root/'pool.json').read_bytes(),before)
+
     def test_cli_utf8_is_independent_of_parent_encoding(self):
         self.analysis['questions'][1]['label']='剩余工作 −1² 与下一步'
         self.ingest()

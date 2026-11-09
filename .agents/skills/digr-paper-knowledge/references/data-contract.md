@@ -89,6 +89,8 @@ All mutation inputs include `session_id` and `questionnaire_sha256`. An `explana
 
 Evidence kinds: `self_report`, `application_observation`, `needs_review`, `declined_check`, `legacy_unverified_claim`. The operator supplies observations; the CLI does not authenticate the user or certify understanding. `resume` exposes the full scoped records and labels derived only as `unassessed`, `explained_not_assessed`, or `evidence_recorded_for_scoped_ability`. Read the statement and scope; that last label is not “mastered.”
 
+For a grouped question, `explanation` and `evidence` can specify a nonempty `occurrence_ids` subset of that question. Omission attributes the record to the whole offered item and must only be used for full coverage. A partial explanation leaves the other uses unassessed, reports `partially_explained_not_assessed`, and exposes `explained_occurrence_ids`/`unexplained_occurrence_ids`. Evidence still reports only a scoped ability, never full-group or permanent mastery. The CLI text/JSON interface is UTF-8, including in Windows subprocesses.
+
 ```text
 python -B <cli> --pool <root> explanation --input delivered.json --expected-revision 2 --operation-id explanation-1
 python -B <cli> --pool <root> evidence --input observed.json --expected-revision 3 --operation-id evidence-1

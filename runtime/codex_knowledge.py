@@ -360,7 +360,12 @@ def record(root: Path, payload: dict, *, expected_revision: int, operation_id: s
         require(payload['item_id'] in items,'item not offered')
         require(payload.get('source_ref'),'record needs a real message/artifact location')
         entry=deepcopy(payload)
-        entry['occurrence_ids']=items[payload['item_id']]['occurrence_ids']
+        offered_uses=items[payload['item_id']]['occurrence_ids']
+        scope=payload.get('occurrence_ids',offered_uses)
+        require(isinstance(scope,list) and scope and len(scope)==len(set(scope))
+                and set(scope)<=set(offered_uses),'record scope outside the offered question')
+        entry['occurrence_ids']=list(scope)
+        entry['scope_basis']='explicit use subset' if 'occurrence_ids' in payload else 'operator attributed the whole offered item'
         entry['recorded_at']=now()
         entry['record_basis']='operator-supplied observation; not authenticated or semantically certified by CLI'
         if kind=='explanation':
@@ -485,8 +490,12 @@ def _state(pool,item):
     ids=set(item['occurrence_ids'])
     explanations=[e for e in pool['explanations'].values() if ids.intersection(e['occurrence_ids'])]
     evidence=[e for e in pool['evidence'].values() if ids.intersection(e['occurrence_ids'])]
+    explained={oid for e in explanations for oid in e['occurrence_ids']} & ids
     return {'status':('evidence_recorded_for_scoped_ability' if evidence else
-                     'explained_not_assessed' if explanations else 'unassessed'),
+                     'explained_not_assessed' if explained==ids else
+                     'partially_explained_not_assessed' if explained else 'unassessed'),
+            'explained_occurrence_ids':sorted(explained),
+            'unexplained_occurrence_ids':sorted(ids-explained),
             'explanations':explanations,'evidence':evidence}
 
 
