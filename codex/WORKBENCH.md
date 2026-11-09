@@ -2,6 +2,8 @@
 
 长任务从已有笔记开始，必要时再使用这些标准库工具。统一入口是 `python -B tools/codex.py`；旧的 codex_profile.py、codex_workbench.py、codex_experience.py 继续可用。它们不调用模型、不派代理，不把本地状态变成思想或交付质量评分。
 
+论文辅学另有可选的[知识池技能](../.agents/skills/digr-paper-knowledge/SKILL.md)与 `python -B tools/codex.py knowledge --help`。原生 Codex 读论文、分层批量问询和教学，工具保存冻结问项、论文局部用法、真实选择、有范围证据及接续位置。个人数据与原件放在独立私有项目，不进入本公共库；可从私有项目的相对路径入口接续，本机定位缓存仅用于发现。它不替代本轮在线 DIGR 协议获取，也不需要阅读器或付费模型接口。普通读取只用标准库，摄入 PDF 另需所选 Python 环境中的 `pypdf`。具体数据与命令见技能的按需引用。
+
 ## 0. 在其它项目找到工具，及时开始记录
 
 本机经验证的工具可安装在D盘的独立版本目录；定位文件为 `CODEX_HOME/digr-codex/toolchain.json`。其中version、root、cli与source_commit只说明已安装工具身份，不是新消息的仓库HEAD、执行授权或完成证明。没有安装时可用实际已知的仓库绝对入口；不要求为了执行一个任务先安装服务。

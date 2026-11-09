@@ -62,7 +62,7 @@ DIGR：比较这个项目的两种发布方案，实际验证关键路径，给�
 
 ## 本地工具：从一份材料开始
 
-需要 **Python 3.10+**，运行时只用标准库。以下是 Windows PowerShell 示例，任务数据放在 D 盘；其它平台按实际任务目录调整路径。在现有本分支 checkout 根目录运行即可。尚无 checkout 时：
+需要 **Python 3.10+**，核心运行时只用标准库；可选[论文知识池](.agents/skills/digr-paper-knowledge/SKILL.md)在摄入 PDF 时另需 `pypdf`。以下是 Windows PowerShell 示例，任务数据放在 D 盘；其它平台按实际任务目录调整路径。在现有本分支 checkout 根目录运行即可。尚无 checkout 时：
 
 ```powershell
 git clone --branch codex/codex-host-adaptation --single-branch https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime.git D:/CodexStorage/workspaces/digr-runtime

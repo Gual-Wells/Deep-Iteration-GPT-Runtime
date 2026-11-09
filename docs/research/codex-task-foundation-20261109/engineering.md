@@ -14,14 +14,14 @@
 
 | 现有位置 | 真实能力 | 当前缺口及后果 |
 | --- | --- | --- |
-| [codex_session.py:193](D:/CodexLab/worktrees/digr-codex-adaptation/digr-runtime-source/runtime/codex_session.py:193) `create_session` | 冻结 REQUEST 原字节及散列，保存 P_run，引用共同决定文件；明确不启动执行 | 没有解释目标、辨认成品或调查依赖，不能称为「意图识别已完成」 |
-| [codex_session.py:231](D:/CodexLab/worktrees/digr-codex-adaptation/digr-runtime-source/runtime/codex_session.py:231) `create_line` | 校验完整参数，接入已有 WORK 或生成模板 | 模板只有原请求，交付、纠正、研究、产物、下一步栏初始为空；文件存在不等于任务说明成立 |
-| [codex_workbench.py:71](D:/CodexLab/worktrees/digr-codex-adaptation/digr-runtime-source/runtime/codex_workbench.py:71) `create_workbench` | 留原话、自由标题、明确选取材料；不会调模型 | 应继续作为研究工作台，不把空模板升级成自动研究器 |
-| [codex_session.py:541](D:/CodexLab/worktrees/digr-codex-adaptation/digr-runtime-source/runtime/codex_session.py:541) `line_packet` | 取回原请求、本线材料、实际候选、最新共同纠正；纠正在旧计划之后；不依赖其它线私有笔记 | 可以接入 foundation 当前说明，复用恢复机制；原有包不能自行判定用户已经同意 |
-| [codex_session.py:264](D:/CodexLab/worktrees/digr-codex-adaptation/digr-runtime-source/runtime/codex_session.py:264) `_artifact_ref` | 文件散列；目录仅作为入口 | 目录没有递归内容认证；需要检查真实选中材料，不能把路径存在当作工作基础可用 |
-| [codex_session.py:408](D:/CodexLab/worktrees/digr-codex-adaptation/digr-runtime-source/runtime/codex_session.py:408) `activity` | COMMON 不要求 M 线存在，支持明确 begin/checkpoint/end/recover | 已有前置活动落点，不必为了计时提前初始化正式生产线 |
-| [codex_session.py:438](D:/CodexLab/worktrees/digr-codex-adaptation/digr-runtime-source/runtime/codex_session.py:438) `summarize_activity` | MAIN/SOURCE 进入 T，SOURCE 进入 t；META/D/V/IDLE 排除 | 前置研究不能简单改标 META：那会丢失其研究成本；应按 scope 分组 |
-| [tools/codex.py:43](D:/CodexLab/worktrees/digr-codex-adaptation/digr-runtime-source/tools/codex.py:43) task/line/clock | 统一 CLI，已有文件和恢复通路 | 最合适的新增入口就在这里，不需新常驻进程或独立工作站 |
+| [codex_session.py:193](../../../runtime/codex_session.py#L193) `create_session` | 冻结 REQUEST 原字节及散列，保存 P_run，引用共同决定文件；明确不启动执行 | 没有解释目标、辨认成品或调查依赖，不能称为「意图识别已完成」 |
+| [codex_session.py:231](../../../runtime/codex_session.py#L231) `create_line` | 校验完整参数，接入已有 WORK 或生成模板 | 模板只有原请求，交付、纠正、研究、产物、下一步栏初始为空；文件存在不等于任务说明成立 |
+| [codex_workbench.py:71](../../../runtime/codex_workbench.py#L71) `create_workbench` | 留原话、自由标题、明确选取材料；不会调模型 | 应继续作为研究工作台，不把空模板升级成自动研究器 |
+| [codex_session.py:541](../../../runtime/codex_session.py#L541) `line_packet` | 取回原请求、本线材料、实际候选、最新共同纠正；纠正在旧计划之后；不依赖其它线私有笔记 | 可以接入 foundation 当前说明，复用恢复机制；原有包不能自行判定用户已经同意 |
+| [codex_session.py:264](../../../runtime/codex_session.py#L264) `_artifact_ref` | 文件散列；目录仅作为入口 | 目录没有递归内容认证；需要检查真实选中材料，不能把路径存在当作工作基础可用 |
+| [codex_session.py:408](../../../runtime/codex_session.py#L408) `activity` | COMMON 不要求 M 线存在，支持明确 begin/checkpoint/end/recover | 已有前置活动落点，不必为了计时提前初始化正式生产线 |
+| [codex_session.py:438](../../../runtime/codex_session.py#L438) `summarize_activity` | MAIN/SOURCE 进入 T，SOURCE 进入 t；META/D/V/IDLE 排除 | 前置研究不能简单改标 META：那会丢失其研究成本；应按 scope 分组 |
+| [tools/codex.py:43](../../../tools/codex.py#L43) task/line/clock | 统一 CLI，已有文件和恢复通路 | 最合适的新增入口就在这里，不需新常驻进程或独立工作站 |
 
 本轮真实 session 已保留原始 L1，在 line 中记录用户明确改 L3 的原因；`decisions.md` 已明确「研究后的任务说明及关键取舍经用户确认，已确认续做只问变化」。这是可复用的变更依据，不能再次向用户重复询问同一选择。其 `content_status=PREPARED`、`responsibility_status=UNVERIFIED`、`candidate=null` 也没有伪称产物已经完成。
 
