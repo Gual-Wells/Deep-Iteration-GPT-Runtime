@@ -1,0 +1,704 @@
+{
+  "schema_version": 1,
+  "title": "DIGR · 缺失时间反例",
+  "mode": "illustration",
+  "axis_domain": "demonstration-only",
+  "protocol_pin": "0.7.0@fd009be2278684042ea37052df00b282a2d8092e",
+  "notice": "以下时间、身份数量、交流与结果均为设计构造；不是本轮执行记录或固定必经次序。",
+  "phases": [
+    {
+      "start": 0,
+      "end": 80,
+      "label": "U0 前置"
+    },
+    {
+      "start": 80,
+      "end": 300,
+      "label": "候选形成"
+    },
+    {
+      "start": 300,
+      "end": 540,
+      "label": "竞争、处理"
+    },
+    {
+      "start": 540,
+      "end": 720,
+      "label": "再入、交付"
+    }
+  ],
+  "tracks": [
+    {
+      "id": "M01",
+      "kind": "M",
+      "label": "主进度与交付",
+      "segments": [
+        {
+          "start": 80,
+          "end": 130,
+          "label": "自举 / 主张",
+          "executor": "Main-α",
+          "artifact_versions": []
+        },
+        {
+          "start": 210,
+          "end": 285,
+          "label": "候选 A",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "A@1"
+          ]
+        },
+        {
+          "start": 390,
+          "end": 490,
+          "label": "处理 / 改作",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "A@2"
+          ]
+        },
+        {
+          "start": 620,
+          "end": 710,
+          "label": "综合返回",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "A@3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.N01",
+      "kind": "N",
+      "label": "界定对象",
+      "segments": [
+        {
+          "start": 90,
+          "end": 140,
+          "label": "界定对象",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "说明@1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.N02",
+      "kind": "N",
+      "label": "形成构形",
+      "segments": [
+        {
+          "start": 145,
+          "end": 215,
+          "label": "形成构形",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "A@1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.N03",
+      "kind": "N",
+      "label": "完整候选",
+      "segments": [
+        {
+          "start": null,
+          "end": null,
+          "label": "完整候选",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "A@1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.N04",
+      "kind": "N",
+      "label": "落实改变",
+      "segments": [
+        {
+          "start": 420,
+          "end": 500,
+          "label": "落实改变",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "A@2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.N05",
+      "kind": "N",
+      "label": "可用交付",
+      "segments": [
+        {
+          "start": 630,
+          "end": 690,
+          "label": "可用交付",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "A@3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.R01",
+      "kind": "R",
+      "label": "重看整体路线",
+      "segments": [
+        {
+          "start": 325,
+          "end": 385,
+          "label": "重新比较",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "A@1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.R02",
+      "kind": "R",
+      "label": "重看完整新稿",
+      "segments": [
+        {
+          "start": 550,
+          "end": 605,
+          "label": "再研究全稿",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "A@2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.S01",
+      "kind": "S",
+      "label": "来源问题一",
+      "segments": [
+        {
+          "start": 82,
+          "end": 150,
+          "label": "n₁ / n₂",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "原件P@1"
+          ]
+        },
+        {
+          "start": 300,
+          "end": 335,
+          "label": "r₁ / n₃",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "原件P@2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.S02",
+      "kind": "S",
+      "label": "来源问题二",
+      "segments": [
+        {
+          "start": 155,
+          "end": 220,
+          "label": "n₁ / n₂",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "材料Q@1"
+          ]
+        },
+        {
+          "start": 365,
+          "end": 415,
+          "label": "反例 / r₁",
+          "executor": "Main-α",
+          "artifact_versions": [
+            "材料Q@2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.D01",
+      "kind": "D",
+      "label": "竞争性介入",
+      "segments": [
+        {
+          "start": 205,
+          "end": 340,
+          "label": "侦察→成旗→试作",
+          "executor": "独立者-β",
+          "artifact_versions": [
+            "A@1",
+            "竞争稿B@1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.D02",
+      "kind": "D",
+      "label": "另一条强替代",
+      "segments": [
+        {
+          "start": 245,
+          "end": 365,
+          "label": "研究另一构形",
+          "executor": "独立者-γ",
+          "artifact_versions": [
+            "竞争稿C@1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.V01",
+      "kind": "V",
+      "label": "持续领域一",
+      "segments": [
+        {
+          "start": 170,
+          "end": 265,
+          "label": "领域作品",
+          "executor": "研究者-δ",
+          "artifact_versions": [
+            "A@1"
+          ]
+        },
+        {
+          "start": 480,
+          "end": null,
+          "label": "V₁ 再入",
+          "executor": "研究者-δ",
+          "artifact_versions": [
+            "A@2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01.V02",
+      "kind": "V",
+      "label": "持续领域二",
+      "segments": [
+        {
+          "start": 185,
+          "end": 290,
+          "label": "独立研究",
+          "executor": "研究者-ε",
+          "artifact_versions": [
+            "领域材料@1"
+          ]
+        },
+        {
+          "start": 505,
+          "end": 575,
+          "label": "继续自己的问题",
+          "executor": "研究者-ζ",
+          "artifact_versions": [
+            "领域作品@2"
+          ]
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": "u0",
+      "track": "COMMON",
+      "at": 8,
+      "kind": "bootstrap",
+      "label": "U0：从原话建立任务对象",
+      "note": "研究用途、原件与关键歧义；前置投入独立，不计入正式N/R/D/V。",
+      "artifact_versions": []
+    },
+    {
+      "id": "confirm",
+      "track": "COMMON",
+      "at": 73,
+      "kind": "decision",
+      "label": "U0：明确任务与取舍",
+      "note": "图中是设计场景的假想用户决定，不是当前用户另一次答复。",
+      "artifact_versions": [],
+      "display_label": "U0 明确决定"
+    },
+    {
+      "id": "m-boot",
+      "track": "M01",
+      "at": 84,
+      "kind": "bootstrap",
+      "label": "M₁ 自举",
+      "note": "形成当前问题、材料、方法与投入/活动边界；不是复制一个空目录。",
+      "artifact_versions": [],
+      "executor": "Main-α"
+    },
+    {
+      "id": "council-a",
+      "track": "M01",
+      "at": 150,
+      "kind": "council",
+      "label": "议会：探索材料交换",
+      "note": "参与者是Main和尚未分域的探索者；可分批交流，不假设全员同时在线。",
+      "artifact_versions": [],
+      "display_label": "议会"
+    },
+    {
+      "id": "council-b",
+      "track": "M01",
+      "at": 166,
+      "kind": "council",
+      "label": "议会：形成可区分领域",
+      "note": "这是第二次材料往返，议会不是贯穿所有行的同步栅栏。",
+      "artifact_versions": []
+    },
+    {
+      "id": "v1-boot",
+      "track": "M01.V01",
+      "at": 170,
+      "kind": "bootstrap",
+      "label": "V₁ 形成领域",
+      "note": "从探索中形成自己的材料、问题与作品；不预填审核槽位。",
+      "artifact_versions": [],
+      "executor": "研究者-δ"
+    },
+    {
+      "id": "v2-boot",
+      "track": "M01.V02",
+      "at": 185,
+      "kind": "bootstrap",
+      "label": "V₂ 形成领域",
+      "note": "领域身份、实际执行者、当前研究对象分别保留。",
+      "artifact_versions": [],
+      "executor": "研究者-ε"
+    },
+    {
+      "id": "d1-boot",
+      "track": "M01.D01",
+      "at": 205,
+      "kind": "bootstrap",
+      "label": "D₁ 从侦察进入强替代",
+      "note": "先找攻击口，成旗后用研究与试作争取取舍；不要求一开始就有成熟主张。",
+      "artifact_versions": [],
+      "executor": "独立者-β"
+    },
+    {
+      "id": "n2-boot",
+      "track": "M01.N02",
+      "at": 145,
+      "kind": "bootstrap",
+      "label": "N₂ 形成实际问题与方法",
+      "note": "N/R是Main自身工作责任，不是新派出的代理。",
+      "artifact_versions": [],
+      "executor": "Main-α"
+    },
+    {
+      "id": "s1-n2",
+      "track": "M01.S01",
+      "at": 130,
+      "kind": "note",
+      "label": "S₁.n₂：同一来源问题的新推进",
+      "note": "一个S工作面可以使用多个URL，n不是网址计数。",
+      "artifact_versions": [
+        "原件P@1"
+      ]
+    },
+    {
+      "id": "v1-return",
+      "track": "M01.V01",
+      "at": 267,
+      "kind": "send",
+      "label": "V₁ 首次回传",
+      "note": "回传不等于领域关闭；该研究仍只针对A@1。",
+      "artifact_versions": [
+        "A@1"
+      ],
+      "display_label": "首次返回",
+      "executor": "研究者-δ",
+      "domain": "uncomparable-clock"
+    },
+    {
+      "id": "v1-recv",
+      "track": "M01",
+      "at": 276,
+      "kind": "receive",
+      "label": "Main收到V₁回传",
+      "note": "保留对方材料性质和不确定性；收到并不自动表示采用。",
+      "artifact_versions": [
+        "A@1"
+      ]
+    },
+    {
+      "id": "candidate-a",
+      "track": "M01.N03",
+      "at": 295,
+      "kind": "candidate",
+      "label": "完整候选 A@1",
+      "note": "一个N可以产生多个版本，版本不是新的N身份。",
+      "artifact_versions": [
+        "A@1"
+      ],
+      "display_label": "A@1"
+    },
+    {
+      "id": "s1-reopen",
+      "track": "M01.S01",
+      "at": 305,
+      "kind": "reenter",
+      "label": "S₁.r₁：追查冲突",
+      "note": "同一来源工作面重新研究结论或方法，保留原来问题。",
+      "artifact_versions": [
+        "原件P@2"
+      ]
+    },
+    {
+      "id": "d1-return",
+      "track": "M01.D01",
+      "at": 342,
+      "kind": "send",
+      "label": "D₁ 返回竞争稿",
+      "note": "返回有作品、条件和代价，不由代理结束自动计为已落实。",
+      "artifact_versions": [
+        "竞争稿B@1"
+      ]
+    },
+    {
+      "id": "d1-receive",
+      "track": "M01",
+      "at": 352,
+      "kind": "receive",
+      "label": "Main收到D₁完整介入",
+      "note": "将进入对中心主张的实际处理。",
+      "artifact_versions": [
+        "竞争稿B@1"
+      ]
+    },
+    {
+      "id": "d2-return",
+      "track": "M01.D02",
+      "at": 367,
+      "kind": "send",
+      "label": "D₂ 返回强替代",
+      "note": "不同竞争路线也可经过认真比较后有据不采纳。",
+      "artifact_versions": [
+        "竞争稿C@1"
+      ]
+    },
+    {
+      "id": "choose-b",
+      "track": "M01",
+      "at": 392,
+      "kind": "decision",
+      "label": "决定：采用D₁的中心改变",
+      "note": "取舍有据；决定尚未等同作品中已经发生改变。",
+      "artifact_versions": [
+        "竞争稿B@1"
+      ],
+      "display_label": "决定"
+    },
+    {
+      "id": "keep-d2",
+      "track": "M01",
+      "at": 412,
+      "kind": "decision",
+      "label": "决定：有据不采纳D₂",
+      "note": "有充分研究且Main处理过的D，即使未采纳，也可能完成责任；不画失败红叉。",
+      "artifact_versions": [
+        "竞争稿C@1"
+      ]
+    },
+    {
+      "id": "applied",
+      "track": "M01.N04",
+      "at": 468,
+      "kind": "apply",
+      "label": "落实：新稿 A@2",
+      "note": "实际产物已改变；与先前收到、决定分别落点。",
+      "artifact_versions": [
+        "A@2"
+      ],
+      "display_label": "落实 A@2"
+    },
+    {
+      "id": "v1-reenter",
+      "track": "M01.V01",
+      "at": 480,
+      "kind": "reenter",
+      "label": "V₁.2：针对A@2同线再入",
+      "note": "同一领域重新研究新版本；没有新增V身份。",
+      "artifact_versions": [
+        "A@2"
+      ],
+      "display_label": "同线再入",
+      "executor": "研究者-δ"
+    },
+    {
+      "id": "v1-return2",
+      "track": "M01.V01",
+      "at": 533,
+      "kind": "send",
+      "label": "V₁ 第二次返回",
+      "note": "新的研究针对A@2，不能把初次A@1回传当作读过新版。",
+      "artifact_versions": [
+        "A@2"
+      ]
+    },
+    {
+      "id": "v2-change",
+      "track": "M01.V02",
+      "at": 505,
+      "kind": "reenter",
+      "label": "V₂ 延续，实际执行者变化",
+      "note": "保持领域标识并不证明同一个代理或同一输入；这里另写执行者。",
+      "artifact_versions": [
+        "领域作品@2"
+      ],
+      "executor": "研究者-ζ"
+    },
+    {
+      "id": "r2-boot",
+      "track": "M01.R02",
+      "at": 550,
+      "kind": "bootstrap",
+      "label": "R₂ 形成新的整体重开问题",
+      "note": "引用旧版本来研究将来的新工作；不把执行箭头画成向过去倒流。",
+      "artifact_versions": [
+        "A@2"
+      ],
+      "executor": "Main-α"
+    },
+    {
+      "id": "final-choice",
+      "track": "M01",
+      "at": 621,
+      "kind": "decision",
+      "label": "综合：保留更好的整体",
+      "note": "可以选一条整体，也可吸收局部；不是平均合并所有返回。",
+      "artifact_versions": [
+        "A@3"
+      ]
+    },
+    {
+      "id": "v1-close",
+      "track": "M01.V01",
+      "at": 651,
+      "kind": "close",
+      "label": "V₁ 本轮线路关闭",
+      "note": "仅在实际决定收窄或关闭后标记；首次返回不是关闭。",
+      "artifact_versions": []
+    },
+    {
+      "id": "return",
+      "track": "M01",
+      "at": 710,
+      "kind": "apply",
+      "label": "返回：成品、入口、依据与限制",
+      "note": "图形帮助定位事实，不认证责任数、掌握或跨任务收益。",
+      "artifact_versions": [
+        "A@3"
+      ],
+      "display_label": "交付"
+    }
+  ],
+  "links": [
+    {
+      "from": "council-b",
+      "to": "v1-boot",
+      "kind": "handling",
+      "overview": false
+    },
+    {
+      "from": "v1-return",
+      "to": "v1-recv",
+      "kind": "message",
+      "overview": false
+    },
+    {
+      "from": "d1-return",
+      "to": "d1-receive",
+      "kind": "message",
+      "overview": true
+    },
+    {
+      "from": "d1-receive",
+      "to": "choose-b",
+      "kind": "handling",
+      "overview": true
+    },
+    {
+      "from": "choose-b",
+      "to": "applied",
+      "kind": "application",
+      "overview": true
+    },
+    {
+      "from": "d2-return",
+      "to": "keep-d2",
+      "kind": "handling",
+      "overview": false
+    },
+    {
+      "from": "applied",
+      "to": "v1-reenter",
+      "kind": "reference",
+      "overview": false
+    },
+    {
+      "from": "v1-return2",
+      "to": "r2-boot",
+      "kind": "handling",
+      "overview": false
+    },
+    {
+      "from": "candidate-a",
+      "to": "r2-boot",
+      "kind": "reference",
+      "overview": false
+    },
+    {
+      "from": "final-choice",
+      "to": "return",
+      "kind": "application",
+      "overview": false
+    }
+  ],
+  "highlights": [
+    {
+      "label": "D₁：返回342秒 → 收到352秒 → 采用392秒 → 落实468秒（A@2）。",
+      "events": [
+        "d1-return",
+        "d1-receive",
+        "choose-b",
+        "applied"
+      ]
+    },
+    {
+      "label": "D₂：强替代经研究后有据未采纳；这不等于该介入失败。",
+      "events": [
+        "d2-return",
+        "keep-d2"
+      ]
+    },
+    {
+      "label": "V₁：初次针对A@1；新稿A@2出现后同线再入，首次返回不关闭领域。",
+      "events": [
+        "v1-return",
+        "v1-reenter",
+        "v1-return2",
+        "v1-close"
+      ]
+    }
+  ]
+}
