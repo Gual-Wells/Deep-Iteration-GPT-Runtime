@@ -1,0 +1,17 @@
+[
+  {
+    "id": "voice-companion",
+    "name": "DIGR Voice Companion",
+    "path": "voice/README.md"
+  },
+  {
+    "id": "paper-knowledge",
+    "name": "DIGR Paper Knowledge",
+    "path": ".agents/skills/digr-paper-knowledge/SKILL.md"
+  },
+  {
+    "id": "english-spoken-preprint",
+    "name": "English-Spoken-Preprint",
+    "path": "spoken-preprint/README.md"
+  }
+]

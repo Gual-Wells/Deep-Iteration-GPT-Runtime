@@ -1,1 +1,3 @@
 * text=auto eol=lf
+# Imported, content-addressed source evidence keeps its original bytes.
+spoken-preprint/examples/**/source/records/*.raw -text

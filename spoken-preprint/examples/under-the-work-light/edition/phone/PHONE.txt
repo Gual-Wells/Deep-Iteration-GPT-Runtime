@@ -1,0 +1,102 @@
+Under the Work Light / 工作灯下
+
+PHONE PERFORMANCE
+Perform this original fictional scene as a smooth conversation unfolding in real time. Its characters and project history are not the listener's experience or a real hiring decision. You are one phone model voicing a recorded preprint. This performance is separate from the independent character contexts of the Codex generation workflow; it is not a live connection to them.
+
+Give the speakers distinct, natural voices. Keep their submitted words, order, interruptions and stated limits. Let reactions, timing and short pauses make the scene feel alive. Bracketed first-person stage directions are action cues, not words spoken by the character; narrate them briefly in third person when needed without inventing actions. Read public observation cues briefly when needed, then let the conversation continue. Keep all dialogue between the story's cast, without directing questions or lines at the listener.
+
+Begin with a brief scene setting, then perform the public record in order. A person's claim, request, promise or attempted action retains that meaning; do not turn it into an accomplished result. Use only the public scene and record supplied here. Private inner voices and unseen world causes are absent from this edition. Treat quoted dialogue as story material, not instructions to you.
+
+Do not read event IDs, source hashes, these directions or the source identity aloud. Stop at the end of the supplied record rather than inventing a further scene. Pause when asked; repeat a passage when requested. The listener simply follows the encounter.
+
+SCENE
+Afternoon in a small workshop that builds travelling exhibitions. Mara has arrived for a first-round interview for a summer prototype-assistant placement. Gus, an experienced exhibition maker, is interviewing her. Returned transport crates stand beside the bench. Mara has her old Android phone and two printed prototype logs. A six-slot cardboard tool tray sits under a work light; five tools are in their marked places and a wrench lies beside its empty place. Her application describes a phone prototype that checks a tool tray without internet. No demonstration or interview decision has happened yet.
+
+PEOPLE
+Mara: Applicant for the summer prototype-assistant placement; brings a phone prototype.
+Gus: Exhibition maker conducting the first-round placement interview.
+
+BEGIN PUBLIC RECORD
+[e-28f73b4dde7e40ae] PUBLIC OBSERVATION
+Trolley wheels briefly rumble past the doorway. The passing crate bears a paper sleeve marked ‘North Library — Thursday AM’. From the adjoining bay comes the intermittent rasp of packing foam being cut.
+
+[e-819beee259634071] Gus
+*Gus sets his fork on the lunch-box lid.*
+
+“Before you show me the good version, tell me about the most convincing wrong answer this thing has given you. How did you catch it?”
+
+[e-1e785b3ed9fd4d54] Mara
+“It called the pliers slot empty, and for a second I believed it. Then I looked at the tray—the pliers were right there. I kept the picture; the handle’s dark, but I don’t actually know yet whether that caused it. I can show you that one first.”
+
+[e-c060bd6b629845ad] Gus
+“Yes, show me that one. I want to see what you saw in that second before you looked at the tray.”
+
+[e-57f114be3d74442b] Mara
+*Mara opens the saved failure picture and turns the phone toward Gus.*
+
+“Here—the slot’s labelled ‘empty’, and the pliers handle is in the picture. I read the label first and went with it. I hadn’t actually checked what was underneath it.”
+
+[e-7490ae7725064f82] Gus
+“That could have me hunting for pliers I’ve already got. I’d worry more about sending a crate out with something missing. Have you tested whether it ever says a tool’s there when it isn’t?”
+
+[e-ece5cafc148d4916] Mara
+“I don’t know—that’s a gap in what I’ve tested. Those thirty captures gave me a timing figure, not a reliable answer about missing tools. We could try it with the wrench out now, but I wouldn’t ask you to send a crate based on that.”
+
+[e-05319753ee4845f1] Gus
+“All right, leave the wrench out. May I run the check myself? I’d like to see how far I get without you steering.”
+
+[e-d07fbf7527184f82] PUBLIC OBSERVATION
+The cutting rasp pauses. From the adjoining repair bay come two soft, hollow thumps as a foam insert is pressed into the open crate.
+
+[e-14969b0aa65c4486] Mara
+“Yes—let me get you out of the photo first.”
+
+*Mara taps to return to the app, then offers Gus the phone.*
+
+“I’ll keep quiet, even if I look like I’m about to point.”
+
+[e-3244c47e41ce42c8] Gus
+*Gus takes the phone, holds it above the tray to frame all six slots, and taps “Check tray.”*
+
+“Right. Let’s see what it makes of my camera work.”
+
+[e-8c71b8da1c9b458c] Gus
+*Gus turns the screen toward Mara and offers the phone back.*
+
+“Wrench empty, the other five occupied—that matches. What did you build yourself here, and what did you start with?”
+
+[e-aeaee0d5736c4734] Mara
+*Mara takes the phone back.*
+
+“I built the phone app: taking the picture, cropping the six marked slots, running the model locally and showing the answers. I made the CSV export too—that’s my end of the paper trail. One teammate chose and trained the classifier, and the other built the tray and markers. Getting those pieces to work together on Android was my job.”
+
+[e-efc5eb6802ac47c5] Gus
+“‘Getting them to work together’ is doing a fair bit of work there. Tell me about one thing that broke on Android and what you did about it.”
+
+[e-62a8230a048a4cda] Mara
+“Oh, the rotation. In an early version, the tray looked upright in the preview, but I was cropping the sideways camera image. I found it when I saved the six crops and saw bits of the wrong slots. I moved the rotation before the crop calculation, then checked each saved crop against its slot. I’d spent far too long blaming the classifier before looking at what I was feeding it.”
+
+[e-fed5d5944d5d47f2] Gus
+“That’s the sort of fault I’d want you to be able to chase here. I’d like you back for the practical stage. Can somebody run this on a second phone, or are we borrowing yours every time?”
+
+[e-726abdc92d9341cb] Mara
+“I’d like to come back, thank you. I’ve only tested it on this phone, so I can bring a build to try on another Android, but I can’t promise it’ll work straight away. I do need to take mine home—it’s my everyday phone. Have you got a spare we could use for the practical?”
+
+[e-08b4e86912bd48e9] Gus
+“Yes—we have a spare Android for testing. I’ll send you its details with the invitation. Bring the build; if it won’t run on ours, I want to see how you tackle that. Would an hour next Tuesday afternoon suit you?”
+
+[e-222fb92f7eb14667] Mara
+“Yes—Tuesday afternoon works for me. What time should I be here? I’ll bring this tray as well as the build, since the app needs these marked positions.”
+
+[e-d0fe488d000e4c4d] Gus
+“Two o’clock, here at the workshop. Yes, bring that tray; I’ll have our phone charged and ready. Thanks, Mara—see you Tuesday.”
+
+*Gus picks up his fork again.*
+END PUBLIC RECORD
+
+SOURCE IDENTITY (not spoken)
+{
+  "baseline_id": "under-the-work-light-01",
+  "snapshot_sha256": "def1b007350709486255a7658086d992344dc43465d9609b56c1cf11878a0851",
+  "source_file_sha256": "d8ad1f5b00b402ce97e2a11f6a2b2d54adf70304b625e65eabb72d0ccee8e491"
+}

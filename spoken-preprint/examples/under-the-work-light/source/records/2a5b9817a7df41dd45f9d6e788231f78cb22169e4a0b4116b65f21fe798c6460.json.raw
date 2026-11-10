@@ -1,0 +1,4 @@
+{
+  "actual_native_return": "“Oh, the rotation. In an early version, the tray looked upright in the preview, but I was cropping the sideways camera image. I found it when I saved the six crops and saw bits of the wrong slots. I moved the rotation before the crop calculation, then checked each saved crop against its slot. I’d spent far too long blaming the classifier before looking at what I was feeding it.”",
+  "executor": "/root/worklight_mara_outward"
+}

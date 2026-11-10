@@ -1,0 +1,16 @@
+{
+  "proposal": "Make the existing saved failure picture directly visible to Gus.",
+  "decision_suggestion": "apply",
+  "changes": {
+    "phone_display": "Saved failure picture showing the pliers handle present and its slot labelled ‘empty’."
+  },
+  "percepts": [
+    {
+      "to": [
+        "gus"
+      ],
+      "text": "On the phone screen turned toward you, the saved picture shows the dark pliers handle present and an ‘empty’ label for its slot."
+    }
+  ],
+  "reason": "Mara has opened and presented the saved picture. This exposes the established contradiction without specifying label placement, explaining the failure, or introducing a fresh run."
+}

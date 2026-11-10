@@ -1,0 +1,18 @@
+{
+  "proposal": "The outgoing photograph and message are delivered, without an immediate reply.",
+  "decision_suggestion": "apply",
+  "changes": {
+    "idris.message_to_nephew.status": "delivered",
+    "idris.message_to_nephew.read_receipt": "not displayed",
+    "idris.message_to_nephew.reply": "none yet"
+  },
+  "percepts": [
+    {
+      "to": [
+        "idris"
+      ],
+      "text": "“Delivered” appears beneath your outgoing photograph and message. No read marker or reply is visible."
+    }
+  ],
+  "reason": "Sending now has a bounded external result. Delivery establishes neither that the nephew has read the message nor that he will collect the chair."
+}

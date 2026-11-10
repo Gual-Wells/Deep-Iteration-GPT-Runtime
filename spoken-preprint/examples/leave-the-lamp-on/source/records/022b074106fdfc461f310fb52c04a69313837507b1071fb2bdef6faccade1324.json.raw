@@ -1,0 +1,15 @@
+{
+  "decision_suggestion": "apply",
+  "changes": {
+    "next_door_business": "Its keeper is closing for the evening; no involvement with the chair is established."
+  },
+  "percepts": [
+    {
+      "to": [
+        "public"
+      ],
+      "text": "Outside, a neighbouring shutter rattles down. Someone calls farther along the canal, “See you tomorrow!”"
+    }
+  ],
+  "reason": "Ordinary neighbouring life continues without interrupting the arrival or resolving the unconfirmed chair collection."
+}

@@ -1,0 +1,18 @@
+{
+  "id": "english-spoken-preprint",
+  "name": "English-Spoken-Preprint",
+  "version": "0.1.0",
+  "status": "first-release",
+  "entry": "spoken-preprint/README.md",
+  "skill": ".agents/skills/digr-spoken-preprint/SKILL.md",
+  "cli": "tools/codex.py preprint",
+  "data_schema": 1,
+  "actions": {
+    "generate": {"requires": ["actual native independent contexts", "controlled character views", "source workspace", "Python 3.10+"]},
+    "publish_verify": {"requires": ["valid source snapshot", "Python 3.10+ standard library"]},
+    "listen_on_phone": {"requires": ["frontstage phone package", "host capable of reading files and actual voice enactment"]}
+  },
+  "optional_relations": {"voice-companion": "separately requested voice help", "paper-knowledge": "source/use/evidence design reference; no private pool import"},
+  "core": {"relationship": "adjunct; no routing or execution authority", "construction_profile": "0.8.0@ca5d6083edb0f60c8167ba16a78d45970d68c3fd"},
+  "capability_note": "Requirements are declarations, not host detection or mobile verification."
+}

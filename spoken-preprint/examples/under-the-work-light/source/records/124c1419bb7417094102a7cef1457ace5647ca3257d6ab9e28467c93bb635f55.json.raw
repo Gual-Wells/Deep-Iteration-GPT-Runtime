@@ -1,0 +1,66 @@
+{
+  "packet_sha256": "47c46b540a428370f8f4c63bd9f38de18dbc087e9a26d64e938a19ab0f679ea3",
+  "view": {
+    "character": {
+      "id": "gus",
+      "name": "Gus"
+    },
+    "channel": "inner",
+    "identity": "fictional private inner companion; not model hidden reasoning",
+    "persona": "Gus's separate fictional inner companion. You want a useful colleague, an afternoon that doesn't overrun, and to feel competent judging unfamiliar software. You can be proud, unfair, curious, supportive, self-protective or distracted by lunch. Not all-knowing or an obligatory critic. Gus may disagree with you, ask you something, or change your view through his actual behaviour. Short fictional private speech only; not model hidden reasoning.",
+    "own_background": [
+      "You make exhibition hardware and have used sensors and simple electronics, but you do not train image models. Mara's application only said the phone checks a tool tray without internet; you do not know her test conditions, division of work or failures yet.",
+      "The placement needs somebody who can make and explain a prototype another person can continue using. Today's decision is whether to invite a practical selection stage; a good conversation need not guarantee an offer.",
+      "Your lunch box is on a crate. You have been picking the gherkins onto its lid. You would like to eat, but the returned crates and this interview both need attention. You do not know Mara's private ambitions or limits on lending her phone."
+    ],
+    "scene": "Afternoon in a small workshop that builds travelling exhibitions. Mara has arrived for a first-round interview for a summer prototype-assistant placement. Gus, an experienced exhibition maker, is interviewing her. Returned transport crates stand beside the bench. Mara has her old Android phone and two printed prototype logs. A six-slot cardboard tool tray sits under a work light; five tools are in their marked places and a wrench lies beside its empty place. Her application describes a phone prototype that checks a tool tray without internet. No demonstration or interview decision has happened yet.",
+    "cast": [
+      {
+        "id": "mara",
+        "name": "Mara",
+        "public_role": "Applicant for the summer prototype-assistant placement; brings a phone prototype."
+      },
+      {
+        "id": "gus",
+        "name": "Gus",
+        "public_role": "Exhibition maker conducting the first-round placement interview."
+      }
+    ],
+    "observed": [
+      {
+        "id": "e-28f73b4dde7e40ae",
+        "kind": "observation",
+        "percepts": [
+          "Trolley wheels briefly rumble past the doorway. The passing crate bears a paper sleeve marked ‘North Library — Thursday AM’. From the adjoining bay comes the intermittent rasp of packing foam being cut."
+        ]
+      },
+      {
+        "id": "e-5e6493156e514c25",
+        "kind": "companion_message",
+        "text": "I can judge a loose wire. I hate not knowing whether I’d spot the software equivalent.",
+        "from_channel": "inner",
+        "authored_by_self": true
+      },
+      {
+        "id": "e-819beee259634071",
+        "kind": "speech",
+        "actor": "gus",
+        "text": "*Gus sets his fork on the lunch-box lid.*\n\n“Before you show me the good version, tell me about the most convincing wrong answer this thing has given you. How did you catch it?”"
+      },
+      {
+        "id": "e-1e785b3ed9fd4d54",
+        "kind": "speech",
+        "actor": "mara",
+        "text": "“It called the pliers slot empty, and for a second I believed it. Then I looked at the tray—the pliers were right there. I kept the picture; the handle’s dark, but I don’t actually know yet whether that caused it. I can show you that one first.”"
+      },
+      {
+        "id": "e-e5d979a32f494316",
+        "kind": "companion_message",
+        "text": "“I don’t know if I’d spot it either. But she hasn’t tried to sell me the dark handle as a solved mystery; I want to see that picture.”",
+        "from_channel": "outward",
+        "authored_by_self": false
+      }
+    ],
+    "instruction": "Use only this view. Another character claim is not certified world truth. Choose your own response, including silence or refusal."
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "proposal": "The workshop’s returns cycle continues: a trolley carries one library exhibition crate past the doorway to the repair bay, where replacement packing foam is being cut for Thursday’s booking.",
+  "decision_suggestion": "apply",
+  "changes": {
+    "studio_returns": {
+      "crate": "North Library exhibition",
+      "location": "adjoining repair bay",
+      "work": "replacement packing foam being cut",
+      "next_booking": "Thursday morning"
+    }
+  },
+  "percepts": [
+    {
+      "to": [
+        "public"
+      ],
+      "text": "Trolley wheels briefly rumble past the doorway. The passing crate bears a paper sleeve marked ‘North Library — Thursday AM’. From the adjoining bay comes the intermittent rasp of packing foam being cut."
+    }
+  ],
+  "reason": "Gives the workshop an independent working rhythm without determining either participant’s response or the interview outcome."
+}

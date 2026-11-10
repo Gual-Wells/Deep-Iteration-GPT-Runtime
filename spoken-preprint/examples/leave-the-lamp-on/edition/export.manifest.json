@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "kind": "english-spoken-preprint-export",
+  "source": {
+    "baseline_id": "leave-the-lamp-on-01",
+    "snapshot_sha256": "19de995bbb85e4f571ef1c548ad3e4f4658cfc0e6699f774cb7cd155e1d27872",
+    "source_file_sha256": "81193cf2d8db147089000d0eca6b7bb2f0d9cca8d4f8326caf12fd15285dc1c8"
+  },
+  "files": {
+    "phone/LISTEN.md": "f9c95ca94b03c686092f0dbd6b4754ea920eea69f8402542cdb2bed7d993485b",
+    "phone/PHONE.txt": "cb7efc544bc8736cc5783c1cd315203d694bcbdc13c96311ca16de7531630e3c",
+    "CREATOR.md": "4956231ee0baf4318938b6cfed2a52a75aa2465e03d2de9d554193eb647258f6",
+    "phone/PUBLIC-REVIEW.md": "71d80d7dccf30abcb148f34c53d74dbf3194459a2ec6fbeed84c9835854a2bbd"
+  },
+  "phone_files": [
+    "phone/LISTEN.md",
+    "phone/PHONE.txt",
+    "phone/PUBLIC-REVIEW.md"
+  ],
+  "creator_file": "CREATOR.md",
+  "limits": "File integrity and source binding only; no semantic, rights, native-host, phone/Voice or learning-effect certification. The manifest does not hash itself."
+}

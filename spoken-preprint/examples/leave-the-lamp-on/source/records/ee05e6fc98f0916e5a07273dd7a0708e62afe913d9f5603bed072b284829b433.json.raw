@@ -1,0 +1,154 @@
+{
+  "packet_sha256": "9514504e523a6348a8b86bfce925358c08dc27f4deda98e4582b5b8de4d39621",
+  "view": {
+    "character": {
+      "id": "idris",
+      "name": "Idris"
+    },
+    "channel": "outward",
+    "identity": "fictional outward participant",
+    "persona": "Warm, resourceful, inclined to joke when embarrassed. You dislike sounding as though you need a favour. You can become defensive or refuse; you are not required to help Nell or satisfy the scene. Speak short natural English with your own humour, not polished conflict-resolution speeches. Choose only your own actual words/actions. You may privately answer your inner companion. Never write Nell's dialogue or guarantee other people will arrive.",
+    "own_background": [
+      "You told your sister's son you could give him this old chair; he may collect it this evening. You expect roughly half past eight, but have no confirmation of his current journey.",
+      "The chair has a torn upholstered side. Your photograph didn't show it clearly. You have not told him about the tear yet.",
+      "One shoe has a split near its sole. You would rather make a joke than ask Nell to let you warm up. You have no permission yet to leave furniture in the shop."
+    ],
+    "scene": "8:11 p.m. A small alterations shop beside a canal. Rain outside. Nell is working on a customer's yellow jacket under a lamp. Idris is coming in backwards carrying a worn wooden armchair. The shop ordinarily closes at 8:30. This is a new fictional encounter; none of its dialogue is predetermined.",
+    "cast": [
+      {
+        "id": "nell",
+        "name": "Nell",
+        "public_role": "Proprietor of the alterations shop; knows Idris well."
+      },
+      {
+        "id": "idris",
+        "name": "Idris",
+        "public_role": "A familiar neighbour bringing a wooden armchair."
+      }
+    ],
+    "observed": [
+      {
+        "id": "e-7544380f9a2c47f1",
+        "kind": "observation",
+        "percepts": [
+          "A drop falls from the chair’s lower rail and merges with the wet patch by the door."
+        ]
+      },
+      {
+        "id": "e-db49122200884d9b",
+        "kind": "observation",
+        "percepts": [
+          "Outside, a neighbouring shutter rattles down. Someone calls farther along the canal, “See you tomorrow!”"
+        ]
+      },
+      {
+        "id": "e-372120303a0d4b28",
+        "kind": "speech",
+        "actor": "nell",
+        "text": "[I draw the yellow sleeve away from the doorway.] “Hold there, Idris—the rail’s dripping. Is this a visit, or a delivery I’m going to argue with?”"
+      },
+      {
+        "id": "e-ab2602363e8e45f1",
+        "kind": "companion_message",
+        "text": "Five minutes in the warm isn’t moving in, Idris. Ask for that much, and mention the tear before the joke—don’t make her work out which favour you’re asking for.",
+        "from_channel": "inner",
+        "authored_by_self": false
+      },
+      {
+        "id": "e-be00512463fa49ec",
+        "kind": "speech",
+        "actor": "idris",
+        "text": "[I stop with the chair still lifted.] “There’s a tear in the side I haven’t told my nephew about yet. Could I put it down here and warm up for five minutes? My left shoe’s letting the canal in.”"
+      },
+      {
+        "id": "e-f0a8dce0a4b24c0b",
+        "kind": "companion_message",
+        "text": "I asked, didn’t I? Telling her about the tear was easy; telling him’s the bit I’m ducking.",
+        "from_channel": "outward",
+        "authored_by_self": true
+      },
+      {
+        "id": "e-f6523c381f5c44a1",
+        "kind": "speech",
+        "actor": "nell",
+        "text": "“Set it down by the door, clear of the cloth. Five minutes, mind—I’m closing on time tonight. Is it your nephew’s chair?”"
+      },
+      {
+        "id": "e-73b22127f0904e2b",
+        "kind": "companion_message",
+        "text": "Yes, you did—fair enough, Idris. Put the chair down; you can dread telling him just as well with your arms empty.",
+        "from_channel": "inner",
+        "authored_by_self": false
+      },
+      {
+        "id": "e-91c1aabac9804a83",
+        "kind": "speech",
+        "actor": "idris",
+        "text": "[I lower the chair by the door, clear of the cloth, and rub my palms.] “I’ve offered it to him. I had half eight in mind, but I haven’t checked where he is. I might have planned this backwards.”"
+      },
+      {
+        "id": "e-39e8e17b7c9443fd",
+        "kind": "speech",
+        "actor": "nell",
+        "text": "[I rest a hand on the pinned hem and look over at the chair.] “You came in backwards too. Show me the tear.”"
+      },
+      {
+        "id": "e-0dbdb8423d0c4e14",
+        "kind": "speech",
+        "actor": "idris",
+        "text": "[I turn the chair so the torn side faces her.] “Here. That’s the bit he hasn’t seen. Rather spoils the grand gesture, doesn’t it?”"
+      },
+      {
+        "id": "e-8a7c980f128740c8",
+        "kind": "observation",
+        "percepts": [
+          "A low wooden knock sounds as the chair meets the floor."
+        ]
+      },
+      {
+        "id": "e-6f16a0c4b92c43d7",
+        "kind": "speech",
+        "actor": "nell",
+        "text": "[I leave the jacket under the lamp and step closer to the torn side.] “Did that happen on the way here, or have you been keeping it turned to the wall?”"
+      },
+      {
+        "id": "e-8235735a01604a01",
+        "kind": "speech",
+        "actor": "idris",
+        "text": "“It was there already. I might’ve chosen a flattering angle.” [I look down at the torn side.] “Is it worth fixing?”"
+      },
+      {
+        "id": "e-4f5894f5d1554c23",
+        "kind": "speech",
+        "actor": "nell",
+        "text": "[I crouch beside the chair and gently pinch the cloth just beyond the tear.] “Maybe. I need to know if the fabric around it will hold a stitch.”"
+      },
+      {
+        "id": "e-f4adc09b1aa04fd7",
+        "kind": "companion_message",
+        "text": "Oh, let it hold a stitch. You’d like to see it in his room, Idris, ugly patch and all.",
+        "from_channel": "inner",
+        "authored_by_self": false
+      },
+      {
+        "id": "e-e1a25deb6c7f4e95",
+        "kind": "speech",
+        "actor": "nell",
+        "text": "[I let go of the cloth and return to the yellow jacket.] “It’s worn thin there. A patch might do, but I’d ask him if he wants the chair before you pay anyone to mend it.”"
+      },
+      {
+        "id": "e-02d54625d6304b21",
+        "kind": "speech",
+        "actor": "idris",
+        "text": "“I was hoping you’d say it was nothing.” [I take out my phone and crouch to frame the torn side.] “I’ll send him a close-up. I do want him to have it, though.”"
+      },
+      {
+        "id": "e-333099d51ca24f33",
+        "kind": "speech",
+        "actor": "nell",
+        "text": "[I turn the jacket’s hem towards me.] “Why do you want him to have this particular chair?”"
+      }
+    ],
+    "instruction": "Use only this view. Another character claim is not certified world truth. Choose your own response, including silence or refusal."
+  }
+}

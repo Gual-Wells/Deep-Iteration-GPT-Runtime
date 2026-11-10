@@ -1,0 +1,800 @@
+{
+  "schema_version": 1,
+  "kind": "english-spoken-preprint-native-sources",
+  "source": {
+    "file": "preprint.json",
+    "baseline_id": "under-the-work-light-01",
+    "snapshot_sha256": "def1b007350709486255a7658086d992344dc43465d9609b56c1cf11878a0851",
+    "source_file_sha256": "d8ad1f5b00b402ce97e2a11f6a2b2d54adf70304b625e65eabb72d0ccee8e491"
+  },
+  "records": {
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\material-g0.json": {
+      "path": "records/e8e5b3cd39d393ef30a0f1a7b635c8875d4ca92ffb40a3ef266289804b0e084a.json.raw",
+      "sha256": "e8e5b3cd39d393ef30a0f1a7b635c8875d4ca92ffb40a3ef266289804b0e084a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-12f4ad0b9eb146cd",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\material-g0.json": {
+      "path": "records/b3a7b091adfea4aec96c3f545691a67115cbe10971e2c18dc9163b73947d64cb.json.raw",
+      "sha256": "b3a7b091adfea4aec96c3f545691a67115cbe10971e2c18dc9163b73947d64cb",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-12f4ad0b9eb146cd",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\studio-g0.json": {
+      "path": "records/17e6e2d6910989b40080f58d7adb1953def7797023ee6da137df298ecb334321.json.raw",
+      "sha256": "17e6e2d6910989b40080f58d7adb1953def7797023ee6da137df298ecb334321",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-28f73b4dde7e40ae",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\studio-g0.json": {
+      "path": "records/365d47e97c25c40f47217c0a3ad695ae99cf20953da45d529c70acfa460dc25b.json.raw",
+      "sha256": "365d47e97c25c40f47217c0a3ad695ae99cf20953da45d529c70acfa460dc25b",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-28f73b4dde7e40ae",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-d01.json": {
+      "path": "records/99c53ac0b2228575469924a3fc649ea307b0fd9a83e320627632cdd828d75dc4.json.raw",
+      "sha256": "99c53ac0b2228575469924a3fc649ea307b0fd9a83e320627632cdd828d75dc4",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-5e6493156e514c25",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-d01.json": {
+      "path": "records/bdc2c8fbf4e7ae3334f61d16254100a5009d0920275698d38470e827a1067bc6.json.raw",
+      "sha256": "bdc2c8fbf4e7ae3334f61d16254100a5009d0920275698d38470e827a1067bc6",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-5e6493156e514c25",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-d01.json": {
+      "path": "records/d3cb0c00578492f9f7a4b6266a5e22eec5688cc60115a897cd1bd060a13e611a.json.raw",
+      "sha256": "d3cb0c00578492f9f7a4b6266a5e22eec5688cc60115a897cd1bd060a13e611a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-b675012adc064b89",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-d01.json": {
+      "path": "records/fddf03f99a89c3ce2bfcdc9048509f3daeda8bda017f34041df7795138427356.json.raw",
+      "sha256": "fddf03f99a89c3ce2bfcdc9048509f3daeda8bda017f34041df7795138427356",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-b675012adc064b89",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m01.json": {
+      "path": "records/d3a07c01f4a6cf0cfb1f251d2120632677720710fc9977314df9ace22b3d0e7d.json.raw",
+      "sha256": "d3a07c01f4a6cf0cfb1f251d2120632677720710fc9977314df9ace22b3d0e7d",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-819beee259634071",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m01.json": {
+      "path": "records/5dfb1b3cf0e6fa15d8e6248cd9a0a49585d15219fb9359a2fd03ad8c7cacc287.json.raw",
+      "sha256": "5dfb1b3cf0e6fa15d8e6248cd9a0a49585d15219fb9359a2fd03ad8c7cacc287",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-819beee259634071",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m01.json": {
+      "path": "records/fac2ff900ff5f941e74695a3929867ea65edf36dc9aba956c14d9a9e94dde988.json.raw",
+      "sha256": "fac2ff900ff5f941e74695a3929867ea65edf36dc9aba956c14d9a9e94dde988",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-1e785b3ed9fd4d54",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m01.json": {
+      "path": "records/0991f38ad4514c0a04b79068809746981a0419cb51de6da1554a53f361260288.json.raw",
+      "sha256": "0991f38ad4514c0a04b79068809746981a0419cb51de6da1554a53f361260288",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-1e785b3ed9fd4d54",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-private01.json": {
+      "path": "records/a0593b59785d5ee78759c07f3d8d0e4fe84c4de5d3709c8da54b7985e81c1c79.json.raw",
+      "sha256": "a0593b59785d5ee78759c07f3d8d0e4fe84c4de5d3709c8da54b7985e81c1c79",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-e5d979a32f494316",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-private01.json": {
+      "path": "records/59eda7e08b2cb2ef43331c5b03d41ec72ea711c74a03754a4fee20490f402f51.json.raw",
+      "sha256": "59eda7e08b2cb2ef43331c5b03d41ec72ea711c74a03754a4fee20490f402f51",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-e5d979a32f494316",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-private01.json": {
+      "path": "records/ccfa75deadf4393d085734dfdf28d45817c6d63cd64658519defed5bbe5df072.json.raw",
+      "sha256": "ccfa75deadf4393d085734dfdf28d45817c6d63cd64658519defed5bbe5df072",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-bef316da058448e7",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-private01.json": {
+      "path": "records/8780177960d508dc9d914787b5ee2cb056afa3786e3d6fc92bf6e768d2ffb235.json.raw",
+      "sha256": "8780177960d508dc9d914787b5ee2cb056afa3786e3d6fc92bf6e768d2ffb235",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-bef316da058448e7",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-d02.json": {
+      "path": "records/e0c2b439040acf9b7fef36cea741c226d45fca8ac2127b2c3d7552d4073e63b2.json.raw",
+      "sha256": "e0c2b439040acf9b7fef36cea741c226d45fca8ac2127b2c3d7552d4073e63b2",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-8de4418c048b41e6",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-d02.json": {
+      "path": "records/124c1419bb7417094102a7cef1457ace5647ca3257d6ab9e28467c93bb635f55.json.raw",
+      "sha256": "124c1419bb7417094102a7cef1457ace5647ca3257d6ab9e28467c93bb635f55",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-8de4418c048b41e6",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-d02.json": {
+      "path": "records/acbb1c039e021905869fb29895578f663a63c788661dfa8cf86ac6880b2612b8.json.raw",
+      "sha256": "acbb1c039e021905869fb29895578f663a63c788661dfa8cf86ac6880b2612b8",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-9cb5362cb7404f53",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-d02.json": {
+      "path": "records/fde7f55e1620c5d8606e7bf352670082fc841d437eff0c51b916926d29c17673.json.raw",
+      "sha256": "fde7f55e1620c5d8606e7bf352670082fc841d437eff0c51b916926d29c17673",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-9cb5362cb7404f53",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m02.json": {
+      "path": "records/9b67bb467c8aa9525d58929fa74c42e796b0b3d9db3e23ffe246eda42b5e3981.json.raw",
+      "sha256": "9b67bb467c8aa9525d58929fa74c42e796b0b3d9db3e23ffe246eda42b5e3981",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-c060bd6b629845ad",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m02.json": {
+      "path": "records/de7d942d67e39cc502b89cc90926c9ae87729f14e9bf59cf1c18a651ba0cc406.json.raw",
+      "sha256": "de7d942d67e39cc502b89cc90926c9ae87729f14e9bf59cf1c18a651ba0cc406",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-c060bd6b629845ad",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m02.json": {
+      "path": "records/95be22f1d29b4cd8f4b335b58bb41330be25c12866154ae395c74ead0b9af9e8.json.raw",
+      "sha256": "95be22f1d29b4cd8f4b335b58bb41330be25c12866154ae395c74ead0b9af9e8",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-57f114be3d74442b",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m02.json": {
+      "path": "records/c1bc902e624be40a59b91fe8d8901bc1c6c4b0044ba7d5a1a701ab5788106170.json.raw",
+      "sha256": "c1bc902e624be40a59b91fe8d8901bc1c6c4b0044ba7d5a1a701ab5788106170",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-57f114be3d74442b",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\material-pic.json": {
+      "path": "records/1f35778923785d3914b1e0fd4ff25a2cc2dc6272d659538678ad43a44b4bddff.json.raw",
+      "sha256": "1f35778923785d3914b1e0fd4ff25a2cc2dc6272d659538678ad43a44b4bddff",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-9e898f8dbf99415d",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\material-pic.json": {
+      "path": "records/301f8dc685ac3f2a960d9d4f47f212bad7844f90ab3b97319a02518e9cd74cf4.json.raw",
+      "sha256": "301f8dc685ac3f2a960d9d4f47f212bad7844f90ab3b97319a02518e9cd74cf4",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-9e898f8dbf99415d",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m03.json": {
+      "path": "records/3a7f5a7be7248b2cc2aef11ee57b4f88f19c472056684f6e9869abd72ab89d51.json.raw",
+      "sha256": "3a7f5a7be7248b2cc2aef11ee57b4f88f19c472056684f6e9869abd72ab89d51",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7490ae7725064f82",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m03.json": {
+      "path": "records/7fe7cdda71d7c5fcc3deb288fd710942451a44f7cfaef42b1c62abd87b0d9820.json.raw",
+      "sha256": "7fe7cdda71d7c5fcc3deb288fd710942451a44f7cfaef42b1c62abd87b0d9820",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7490ae7725064f82",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m03.json": {
+      "path": "records/34355052f9ef84b2849bbfeba709def6c476d50a8eac40cf81905f0da0efe7c0.json.raw",
+      "sha256": "34355052f9ef84b2849bbfeba709def6c476d50a8eac40cf81905f0da0efe7c0",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ece5cafc148d4916",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m03.json": {
+      "path": "records/26f3a12b2757ba51058394c8d7c4dcbd5ee27850516e00a85bc20a0a4c72d640.json.raw",
+      "sha256": "26f3a12b2757ba51058394c8d7c4dcbd5ee27850516e00a85bc20a0a4c72d640",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ece5cafc148d4916",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m04.json": {
+      "path": "records/8d3c95a3ec32f097e3ef73d5ea40ad274a1f4f9685deae457f31697f986dc073.json.raw",
+      "sha256": "8d3c95a3ec32f097e3ef73d5ea40ad274a1f4f9685deae457f31697f986dc073",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-05319753ee4845f1",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m04.json": {
+      "path": "records/efc4ab21b0bd58cb8ff6dcba4a6d6cdfcae16409224a935a8f77d020598572d5.json.raw",
+      "sha256": "efc4ab21b0bd58cb8ff6dcba4a6d6cdfcae16409224a935a8f77d020598572d5",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-05319753ee4845f1",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\studio-progress.json": {
+      "path": "records/f20d341e3eb664b5fecca6489158a6488f1bc4451eeb466d9583750a99980efc.json.raw",
+      "sha256": "f20d341e3eb664b5fecca6489158a6488f1bc4451eeb466d9583750a99980efc",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d07fbf7527184f82",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\studio-progress.json": {
+      "path": "records/524708e45cf2c875488eb37b09c7c5563e643d9651653adec49e27ec9b1c509e.json.raw",
+      "sha256": "524708e45cf2c875488eb37b09c7c5563e643d9651653adec49e27ec9b1c509e",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d07fbf7527184f82",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-d03.json": {
+      "path": "records/2a28244fde19848dbf1d21c1f05b76f75cb2058c08eccadd4c1fcdceb55f093e.json.raw",
+      "sha256": "2a28244fde19848dbf1d21c1f05b76f75cb2058c08eccadd4c1fcdceb55f093e",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a06c8b3b4ec548cd",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-d03.json": {
+      "path": "records/7984813d481e9264ee01b075c402fbf8b071c379669a6d0cb9d69156c78d34ab.json.raw",
+      "sha256": "7984813d481e9264ee01b075c402fbf8b071c379669a6d0cb9d69156c78d34ab",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a06c8b3b4ec548cd",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m04.json": {
+      "path": "records/59cfcb15bd4ba6af2ec23ee33923fef904c252703fcf5921dde7f652d34ef145.json.raw",
+      "sha256": "59cfcb15bd4ba6af2ec23ee33923fef904c252703fcf5921dde7f652d34ef145",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-14969b0aa65c4486",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m04.json": {
+      "path": "records/ba5b4ff640f9641497fb0efd3dcaa35ecf821a097032e41e04e463a4943715a7.json.raw",
+      "sha256": "ba5b4ff640f9641497fb0efd3dcaa35ecf821a097032e41e04e463a4943715a7",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-14969b0aa65c4486",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\material-app.json": {
+      "path": "records/9cbf96b07163c11377ddb9e7323bd2c1488329e414ee517423ff69e5fbe31cc7.json.raw",
+      "sha256": "9cbf96b07163c11377ddb9e7323bd2c1488329e414ee517423ff69e5fbe31cc7",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7680b9a10c584eb0",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\material-app.json": {
+      "path": "records/1b6c99ef221eea9281ce1f391ea22333a4afd2f08b1ddecd75e439b7f14ef2ec.json.raw",
+      "sha256": "1b6c99ef221eea9281ce1f391ea22333a4afd2f08b1ddecd75e439b7f14ef2ec",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7680b9a10c584eb0",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m05.json": {
+      "path": "records/8450e16ded6893e528240a5895f59a47d51c94856d746048f4b5c0e81cc5fcf9.json.raw",
+      "sha256": "8450e16ded6893e528240a5895f59a47d51c94856d746048f4b5c0e81cc5fcf9",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-3244c47e41ce42c8",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m05.json": {
+      "path": "records/8a3185169e5063b69efb330cea47e4baac15c763d6ce53c53b648d252b6fb114.json.raw",
+      "sha256": "8a3185169e5063b69efb330cea47e4baac15c763d6ce53c53b648d252b6fb114",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-3244c47e41ce42c8",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\material-check.json": {
+      "path": "records/c83f3621eba05bbd2a53bd4b44592913cb8400ec9d7e396adae6894409f77c5b.json.raw",
+      "sha256": "c83f3621eba05bbd2a53bd4b44592913cb8400ec9d7e396adae6894409f77c5b",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-82ac9970f81b4b74",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\material-check.json": {
+      "path": "records/bbe96b8adebba9545aa282204cab748d48f3735482a86f257c425b9f653c5063.json.raw",
+      "sha256": "bbe96b8adebba9545aa282204cab748d48f3735482a86f257c425b9f653c5063",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-82ac9970f81b4b74",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-d03.json": {
+      "path": "records/d2a94ca6568a03820a4862d51a8c3b547439390053c963ec770c475cd88983dc.json.raw",
+      "sha256": "d2a94ca6568a03820a4862d51a8c3b547439390053c963ec770c475cd88983dc",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-4b0c73c46a474dd5",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-d03.json": {
+      "path": "records/96af2435b5905346df9e56cbf7d84567948abc85fd6ab8313f8ad780cca4bc5a.json.raw",
+      "sha256": "96af2435b5905346df9e56cbf7d84567948abc85fd6ab8313f8ad780cca4bc5a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-4b0c73c46a474dd5",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m06.json": {
+      "path": "records/1a3e0068e9976d7fe6ea8150d1b15d501e5b79aa323d5838992fd94bb84a18e4.json.raw",
+      "sha256": "1a3e0068e9976d7fe6ea8150d1b15d501e5b79aa323d5838992fd94bb84a18e4",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-8c71b8da1c9b458c",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m06.json": {
+      "path": "records/e54a99c8b4fb4b8f9d7919de9726c2503f31ce0e6adf8348476426092081faa1.json.raw",
+      "sha256": "e54a99c8b4fb4b8f9d7919de9726c2503f31ce0e6adf8348476426092081faa1",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-8c71b8da1c9b458c",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-d04.json": {
+      "path": "records/c2f24fae9d6a0f9bcc5b139d8636538a158aa7e11a6d5032d4875c5f6bb415ef.json.raw",
+      "sha256": "c2f24fae9d6a0f9bcc5b139d8636538a158aa7e11a6d5032d4875c5f6bb415ef",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d9c1c84a351c4365",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-d04.json": {
+      "path": "records/d9680d074860b1e4adb15b12252f8e1df386d25c85d7faca0d70704fe0c16944.json.raw",
+      "sha256": "d9680d074860b1e4adb15b12252f8e1df386d25c85d7faca0d70704fe0c16944",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d9c1c84a351c4365",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m05.json": {
+      "path": "records/5c98d55624eed00b71b7019f2f144bdd4d3fee223290f3eca0306bd1342a309c.json.raw",
+      "sha256": "5c98d55624eed00b71b7019f2f144bdd4d3fee223290f3eca0306bd1342a309c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-aeaee0d5736c4734",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m05.json": {
+      "path": "records/a8f458c59e07bea629cdc9e53da4c35959375cad26365d032fb9f41a457dc30a.json.raw",
+      "sha256": "a8f458c59e07bea629cdc9e53da4c35959375cad26365d032fb9f41a457dc30a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-aeaee0d5736c4734",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m07.json": {
+      "path": "records/574809a21d8216dbac26b72bc6d8dca737cf1cf04ed0d6975f5bccdebf654f26.json.raw",
+      "sha256": "574809a21d8216dbac26b72bc6d8dca737cf1cf04ed0d6975f5bccdebf654f26",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-efc5eb6802ac47c5",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m07.json": {
+      "path": "records/fe70bdd89e19ac2cf8bc243d5aecdb27eb0772895de0cad6b4ae16755b3eae2c.json.raw",
+      "sha256": "fe70bdd89e19ac2cf8bc243d5aecdb27eb0772895de0cad6b4ae16755b3eae2c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-efc5eb6802ac47c5",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m06.json": {
+      "path": "records/2a5b9817a7df41dd45f9d6e788231f78cb22169e4a0b4116b65f21fe798c6460.json.raw",
+      "sha256": "2a5b9817a7df41dd45f9d6e788231f78cb22169e4a0b4116b65f21fe798c6460",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-62a8230a048a4cda",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m06.json": {
+      "path": "records/82fec86bde666dcc763649d41973de856bd594b7b71967fff0f89aefd291f288.json.raw",
+      "sha256": "82fec86bde666dcc763649d41973de856bd594b7b71967fff0f89aefd291f288",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-62a8230a048a4cda",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-d04.json": {
+      "path": "records/4dbc6a47e80db21d7ea6791c172f9ed2ccbc955e06597a0a11d4dc546121c264.json.raw",
+      "sha256": "4dbc6a47e80db21d7ea6791c172f9ed2ccbc955e06597a0a11d4dc546121c264",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a39a10e7c89b4159",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-d04.json": {
+      "path": "records/9bf151a3176a58ab8e08c502639189aa366c7700eb80bedafa5f1f392ce88770.json.raw",
+      "sha256": "9bf151a3176a58ab8e08c502639189aa366c7700eb80bedafa5f1f392ce88770",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a39a10e7c89b4159",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m08.json": {
+      "path": "records/e73cd9b4bdd260beb5f76fb3c6f159f6d80b8dd7ab53d4fba175d7bb39417f9f.json.raw",
+      "sha256": "e73cd9b4bdd260beb5f76fb3c6f159f6d80b8dd7ab53d4fba175d7bb39417f9f",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-fed5d5944d5d47f2",
+          "field": "source_ref"
+        },
+        {
+          "event_id": "e-e030880dfdda4763",
+          "field": "source_ref"
+        },
+        {
+          "event_id": "e-e030880dfdda4763",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m08.json": {
+      "path": "records/5c64856cb992c2cabaf16296034a56f5b4b24005ffd75818b1d19ebf11569802.json.raw",
+      "sha256": "5c64856cb992c2cabaf16296034a56f5b4b24005ffd75818b1d19ebf11569802",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-fed5d5944d5d47f2",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m07.json": {
+      "path": "records/b3ed78325bd297c7618ef558656547b413bc4846b4755ba2b0a4e013617502ef.json.raw",
+      "sha256": "b3ed78325bd297c7618ef558656547b413bc4846b4755ba2b0a4e013617502ef",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-726abdc92d9341cb",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m07.json": {
+      "path": "records/608d73c011ba1e8be84add9df412a98b93522017993192d99680e2a999361a1e.json.raw",
+      "sha256": "608d73c011ba1e8be84add9df412a98b93522017993192d99680e2a999361a1e",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-726abdc92d9341cb",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m09.json": {
+      "path": "records/ebe65f207ab6453ad2affb1797a583a1192664df4a1b28c2ed09b44f3f1f6dab.json.raw",
+      "sha256": "ebe65f207ab6453ad2affb1797a583a1192664df4a1b28c2ed09b44f3f1f6dab",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-08b4e86912bd48e9",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m09.json": {
+      "path": "records/0807acd267c07c686894d14ab52f1ad9d27ba3c8ebcad203a71eab4dc01561c1.json.raw",
+      "sha256": "0807acd267c07c686894d14ab52f1ad9d27ba3c8ebcad203a71eab4dc01561c1",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-08b4e86912bd48e9",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-d05.json": {
+      "path": "records/0d7bd3fbffebe6fc35999f17d8795e037c0dd6cd96af309f9cb1785e8a3e8c2d.json.raw",
+      "sha256": "0d7bd3fbffebe6fc35999f17d8795e037c0dd6cd96af309f9cb1785e8a3e8c2d",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-553e516589734939",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-d05.json": {
+      "path": "records/255d8d22d203534ee99bda8f2c80cdba1921eb40511c0e8d52afa494c8517c01.json.raw",
+      "sha256": "255d8d22d203534ee99bda8f2c80cdba1921eb40511c0e8d52afa494c8517c01",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-553e516589734939",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m08.json": {
+      "path": "records/d66b2569f8a0c6f6481e9d3407c34f3e6b723ba7365236ae7dad243ed35b6459.json.raw",
+      "sha256": "d66b2569f8a0c6f6481e9d3407c34f3e6b723ba7365236ae7dad243ed35b6459",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-222fb92f7eb14667",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m08.json": {
+      "path": "records/aaba3a527423e3b9c20dbbcd3321a734329e97c26ffaa2b505461460286ca142.json.raw",
+      "sha256": "aaba3a527423e3b9c20dbbcd3321a734329e97c26ffaa2b505461460286ca142",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-222fb92f7eb14667",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m10.json": {
+      "path": "records/6609f18d3f566d66f1a69fd402a883ab3a67746d9406ad9cf917299e14690e15.json.raw",
+      "sha256": "6609f18d3f566d66f1a69fd402a883ab3a67746d9406ad9cf917299e14690e15",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d0fe488d000e4c4d",
+          "field": "source_ref"
+        },
+        {
+          "event_id": "e-5f4606415b074ec8",
+          "field": "source_ref"
+        },
+        {
+          "event_id": "e-5f4606415b074ec8",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m10.json": {
+      "path": "records/f14bb548647b2f89288f6b3ae2c1870f5a41d6d22c37abd03c1a476734236649.json.raw",
+      "sha256": "f14bb548647b2f89288f6b3ae2c1870f5a41d6d22c37abd03c1a476734236649",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d0fe488d000e4c4d",
+          "field": "input_ref"
+        }
+      ]
+    }
+  },
+  "missing_inputs": [],
+  "limits": "Creator-only selected file archive, not a phone package. Native text and saved packet checks are file consistency checks. Executor strings are operator attribution, not authenticated independent identities or input delivery. Missing inputs are not reconstructed. No hostile filesystem-race guarantee; the manifest does not hash or authenticate itself."
+}

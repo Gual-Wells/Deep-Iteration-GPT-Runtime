@@ -1,0 +1,17 @@
+{
+  "proposal": "A bead of rainwater drops from the chair’s lower wooden rail onto the wet floor just inside the doorway.",
+  "decision_suggestion": "apply",
+  "changes": {
+    "chair.lower_rail": "Damp, with one fewer hanging drop.",
+    "floor.near_door": "Receives one drop of rainwater."
+  },
+  "percepts": [
+    {
+      "to": [
+        "public"
+      ],
+      "text": "A drop falls from the chair’s lower rail and merges with the wet patch by the door."
+    }
+  ],
+  "reason": "A small material consequence of carrying the chair through steady rain; it requires no response."
+}

@@ -1,0 +1,875 @@
+{
+  "schema_version": 1,
+  "kind": "english-spoken-preprint-native-sources",
+  "source": {
+    "file": "preprint.json",
+    "baseline_id": "leave-the-lamp-on-01",
+    "snapshot_sha256": "19de995bbb85e4f571ef1c548ad3e4f4658cfc0e6699f774cb7cd155e1d27872",
+    "source_file_sha256": "81193cf2d8db147089000d0eca6b7bb2f0d9cca8d4f8326caf12fd15285dc1c8"
+  },
+  "records": {
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\genesis-material.json": {
+      "path": "records/4bc173f123878f7d32c8df6dba68a49c2c30e2c42769ebeddc4f801b130f8366.json.raw",
+      "sha256": "4bc173f123878f7d32c8df6dba68a49c2c30e2c42769ebeddc4f801b130f8366",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7544380f9a2c47f1",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\genesis-social.json": {
+      "path": "records/022b074106fdfc461f310fb52c04a69313837507b1071fb2bdef6faccade1324.json.raw",
+      "sha256": "022b074106fdfc461f310fb52c04a69313837507b1071fb2bdef6faccade1324",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-db49122200884d9b",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-d01.json": {
+      "path": "records/fc8b753a7c68b8caf5a9787c2933ea2d544b69a9e41bdfa7925a91880db29947.json.raw",
+      "sha256": "fc8b753a7c68b8caf5a9787c2933ea2d544b69a9e41bdfa7925a91880db29947",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-f48f0b37e49b4cf8",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-m01.json": {
+      "path": "records/821b70483b90c140d1efecaf6c0edffc7ab92d33b083ea35f1812f6b1177a8b4.json.raw",
+      "sha256": "821b70483b90c140d1efecaf6c0edffc7ab92d33b083ea35f1812f6b1177a8b4",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-372120303a0d4b28",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-d01.json": {
+      "path": "records/a31b1dd44766b53ebb9ca9e020f00c9c511858d6e0c63dc19a809ddc9f823f4a.json.raw",
+      "sha256": "a31b1dd44766b53ebb9ca9e020f00c9c511858d6e0c63dc19a809ddc9f823f4a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ab2602363e8e45f1",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-d01.json": {
+      "path": "records/c37ea3303a77a9fa6a4d825f540ed4fb140dc66d4b848f11c1c4c9b04ba13494.json.raw",
+      "sha256": "c37ea3303a77a9fa6a4d825f540ed4fb140dc66d4b848f11c1c4c9b04ba13494",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ab2602363e8e45f1",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-m01.json": {
+      "path": "records/1ffa9951ae2880a7945c27c1dca3c11bff201ebf7a72797060f31522c6275767.json.raw",
+      "sha256": "1ffa9951ae2880a7945c27c1dca3c11bff201ebf7a72797060f31522c6275767",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-be00512463fa49ec",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-m01.json": {
+      "path": "records/61336a2acea8ede23b41e2abbf57a0d7fdd86c5cbdb3c88e4d9fa038180d2eab.json.raw",
+      "sha256": "61336a2acea8ede23b41e2abbf57a0d7fdd86c5cbdb3c88e4d9fa038180d2eab",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-be00512463fa49ec",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-private01.json": {
+      "path": "records/e29a3b288aab19886b1b326c80222f47da5c9d7917e1a6ab8baacd01fe5c9854.json.raw",
+      "sha256": "e29a3b288aab19886b1b326c80222f47da5c9d7917e1a6ab8baacd01fe5c9854",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-f0a8dce0a4b24c0b",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-private01.json": {
+      "path": "records/ce031a3ae0971fe938c437ca857325e7d082e103271c4f59d706272649e8c348.json.raw",
+      "sha256": "ce031a3ae0971fe938c437ca857325e7d082e103271c4f59d706272649e8c348",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-f0a8dce0a4b24c0b",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-m02.json": {
+      "path": "records/de7a3563766b33ad5e67b85a9e0e171129239c7320595af56c8d511df7e15b1c.json.raw",
+      "sha256": "de7a3563766b33ad5e67b85a9e0e171129239c7320595af56c8d511df7e15b1c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-f6523c381f5c44a1",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-m02.json": {
+      "path": "records/57eb4a803a9a635ce50310c0d9c39e31c1544e851bb4a605c69fca7f617f5eaf.json.raw",
+      "sha256": "57eb4a803a9a635ce50310c0d9c39e31c1544e851bb4a605c69fca7f617f5eaf",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-f6523c381f5c44a1",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-private01.json": {
+      "path": "records/fc32b3ec57240b8221252eeff60cf8cbba4426d6392be039bb3d883994b5a395.json.raw",
+      "sha256": "fc32b3ec57240b8221252eeff60cf8cbba4426d6392be039bb3d883994b5a395",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ea935a639ddf43a9",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-private01.json": {
+      "path": "records/eb89aa88dbc36ad5b31dde8cecba81497ac24e9453876f13dbb4267a2bed66f3.json.raw",
+      "sha256": "eb89aa88dbc36ad5b31dde8cecba81497ac24e9453876f13dbb4267a2bed66f3",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ea935a639ddf43a9",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-d02.json": {
+      "path": "records/055d7b8c9f4bc5a6cdcf5e5cb8aea331a66f13d749049ef4c92dc0ba18f21ecb.json.raw",
+      "sha256": "055d7b8c9f4bc5a6cdcf5e5cb8aea331a66f13d749049ef4c92dc0ba18f21ecb",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-73b22127f0904e2b",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-d02.json": {
+      "path": "records/84807468911e8bfcb29754fac6190a680f4de97e4e5e1f126d3b6cbfeb77a281.json.raw",
+      "sha256": "84807468911e8bfcb29754fac6190a680f4de97e4e5e1f126d3b6cbfeb77a281",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-73b22127f0904e2b",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-d02.json": {
+      "path": "records/f58367acf12196285b37cf70302d7dabcecafb3bdc0990f4cbe5f89a02c58dd5.json.raw",
+      "sha256": "f58367acf12196285b37cf70302d7dabcecafb3bdc0990f4cbe5f89a02c58dd5",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-f8dc9424916a4893",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-d02.json": {
+      "path": "records/e550a5e53a0a80534525fde7aa4d291d0262e269ae5ad379e04a700733a632f4.json.raw",
+      "sha256": "e550a5e53a0a80534525fde7aa4d291d0262e269ae5ad379e04a700733a632f4",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-f8dc9424916a4893",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-m02.json": {
+      "path": "records/7605649680b6de86c308f21110ded9dc1c538625d32776f1c256a7f1ce096002.json.raw",
+      "sha256": "7605649680b6de86c308f21110ded9dc1c538625d32776f1c256a7f1ce096002",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-91c1aabac9804a83",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-m02.json": {
+      "path": "records/b5bb5d4138778a668d398fc0fd23cd4678261c6819e5f843a677528a7520c7b5.json.raw",
+      "sha256": "b5bb5d4138778a668d398fc0fd23cd4678261c6819e5f843a677528a7520c7b5",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-91c1aabac9804a83",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-m03.json": {
+      "path": "records/74b31b1860d11fe7bab0c3c835c341abb3d1ed63065cf12d148615f0d585e83f.json.raw",
+      "sha256": "74b31b1860d11fe7bab0c3c835c341abb3d1ed63065cf12d148615f0d585e83f",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-39e8e17b7c9443fd",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-m03.json": {
+      "path": "records/6512531f0dbd6ba73431e20abc7c63e5aa5618d88ff1624ec8043f4121282506.json.raw",
+      "sha256": "6512531f0dbd6ba73431e20abc7c63e5aa5618d88ff1624ec8043f4121282506",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-39e8e17b7c9443fd",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-m03.json": {
+      "path": "records/a4ca220402ad039a65ee6ee00ab27fefc916acd482cd1ed669f44ccac84259a1.json.raw",
+      "sha256": "a4ca220402ad039a65ee6ee00ab27fefc916acd482cd1ed669f44ccac84259a1",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-0dbdb8423d0c4e14",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-m03.json": {
+      "path": "records/f18615e9e307daefeda2a98e6c1c9073bbbd28d83c8516f0c1823eece0f9607f.json.raw",
+      "sha256": "f18615e9e307daefeda2a98e6c1c9073bbbd28d83c8516f0c1823eece0f9607f",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-0dbdb8423d0c4e14",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\material02.json": {
+      "path": "records/c0af569358e986b7ec4e6f220448a53eb9bb20f7a5d276a1c38356113fcbf022.json.raw",
+      "sha256": "c0af569358e986b7ec4e6f220448a53eb9bb20f7a5d276a1c38356113fcbf022",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-8a7c980f128740c8",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-m04.json": {
+      "path": "records/8f6208ab1d1b6001c69159bd22375ab5a7df8f89eececf994b245303c83de495.json.raw",
+      "sha256": "8f6208ab1d1b6001c69159bd22375ab5a7df8f89eececf994b245303c83de495",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-6f16a0c4b92c43d7",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-m04.json": {
+      "path": "records/31f56a8ded9beb01296a8e9ce163c21c9ff43ef0ba9b2e01127b09579919bb63.json.raw",
+      "sha256": "31f56a8ded9beb01296a8e9ce163c21c9ff43ef0ba9b2e01127b09579919bb63",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-6f16a0c4b92c43d7",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-m04.json": {
+      "path": "records/60f91c9bff4d856723eee7eca88316ae482b9aa397c8e26ad0a8a7e042308c53.json.raw",
+      "sha256": "60f91c9bff4d856723eee7eca88316ae482b9aa397c8e26ad0a8a7e042308c53",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-8235735a01604a01",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-m04.json": {
+      "path": "records/a529b5e4439b934503c2426b98875cb439ff90e4f81f6daf49bd8d66500c25af.json.raw",
+      "sha256": "a529b5e4439b934503c2426b98875cb439ff90e4f81f6daf49bd8d66500c25af",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-8235735a01604a01",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-m05.json": {
+      "path": "records/1ac86217167a7fe57fce6db2d5fd6e791020628c876a6d5b00152e5c572ebf12.json.raw",
+      "sha256": "1ac86217167a7fe57fce6db2d5fd6e791020628c876a6d5b00152e5c572ebf12",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-4f5894f5d1554c23",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-m05.json": {
+      "path": "records/7ccb483727898b7c95316eccbd079769f64d2a80ecb5a8cdabfad93272dc2a94.json.raw",
+      "sha256": "7ccb483727898b7c95316eccbd079769f64d2a80ecb5a8cdabfad93272dc2a94",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-4f5894f5d1554c23",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\social03.json": {
+      "path": "records/b828844b131ca8922eba673172d4e90499cd48b619f3b36e0d9cd1cd487f2b18.json.raw",
+      "sha256": "b828844b131ca8922eba673172d4e90499cd48b619f3b36e0d9cd1cd487f2b18",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-fa1626d0a26c4778",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\material03.json": {
+      "path": "records/591b15cf7f7da707645ba5bf895135e3dc777eab2384c506b7046c301536d333.json.raw",
+      "sha256": "591b15cf7f7da707645ba5bf895135e3dc777eab2384c506b7046c301536d333",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-2b9b005d45ba41df",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-d03.json": {
+      "path": "records/5b4294412a9459c7fa0b264c3e78c4caaa264bea61746d3291785dc065b81cf5.json.raw",
+      "sha256": "5b4294412a9459c7fa0b264c3e78c4caaa264bea61746d3291785dc065b81cf5",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-f4adc09b1aa04fd7",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-d03.json": {
+      "path": "records/c3bbf1577414a2c33ddbe02db0bcb11c23b1c685f6aebabb44024c032465bcc4.json.raw",
+      "sha256": "c3bbf1577414a2c33ddbe02db0bcb11c23b1c685f6aebabb44024c032465bcc4",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-f4adc09b1aa04fd7",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-m06.json": {
+      "path": "records/7bb3aa4ea485d3b241614e02fb588cda0115a221663cb207fe877798bf188313.json.raw",
+      "sha256": "7bb3aa4ea485d3b241614e02fb588cda0115a221663cb207fe877798bf188313",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-e1a25deb6c7f4e95",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-m06.json": {
+      "path": "records/2770f5fc809b5edd586da80adf87a25105e8e9b09222d61e8bd86baffd622205.json.raw",
+      "sha256": "2770f5fc809b5edd586da80adf87a25105e8e9b09222d61e8bd86baffd622205",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-e1a25deb6c7f4e95",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-m05.json": {
+      "path": "records/ac44aea2db1212690c886378a8f734256a3c65f7e65c4ee8faf353c2648fa00f.json.raw",
+      "sha256": "ac44aea2db1212690c886378a8f734256a3c65f7e65c4ee8faf353c2648fa00f",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-02d54625d6304b21",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-m05.json": {
+      "path": "records/a1e452b274b4089c3802ed8c0959f5b6cdbe03d09a0bfdc4be92a2cf84c91999.json.raw",
+      "sha256": "a1e452b274b4089c3802ed8c0959f5b6cdbe03d09a0bfdc4be92a2cf84c91999",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-02d54625d6304b21",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-m07.json": {
+      "path": "records/8c4d2d3244a0d0fb66865f01ed8b0dfa8ed9722434b2c673a6f5fd1c8e9f57a8.json.raw",
+      "sha256": "8c4d2d3244a0d0fb66865f01ed8b0dfa8ed9722434b2c673a6f5fd1c8e9f57a8",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-333099d51ca24f33",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-m07.json": {
+      "path": "records/9eb82314cf50f94fb2aa74ca524afb46f73dd112c3ed05a43f3085716120af7c.json.raw",
+      "sha256": "9eb82314cf50f94fb2aa74ca524afb46f73dd112c3ed05a43f3085716120af7c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-333099d51ca24f33",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-d03.json": {
+      "path": "records/f4f37878e8109a18f23d62cfa1865defc845517bb5b2249fba17767c44c7afe6.json.raw",
+      "sha256": "f4f37878e8109a18f23d62cfa1865defc845517bb5b2249fba17767c44c7afe6",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-c24b62936310442d",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-d03.json": {
+      "path": "records/9f7808da9f3a671ce12c336587bc474f0846d2811b8e7ac00f47d2466e1cd280.json.raw",
+      "sha256": "9f7808da9f3a671ce12c336587bc474f0846d2811b8e7ac00f47d2466e1cd280",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-c24b62936310442d",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-m06.json": {
+      "path": "records/9364f4514de122077b7f12870bceb2d68e0c5a6d6b5b134e45a3359711830b7b.json.raw",
+      "sha256": "9364f4514de122077b7f12870bceb2d68e0c5a6d6b5b134e45a3359711830b7b",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-17be16734ab24bde",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-m06.json": {
+      "path": "records/ee05e6fc98f0916e5a07273dd7a0708e62afe913d9f5603bed072b284829b433.json.raw",
+      "sha256": "ee05e6fc98f0916e5a07273dd7a0708e62afe913d9f5603bed072b284829b433",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-17be16734ab24bde",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-private02.json": {
+      "path": "records/5f725bcf0a3cb0280236989631a08a5c411ada04796445d287ea0a477c131bd8.json.raw",
+      "sha256": "5f725bcf0a3cb0280236989631a08a5c411ada04796445d287ea0a477c131bd8",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d616aabfa4a84c64",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-private02.json": {
+      "path": "records/1971666e8c240387d516355a2d4d3ab579f3a84e21427d5ea6da08c396a1cfd9.json.raw",
+      "sha256": "1971666e8c240387d516355a2d4d3ab579f3a84e21427d5ea6da08c396a1cfd9",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d616aabfa4a84c64",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-d04.json": {
+      "path": "records/5dd644248949ba14af1ada1f0e7dd0570792a0f25af7be7cab2b89960d4b7111.json.raw",
+      "sha256": "5dd644248949ba14af1ada1f0e7dd0570792a0f25af7be7cab2b89960d4b7111",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-53b4c5f88b5549a4",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-d04.json": {
+      "path": "records/3450097017b89daf9b1aaba85cea6b7ae34fd732061dbc672a33fb803d1dfc4a.json.raw",
+      "sha256": "3450097017b89daf9b1aaba85cea6b7ae34fd732061dbc672a33fb803d1dfc4a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-53b4c5f88b5549a4",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-m08.json": {
+      "path": "records/12fb19bf85cfc389be01f045692d68f4bb5ddfa42cf8a2b9a4fbd4fea480da7a.json.raw",
+      "sha256": "12fb19bf85cfc389be01f045692d68f4bb5ddfa42cf8a2b9a4fbd4fea480da7a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7fe69b6dc564495c",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-m08.json": {
+      "path": "records/7226f1773e9afef82a1e6b732a1335709aab300649d539b0fcb9c2a5e39fc7ce.json.raw",
+      "sha256": "7226f1773e9afef82a1e6b732a1335709aab300649d539b0fcb9c2a5e39fc7ce",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7fe69b6dc564495c",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-private02.json": {
+      "path": "records/0893a58aecc2d1abeb2dcf7a72d8b300345d05438e2643972e969b3ebd767820.json.raw",
+      "sha256": "0893a58aecc2d1abeb2dcf7a72d8b300345d05438e2643972e969b3ebd767820",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7e796e48d02a499d",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-private02.json": {
+      "path": "records/5ba26c881f3948e410948c5c88d766ac849ff78216db5600600455ddf5029c33.json.raw",
+      "sha256": "5ba26c881f3948e410948c5c88d766ac849ff78216db5600600455ddf5029c33",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7e796e48d02a499d",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-m07.json": {
+      "path": "records/88c98a7a0d3f3882e42cdd0386dc973f2f47623667ac0fc35b7f7739b809fff6.json.raw",
+      "sha256": "88c98a7a0d3f3882e42cdd0386dc973f2f47623667ac0fc35b7f7739b809fff6",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-11910177a12d4d9f",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-m07.json": {
+      "path": "records/0ce557d960965496cb93d97aea17359d09b94fd3c162d28b86a31c57b1e984a7.json.raw",
+      "sha256": "0ce557d960965496cb93d97aea17359d09b94fd3c162d28b86a31c57b1e984a7",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-11910177a12d4d9f",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-d04.json": {
+      "path": "records/0a700364cb4959119a7c167bc475bea3438bfd2f6e25592daf7d9e8731f8f56f.json.raw",
+      "sha256": "0a700364cb4959119a7c167bc475bea3438bfd2f6e25592daf7d9e8731f8f56f",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-b06b5648c5514c4e",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-d04.json": {
+      "path": "records/2662695194f90f4520d85b643381202a1f50abd87a324fce5cb9768966db39d6.json.raw",
+      "sha256": "2662695194f90f4520d85b643381202a1f50abd87a324fce5cb9768966db39d6",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-b06b5648c5514c4e",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\social04.json": {
+      "path": "records/0dd9c3767028238b0a6e139fcf6acfcc7a2cceb86aebcd68b120aa6b9a0ba95e.json.raw",
+      "sha256": "0dd9c3767028238b0a6e139fcf6acfcc7a2cceb86aebcd68b120aa6b9a0ba95e",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-fba41550df3f4998",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\social-04.json": {
+      "path": "records/b7e4c9900197b18267cb231b9f7d0c6728ae7d5512b8af113eeebfea439eeafe.json.raw",
+      "sha256": "b7e4c9900197b18267cb231b9f7d0c6728ae7d5512b8af113eeebfea439eeafe",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-fba41550df3f4998",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-m08.json": {
+      "path": "records/a53df5dc600bd32178637a74b4fece07fa07215c2c7f6387e912c3d1770ed01c.json.raw",
+      "sha256": "a53df5dc600bd32178637a74b4fece07fa07215c2c7f6387e912c3d1770ed01c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-3ddc7a2643f540eb",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-m08.json": {
+      "path": "records/017d9ccc021814f07a5ad42f3d1b212e32afb93a9abbb212ae99e331220d9eb8.json.raw",
+      "sha256": "017d9ccc021814f07a5ad42f3d1b212e32afb93a9abbb212ae99e331220d9eb8",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-3ddc7a2643f540eb",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-m09.json": {
+      "path": "records/546ebff7303167c1051ad0c99bc8072cd6d622f793198491755e18944f090482.json.raw",
+      "sha256": "546ebff7303167c1051ad0c99bc8072cd6d622f793198491755e18944f090482",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-8f1067db139d4858",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-m09.json": {
+      "path": "records/1df4e5bce19d28304273ffd53a6b244d896c10472325bb508de8f85a351cc44b.json.raw",
+      "sha256": "1df4e5bce19d28304273ffd53a6b244d896c10472325bb508de8f85a351cc44b",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-8f1067db139d4858",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-m09.json": {
+      "path": "records/be9bae9015d4d13780f665e58970cae7cda9c777e62ac1665fc178f53e07964d.json.raw",
+      "sha256": "be9bae9015d4d13780f665e58970cae7cda9c777e62ac1665fc178f53e07964d",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a25cf36e75cb43b4",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-m09.json": {
+      "path": "records/b00bf745b5542c279a64cc818dcc3bc9860b31d72df522b86bfe9048eae6dae9.json.raw",
+      "sha256": "b00bf745b5542c279a64cc818dcc3bc9860b31d72df522b86bfe9048eae6dae9",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a25cf36e75cb43b4",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\material04.json": {
+      "path": "records/2ec3ad742f87dd89b53ff77f6c7277e4de09076f8faa47826ee4da6e50c8b35e.json.raw",
+      "sha256": "2ec3ad742f87dd89b53ff77f6c7277e4de09076f8faa47826ee4da6e50c8b35e",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-4201cb9932f3416f",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\material-04.json": {
+      "path": "records/71fc807194c4bb0121b30c62d07d3ad3b76f7e0fd0419ceeff8136ef5e1c8fbe.json.raw",
+      "sha256": "71fc807194c4bb0121b30c62d07d3ad3b76f7e0fd0419ceeff8136ef5e1c8fbe",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-4201cb9932f3416f",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-m10.json": {
+      "path": "records/eef05c4c7429f8e34000e193efd8b28beab8eb89595447b584a66ca7b3ee02a0.json.raw",
+      "sha256": "eef05c4c7429f8e34000e193efd8b28beab8eb89595447b584a66ca7b3ee02a0",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-e4e087d86dd744a4",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-m10.json": {
+      "path": "records/96a0492e00bd141bf9643530ec5a2a3cf75057eda8ddb54bd80cd6d65406fce9.json.raw",
+      "sha256": "96a0492e00bd141bf9643530ec5a2a3cf75057eda8ddb54bd80cd6d65406fce9",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-e4e087d86dd744a4",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-d05.json": {
+      "path": "records/cec0f5d69f7389fd301478f72dc9c7d271de4f3000e45d7a3d9e2afbefedf343.json.raw",
+      "sha256": "cec0f5d69f7389fd301478f72dc9c7d271de4f3000e45d7a3d9e2afbefedf343",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-8e65c9af00e743a4",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-d05.json": {
+      "path": "records/815d20f30d23a68846c511f2c99eb07a669dbd02774614e4824a20c91121d524.json.raw",
+      "sha256": "815d20f30d23a68846c511f2c99eb07a669dbd02774614e4824a20c91121d524",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-8e65c9af00e743a4",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\idris-m10.json": {
+      "path": "records/6200eb90c17e0dd3d779e115ece7d7c334d5a6afa9e8ea3dad1d73430f69b69b.json.raw",
+      "sha256": "6200eb90c17e0dd3d779e115ece7d7c334d5a6afa9e8ea3dad1d73430f69b69b",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ba6f292208544433",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\idris-m10.json": {
+      "path": "records/ad33da29c056e5b969a7ec8ccb7366c617f0e2c5558b4c8396734c561f6beb2a.json.raw",
+      "sha256": "ad33da29c056e5b969a7ec8ccb7366c617f0e2c5558b4c8396734c561f6beb2a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ba6f292208544433",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\actual-returns\\nell-m11.json": {
+      "path": "records/a8528bdb15e90bb86c45790e971c92f848d021cf38a1488b9fa5d47d2317a317.json.raw",
+      "sha256": "a8528bdb15e90bb86c45790e971c92f848d021cf38a1488b9fa5d47d2317a317",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-77f3063718b64fd3",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache\\english-spoken-preprint-20261110\\input-views\\nell-m11.json": {
+      "path": "records/1415dd6077efec4432c7df03f9bf55842b0aa53db426703087c6b980f92ea74a.json.raw",
+      "sha256": "1415dd6077efec4432c7df03f9bf55842b0aa53db426703087c6b980f92ea74a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-77f3063718b64fd3",
+          "field": "input_ref"
+        }
+      ]
+    }
+  },
+  "missing_inputs": [
+    {
+      "event_id": "e-7544380f9a2c47f1",
+      "kind": "world",
+      "reason": "input_ref not recorded; no input snapshot reconstructed"
+    },
+    {
+      "event_id": "e-db49122200884d9b",
+      "kind": "world",
+      "reason": "input_ref not recorded; no input snapshot reconstructed"
+    },
+    {
+      "event_id": "e-f48f0b37e49b4cf8",
+      "kind": "inner",
+      "reason": "input_ref not recorded; no input snapshot reconstructed"
+    },
+    {
+      "event_id": "e-372120303a0d4b28",
+      "kind": "speech",
+      "reason": "input_ref not recorded; no input snapshot reconstructed"
+    },
+    {
+      "event_id": "e-8a7c980f128740c8",
+      "kind": "world",
+      "reason": "input_ref not recorded; no input snapshot reconstructed"
+    },
+    {
+      "event_id": "e-fa1626d0a26c4778",
+      "kind": "world",
+      "reason": "input_ref not recorded; no input snapshot reconstructed"
+    },
+    {
+      "event_id": "e-2b9b005d45ba41df",
+      "kind": "world",
+      "reason": "input_ref not recorded; no input snapshot reconstructed"
+    }
+  ],
+  "limits": "Creator-only selected file archive, not a phone package. Native text and saved packet checks are file consistency checks. Executor strings are operator attribution, not authenticated independent identities or input delivery. Missing inputs are not reconstructed. No hostile filesystem-race guarantee; the manifest does not hash or authenticate itself."
+}

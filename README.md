@@ -12,6 +12,8 @@ DIGR 是一套由模型承担研究、判断与制作的工作协议。它鼓励
 
 本分支提供 **Codex 0.8.0 实验通道**与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
 
+[附属项目入口](addons/README.md)列出已有 Voice Companion、Paper Knowledge 和新 [English-Spoken-Preprint](spoken-preprint/README.md)。ESP 由真实独立人物与伴生内心生成预印本，手机仅演绎供跟听；创世须与用户目标领域有适当的泛化相关关系。项目按实际动作接入、回原数据接续，不互相强绑；独立的[真人参与实训](research/codex-participation/README.md)目前只作设计探索。
+
 ## 从你的用途进入
 
 | 你现在要做什么 | 从哪里开始 |

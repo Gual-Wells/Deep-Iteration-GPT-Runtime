@@ -1,0 +1,16 @@
+{
+  "proposal": "Show the prototype’s camera view with a clearly labelled check button.",
+  "decision_suggestion": "apply",
+  "changes": {
+    "phone_display": "Camera preview with a ‘Check tray’ button along the bottom; no current check result displayed."
+  },
+  "percepts": [
+    {
+      "to": [
+        "gus"
+      ],
+      "text": "The offered phone shows a camera preview and a button labelled ‘Check tray’ along the bottom. No occupied/empty result is displayed."
+    }
+  ],
+  "reason": "This supplies the visible effect of Mara returning to the app without transferring the phone, operating it for Gus, or establishing whether a check will work."
+}

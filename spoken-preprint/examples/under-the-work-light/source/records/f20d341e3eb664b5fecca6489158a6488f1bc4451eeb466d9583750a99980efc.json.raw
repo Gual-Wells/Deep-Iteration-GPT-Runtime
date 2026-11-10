@@ -1,0 +1,21 @@
+{
+  "proposal": "One replacement foam insert reaches a dry-fit check in the North Library crate; the rest of the repacking remains unfinished.",
+  "decision_suggestion": "apply",
+  "changes": {
+    "studio_returns": {
+      "crate": "North Library exhibition",
+      "location": "adjoining repair bay",
+      "work": "one replacement foam insert being dry-fitted; repacking ongoing",
+      "next_booking": "Thursday morning"
+    }
+  },
+  "percepts": [
+    {
+      "to": [
+        "public"
+      ],
+      "text": "The cutting rasp pauses. From the adjoining repair bay come two soft, hollow thumps as a foam insert is pressed into the open crate."
+    }
+  ],
+  "reason": "A small, ordinary transition in the existing repair work gives it its own course without establishing elapsed time or requiring an interview response."
+}

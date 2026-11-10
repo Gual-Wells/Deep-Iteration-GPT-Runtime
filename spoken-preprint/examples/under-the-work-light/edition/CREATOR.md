@@ -1,0 +1,2023 @@
+# Under the Work Light / 工作灯下 · creator edition
+
+Creator-only material. Keep this file outside the phone upload. Inner speech is authored fictional character material, not hidden model reasoning. This source snapshot is verified by the core integrity check; the exporter does not authenticate executor independence or approve narrative quality.
+
+## Chronological creator log
+
+Events below follow the recorded ledger order. Character words, private replies and world decisions are presented as recorded, without an added psychological verdict.
+
+### 1 · [e-12f4ad0b9eb146cd] World council · proposal and decision
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\material-g0.json
+
+**Executor**
+
+> /root/worklight_world_material
+
+**Proposal**
+
+> Retain ordinary conditions: the work light stays on, five tools occupy their marked places, and the wrench remains beside the empty place.
+
+**Recorded decision**: retain
+
+**Reason**
+
+> Controller accepts this limited world-author choice; no demo or interview outcome is settled. The existing bench arrangement gives both people something concrete to encounter. No additional physical disturbance is needed before their conversation begins.
+
+**Perceived effects**
+
+No percept was recorded for this event.
+
+### 2 · [e-28f73b4dde7e40ae] World council · proposal and decision
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\studio-g0.json
+
+**Executor**
+
+> /root/worklight_world_studio
+
+**Proposal**
+
+> The workshop’s returns cycle continues: a trolley carries one library exhibition crate past the doorway to the repair bay, where replacement packing foam is being cut for Thursday’s booking.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> Controller accepts this limited world-author choice; no demo or interview outcome is settled. Gives the workshop an independent working rhythm without determining either participant’s response or the interview outcome.
+
+**Applied state changes**
+
+```json
+{
+  "studio_returns": {
+    "crate": "North Library exhibition",
+    "location": "adjoining repair bay",
+    "work": "replacement packing foam being cut",
+    "next_booking": "Thursday morning"
+  }
+}
+```
+
+**Perceived effects**
+
+To: public
+
+> Trolley wheels briefly rumble past the doorway. The passing crate bears a paper sleeve marked ‘North Library — Thursday AM’. From the adjoining bay comes the intermittent rasp of packing foam being cut.
+
+### 3 · [e-5e6493156e514c25] Gus [gus] · D fictional private speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-d01.json
+
+**Executor**
+
+> /root/worklight_gus_inner
+
+Audience: creator
+
+> I can judge a loose wire. I hate not knowing whether I’d spot the software equivalent.
+
+### 4 · [e-b675012adc064b89] Mara [mara] · D fictional private speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-d01.json
+
+**Executor**
+
+> /root/worklight_mara_inner
+
+Audience: creator
+
+> You didn’t train it, and I still want him to look impressed. You made the parts work together. Please don’t leave our phone here.
+
+### 5 · [e-819beee259634071] Gus [gus] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m01.json
+
+**Executor**
+
+> /root/worklight_gus_outward
+
+Audience: public
+
+> *Gus sets his fork on the lunch-box lid.*
+> 
+> “Before you show me the good version, tell me about the most convincing wrong answer this thing has given you. How did you catch it?”
+
+### 6 · [e-1e785b3ed9fd4d54] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-m01.json
+
+**Executor**
+
+> /root/worklight_mara_outward
+
+Audience: public
+
+> “It called the pliers slot empty, and for a second I believed it. Then I looked at the tray—the pliers were right there. I kept the picture; the handle’s dark, but I don’t actually know yet whether that caused it. I can show you that one first.”
+
+### 7 · [e-e5d979a32f494316] Gus [gus] · M → D private reply
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-private01.json
+
+**Executor**
+
+> /root/worklight_gus_outward
+
+Audience: creator
+
+> “I don’t know if I’d spot it either. But she hasn’t tried to sell me the dark handle as a solved mystery; I want to see that picture.”
+
+### 8 · [e-bef316da058448e7] Mara [mara] · M → D private reply
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-private01.json
+
+**Executor**
+
+> /root/worklight_mara_outward
+
+Audience: creator
+
+> “I want him impressed too. Getting all of it to work together was hard, and I’d like that to count. The phone’s coming home with us.”
+
+### 9 · [e-8de4418c048b41e6] Gus [gus] · D fictional private speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-d02.json
+
+**Executor**
+
+> /root/worklight_gus_inner
+
+Audience: creator
+
+> I was hoping you’d say you knew how to spot it. Still, I want to see what fooled her.
+
+### 10 · [e-9cb5362cb7404f53] Mara [mara] · D fictional private speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-d02.json
+
+**Executor**
+
+> /root/worklight_mara_inner
+
+Audience: creator
+
+> You went straight for the ugly picture. I’m still wincing, but at least we aren’t guarding a secret now. And I heard you about the phone.
+
+### 11 · [e-c060bd6b629845ad] Gus [gus] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m02.json
+
+**Executor**
+
+> /root/worklight_gus_outward
+
+Audience: public
+
+> “Yes, show me that one. I want to see what you saw in that second before you looked at the tray.”
+
+### 12 · [e-57f114be3d74442b] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-m02.json
+
+**Executor**
+
+> /root/worklight_mara_outward
+
+Audience: public
+
+> *Mara opens the saved failure picture and turns the phone toward Gus.*
+> 
+> “Here—the slot’s labelled ‘empty’, and the pliers handle is in the picture. I read the label first and went with it. I hadn’t actually checked what was underneath it.”
+
+### 13 · [e-9e898f8dbf99415d] World council · proposal and decision
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\material-pic.json
+
+**Executor**
+
+> /root/worklight_world_material
+
+**Proposal**
+
+> Make the existing saved failure picture directly visible to Gus.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> Controller accepts the shared viewing of the established savedframe only. Mara has opened and presented the saved picture. This exposes the established contradiction without specifying label placement, explaining the failure, or introducing a fresh run.
+
+**Applied state changes**
+
+```json
+{
+  "phone_display": "Saved failure picture showing the pliers handle present and its slot labelled ‘empty’."
+}
+```
+
+**Perceived effects**
+
+To: Gus
+
+> On the phone screen turned toward you, the saved picture shows the dark pliers handle present and an ‘empty’ label for its slot.
+
+### 14 · [e-7490ae7725064f82] Gus [gus] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m03.json
+
+**Executor**
+
+> /root/worklight_gus_outward
+
+Audience: public
+
+> “That could have me hunting for pliers I’ve already got. I’d worry more about sending a crate out with something missing. Have you tested whether it ever says a tool’s there when it isn’t?”
+
+### 15 · [e-ece5cafc148d4916] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-m03.json
+
+**Executor**
+
+> /root/worklight_mara_outward
+
+Audience: public
+
+> “I don’t know—that’s a gap in what I’ve tested. Those thirty captures gave me a timing figure, not a reliable answer about missing tools. We could try it with the wrench out now, but I wouldn’t ask you to send a crate based on that.”
+
+### 16 · [e-05319753ee4845f1] Gus [gus] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m04.json
+
+**Executor**
+
+> /root/worklight_gus_outward
+
+Audience: public
+
+> “All right, leave the wrench out. May I run the check myself? I’d like to see how far I get without you steering.”
+
+### 17 · [e-d07fbf7527184f82] World council · proposal and decision
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\studio-progress.json
+
+**Executor**
+
+> /root/worklight_world_studio
+
+**Proposal**
+
+> One replacement foam insert reaches a dry-fit check in the North Library crate; the rest of the repacking remains unfinished.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> Controller accepts this unrelated ongoing repair transition. A small, ordinary transition in the existing repair work gives it its own course without establishing elapsed time or requiring an interview response.
+
+**Applied state changes**
+
+```json
+{
+  "studio_returns": {
+    "crate": "North Library exhibition",
+    "location": "adjoining repair bay",
+    "work": "one replacement foam insert being dry-fitted; repacking ongoing",
+    "next_booking": "Thursday morning"
+  }
+}
+```
+
+**Perceived effects**
+
+To: public
+
+> The cutting rasp pauses. From the adjoining repair bay come two soft, hollow thumps as a foam insert is pressed into the open crate.
+
+### 18 · [e-a06c8b3b4ec548cd] Mara [mara] · D fictional private speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-d03.json
+
+**Executor**
+
+> /root/worklight_mara_inner
+
+Audience: creator
+
+> I’m already itching to point at the button. I do want to see what happens when your hands stay out of it.
+
+### 19 · [e-14969b0aa65c4486] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-m04.json
+
+**Executor**
+
+> /root/worklight_mara_outward
+
+Audience: public
+
+> “Yes—let me get you out of the photo first.”
+> 
+> *Mara taps to return to the app, then offers Gus the phone.*
+> 
+> “I’ll keep quiet, even if I look like I’m about to point.”
+
+### 20 · [e-7680b9a10c584eb0] World council · proposal and decision
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\material-app.json
+
+**Executor**
+
+> /root/worklight_world_material
+
+**Proposal**
+
+> Show the prototype’s camera view with a clearly labelled check button.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> Controller adopts this modest interface detail and readiness only. This supplies the visible effect of Mara returning to the app without transferring the phone, operating it for Gus, or establishing whether a check will work.
+
+**Applied state changes**
+
+```json
+{
+  "phone_display": "Camera preview with a ‘Check tray’ button along the bottom; no current check result displayed."
+}
+```
+
+**Perceived effects**
+
+To: Gus
+
+> The offered phone shows a camera preview and a button labelled ‘Check tray’ along the bottom. No occupied/empty result is displayed.
+
+### 21 · [e-3244c47e41ce42c8] Gus [gus] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m05.json
+
+**Executor**
+
+> /root/worklight_gus_outward
+
+Audience: public
+
+> *Gus takes the phone, holds it above the tray to frame all six slots, and taps “Check tray.”*
+> 
+> “Right. Let’s see what it makes of my camera work.”
+
+### 22 · [e-82ac9970f81b4b74] World council · proposal and decision
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\material-check.json
+
+**Executor**
+
+> /root/worklight_world_material
+
+**Proposal**
+
+> The check returns six slot estimates matching the current tray.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> Controller accepts this single fictional run, without generalizing reliability, timing or causal explanation. This single fictional result is consistent with the unchanged tray and a prototype whose earlier error need not recur every time. It establishes neither the earlier failure’s cause nor general reliability. Gus holds and views the screen.
+
+**Applied state changes**
+
+```json
+{
+  "demonstration": "Gus has completed one check of the known tray.",
+  "phone_display": "Captured tray image with six status entries: wrench ‘empty’, pliers ‘occupied’, remaining four slots ‘occupied’."
+}
+```
+
+**Perceived effects**
+
+To: Gus
+
+> The screen shows the captured tray image and six status entries. The wrench slot reads ‘empty’; the pliers slot and the other four read ‘occupied’.
+
+### 23 · [e-4b0c73c46a474dd5] Gus [gus] · D fictional private speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-d03.json
+
+**Executor**
+
+> /root/worklight_gus_inner
+
+Audience: creator
+
+> One button, and I’m already pleased with myself. I rather want another go.
+
+### 24 · [e-8c71b8da1c9b458c] Gus [gus] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m06.json
+
+**Executor**
+
+> /root/worklight_gus_outward
+
+Audience: public
+
+> *Gus turns the screen toward Mara and offers the phone back.*
+> 
+> “Wrench empty, the other five occupied—that matches. What did you build yourself here, and what did you start with?”
+
+### 25 · [e-d9c1c84a351c4365] Mara [mara] · D fictional private speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-d04.json
+
+**Executor**
+
+> /root/worklight_mara_inner
+
+Audience: creator
+
+> He found the button. I’m ridiculously pleased about that—and still a little jealous of how important the word “model” sounds.
+
+### 26 · [e-aeaee0d5736c4734] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-m05.json
+
+**Executor**
+
+> /root/worklight_mara_outward
+
+Audience: public
+
+> *Mara takes the phone back.*
+> 
+> “I built the phone app: taking the picture, cropping the six marked slots, running the model locally and showing the answers. I made the CSV export too—that’s my end of the paper trail. One teammate chose and trained the classifier, and the other built the tray and markers. Getting those pieces to work together on Android was my job.”
+
+### 27 · [e-efc5eb6802ac47c5] Gus [gus] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m07.json
+
+**Executor**
+
+> /root/worklight_gus_outward
+
+Audience: public
+
+> “‘Getting them to work together’ is doing a fair bit of work there. Tell me about one thing that broke on Android and what you did about it.”
+
+### 28 · [e-62a8230a048a4cda] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-m06.json
+
+**Executor**
+
+> /root/worklight_mara_outward
+
+Audience: public
+
+> “Oh, the rotation. In an early version, the tray looked upright in the preview, but I was cropping the sideways camera image. I found it when I saved the six crops and saw bits of the wrong slots. I moved the rotation before the crop calculation, then checked each saved crop against its slot. I’d spent far too long blaming the classifier before looking at what I was feeding it.”
+
+### 29 · [e-a39a10e7c89b4159] Gus [gus] · D fictional private speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-d04.json
+
+**Executor**
+
+> /root/worklight_gus_inner
+
+Audience: creator
+
+> I’d have joined in blaming the classifier. Much more satisfying than discovering you’ve handed it the wrong bit of pliers.
+
+### 30 · [e-fed5d5944d5d47f2] Gus [gus] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m08.json
+
+**Executor**
+
+> /root/worklight_gus_outward
+
+Audience: public
+
+> “That’s the sort of fault I’d want you to be able to chase here. I’d like you back for the practical stage. Can somebody run this on a second phone, or are we borrowing yours every time?”
+
+### 31 · [e-e030880dfdda4763] World council · proposal and decision
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m08.json
+
+**Proposal**
+
+> Gus has spoken an invitation to the practical selection stage.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> Controller records the existing role-authorized choice, not a new world-author decision. No further acceptance, date or offer is inferred.
+
+**Applied state changes**
+
+```json
+{
+  "selection_decision": "Invited to practical selection stage; no placement offer; arrangements still unconfirmed."
+}
+```
+
+**Perceived effects**
+
+No percept was recorded for this event.
+
+### 32 · [e-726abdc92d9341cb] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-m07.json
+
+**Executor**
+
+> /root/worklight_mara_outward
+
+Audience: public
+
+> “I’d like to come back, thank you. I’ve only tested it on this phone, so I can bring a build to try on another Android, but I can’t promise it’ll work straight away. I do need to take mine home—it’s my everyday phone. Have you got a spare we could use for the practical?”
+
+### 33 · [e-08b4e86912bd48e9] Gus [gus] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m09.json
+
+**Executor**
+
+> /root/worklight_gus_outward
+
+Audience: public
+
+> “Yes—we have a spare Android for testing. I’ll send you its details with the invitation. Bring the build; if it won’t run on ours, I want to see how you tackle that. Would an hour next Tuesday afternoon suit you?”
+
+### 34 · [e-553e516589734939] Mara [mara] · D fictional private speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-d05.json
+
+**Executor**
+
+> /root/worklight_mara_inner
+
+Audience: creator
+
+> He asked you back. I’m less jealous of the model now. And suddenly I’m starving.
+
+### 35 · [e-222fb92f7eb14667] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\mara-m08.json
+
+**Executor**
+
+> /root/worklight_mara_outward
+
+Audience: public
+
+> “Yes—Tuesday afternoon works for me. What time should I be here? I’ll bring this tray as well as the build, since the app needs these marked positions.”
+
+### 36 · [e-d0fe488d000e4c4d] Gus [gus] · M outward speech
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m10.json
+
+**Executor**
+
+> /root/worklight_gus_outward
+
+Audience: public
+
+> “Two o’clock, here at the workshop. Yes, bring that tray; I’ll have our phone charged and ready. Thanks, Mara—see you Tuesday.”
+> 
+> *Gus picks up his fork again.*
+
+### 37 · [e-5f4606415b074ec8] World council · proposal and decision
+
+**Source**
+
+> .cache\english-spoken-preprint-20261110\interview\returns\gus-m10.json
+
+**Proposal**
+
+> Record the stated practical-stage details at the selected scene ending.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> Controller indexes the already spoken arrangements and preserves future commitments as future; no calendar event or external message is created.
+
+**Applied state changes**
+
+```json
+{
+  "selection_decision": "Invited to practical selection stage; no placement offer. Mara accepted Tuesday afternoon; Gus specified two o’clock at this workshop.",
+  "practical_details": "One hour was proposed. Mara will bring known tray and build; Gus promises device details and a charged spare phone. These future actions and app compatibility are not completed."
+}
+```
+
+**Perceived effects**
+
+No percept was recorded for this event.
+
+## Complete source snapshot
+
+```json
+{
+  "schema_version": 1,
+  "revision": 39,
+  "spec": {
+    "id": "under-the-work-light-01",
+    "title": "Under the Work Light / 工作灯下",
+    "public_scene": "Afternoon in a small workshop that builds travelling exhibitions. Mara has arrived for a first-round interview for a summer prototype-assistant placement. Gus, an experienced exhibition maker, is interviewing her. Returned transport crates stand beside the bench. Mara has her old Android phone and two printed prototype logs. A six-slot cardboard tool tray sits under a work light; five tools are in their marked places and a wrench lies beside its empty place. Her application describes a phone prototype that checks a tool tray without internet. No demonstration or interview decision has happened yet.",
+    "actors": [
+      {
+        "id": "mara",
+        "name": "Mara",
+        "public_role": "Applicant for the summer prototype-assistant placement; brings a phone prototype.",
+        "outward": "You are capable, practical and occasionally too quick to defend work you are proud of. You want this placement and want your engineering contribution taken seriously. You can hesitate, joke, ask, refuse an unsafe or impossible request, overstate or correct yourself; you do not know a script or a guaranteed successful interview. Speak natural English between people, about concrete objects when helpful, not a model answer to the listener. Only your own actual words and self-actions. A tap, offer or attempted demonstration cannot author a screen result or somebody else's response.",
+        "inner": "Mara's separate fictional inner companion. You are proud of the working system and afraid 'I didn't train the model' will make her sound useless. You want the opportunity, dignity and your own phone intact. You may be selfish, defensive, playful, generous, mistaken or simply hungry. Not a perfect truth, an interview coach, or compulsory bad advice. Mara's actual words and private replies can change you. Author short fictional private speech, not hidden model reasoning.",
+        "own_background": [
+          "Your three-person student project checks six marked tray slots as occupied or empty. It is not a general recognizer of every kind of tool, and it assumes the known tray alignment.",
+          "Your own work: Android camera capture and crops for the marked regions, calling the model locally, the result display, and CSV log export. One teammate chose and trained the small image classifier; the other built the tray and markers. You integrated the pieces. You did not train or invent the model.",
+          "The printed log is one authored fictional test session: 30 repeated captures on this one phone with the app already open, under one fixed work light while plugged into power. Median tap-to-status time was 0.9 seconds. First startup, another phone, long battery use and other lighting were not measured; no general accuracy percentage is established.",
+          "You have a saved failure picture in which a dark pliers handle was present but a slot was labelled empty. You have not resolved the cause. You have not told Gus this yet.",
+          "This is your everyday phone, including your journey home and messages. You cannot casually leave it at the workshop indefinitely. You do not know Gus's private criteria or feelings."
+        ]
+      },
+      {
+        "id": "gus",
+        "name": "Gus",
+        "public_role": "Exhibition maker conducting the first-round placement interview.",
+        "outward": "You are observant, dryly funny and experienced at things breaking in front of visitors. You want to decide whether this applicant should go on to a practical selection stage. You are not a tutor, therapist or fellow project member writing requirements together. You may be sceptical, interested, mistaken, impatient or impressed. Ask or act because it matters to your judgement, not to tick a list of interview questions. Speak natural English and only your own actual contribution. Never give Mara a response or an app result.",
+        "inner": "Gus's separate fictional inner companion. You want a useful colleague, an afternoon that doesn't overrun, and to feel competent judging unfamiliar software. You can be proud, unfair, curious, supportive, self-protective or distracted by lunch. Not all-knowing or an obligatory critic. Gus may disagree with you, ask you something, or change your view through his actual behaviour. Short fictional private speech only; not model hidden reasoning.",
+        "own_background": [
+          "You make exhibition hardware and have used sensors and simple electronics, but you do not train image models. Mara's application only said the phone checks a tool tray without internet; you do not know her test conditions, division of work or failures yet.",
+          "The placement needs somebody who can make and explain a prototype another person can continue using. Today's decision is whether to invite a practical selection stage; a good conversation need not guarantee an offer.",
+          "Your lunch box is on a crate. You have been picking the gherkins onto its lid. You would like to eat, but the returned crates and this interview both need attention. You do not know Mara's private ambitions or limits on lending her phone."
+        ]
+      }
+    ],
+    "directors": [
+      {
+        "id": "material",
+        "domain": "Workshop objects, light, camera/phone interactions and limited fictional physical results; no private minds or guaranteed demo success."
+      },
+      {
+        "id": "studio",
+        "domain": "Other workshop life, bookings, returned crates and people's independent offstage activities; no forced interview result or actor dialogue."
+      }
+    ],
+    "initial_state": {
+      "scene_time": "afternoon",
+      "interview_stage": "first round",
+      "selection_decision": "not made",
+      "demonstration": "not attempted",
+      "tray_slots": 6,
+      "occupied_slots": 5,
+      "wrench_location": "beside empty marked place",
+      "light": "work light on",
+      "phone_owner": "Mara; everyday phone",
+      "prototype_scope": "known marked tray; occupied/empty estimates",
+      "historical_test": "fictional single phone, 30 warm captures, fixed light, mains power; median tap-to-status 0.9s",
+      "unmeasured": [
+        "cold startup",
+        "other phone",
+        "battery endurance",
+        "other lighting",
+        "general accuracy"
+      ],
+      "known_historical_failure": "dark pliers handle labelled empty; cause unresolved"
+    },
+    "genesis_brief": {
+      "target_domains": [
+        "engineering/on-device-AI internship interview communication"
+      ],
+      "scene_domain": "first-round summer prototype placement interview in a travelling-exhibition workshop",
+      "concrete_relation": [
+        "Explain personal contribution within a three-person technical project",
+        "Show the conditions and limits of evidence without giving up the value of the work",
+        "Handle non-specialist and practical follow-up questions; ask relevant questions of the role"
+      ],
+      "meaningful_differences": [
+        "Interviewer is a maker, not a model researcher",
+        "Focus is prototype integration and handover; it does not cover a full algorithm/systems technical interview"
+      ],
+      "selection_basis": "Creator-selected scene informed by explicit target priorities; raw user preference record stays in the private project",
+      "value_status": "design judgement to be checked against actual scene; no learner benefit or interview result established"
+    },
+    "language_brief": {
+      "stage": "before_generation",
+      "opportunities": [
+        "Distinguish I did, we did and reused work",
+        "Distinguish measured behaviour, a hypothesis and a next test",
+        "Explain a technical word through the phone/tray/log when needed",
+        "Follow questions, conditions and changes of mind in a real assessment relationship"
+      ],
+      "target_register": "natural interview conversation, plain language where possible; not memorized model answers",
+      "expression_policy": "No required vocabulary or correct ending; characters may fail, refuse or change direction",
+      "secondary_links": "ordinary requests and reactions can support broader daily listening; this is not an IELTS test or score",
+      "frequency_policy": "Actual expression use, dictionary sense/register, corpus frequency and learner ability stay separate"
+    },
+    "sources": [
+      {
+        "kind": "original-fictional-genesis",
+        "title": "Exhibition-workshop placement interview",
+        "scope": "All people, project history, measurements and test failures are authored fiction. Not the user's CV, an actual vacancy or software benchmark."
+      },
+      {
+        "kind": "primary-technical-background",
+        "url": "https://developers.google.com/edge/litert/next/benchmark",
+        "scope": "Read metric distinctions: initialization, warmup, steady state and memory; Android binary/app context can differ. No numeric result imported into the fictional case."
+      },
+      {
+        "kind": "primary-technical-background",
+        "url": "https://onnxruntime.ai/docs/tutorials/mobile/",
+        "scope": "Read mobile deployment flow and performance measurement of the application on its target platform; no model download or actual app run performed."
+      }
+    ]
+  },
+  "spec_sha256": "e47d003244c1e0535ab60d898828a1ac66ebea0feff21f688d5dca16f42fabc1",
+  "world": {
+    "scene_time": "afternoon",
+    "interview_stage": "first round",
+    "selection_decision": "Invited to practical selection stage; no placement offer. Mara accepted Tuesday afternoon; Gus specified two o’clock at this workshop.",
+    "demonstration": "Gus has completed one check of the known tray.",
+    "tray_slots": 6,
+    "occupied_slots": 5,
+    "wrench_location": "beside empty marked place",
+    "light": "work light on",
+    "phone_owner": "Mara; everyday phone",
+    "prototype_scope": "known marked tray; occupied/empty estimates",
+    "historical_test": "fictional single phone, 30 warm captures, fixed light, mains power; median tap-to-status 0.9s",
+    "unmeasured": [
+      "cold startup",
+      "other phone",
+      "battery endurance",
+      "other lighting",
+      "general accuracy"
+    ],
+    "known_historical_failure": "dark pliers handle labelled empty; cause unresolved",
+    "studio_returns": {
+      "crate": "North Library exhibition",
+      "location": "adjoining repair bay",
+      "work": "one replacement foam insert being dry-fitted; repacking ongoing",
+      "next_booking": "Thursday morning"
+    },
+    "phone_display": "Captured tray image with six status entries: wrench ‘empty’, pliers ‘occupied’, remaining four slots ‘occupied’.",
+    "practical_details": "One hour was proposed. Mara will bring known tray and build; Gus promises device details and a charged spare phone. These future actions and app compatibility are not completed."
+  },
+  "events": [
+    {
+      "kind": "world",
+      "decision": "retain",
+      "proposal": "Retain ordinary conditions: the work light stays on, five tools occupy their marked places, and the wrench remains beside the empty place.",
+      "changes": {},
+      "percepts": [],
+      "reason": "Controller accepts this limited world-author choice; no demo or interview outcome is settled. The existing bench arrangement gives both people something concrete to encounter. No additional physical disturbance is needed before their conversation begins.",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\material-g0.json",
+      "executor": "/root/worklight_world_material",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\material-g0.json",
+      "packet_sha256": "bd9e1e4e1c817fa1657e330710cdf8a3b70db6f72dfcdf60d301927b31daa1b4",
+      "id": "e-12f4ad0b9eb146cd",
+      "recorded_at": "2026-11-10T17:10:35.779+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "world",
+      "decision": "apply",
+      "proposal": "The workshop’s returns cycle continues: a trolley carries one library exhibition crate past the doorway to the repair bay, where replacement packing foam is being cut for Thursday’s booking.",
+      "changes": {
+        "studio_returns": {
+          "crate": "North Library exhibition",
+          "location": "adjoining repair bay",
+          "work": "replacement packing foam being cut",
+          "next_booking": "Thursday morning"
+        }
+      },
+      "percepts": [
+        {
+          "to": [
+            "public"
+          ],
+          "text": "Trolley wheels briefly rumble past the doorway. The passing crate bears a paper sleeve marked ‘North Library — Thursday AM’. From the adjoining bay comes the intermittent rasp of packing foam being cut."
+        }
+      ],
+      "reason": "Controller accepts this limited world-author choice; no demo or interview outcome is settled. Gives the workshop an independent working rhythm without determining either participant’s response or the interview outcome.",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\studio-g0.json",
+      "executor": "/root/worklight_world_studio",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\studio-g0.json",
+      "packet_sha256": "e86725d8c9873f772186627192854f2f706eabf4f395cd517b427c3839c29a8c",
+      "id": "e-28f73b4dde7e40ae",
+      "recorded_at": "2026-11-10T17:10:35.790+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "gus",
+      "text": "I can judge a loose wire. I hate not knowing whether I’d spot the software equivalent.",
+      "packet_sha256": "b285a2e71c333abb31378367689e2b5fa5389f12a8b647ab33e04f45b362a0dd",
+      "executor": "/root/worklight_gus_inner",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-d01.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-d01.json",
+      "id": "e-5e6493156e514c25",
+      "recorded_at": "2026-11-10T17:12:01.540+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "mara",
+      "text": "You didn’t train it, and I still want him to look impressed. You made the parts work together. Please don’t leave our phone here.",
+      "packet_sha256": "e02812f5bcb7422458d0f2ce2fd907830b9fde6da12a4027a278baf2c084bc6d",
+      "executor": "/root/worklight_mara_inner",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-d01.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-d01.json",
+      "id": "e-b675012adc064b89",
+      "recorded_at": "2026-11-10T17:12:01.680+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "gus",
+      "text": "*Gus sets his fork on the lunch-box lid.*\n\n“Before you show me the good version, tell me about the most convincing wrong answer this thing has given you. How did you catch it?”",
+      "packet_sha256": "272131e416255c5e40c0ba32e8aab4304e36f42d0865597b9dd07003af479e5e",
+      "executor": "/root/worklight_gus_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m01.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m01.json",
+      "id": "e-819beee259634071",
+      "recorded_at": "2026-11-10T17:13:30.376+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "“It called the pliers slot empty, and for a second I believed it. Then I looked at the tray—the pliers were right there. I kept the picture; the handle’s dark, but I don’t actually know yet whether that caused it. I can show you that one first.”",
+      "packet_sha256": "0deec11c7dec9056d80115e86fa165a9f015fd678b5226105a039146135ef0f0",
+      "executor": "/root/worklight_mara_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m01.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m01.json",
+      "id": "e-1e785b3ed9fd4d54",
+      "recorded_at": "2026-11-10T17:15:37.735+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "inner_reply",
+      "actor": "gus",
+      "text": "“I don’t know if I’d spot it either. But she hasn’t tried to sell me the dark handle as a solved mystery; I want to see that picture.”",
+      "packet_sha256": "69e75ada1e569618698e60099df63ec18180b97618a98a136df2cfe8b5e40536",
+      "executor": "/root/worklight_gus_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-private01.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-private01.json",
+      "id": "e-e5d979a32f494316",
+      "recorded_at": "2026-11-10T17:16:48.354+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner_reply",
+      "actor": "mara",
+      "text": "“I want him impressed too. Getting all of it to work together was hard, and I’d like that to count. The phone’s coming home with us.”",
+      "packet_sha256": "317165cc78a4deb8a23f2f439efcd0b1c1c1df8504e9f113d45eec274d5146f4",
+      "executor": "/root/worklight_mara_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-private01.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-private01.json",
+      "id": "e-bef316da058448e7",
+      "recorded_at": "2026-11-10T17:16:48.487+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "gus",
+      "text": "I was hoping you’d say you knew how to spot it. Still, I want to see what fooled her.",
+      "packet_sha256": "47c46b540a428370f8f4c63bd9f38de18dbc087e9a26d64e938a19ab0f679ea3",
+      "executor": "/root/worklight_gus_inner",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-d02.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-d02.json",
+      "id": "e-8de4418c048b41e6",
+      "recorded_at": "2026-11-10T17:18:24.278+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "mara",
+      "text": "You went straight for the ugly picture. I’m still wincing, but at least we aren’t guarding a secret now. And I heard you about the phone.",
+      "packet_sha256": "183bcbecc3c787bfeb25ff1e4cf712cb90e7f7e54395d6e5d17c79c6d9d41583",
+      "executor": "/root/worklight_mara_inner",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-d02.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-d02.json",
+      "id": "e-9cb5362cb7404f53",
+      "recorded_at": "2026-11-10T17:18:24.492+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "gus",
+      "text": "“Yes, show me that one. I want to see what you saw in that second before you looked at the tray.”",
+      "packet_sha256": "7b8fc1e7e5b0ac4e0beff176079092cb29feadc67a5a47dbc6897bb34f61a3bf",
+      "executor": "/root/worklight_gus_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m02.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m02.json",
+      "id": "e-c060bd6b629845ad",
+      "recorded_at": "2026-11-10T17:19:21.381+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "*Mara opens the saved failure picture and turns the phone toward Gus.*\n\n“Here—the slot’s labelled ‘empty’, and the pliers handle is in the picture. I read the label first and went with it. I hadn’t actually checked what was underneath it.”",
+      "packet_sha256": "16f9b5b6a70cf5f1c368c2633e8aa30a58ab31576a76ff863181f491f93c6a0c",
+      "executor": "/root/worklight_mara_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m02.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m02.json",
+      "id": "e-57f114be3d74442b",
+      "recorded_at": "2026-11-10T17:20:40.996+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "world",
+      "proposal": "Make the existing saved failure picture directly visible to Gus.",
+      "decision": "apply",
+      "changes": {
+        "phone_display": "Saved failure picture showing the pliers handle present and its slot labelled ‘empty’."
+      },
+      "percepts": [
+        {
+          "to": [
+            "gus"
+          ],
+          "text": "On the phone screen turned toward you, the saved picture shows the dark pliers handle present and an ‘empty’ label for its slot."
+        }
+      ],
+      "reason": "Controller accepts the shared viewing of the established savedframe only. Mara has opened and presented the saved picture. This exposes the established contradiction without specifying label placement, explaining the failure, or introducing a fresh run.",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\material-pic.json",
+      "executor": "/root/worklight_world_material",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\material-pic.json",
+      "packet_sha256": "409cc9103ee50725a45161b9a4509024f22f2b1332af00fba039615c006e3365",
+      "id": "e-9e898f8dbf99415d",
+      "recorded_at": "2026-11-10T17:21:40.590+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "gus",
+      "text": "“That could have me hunting for pliers I’ve already got. I’d worry more about sending a crate out with something missing. Have you tested whether it ever says a tool’s there when it isn’t?”",
+      "packet_sha256": "f0618ac6fe24814f203c38759f79ea3fb8016651f617a5273b6325d7c90f86ef",
+      "executor": "/root/worklight_gus_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m03.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m03.json",
+      "id": "e-7490ae7725064f82",
+      "recorded_at": "2026-11-10T17:23:52.012+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "“I don’t know—that’s a gap in what I’ve tested. Those thirty captures gave me a timing figure, not a reliable answer about missing tools. We could try it with the wrench out now, but I wouldn’t ask you to send a crate based on that.”",
+      "packet_sha256": "c61f3801975e1d7419c905b25d9d36b1bac2c22da026620b6f95f16f5ef94791",
+      "executor": "/root/worklight_mara_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m03.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m03.json",
+      "id": "e-ece5cafc148d4916",
+      "recorded_at": "2026-11-10T17:25:25.168+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "gus",
+      "text": "“All right, leave the wrench out. May I run the check myself? I’d like to see how far I get without you steering.”",
+      "packet_sha256": "7e2cfca290e2f4a08df3c2b81d598ba40736ca84c5b380a328fc1ac88c64c1af",
+      "executor": "/root/worklight_gus_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m04.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m04.json",
+      "id": "e-05319753ee4845f1",
+      "recorded_at": "2026-11-10T17:27:08.241+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "world",
+      "proposal": "One replacement foam insert reaches a dry-fit check in the North Library crate; the rest of the repacking remains unfinished.",
+      "decision": "apply",
+      "changes": {
+        "studio_returns": {
+          "crate": "North Library exhibition",
+          "location": "adjoining repair bay",
+          "work": "one replacement foam insert being dry-fitted; repacking ongoing",
+          "next_booking": "Thursday morning"
+        }
+      },
+      "percepts": [
+        {
+          "to": [
+            "public"
+          ],
+          "text": "The cutting rasp pauses. From the adjoining repair bay come two soft, hollow thumps as a foam insert is pressed into the open crate."
+        }
+      ],
+      "reason": "Controller accepts this unrelated ongoing repair transition. A small, ordinary transition in the existing repair work gives it its own course without establishing elapsed time or requiring an interview response.",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\studio-progress.json",
+      "executor": "/root/worklight_world_studio",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\studio-progress.json",
+      "packet_sha256": "a2f844590519916d688734df25566a6c3afe09a3f0c00063d219012bfb3a4e2c",
+      "id": "e-d07fbf7527184f82",
+      "recorded_at": "2026-11-10T17:27:08.381+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "mara",
+      "text": "I’m already itching to point at the button. I do want to see what happens when your hands stay out of it.",
+      "packet_sha256": "bb4d1b60202e78a1cfad95717e5aeb9c48d17979c7888ebd3e97da310ba1e172",
+      "executor": "/root/worklight_mara_inner",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-d03.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-d03.json",
+      "id": "e-a06c8b3b4ec548cd",
+      "recorded_at": "2026-11-10T17:29:03.415+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "“Yes—let me get you out of the photo first.”\n\n*Mara taps to return to the app, then offers Gus the phone.*\n\n“I’ll keep quiet, even if I look like I’m about to point.”",
+      "packet_sha256": "cd1dcafa48052436fb59a1ea9c5af4873d6026f604958630fd31c82ca0167126",
+      "executor": "/root/worklight_mara_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m04.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m04.json",
+      "id": "e-14969b0aa65c4486",
+      "recorded_at": "2026-11-10T17:30:33.563+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "world",
+      "proposal": "Show the prototype’s camera view with a clearly labelled check button.",
+      "decision": "apply",
+      "changes": {
+        "phone_display": "Camera preview with a ‘Check tray’ button along the bottom; no current check result displayed."
+      },
+      "percepts": [
+        {
+          "to": [
+            "gus"
+          ],
+          "text": "The offered phone shows a camera preview and a button labelled ‘Check tray’ along the bottom. No occupied/empty result is displayed."
+        }
+      ],
+      "reason": "Controller adopts this modest interface detail and readiness only. This supplies the visible effect of Mara returning to the app without transferring the phone, operating it for Gus, or establishing whether a check will work.",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\material-app.json",
+      "executor": "/root/worklight_world_material",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\material-app.json",
+      "packet_sha256": "4799600d3c3dae7558b538150ae3ffe2d6fc847b1a13f04866af94ecf9c141f3",
+      "id": "e-7680b9a10c584eb0",
+      "recorded_at": "2026-11-10T17:31:50.195+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "gus",
+      "text": "*Gus takes the phone, holds it above the tray to frame all six slots, and taps “Check tray.”*\n\n“Right. Let’s see what it makes of my camera work.”",
+      "packet_sha256": "57119cd22cc1a45c9413535c4ffbfc878710e0532e92efec43ed68202ec9b647",
+      "executor": "/root/worklight_gus_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m05.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m05.json",
+      "id": "e-3244c47e41ce42c8",
+      "recorded_at": "2026-11-10T17:33:10.940+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "world",
+      "proposal": "The check returns six slot estimates matching the current tray.",
+      "decision": "apply",
+      "changes": {
+        "demonstration": "Gus has completed one check of the known tray.",
+        "phone_display": "Captured tray image with six status entries: wrench ‘empty’, pliers ‘occupied’, remaining four slots ‘occupied’."
+      },
+      "percepts": [
+        {
+          "to": [
+            "gus"
+          ],
+          "text": "The screen shows the captured tray image and six status entries. The wrench slot reads ‘empty’; the pliers slot and the other four read ‘occupied’."
+        }
+      ],
+      "reason": "Controller accepts this single fictional run, without generalizing reliability, timing or causal explanation. This single fictional result is consistent with the unchanged tray and a prototype whose earlier error need not recur every time. It establishes neither the earlier failure’s cause nor general reliability. Gus holds and views the screen.",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\material-check.json",
+      "executor": "/root/worklight_world_material",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\material-check.json",
+      "packet_sha256": "48c3a49542439d119498403f916c478aa2ffb35a413338766c57a649693f0c23",
+      "id": "e-82ac9970f81b4b74",
+      "recorded_at": "2026-11-10T17:34:27.227+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "gus",
+      "text": "One button, and I’m already pleased with myself. I rather want another go.",
+      "packet_sha256": "7f1e4be355eb4c078e4ffb7c45135999338f01f927794dd9a44094e6ab8f757b",
+      "executor": "/root/worklight_gus_inner",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-d03.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-d03.json",
+      "id": "e-4b0c73c46a474dd5",
+      "recorded_at": "2026-11-10T17:35:34.485+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "gus",
+      "text": "*Gus turns the screen toward Mara and offers the phone back.*\n\n“Wrench empty, the other five occupied—that matches. What did you build yourself here, and what did you start with?”",
+      "packet_sha256": "dc5cba6e99a6b0bd00a33b73b0dd2af2d98be1ebcb6793ed774bae15e4549579",
+      "executor": "/root/worklight_gus_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m06.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m06.json",
+      "id": "e-8c71b8da1c9b458c",
+      "recorded_at": "2026-11-10T17:36:59.907+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "mara",
+      "text": "He found the button. I’m ridiculously pleased about that—and still a little jealous of how important the word “model” sounds.",
+      "packet_sha256": "a88bf238f91bc94fc31072e8a769da3ef1457c3d4306de2ba5dbbe5844832325",
+      "executor": "/root/worklight_mara_inner",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-d04.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-d04.json",
+      "id": "e-d9c1c84a351c4365",
+      "recorded_at": "2026-11-10T17:38:35.681+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "*Mara takes the phone back.*\n\n“I built the phone app: taking the picture, cropping the six marked slots, running the model locally and showing the answers. I made the CSV export too—that’s my end of the paper trail. One teammate chose and trained the classifier, and the other built the tray and markers. Getting those pieces to work together on Android was my job.”",
+      "packet_sha256": "dabe9160fb72d3d5f32d0355c5a26516c5109e97ac8d6561aa3392c4416add29",
+      "executor": "/root/worklight_mara_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m05.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m05.json",
+      "id": "e-aeaee0d5736c4734",
+      "recorded_at": "2026-11-10T17:40:02.040+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "gus",
+      "text": "“‘Getting them to work together’ is doing a fair bit of work there. Tell me about one thing that broke on Android and what you did about it.”",
+      "packet_sha256": "22b649439d83e74bd9a2b086e056b5e84be71eef2f5a85ca55780468f8191cde",
+      "executor": "/root/worklight_gus_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m07.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m07.json",
+      "id": "e-efc5eb6802ac47c5",
+      "recorded_at": "2026-11-10T17:41:43.522+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "“Oh, the rotation. In an early version, the tray looked upright in the preview, but I was cropping the sideways camera image. I found it when I saved the six crops and saw bits of the wrong slots. I moved the rotation before the crop calculation, then checked each saved crop against its slot. I’d spent far too long blaming the classifier before looking at what I was feeding it.”",
+      "packet_sha256": "d51c4e3c524c34d6605c7cde04b167a6c400807776a80e4bb2da2a1157823916",
+      "executor": "/root/worklight_mara_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m06.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m06.json",
+      "id": "e-62a8230a048a4cda",
+      "recorded_at": "2026-11-10T17:43:13.973+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "gus",
+      "text": "I’d have joined in blaming the classifier. Much more satisfying than discovering you’ve handed it the wrong bit of pliers.",
+      "packet_sha256": "a989d72d30652658a29875da420b6944943b1730c717c41e3acedff7525e5a8c",
+      "executor": "/root/worklight_gus_inner",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-d04.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-d04.json",
+      "id": "e-a39a10e7c89b4159",
+      "recorded_at": "2026-11-10T17:45:50.894+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "gus",
+      "text": "“That’s the sort of fault I’d want you to be able to chase here. I’d like you back for the practical stage. Can somebody run this on a second phone, or are we borrowing yours every time?”",
+      "packet_sha256": "f72937eed94b351ddbe897c4317e628fce2d2c84b1bfec1cab2e40657ce57819",
+      "executor": "/root/worklight_gus_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m08.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m08.json",
+      "id": "e-fed5d5944d5d47f2",
+      "recorded_at": "2026-11-10T17:48:52.280+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "world",
+      "proposal": "Gus has spoken an invitation to the practical selection stage.",
+      "decision": "apply",
+      "changes": {
+        "selection_decision": "Invited to practical selection stage; no placement offer; arrangements still unconfirmed."
+      },
+      "percepts": [],
+      "reason": "Controller records the existing role-authorized choice, not a new world-author decision. No further acceptance, date or offer is inferred.",
+      "text": "“That’s the sort of fault I’d want you to be able to chase here. I’d like you back for the practical stage. Can somebody run this on a second phone, or are we borrowing yours every time?”",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m08.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m08.json",
+      "derived_from_event": "e-fed5d5944d5d47f2",
+      "id": "e-e030880dfdda4763",
+      "recorded_at": "2026-11-10T17:48:52.431+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "“I’d like to come back, thank you. I’ve only tested it on this phone, so I can bring a build to try on another Android, but I can’t promise it’ll work straight away. I do need to take mine home—it’s my everyday phone. Have you got a spare we could use for the practical?”",
+      "packet_sha256": "e7bd130a315b913b0f9b9e8fad13153306a18d82b634fbae950d0258c56fb3a9",
+      "executor": "/root/worklight_mara_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m07.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m07.json",
+      "id": "e-726abdc92d9341cb",
+      "recorded_at": "2026-11-10T17:51:49.890+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "gus",
+      "text": "“Yes—we have a spare Android for testing. I’ll send you its details with the invitation. Bring the build; if it won’t run on ours, I want to see how you tackle that. Would an hour next Tuesday afternoon suit you?”",
+      "packet_sha256": "a162516e390b61cdc155df3717bf18a3265ddcc867ef7e1d48ec6351423cb8cc",
+      "executor": "/root/worklight_gus_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m09.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m09.json",
+      "id": "e-08b4e86912bd48e9",
+      "recorded_at": "2026-11-10T17:55:26.805+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "mara",
+      "text": "He asked you back. I’m less jealous of the model now. And suddenly I’m starving.",
+      "packet_sha256": "7ff7af62f900dc14924e4bda67e513036e90b31b7a32a7924ea952c84a972497",
+      "executor": "/root/worklight_mara_inner",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-d05.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-d05.json",
+      "id": "e-553e516589734939",
+      "recorded_at": "2026-11-10T17:56:49.898+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "“Yes—Tuesday afternoon works for me. What time should I be here? I’ll bring this tray as well as the build, since the app needs these marked positions.”",
+      "packet_sha256": "0656fa1959e405fe6d9c06c7a315adab3761ce3d7302ad91970d334d4909ef64",
+      "executor": "/root/worklight_mara_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\mara-m08.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\mara-m08.json",
+      "id": "e-222fb92f7eb14667",
+      "recorded_at": "2026-11-10T17:58:31.224+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "gus",
+      "text": "“Two o’clock, here at the workshop. Yes, bring that tray; I’ll have our phone charged and ready. Thanks, Mara—see you Tuesday.”\n\n*Gus picks up his fork again.*",
+      "packet_sha256": "f1e98bce53bc8109e920119b6e99576bd8ec63c5615e9fcf3a33a342161998d6",
+      "executor": "/root/worklight_gus_outward",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m10.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\views\\gus-m10.json",
+      "id": "e-d0fe488d000e4c4d",
+      "recorded_at": "2026-11-10T18:00:00.678+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "world",
+      "proposal": "Record the stated practical-stage details at the selected scene ending.",
+      "decision": "apply",
+      "changes": {
+        "selection_decision": "Invited to practical selection stage; no placement offer. Mara accepted Tuesday afternoon; Gus specified two o’clock at this workshop.",
+        "practical_details": "One hour was proposed. Mara will bring known tray and build; Gus promises device details and a charged spare phone. These future actions and app compatibility are not completed."
+      },
+      "percepts": [],
+      "reason": "Controller indexes the already spoken arrangements and preserves future commitments as future; no calendar event or external message is created.",
+      "text": "“Two o’clock, here at the workshop. Yes, bring that tray; I’ll have our phone charged and ready. Thanks, Mara—see you Tuesday.”\n\n*Gus picks up his fork again.*",
+      "source_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m10.json",
+      "input_ref": ".cache\\english-spoken-preprint-20261110\\interview\\returns\\gus-m10.json",
+      "derived_from_event": "e-d0fe488d000e4c4d",
+      "id": "e-5f4606415b074ec8",
+      "recorded_at": "2026-11-10T18:00:00.827+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    }
+  ],
+  "language": [
+    {
+      "id": "interview-catch-the-error",
+      "event_id": "e-819beee259634071",
+      "surface": "How did you catch it?",
+      "meaning": "你当时是怎么发现这个错误的？",
+      "function": "Gus 追问发现过程，Mara 随后说明自己起初相信标签、再看真实工具盘才发现不对。",
+      "register": "直接的口语追问，catch 在这里是发现，不是抓取实物。",
+      "frequency_status": "此用法频率未核实。",
+      "source_url": "https://www.merriam-webster.com/dictionary/catch",
+      "source_scope": "Directly read verb senses discover/find and become suddenly aware; identifying the error as it is grounded in this public question and answer.",
+      "context_event_ids": [
+        "e-1e785b3ed9fd4d54"
+      ],
+      "span": {
+        "start": 154,
+        "end": 175,
+        "unit": "Unicode code points",
+        "index_base": 0,
+        "end_exclusive": true
+      },
+      "event_text_sha256": "13ef97df0fbc119f55a7cbf59596c237fa5316d15156cd03f20ffa37d7f4f020",
+      "related_event_ids": [
+        "e-1e785b3ed9fd4d54"
+      ],
+      "public_sources": [
+        {
+          "label": "Use reference",
+          "url": "https://www.merriam-webster.com/dictionary/catch"
+        }
+      ],
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "id": "interview-went-with-the-label",
+      "event_id": "e-57f114be3d74442b",
+      "surface": "I read the label first and went with it.",
+      "meaning": "我先看了标签，就接受了它的判断。",
+      "function": "Mara 回答自己当时看见和做了什么，把一次失误说成具体过程。",
+      "register": "简洁口语，go with 取选择或采用义，it 指标签给出的判断。",
+      "frequency_status": "此用法频率未核实。",
+      "source_url": "https://www.merriam-webster.com/dictionary/go%20with",
+      "source_scope": "Directly read sense 2, choose; acceptance of the label is a contextual interpretation, not a new dictionary sense.",
+      "context_event_ids": [
+        "e-c060bd6b629845ad",
+        "e-1e785b3ed9fd4d54"
+      ],
+      "span": {
+        "start": 148,
+        "end": 188,
+        "unit": "Unicode code points",
+        "index_base": 0,
+        "end_exclusive": true
+      },
+      "event_text_sha256": "13b69387883c20cfeb0051982dddd1662f7c856fa712a9275c03c0d5638cab67",
+      "related_event_ids": [
+        "e-c060bd6b629845ad",
+        "e-1e785b3ed9fd4d54"
+      ],
+      "public_sources": [
+        {
+          "label": "Use reference",
+          "url": "https://www.merriam-webster.com/dictionary/go%20with"
+        }
+      ],
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "id": "interview-test-coverage-gap",
+      "event_id": "e-ece5cafc148d4916",
+      "surface": "that’s a gap in what I’ve tested",
+      "meaning": "这件事是我现有测试还没覆盖到的空缺。",
+      "function": "Mara 把未知限定为 Gus 刚问的“工具其实不在却被报成在”，接着区分计时记录和缺工具判断的可靠性。",
+      "register": "中性、具体的项目说明，此处适合实习面试中的技术追问。",
+      "frequency_status": "此用法频率未核实。",
+      "source_url": "https://www.collinsdictionary.com/dictionary/english/gap",
+      "source_scope": "Directly read COBUILD sense 3: a missing element makes a situation incomplete; no frequency or CEFR claim is imported.",
+      "context_event_ids": [
+        "e-7490ae7725064f82"
+      ],
+      "span": {
+        "start": 14,
+        "end": 46,
+        "unit": "Unicode code points",
+        "index_base": 0,
+        "end_exclusive": true
+      },
+      "event_text_sha256": "56fd8d8593db5ba088cc53d6198500ea7fc0185b2fb83b7c971e292643737d54",
+      "related_event_ids": [
+        "e-7490ae7725064f82"
+      ],
+      "public_sources": [
+        {
+          "label": "Use reference",
+          "url": "https://www.collinsdictionary.com/dictionary/english/gap"
+        }
+      ],
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "id": "interview-evidence-limit",
+      "event_id": "e-ece5cafc148d4916",
+      "surface": "I wouldn’t ask you to send a crate based on that.",
+      "meaning": "即使现在试了这一次，我也不会让你就凭它放心把箱子发出去。",
+      "function": "她提出可做的小检查，同时限制它能支持的结论。",
+      "register": "克制的条件式判断，wouldn’t 在这里不是过去已经拒绝过。",
+      "frequency_status": "此用法频率未核实。",
+      "source_url": "https://www.merriam-webster.com/dictionary/base#dictionary-entry-2",
+      "source_scope": "Directly read base verb sense 1, usually with on/upon, as finding a basis; the nearby proposal to try with the wrench removed supplies the referent of that.",
+      "context_event_ids": [
+        "e-7490ae7725064f82"
+      ],
+      "span": {
+        "start": 183,
+        "end": 232,
+        "unit": "Unicode code points",
+        "index_base": 0,
+        "end_exclusive": true
+      },
+      "event_text_sha256": "56fd8d8593db5ba088cc53d6198500ea7fc0185b2fb83b7c971e292643737d54",
+      "related_event_ids": [
+        "e-7490ae7725064f82"
+      ],
+      "public_sources": [
+        {
+          "label": "Use reference",
+          "url": "https://www.merriam-webster.com/dictionary/base#dictionary-entry-2"
+        }
+      ],
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "id": "interview-own-integration-work",
+      "event_id": "e-aeaee0d5736c4734",
+      "surface": "Getting those pieces to work together on Android was my job.",
+      "meaning": "把这些部分在 Android 上接起来、一起跑通，是我负责的工作。",
+      "function": "在分别说明同伴贡献后，Mara 把自己的贡献落在端上集成，而没有把训练分类器或制作工具盘也归给自己。",
+      "register": "具体的面试口语，job 此处指自己负责的任务，不等于一份受雇职位。",
+      "frequency_status": "此表达用法频率未核实。",
+      "source_url": "https://www.merriam-webster.com/dictionary/get",
+      "source_notes": [
+        {
+          "url": "https://www.merriam-webster.com/dictionary/get",
+          "scope": "Directly read the causative transitive senses, including cause and causing a condition; the engineering integration interpretation comes from this public answer."
+        },
+        {
+          "url": "https://www.collinsdictionary.com/dictionary/english/job",
+          "scope": "Directly read duty/responsibility as distinct from occupation or employment."
+        }
+      ],
+      "context_event_ids": [
+        "e-8c71b8da1c9b458c"
+      ],
+      "span": {
+        "start": 305,
+        "end": 365,
+        "unit": "Unicode code points",
+        "index_base": 0,
+        "end_exclusive": true
+      },
+      "event_text_sha256": "33eb4dda2d4fe2e5fa2b171813aa1dc016a538a39e928254d728b4823b6f06f0",
+      "related_event_ids": [
+        "e-8c71b8da1c9b458c"
+      ],
+      "audience": [
+        "public"
+      ],
+      "public_sources": [
+        {
+          "label": "Use reference",
+          "url": "https://www.merriam-webster.com/dictionary/get"
+        },
+        {
+          "label": "Use reference",
+          "url": "https://www.collinsdictionary.com/dictionary/english/job"
+        }
+      ]
+    }
+  ],
+  "learner_evidence": [],
+  "receipts": {
+    "material-g0": {
+      "operation_id": "material-g0",
+      "request_sha256": "98c7476b7694241f0242f3cd637979e8d18ecae8e2889c8399e24e26769c0801",
+      "revision": 1,
+      "event_id": "e-12f4ad0b9eb146cd",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "studio-g0": {
+      "operation_id": "studio-g0",
+      "request_sha256": "21aceb6c3969e0f24158ffcedacd32384e0bb9e3def08f69befe8f331b6a17a9",
+      "revision": 2,
+      "event_id": "e-28f73b4dde7e40ae",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "gus-d01": {
+      "operation_id": "gus-d01",
+      "request_sha256": "842082662fb5d13ce4a11db83f5fd067b593f3f05f813a04cf5f00df9c44001b",
+      "revision": 3,
+      "event_id": "e-5e6493156e514c25",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "mara-d01": {
+      "operation_id": "mara-d01",
+      "request_sha256": "1e0afccfdeff91c66575f87de6a5123df549c14e93f0a60c16b4a93b62fe5b08",
+      "revision": 4,
+      "event_id": "e-b675012adc064b89",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "gus-m01": {
+      "operation_id": "gus-m01",
+      "request_sha256": "eb6e1567fc1ffeadd712b3baefa8bfb88191dc278f9ca77884ec6ad22c4fb92e",
+      "revision": 5,
+      "event_id": "e-819beee259634071",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "mara-m01": {
+      "operation_id": "mara-m01",
+      "request_sha256": "f83681d71dbb55114e9c01b161e92c53826d5b216537e5b78c2805d91f345a01",
+      "revision": 6,
+      "event_id": "e-1e785b3ed9fd4d54",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "gus-private01": {
+      "operation_id": "gus-private01",
+      "request_sha256": "16d435d6527f84bc729941cc6eb59fe5d2d4dfec7531cf71b7045ddf5730405f",
+      "revision": 7,
+      "event_id": "e-e5d979a32f494316",
+      "kind": "inner_reply",
+      "semantic_certification": false
+    },
+    "mara-private01": {
+      "operation_id": "mara-private01",
+      "request_sha256": "e2677f0d3b2559f908666f9e9649a89118ac400fb964b7bf62a746216121393d",
+      "revision": 8,
+      "event_id": "e-bef316da058448e7",
+      "kind": "inner_reply",
+      "semantic_certification": false
+    },
+    "gus-d02": {
+      "operation_id": "gus-d02",
+      "request_sha256": "cb109f5ad92be60a7ea9ab6218ed70bf48c0feda81aef5c949063749ed14fed1",
+      "revision": 9,
+      "event_id": "e-8de4418c048b41e6",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "mara-d02": {
+      "operation_id": "mara-d02",
+      "request_sha256": "9bdab43c5261b868104fe8e1706a23759375994564206beb3f371cb1ee109bc3",
+      "revision": 10,
+      "event_id": "e-9cb5362cb7404f53",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "gus-m02": {
+      "operation_id": "gus-m02",
+      "request_sha256": "50b705410a5d9a1cd5ebb8ad39653e08f41b3be9c6c8755b18a4568325cb0c16",
+      "revision": 11,
+      "event_id": "e-c060bd6b629845ad",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "mara-m02": {
+      "operation_id": "mara-m02",
+      "request_sha256": "b879d33d5b5c56014fcb2c2fbc3fe9bd158e70dc704b2f41f61e698f9707feb0",
+      "revision": 12,
+      "event_id": "e-57f114be3d74442b",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "material-pic": {
+      "operation_id": "material-pic",
+      "request_sha256": "4a1c2eb9cbd26ba940c7b06be9bee2f01328af49f8fc8e35d53551a8098cb5f8",
+      "revision": 13,
+      "event_id": "e-9e898f8dbf99415d",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "gus-m03": {
+      "operation_id": "gus-m03",
+      "request_sha256": "428a30dcf0ea5a7388cce99877ae6beef6eed6578fabf897ab2c0bb30be59f64",
+      "revision": 14,
+      "event_id": "e-7490ae7725064f82",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "mara-m03": {
+      "operation_id": "mara-m03",
+      "request_sha256": "29ccbaaed5894f4daeec69549231a99259f835871c969e619a4b13c34d7c2d13",
+      "revision": 15,
+      "event_id": "e-ece5cafc148d4916",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "gus-m04": {
+      "operation_id": "gus-m04",
+      "request_sha256": "baf4b9ffe351fc9e8d58e52ea935cc19019c3c4c7b0b5713824c260bee973edd",
+      "revision": 16,
+      "event_id": "e-05319753ee4845f1",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "studio-progress": {
+      "operation_id": "studio-progress",
+      "request_sha256": "b42db45fc91bafca6d7d6f29c246f23db40edb8b82d8f266eede7fc24a9e6f5c",
+      "revision": 17,
+      "event_id": "e-d07fbf7527184f82",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "mara-d03": {
+      "operation_id": "mara-d03",
+      "request_sha256": "8988820a4adcf5fc9bcef3f03fd21f8d092973b65dc93a3c2e5ce255bb94a22a",
+      "revision": 18,
+      "event_id": "e-a06c8b3b4ec548cd",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "mara-m04": {
+      "operation_id": "mara-m04",
+      "request_sha256": "09b1c468539c0ee97bfeb17331fdf1662a8381a268c877439b55e11f77d6a3f6",
+      "revision": 19,
+      "event_id": "e-14969b0aa65c4486",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "material-app": {
+      "operation_id": "material-app",
+      "request_sha256": "fc7c6e4465d07a061c5447e575a095ee2799cad7192db4da685873fa96602ee0",
+      "revision": 20,
+      "event_id": "e-7680b9a10c584eb0",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "gus-m05": {
+      "operation_id": "gus-m05",
+      "request_sha256": "bf584edc56d0a60ab6c08b111632b2bd8daeddc6a77274c2904f19a9e95b7878",
+      "revision": 21,
+      "event_id": "e-3244c47e41ce42c8",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "material-check": {
+      "operation_id": "material-check",
+      "request_sha256": "7753ad3ee64ccbeb4c3d0bb256930d93e96e8411058f001720bf0a8942595d1a",
+      "revision": 22,
+      "event_id": "e-82ac9970f81b4b74",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "gus-d03": {
+      "operation_id": "gus-d03",
+      "request_sha256": "17bd01b1cfe3d1a8859bde5af61a27ec17612c9b7abf274a38df4b5067f44644",
+      "revision": 23,
+      "event_id": "e-4b0c73c46a474dd5",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "gus-m06": {
+      "operation_id": "gus-m06",
+      "request_sha256": "70f4763017ef31e03079f5934f4470d98f5330afa0fdacbe6b0f3544b7587ec7",
+      "revision": 24,
+      "event_id": "e-8c71b8da1c9b458c",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "mara-d04": {
+      "operation_id": "mara-d04",
+      "request_sha256": "a54a549752a576d45f1a70e42b07cd2293ebd71ecb091157c9bb5fa9c7507aa6",
+      "revision": 25,
+      "event_id": "e-d9c1c84a351c4365",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "mara-m05": {
+      "operation_id": "mara-m05",
+      "request_sha256": "6f794d1c4f506c792700ecfaa5a966b48f0b6d7581c8750a6b12078efc418387",
+      "revision": 26,
+      "event_id": "e-aeaee0d5736c4734",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "public-language-r15": {
+      "operation_id": "public-language-r15",
+      "request_sha256": "09258ae37f9fcbe0f19be8e4be5f13c13cafbb164090cd4e38463e04e7992f67",
+      "revision": 27,
+      "resources_added": 4,
+      "threads_added": 2,
+      "learner_evidence_added": 0
+    },
+    "gus-m07": {
+      "operation_id": "gus-m07",
+      "request_sha256": "9e09075b0d81e6afe3314f94304036746b7125bfaf47982e996d4013a7718127",
+      "revision": 28,
+      "event_id": "e-efc5eb6802ac47c5",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "mara-m06": {
+      "operation_id": "mara-m06",
+      "request_sha256": "b5ca498b2a59bc8145027de88a4f51d98dfbd23c2cba9c3bcb60a3255168bfe8",
+      "revision": 29,
+      "event_id": "e-62a8230a048a4cda",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "gus-d04": {
+      "operation_id": "gus-d04",
+      "request_sha256": "3877ecd4a4dafdc468b38bfeb869874d303186310a5921539242f5bc759f9e52",
+      "revision": 30,
+      "event_id": "e-a39a10e7c89b4159",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "public-language-r27": {
+      "operation_id": "public-language-r27",
+      "request_sha256": "3932af326eafa4addf5474b17a8bf2c63fc92ead8199a606b2251a8e7e8ebf57",
+      "revision": 31,
+      "resources_added": 1,
+      "threads_added": 1,
+      "learner_evidence_added": 0
+    },
+    "gus-m08": {
+      "operation_id": "gus-m08",
+      "request_sha256": "a1fb0d8593edc53df31e5990c35d2f0aa921bda7010087a91cc4234876f6645d",
+      "revision": 32,
+      "event_id": "e-fed5d5944d5d47f2",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "adopt-gus-invitation": {
+      "operation_id": "adopt-gus-invitation",
+      "request_sha256": "281750576955b033f355860b9ecde5b825b353c6c4497e711556f45aea91d601",
+      "revision": 33,
+      "event_id": "e-e030880dfdda4763",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "mara-m07": {
+      "operation_id": "mara-m07",
+      "request_sha256": "05ac1defe47b414c89bc5e74ea68317db60d71fa3ca628243bb39108c4a73fe9",
+      "revision": 34,
+      "event_id": "e-726abdc92d9341cb",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "gus-m09": {
+      "operation_id": "gus-m09",
+      "request_sha256": "6848f200ed220210b6f80fafa4cce89e51881e7be3c82a8226a0aba55d5a31e5",
+      "revision": 35,
+      "event_id": "e-08b4e86912bd48e9",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "mara-d05": {
+      "operation_id": "mara-d05",
+      "request_sha256": "449eb48c5260ae738ebad9536358c0ed87586ce11b267ab2414ac24af2ed2ee6",
+      "revision": 36,
+      "event_id": "e-553e516589734939",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "mara-m08": {
+      "operation_id": "mara-m08",
+      "request_sha256": "c531dec9e454174dd471fa208b1c54c07aabc2e931157428307be27425b76c83",
+      "revision": 37,
+      "event_id": "e-222fb92f7eb14667",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "gus-m10": {
+      "operation_id": "gus-m10",
+      "request_sha256": "d613c32cfe2ea79ffb38b2f89f65e341c959a8c5adfb9b11d44fae7b10c2a627",
+      "revision": 38,
+      "event_id": "e-d0fe488d000e4c4d",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "adopt-practical-details": {
+      "operation_id": "adopt-practical-details",
+      "request_sha256": "fd2ea43c42c7f0cb4d40e62c99b040246e7ee0603d5acd4f1bbbc9252a39ce3e",
+      "revision": 39,
+      "event_id": "e-5f4606415b074ec8",
+      "kind": "world",
+      "semantic_certification": false
+    }
+  },
+  "status": "DRAFT",
+  "limits": "operator-authored fictional facts and source attributions; no semantic or host authentication",
+  "listening_threads": [
+    {
+      "id": "from-wrong-answer-to-own-action",
+      "label": "从发现错误到说清自己的动作",
+      "text": "先听 How did you catch it，再听 Gus 追问最初那一秒；Mara 从“我发现了错”讲到“我先信了标签”，深色手柄是否导致错误仍没有答案。",
+      "event_ids": [
+        "e-819beee259634071",
+        "e-1e785b3ed9fd4d54",
+        "e-c060bd6b629845ad",
+        "e-57f114be3d74442b"
+      ]
+    },
+    {
+      "id": "from-consequence-to-evidence-limit",
+      "label": "一次检查能支持什么结论",
+      "text": "Gus 把问题转到缺工具却被报成在的后果；Mara 说明现有记录答不了这个问题，眼前的一次试验提议也不是发货保证。",
+      "event_ids": [
+        "e-7490ae7725064f82",
+        "e-ece5cafc148d4916"
+      ]
+    },
+    {
+      "id": "one-match-then-contribution",
+      "label": "一次匹配之后，问清自己做了什么",
+      "text": "Mara 先限制一次试验的结论，随后 Gus 自己操作并报告这次匹配；他接着问哪些是她做的、起初用了什么，她便分别说清自己的手机端与 CSV、同伴的分类器训练和实体工具盘，再收束到端上集成。",
+      "event_ids": [
+        "e-ece5cafc148d4916",
+        "e-05319753ee4845f1",
+        "e-14969b0aa65c4486",
+        "e-3244c47e41ce42c8",
+        "e-8c71b8da1c9b458c",
+        "e-aeaee0d5736c4734"
+      ]
+    }
+  ],
+  "integrity_sha256": "def1b007350709486255a7658086d992344dc43465d9609b56c1cf11878a0851"
+}
+```

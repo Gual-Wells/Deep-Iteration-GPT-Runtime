@@ -1,0 +1,16 @@
+{
+  "proposal": "The cloth just beyond the tear feels thin and smooth with wear. It folds easily under the gentle pinch without opening a fresh split.",
+  "decision_suggestion": "apply",
+  "changes": {
+    "chair.upholstery.tested_spot": "Thin and smooth with wear; remains intact under the gentle pinch."
+  },
+  "percepts": [
+    {
+      "to": [
+        "nell"
+      ],
+      "text": "The small fold feels thin and worn between your fingers; it yields without tearing."
+    }
+  ],
+  "reason": "This gives the actual touch a limited material result. Gentle pinching does not establish whether a stitch would hold under tension."
+}

@@ -1,0 +1,4 @@
+{
+  "actual_native_return": "*Mara takes the phone back.*\n\n“I built the phone app: taking the picture, cropping the six marked slots, running the model locally and showing the answers. I made the CSV export too—that’s my end of the paper trail. One teammate chose and trained the classifier, and the other built the tray and markers. Getting those pieces to work together on Android was my job.”",
+  "executor": "/root/worklight_mara_outward"
+}

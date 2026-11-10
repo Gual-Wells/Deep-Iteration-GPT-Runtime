@@ -1,0 +1,33 @@
+{
+  "packet_sha256": "e86725d8c9873f772186627192854f2f706eabf4f395cd517b427c3839c29a8c",
+  "view": {
+    "director": {
+      "id": "studio",
+      "domain": "Other workshop life, bookings, returned crates and people's independent offstage activities; no forced interview result or actor dialogue."
+    },
+    "scene": "Afternoon in a small workshop that builds travelling exhibitions. Mara has arrived for a first-round interview for a summer prototype-assistant placement. Gus, an experienced exhibition maker, is interviewing her. Returned transport crates stand beside the bench. Mara has her old Android phone and two printed prototype logs. A six-slot cardboard tool tray sits under a work light; five tools are in their marked places and a wrench lies beside its empty place. Her application describes a phone prototype that checks a tool tray without internet. No demonstration or interview decision has happened yet.",
+    "world": {
+      "scene_time": "afternoon",
+      "interview_stage": "first round",
+      "selection_decision": "not made",
+      "demonstration": "not attempted",
+      "tray_slots": 6,
+      "occupied_slots": 5,
+      "wrench_location": "beside empty marked place",
+      "light": "work light on",
+      "phone_owner": "Mara; everyday phone",
+      "prototype_scope": "known marked tray; occupied/empty estimates",
+      "historical_test": "fictional single phone, 30 warm captures, fixed light, mains power; median tap-to-status 0.9s",
+      "unmeasured": [
+        "cold startup",
+        "other phone",
+        "battery endurance",
+        "other lighting",
+        "general accuracy"
+      ],
+      "known_historical_failure": "dark pliers handle labelled empty; cause unresolved"
+    },
+    "public_events": [],
+    "instruction": "Propose or refrain. Affect situations and perceived events, not another participant private mind. Do not write other characters dialogue."
+  }
+}

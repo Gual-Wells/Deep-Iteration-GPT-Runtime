@@ -1,0 +1,17 @@
+{
+  "proposal": "The grey cotton darkens as it absorbs the pooled water. A thin wet sheen remains across the wiped patch beneath the chair.",
+  "decision_suggestion": "apply",
+  "changes": {
+    "rag.condition": "Damp and darker where it has absorbed water.",
+    "floor.beneath_chair": "Pooled water reduced in the wiped area; a thin wet sheen remains."
+  },
+  "percepts": [
+    {
+      "to": [
+        "public"
+      ],
+      "text": "A dark damp patch spreads through the grey rag; the wiped floor still glistens faintly."
+    }
+  ],
+  "reason": "A limited, visible consequence of wiping with cotton, without making the floor perfectly dry."
+}

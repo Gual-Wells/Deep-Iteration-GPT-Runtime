@@ -1,0 +1,17 @@
+{
+  "proposal": "The check returns six slot estimates matching the current tray.",
+  "decision_suggestion": "apply",
+  "changes": {
+    "demonstration": "Gus has completed one check of the known tray.",
+    "phone_display": "Captured tray image with six status entries: wrench ‘empty’, pliers ‘occupied’, remaining four slots ‘occupied’."
+  },
+  "percepts": [
+    {
+      "to": [
+        "gus"
+      ],
+      "text": "The screen shows the captured tray image and six status entries. The wrench slot reads ‘empty’; the pliers slot and the other four read ‘occupied’."
+    }
+  ],
+  "reason": "This single fictional result is consistent with the unchanged tray and a prototype whose earlier error need not recur every time. It establishes neither the earlier failure’s cause nor general reliability. Gus holds and views the screen."
+}

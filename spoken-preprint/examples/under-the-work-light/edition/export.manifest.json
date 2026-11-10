@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "kind": "english-spoken-preprint-export",
+  "source": {
+    "baseline_id": "under-the-work-light-01",
+    "snapshot_sha256": "def1b007350709486255a7658086d992344dc43465d9609b56c1cf11878a0851",
+    "source_file_sha256": "d8ad1f5b00b402ce97e2a11f6a2b2d54adf70304b625e65eabb72d0ccee8e491"
+  },
+  "files": {
+    "phone/LISTEN.md": "4507bc7aadf49c102b940a6741349720f76b8429ed1b6dc137a7eba88d48cca9",
+    "phone/PHONE.txt": "48b99c9a61d0d19aa9e2a0482f631e65f71183d5249ec8832c0e30dc0179dac1",
+    "CREATOR.md": "c7aa412a9a704888c450f5c784f7d20217f2601fb6f25c9c0d26f84d718e2974",
+    "phone/PUBLIC-REVIEW.md": "98b7305dfa0792a2626015860ed5885adc605a3305d448c814ac2b5fb0fd65b2"
+  },
+  "phone_files": [
+    "phone/LISTEN.md",
+    "phone/PHONE.txt",
+    "phone/PUBLIC-REVIEW.md"
+  ],
+  "creator_file": "CREATOR.md",
+  "limits": "File integrity and source binding only; no semantic, rights, native-host, phone/Voice or learning-effect certification. The manifest does not hash itself."
+}

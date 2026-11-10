@@ -1,0 +1,15 @@
+{
+  "id": "not-over-the-table-seed",
+  "title": "Not Over the Table / 桌子上方先空着",
+  "status_note": "Unselected literary/preparation seed, not an independently generated second preprint. Personal target-domain relevance is unconfirmed; do not use as a target-specific next book without that relation. No future dialogue is prescribed.",
+  "genesis_brief": {"target_domains":[],"target_status":"awaiting actual user domain priorities","scene_domain":"family, moving home and gift placement","relation_status":"unconfirmed; literary interest and CLI success do not establish user value"},
+  "public_scene": "Saturday morning. Ida is unpacking in her new flat. There is a clear rectangle of wall above the kitchen table. Her mother Joan arrives with a framed picture in a shopping bag. They have not agreed where, or whether, to hang it.",
+  "actors": [
+    {"id":"ida","name":"Ida","public_role":"Adult daughter, recently moved into this flat.","outward":"Specific, sometimes abrupt; wants her own space but also her mother there. Speak only your actual contribution, not a whole conversation.","inner":"Independent fictional inner companion: pride, fondness, guilt, impatience and ordinary distraction may conflict. You can be wrong; her actual words can change you.","own_background":["You intentionally left that part of the wall empty. You have not told Joan this yet."]},
+    {"id":"joan","name":"Joan","public_role":"Ida's mother, visiting during unpacking.","outward":"Practical, observant, can be funny and touchy. Help is real but does not mean you approve of everything. Choose your own contribution.","inner":"Independent fictional companion: want a place in her new life and to feel useful; can be generous, proprietary, hurt, amused or distracted. Not an oracle or a mandatory bad voice.","own_background":["You bought the picture because its colour pleased you; you thought it might suit the new kitchen. You do not have permission to choose its place."]}
+  ],
+  "directors":[{"id":"material","domain":"Household objects, sounds, physical conditions; no actor minds."},{"id":"neighbours","domain":"Independent neighbouring life; no guaranteed help or plot payoff."}],
+  "initial_state":{"picture_hung":false,"place_agreed":false},
+  "language_brief":{"stage":"before_generation","opportunities":["Distinguish receiving a gift from consenting to its placement","Hear disagreement coexist with continuing practical cooperation"],"target_register":"Everyday familiar speech; not therapy or a formal debate","expression_policy":"No required words or lines; ordinary repeated expressions are allowed","frequency_policy":"Keep sense/register evidence separate from specific-use frequency"},
+  "sources":[{"kind":"original-single-author-material-study","title":"Not Over the Table","scope":"Initial household situation only; no supplied dialogue is credited as independent actor output."}]
+}

@@ -1,0 +1,17 @@
+{
+  "proposal": "The chair’s wooden feet meet the floor with a low knock as its weight settles.",
+  "decision_suggestion": "apply",
+  "changes": {
+    "chair_location": "On the shop floor by the door, clear of the cloth.",
+    "chair.support": "Resting on its feet."
+  },
+  "percepts": [
+    {
+      "to": [
+        "public"
+      ],
+      "text": "A low wooden knock sounds as the chair meets the floor."
+    }
+  ],
+  "reason": "The direct material consequence of Idris’s stated lowering, following Nell’s permission; no additional incident is needed."
+}
