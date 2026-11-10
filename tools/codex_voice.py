@@ -17,6 +17,9 @@ def instruction_text(root: Path, layer: str) -> str:
     resident = (root / manifest['resident']).read_text(encoding='utf-8').strip()
     if layer == 'resident':
         return resident + '\n'
+    mobile = (root / manifest['mobile_resident']).read_text(encoding='utf-8').strip()
+    if layer == 'mobile':
+        return mobile + '\n'
     if layer != 'project':
         raise ValueError(f'unknown Voice layer: {layer}')
     skill = (root / manifest['skill'] / 'SKILL.md').read_text(encoding='utf-8')
@@ -35,7 +38,7 @@ def instruction_text(root: Path, layer: str) -> str:
         'Its presence alone is not a command to begin rehearsal or proof that Voice read it. '
         'When requested or selected by the host, use the guidance below. '
         'Do not recite the installation notes during practice.',
-        '## Resident guidance\n\n' + resident,
+        '## Portable resident guidance\n\n' + mobile,
         skill,
     ]
     for key, anchor in (('examples', 'exchanges-to-learn-from'),
@@ -52,7 +55,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest='command', required=True)
     for action in ('instructions', 'export'):
         command = sub.add_parser(action)
-        command.add_argument('layer', choices=('resident', 'project'))
+        command.add_argument('layer', choices=('resident', 'mobile', 'project'))
         if action == 'export':
             command.add_argument('--out', type=Path, required=True,
                                  help='create a new file; never overwrite or install')

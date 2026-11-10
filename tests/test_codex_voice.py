@@ -22,6 +22,7 @@ class VoiceExportTests(unittest.TestCase):
             self.assertFalse(receipt['voice_behavior_observed'])
             content = out.read_text(encoding='utf-8')
             manifest = json.loads((ROOT / 'voice/manifest.json').read_text(encoding='utf-8'))
+            self.assertIn((ROOT / manifest['mobile_resident']).read_text(encoding='utf-8').strip(), content)
             for key in ('examples', 'professional', 'hosts'):
                 self.assertIn((ROOT / manifest[key]).read_text(encoding='utf-8').strip(), content)
             self.assertNotIn('(references/', content)

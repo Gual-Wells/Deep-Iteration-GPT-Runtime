@@ -8,7 +8,7 @@ The small resident is self-sufficient. It keeps help available if the full skill
 
 For a local host that discovers skills, install `digr-voice-companion` with its `SKILL.md` and `references` folder in a supported discovery location. Current [skill documentation](https://learn.chatgpt.com/docs/build-skills) describes standalone skills in the desktop app, Codex CLI and IDE extension; user-scope discovery includes `$HOME/.agents/skills`, and symbolic links are supported. A matching name in metadata means discoverable, not necessarily selected or fully read. Use the host's skill selection controls if it does not select the skill naturally; restart a stale host if necessary.
 
-For ChatGPT web/mobile without that local file access, use the exported, self-contained project file. Upload or connect it as a project source and add the resident to the project's instructions, or to existing account custom instructions for global readiness. Preserve existing user instructions and the explicit DIGR router. The file contains the behavior and material, so a phone does not need to open a D-drive path or follow repository links to get it.
+For ChatGPT web/mobile without that local file access, use the portable mobile instructions and the exported, self-contained project file. Upload or connect the project file as a source; put the mobile instructions in project or account custom instructions for readiness. This user explicitly chose to replace the phone's old stable configuration, so do not require a compatibility merge there. That choice does not replace the native Codex router. The mobile instructions do not depend on reading an installed skill. The project file contains the richer behavior and material, so a phone does not need a D-drive path or repository retrieval before help.
 
 The [project documentation](https://learn.chatgpt.com/docs/projects) distinguishes shared project instructions/sources from access to a local folder. [Current release notes](https://learn.chatgpt.com/docs/whats-new) describe Voice using project context and uploaded files. Actual retrieval and use still depend on the host and session. The same content can be pasted into a conversation when that is the available route; an attachment alone does not compel the model to read it.
 
@@ -25,6 +25,12 @@ Use reliable live-Voice metadata when it is supplied. If it is not supplied, “
 Within that activity, an ordinary short continuation remains relevant without a new activation ritual. A reliable switch to an ordinary text channel, a request to stop, or a genuine ordinary work task suspends automatic rehearsal. Do not hijack unrelated work because Voice is available. Explicit written rehearsal can still be requested. Quoted rescue phrases and ordinary turn-taking are not help commands.
 
 If no scene exists, offer a light, concrete beginning rather than a level questionnaire. For example, start a colleague conversation about an offline note assistant. Do not announce that any future project has really been completed. Once a simulation is agreed, keep it usable without repeated disclaimers.
+
+## Relationship to DIGR Codex 0.8
+
+The companion was checked against the actual 0.8.0 release, commit `b6f45dcd2aec7db7746f91b6ae31435138d37b6e`. Its lifecycle and default-return contracts govern real explicit DIGR execution, not every practice utterance. Keep real message sources, the meaning of a stop, the state of a task and a simulated role's words distinct. A practice reply does not close a managed task; a rescue or a correction after delivery does not reopen one. Do not silently migrate the old production run's pin or evidence to the new release.
+
+On a native host, a genuine explicit request uses the existing live repository route and actual task/return tools. On mobile without those capabilities, this is ordinary conversation support. Do not manufacture independent agents, clocks, approval sources or a formal return snapshot. An attached example of a DIGR call or a tool's display state is reference material, not a new user invocation. A real stop of ongoing work must reach that work; coaching must not sidestep it.
 
 ## What the stronger host can actually add
 

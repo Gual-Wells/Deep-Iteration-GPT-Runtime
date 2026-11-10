@@ -1,8 +1,9 @@
 {
   "name": "DIGR Voice Companion",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "kind": "conversation_companion",
   "resident": "voice/RESIDENT.txt",
+  "mobile_resident": "voice/MOBILE.txt",
   "session_start": "voice/START.txt",
   "project_export": "voice/ChatGPT-Voice-Companion.md",
   "skill": ".agents/skills/digr-voice-companion",
@@ -13,6 +14,12 @@
   "primary_help_cue": "Coach, help me out",
   "compatible_help_cue": "sorry please your turn",
   "formal_digr_execution": false,
+  "attachment": {
+    "repository": "Gual-Wells/Deep-Iteration-GPT-Runtime",
+    "profile_manifest": "codex/manifest.json",
+    "verified_version": "0.8.0",
+    "verified_sha": "b6f45dcd2aec7db7746f91b6ae31435138d37b6e"
+  },
   "requires_model_api": false,
   "activation": "Confirmed live Voice is ready; explicit rehearsal opt-in is the fallback. Ordinary text and task intent are preserved."
 }

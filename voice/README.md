@@ -1,8 +1,8 @@
-# DIGR Voice Companion · 0.1.0
+# DIGR Voice Companion · 0.2.0
 
 让语音伙伴能帮你想出、说出并继续发展一段内容。它可以直接给一个观点、一段回应或一起创作，不把帮助限制成纠错和半句提示。
 
-这是DIGR库的附属会话设施，有自己的版本，不是新的DIGR执行通道。Codex和stable的显式路由、参数、真实独立代理及计时语义均保持原义。
+这是DIGR库的附属会话设施，有自己的版本，不是新的DIGR执行通道。当前已按 **DIGR Codex 0.8.0** 的真实发布版本核对适配；普通陪练不启动深执行的参数、计时或返回流程。核对基线与边界见 [0.8适配说明](CODEX-0.8.md)。
 
 ## 日常怎样用
 
@@ -16,30 +16,32 @@
 
 ## 手机上直接使用
 
-1. 将 [RESIDENT.txt](RESIDENT.txt) 的内容合并到 ChatGPT 自定义指令，保留原有指导。这是全局待命层；项目内也可放在项目指令中。
+1. 打开手机App的自定义指令入口，将 [MOBILE.txt](MOBILE.txt) 作为语音伙伴配置。按本用户已明确的选择，可直接替换手机端旧stable配置；这份约1400字符的配置自足，不依赖本地技能路径，也不保留旧stable路由。项目内也可使用。
 2. 把 [完整英文单文件](ChatGPT-Voice-Companion.md) 上传到需要练习的 ChatGPT 项目或对话。它已包含行为、示例及技术世界，不需要手机读本地目录。
 3. 第一次发送 [START.txt](START.txt) 的一句话，明确选用附件并进入陪练；随后使用 Voice。已处于可确认的 Voice 且有当前话题时，无需每轮再开启。
 
-短常驻核可独立救场；全文让伙伴有更多内容与方法。只粘贴全文不是绕过附件读取的办法，长文本可能被界面转换成附件。用 START 明确让模型读取核心指导，示例仍按需。若只想练当前聊天，可以先放短核并说“进入语音陪练”。
+手机短核可独立救场；全文让伙伴有更多内容与方法。只粘贴全文不是绕过附件读取的办法，长文本可能被界面转换成附件。用 START 明确让模型读取核心指导，示例仍按需。若只想练当前聊天，可以先放手机短核并说“进入语音陪练”。手机配置并不安装一个缺少原生能力的Codex执行器。
 
 ## 本地使用和重新导出
 
 将 `.agents/skills/digr-voice-companion` 整个目录安装到宿主支持的用户技能位置；本机数据实体放 D，必要的用户路径入口使用目录联接。安装后的新会话可以发现该技能；是否实际选用仍看会话。全局短核可合并进有效的 `CODEX_HOME/AGENTS.md`，不要另建一个冲突的 DIGR 路由。
 
-在本仓库中可重新导出两种材料，不需要联网或模型 API：
+在本仓库中可重新导出材料，不需要联网或模型 API：
 
 ```powershell
 python -B tools/codex.py voice export resident --out D:/task/Voice-Resident.txt
+python -B tools/codex.py voice export mobile --out D:/task/Voice-Mobile.txt
 python -B tools/codex.py voice export project --out D:/task/ChatGPT-Voice-Companion.md
 ```
 
-输出文件必须不存在，工具不会覆盖原件或自动修改全局配置。`voice instructions resident` / `voice instructions project` 可只查看内容。仓库内的完整单文件是当前源文件的装配产物，修改源后要重新生成；源技能及其三份参考是行为和材料的编辑入口。
+输出文件必须不存在，工具不会覆盖原件或自动修改全局配置。`voice instructions resident` / `voice instructions mobile` / `voice instructions project` 可只查看内容。仓库内的完整单文件是当前源文件的装配产物，修改源后要重新生成；源技能及其三份参考是行为和材料的编辑入口。
 
 ## 组成与挂载
 
 | 材料 | 用途 |
 |---|---|
-| [RESIDENT.txt](RESIDENT.txt) | 可合并到ChatGPT自定义指令或本机个人指导的短常驻核；不替换原DIGR路由。 |
+| [RESIDENT.txt](RESIDENT.txt) | 本机个人指导的短常驻核；保留本机已有DIGR路由和实际技能发现。 |
+| [MOBILE.txt](MOBILE.txt) | 手机／网页自足配置；本用户选择直接替换旧stable，普通语音不另开正式DIGR通道。 |
 | [START.txt](START.txt) | 明确选用完整附件并开练的一次入口；不会以裸 DIGR 前缀误触正式执行。 |
 | [完整英文单文件](ChatGPT-Voice-Companion.md) | 供无本地读取端上传；由同一份源技能和参考装配。 |
 | [完整技能](../.agents/skills/digr-voice-companion/SKILL.md) | 当前交流、救场、创作、事实与话轮的具体行为；按需要读取例子。 |
