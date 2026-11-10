@@ -142,6 +142,18 @@ def has_locations(data):
         position(data,s,key) is not None for t in data['tracks'] for s in t.get('segments',[]) for key in ('start','end'))
 
 
+def time_scale(maximum):
+    """One axis unit for the whole projection, including its responsive redraw."""
+    if maximum < 1:return 1000.0,'毫秒'
+    if maximum < 120:return 1.0,'秒'
+    return 1.0/60,'分'
+
+
+def time_label(seconds,maximum):
+    multiplier,unit=time_scale(maximum)
+    return f'{seconds*multiplier:.4g}{unit}'
+
+
 def unlocated_facts(data):
     notes=[];events={e['id']:e for e in data.get('events',[])}
     for event in events.values():
@@ -185,7 +197,7 @@ def render_svg(data,width=1440,theme='light',focus=None):
     uid=prefix(data);narrow=width<560
     left=72 if narrow else 204;right=width-18;plot=right-left;maximum=extent(data)
     unlocated=[line for note in unlocated_facts(data) for line in wrapped('未定位事实｜'+note,width)]
-    y0=166;row=46;height=y0+len(data['tracks'])*row+(156 if narrow else 104)+23*len(unlocated)
+    y0=182;row=46;height=y0+len(data['tracks'])*row+(156 if narrow else 104)+23*len(unlocated)
     x=lambda value:left+value/maximum*plot
     ys={track['id']:y0+i*row for i,track in enumerate(data['tracks'])};ys['COMMON']=99
     palette=({'bg':'#ffffff','fg':'#172b43','muted':'#52647b','grid':'#dce3eb',
@@ -198,7 +210,8 @@ def render_svg(data,width=1440,theme='light',focus=None):
                   {'N':'blue','R':'purple','S':'yellow','D':'orange','V':'green','M':'red'}.items()}}
     e=escape;out=[]
     def add(s):out.append(s)
-    add(f'<svg xmlns="http://www.w3.org/2000/svg" class="digr-timeline" role="img" aria-labelledby="{uid}-title {uid}-desc" width="{width}" height="{height}" viewBox="0 0 {width} {height}" data-maximum="{maximum}" data-time-known="{str(has_locations(data)).lower()}" data-y0="{y0}" data-row="{row}">')
+    multiplier,unit=time_scale(maximum)
+    add(f'<svg xmlns="http://www.w3.org/2000/svg" class="digr-timeline" role="img" aria-labelledby="{uid}-title {uid}-desc" width="{width}" height="{height}" viewBox="0 0 {width} {height}" data-maximum="{maximum}" data-time-multiplier="{multiplier}" data-time-unit="{unit}" data-time-known="{str(has_locations(data)).lower()}" data-y0="{y0}" data-row="{row}">')
     add(f'<title id="{uid}-title">{e(data["title"])}</title><desc id="{uid}-desc">横轴为同一可比域的时间，纵轴为有类型的工作标识，N/R不代表额外代理。细线只表示标识延续；工作区段不自动证明有效T。未知时间不定位；返回、决定、落实分别记录。</desc>')
     add('<style>.digr-timeline{font-family:"Segoe UI","Microsoft YaHei",sans-serif;font-size:14px;font-weight:400}')
     add(f'.digr-timeline text{{fill:{palette["fg"]}}}.digr-timeline .muted{{fill:{palette["muted"]}}}.digr-timeline .grid{{stroke:{palette["grid"]};stroke-width:1}}')
@@ -217,7 +230,7 @@ def render_svg(data,width=1440,theme='light',focus=None):
     ticks=2 if narrow else 6
     for i in range(ticks+1 if has_locations(data) else 0):
         value=maximum*i/ticks
-        add(f'<line x1="{x(value):.2f}" y1="119" x2="{x(value):.2f}" y2="{height-76}" class="grid decor" opacity=".5"/><text x="{x(value):.2f}" y="145" text-anchor="middle" class="secondary muted">{value/60:g}分</text>')
+        add(f'<line x1="{x(value):.2f}" y1="119" x2="{x(value):.2f}" y2="{height-76}" class="grid decor" opacity=".5"/><text x="{x(value):.2f}" y="145" text-anchor="middle" class="secondary muted">{time_label(value,maximum)}</text>')
     if not has_locations(data):add(f'<text x="{left}" y="145" class="secondary muted">时间未定位</text>')
     add('</g>')
     add('<text x="12" y="143" class="secondary muted">身份 Xᵢ</text>')
@@ -287,21 +300,50 @@ def render_svg(data,width=1440,theme='light',focus=None):
 def fragment(data):
     """Host fragment, with responsive projection and keyboard-accessible detail."""
     validate(data);uid=prefix(data)
+    fingerprint=hashlib.sha256(json.dumps(data,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
     svg=render_svg(data,1024,'host')
     unlocated=unlocated_facts(data)
     options=['<option value="">全局概览</option>']
-    for event in data.get('events',[]):
-        options.append(f'<option value="{event["id"]}">{escape(event["track"]+" · "+event["label"])}</option>')
-    for track in data['tracks']:
+    grouped=[{'id':'COMMON','label':'共同前置','segments':[]},*data['tracks']]
+    for track in grouped:
+        entries=[]
+        for event in data.get('events',[]):
+            if event['track']!=track['id']:continue
+            suffix='（时间未定位）' if position(data,event,'at') is None else ''
+            entries.append(f'<option value="{event["id"]}">{escape(event["label"]+suffix)}</option>')
         for index,segment in enumerate(track.get('segments',[])):
-            options.append(f'<option value="span:{track["id"]}-segment-{index}">{escape(track["id"]+" · 区段："+segment["label"])}</option>')
+            suffix='（主轴未定位）' if any(position(data,segment,k) is None for k in ('start','end')) else ''
+            entries.append(f'<option value="span:{track["id"]}-segment-{index}">{escape("区段："+segment["label"]+suffix)}</option>')
+        if entries:options.append(f'<optgroup label="{escape(track["id"]+" · "+track.get("label",""),quote=True)}">'+''.join(entries)+'</optgroup>')
     mains=[t for t in data['tracks'] if t['kind']=='M']
     groups=''.join(f'<button class="btn" type="button" data-main="{t["id"]}" aria-expanded="false" aria-controls="{uid}-figure">{t["id"]} 展开</button>' for t in mains) if len(mains)>1 else ''
     facts=''.join('<li>'+escape(label)+'</li>' for label in highlighted_facts(data))
     payload=json.dumps(data,ensure_ascii=False).replace('<','\\u003c')
     script=(Path(__file__).resolve().parent/'assets/codex_timeline_view.js').read_text(encoding='utf-8')
-    return f'''<section id="{uid}" aria-label="DIGR全流程时间与身份图">
-<style>#{uid}{{display:grid;gap:calc(var(--font-size-base)*.75)}}#{uid} .digr-timeline{{display:block;width:100%;height:auto;font-size:var(--font-size-base)}}#{uid} .digr-timeline .secondary,#{uid} .digr-timeline .event-label{{font-size:calc(var(--font-size-base)*.86)}}#{uid} .digr-timeline .bar-label{{pointer-events:none}}#{uid} .detail{{white-space:normal;overflow-wrap:anywhere}}#{uid} .diagram-legend{{display:flex;gap:calc(var(--font-size-base)*.75);flex-wrap:wrap}}</style>
+    return f'''<section id="{uid}" data-fingerprint="{fingerprint}" aria-label="DIGR全流程时间与身份图">
+<style>
+#{uid}{{display:grid;gap:calc(var(--font-size-base)*.75)}}
+#{uid} .digr-timeline{{display:block;width:100%;height:auto;font-size:var(--font-size-base)}}
+#{uid} .digr-timeline .secondary,#{uid} .digr-timeline .event-label{{font-size:calc(var(--font-size-base)*.86)}}
+#{uid} .digr-timeline .bar-label{{pointer-events:none}}
+#{uid} .diagram-legend{{display:flex;gap:calc(var(--font-size-base)*.75);flex-wrap:wrap}}
+#{uid} [data-figure]{{position:relative}}
+#{uid} [data-row-controls]{{position:absolute;inset:0;pointer-events:none}}
+#{uid} .row-control{{position:absolute;left:0;height:44px;display:flex;align-items:center;gap:calc(var(--font-size-base)*.25);pointer-events:none}}
+#{uid} .row-control[hidden]{{display:none}}
+#{uid} .row-description{{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+#{uid} .hit-target{{display:inline-flex;align-items:center;min-width:44px;min-height:44px;max-width:100%;pointer-events:auto}}
+#{uid} .hit-target:has(>button[hidden]){{display:none}}
+#{uid} .selector-field{{min-width:0;width:100%}}
+#{uid} [data-inspector],#{uid} [data-detail],#{uid} .detail-relations{{display:grid;gap:calc(var(--font-size-base)*.75);overflow-wrap:anywhere}}
+#{uid} .inspector-heading{{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--font-size-base)*.5);flex-wrap:wrap}}
+#{uid} [data-candidates][hidden]{{display:none}}
+#{uid} [data-detail] dl{{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:calc(var(--font-size-base)*.25) calc(var(--font-size-base)*.75);margin:0}}
+#{uid} [data-detail] dt,#{uid} [data-detail] dd{{margin:0}}
+#{uid} .detail-relation{{display:flex;align-items:center;gap:calc(var(--font-size-base)*.5);flex-wrap:wrap}}
+#{uid} .detail-relation>span:not(.hit-target){{min-width:0;flex:1;overflow-wrap:anywhere}}
+@media(max-width:559px){{#{uid} [data-detail] dl{{grid-template-columns:1fr}}#{uid} [data-detail] dd{{margin-bottom:calc(var(--font-size-base)*.25)}}}}
+</style>
 <div class="text-small">{'结构示意 · 时间与行为均为编排，非本轮实录' if data['mode']=='illustration' else '已记录事实 · 未定位时间单独保留'}</div>
 {('<div class="text-small">观测起点：'+escape(data['origin'])+'</div>') if data['mode']=='recorded' else ''}
 <div class="diagram-legend text-small">N 主线推进 · R 整体重开 · S 来源面 · D 竞争介入 · V 持续领域 · M 完整主进度</div>
@@ -309,9 +351,14 @@ def fragment(data):
 <ul class="text-small">{facts}</ul>
 <div class="viz-controls" data-groups>{groups}</div>
 <div class="text-small text-muted" data-range></div>
-<div class="viz-controls"><label class="form-label">查看行为或工作区段<select class="form-select" data-select>{''.join(options)}</select></label></div>
-<div class="detail text-small" aria-live="polite" data-detail>选择行为或区段，查看执行者、对象版本和已记录关系。</div>
-<div data-figure id="{uid}-figure">{svg}</div>
+<div class="text-small text-muted">点工作行标题查看本行全部条目；图上点按会先区分附近的行为与区段。</div>
+<div data-figure id="{uid}-figure">{svg}<div data-row-controls></div></div>
+<section data-inspector id="{uid}-inspector" aria-labelledby="{uid}-inspector-title">
+<div class="inspector-heading"><h3 data-inspector-title id="{uid}-inspector-title">行为与工作区段详情</h3><button type="button" class="btn" data-back-chart hidden>返回图中</button></div>
+<div class="selector-field"><label class="form-label" for="{uid}-select">完整条目快捷选择</label><select class="form-select" id="{uid}-select" data-select>{''.join(options)}</select></div>
+<div class="selector-field" data-candidates hidden><label class="form-label" data-candidate-label for="{uid}-candidate">选择附近条目</label><select class="form-select" id="{uid}-candidate" data-candidate-select></select></div>
+<div aria-live="polite" data-detail>选择行为或区段，查看执行者、对象版本和已记录关系。</div>
+</section>
 <div class="text-small text-muted">{'未定位：'+escape('；'.join(unlocated)) if unlocated else '示意阶段可重叠、往返；议会可以分批交流，不是全员同步栅栏。'}</div>
 <script type="application/json" data-model>{payload}</script>
 <script>(()=>{{const root=document.getElementById('{uid}');{script}}})();</script>

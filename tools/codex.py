@@ -17,13 +17,16 @@ if str(ROOT) not in sys.path:
 
 from runtime.codex_permissions import assess_operation
 from runtime.codex_foundation import (
-    answer_foundation, confirm_foundation, foundation_packet, propose_foundation,
+    answer_foundation, confirm_foundation, foundation_packet, propose_foundation, revoke_foundation,
 )
 from runtime.codex_session import (
     ACTIVITY_STATES, activity, create_line, create_session, line_packet,
     session_report, set_clock_anchor, set_line_parameters, update_line,
 )
 from runtime.codex_transport import CodexRepositoryTransport, load_acquisition
+from runtime.codex_lifecycle import (
+    MESSAGE_ACTIONS, ingest_message, handle_message, load_lifecycle, close_session, recover_session, terminate_message,
+)
 
 
 def read_object(path: Path) -> dict:
@@ -33,11 +36,20 @@ def read_object(path: Path) -> dict:
     return value
 
 
+def read_message(path: Path) -> str:
+    # Match the lifecycle's byte snapshot. Text-mode newline translation would
+    # turn a genuine Windows CRLF reply into different confirmation text.
+    return path.read_bytes().decode('utf-8-sig')
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else list(argv)
     # Pass through argument parsing rather than duplicate mature CLI surfaces.
-    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice'):
+    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return'):
         from tools import codex_experience, codex_profile, codex_workbench, codex_knowledge, codex_timeline, codex_voice
+        if argv[0] == 'return':
+            from tools.codex_return import main as return_main
+            return return_main(argv[1:])
         return {'profile': codex_profile.main, 'workbench': codex_workbench.main,
                 'experience': codex_experience.main,
                 'knowledge': codex_knowledge.main,
@@ -45,7 +57,7 @@ def main(argv: list[str] | None = None) -> int:
                 'voice': codex_voice.main}[argv[0]](argv[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
-    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice'):
+    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return'):
         sub.add_parser(name, help=f'{name} commands; append --help for details')
     acquire = sub.add_parser('acquire', help='actually acquire a live, immutable Codex profile')
     acquire.add_argument('--stage', choices=('startup', 'help', 'execution'), default='startup')
@@ -66,16 +78,38 @@ def main(argv: list[str] | None = None) -> int:
                         help='prepare research first; managed execution waits for the current user decision')
     report = ts.add_parser('report')
     report.add_argument('--root', required=True, type=Path)
+    message = ts.add_parser('message', help='snapshot an actual user input; fence managed execution until handled')
+    message.add_argument('--root', required=True, type=Path)
+    message.add_argument('--source-file', required=True, type=Path)
+    message.add_argument('--source-ref', required=True)
+    message.add_argument('--route-pin', help='reference to the actually acquired upstream pin; not an acquisition itself')
+    handle = ts.add_parser('handle', help='apply the actual consequence of the selected current input')
+    handle.add_argument('--root', required=True, type=Path)
+    handle.add_argument('--message-id', required=True, type=int)
+    handle.add_argument('--action', dest='message_action', required=True, choices=sorted(MESSAGE_ACTIONS))
+    handle.add_argument('--reason', required=True)
+    lifecycle = ts.add_parser('lifecycle', help='read managed continuation state or explicit legacy status')
+    lifecycle.add_argument('--root', required=True, type=Path)
+    stop = ts.add_parser('terminate', help='stop/cancel a task; completed delivery uses return close')
+    stop.add_argument('--root', required=True, type=Path)
+    stop.add_argument('--status', required=True, choices=('STOPPED', 'CANCELLED'))
+    stop.add_argument('--reason', required=True)
+    stop.add_argument('--source-file', type=Path, help='actual stop/cancel source; takes priority over older pending input')
+    stop.add_argument('--source-ref', help='actual unique message source reference')
+    stop.add_argument('--route-pin', help='actually acquired pin reference for a prefixed termination message')
+    recover = ts.add_parser('recover', help='discard interrupted open tails; does not reactivate a terminated task')
+    recover.add_argument('--root', required=True, type=Path)
+    recover.add_argument('--reason', required=True)
     foundation = sub.add_parser('foundation', help='research-authored task brief, dialogue and execution decision')
     fs = foundation.add_subparsers(dest='action', required=True)
-    for action in ('propose', 'show', 'answer', 'confirm'):
+    for action in ('propose', 'show', 'answer', 'confirm', 'revoke'):
         command = fs.add_parser(action)
         command.add_argument('--root', required=True, type=Path)
         if action == 'propose':
             command.add_argument('--input', required=True, type=Path)
             command.add_argument('--reason', required=True)
             command.add_argument('--change-kind', choices=('material', 'non_material'), default='material')
-        elif action in ('answer', 'confirm'):
+        elif action in ('answer', 'confirm', 'revoke'):
             command.add_argument('--reply-file', required=True, type=Path, help='actual user words; no secret confirmation keyword')
             command.add_argument('--source', required=True, help='actual message or decision reference')
             if action == 'answer':
@@ -83,8 +117,10 @@ def main(argv: list[str] | None = None) -> int:
                 command.add_argument('--revision', required=True, type=int)
                 command.add_argument('--effect', required=True, help='actual consequence; interpretation is model-owned')
                 command.add_argument('--change-kind', choices=('material', 'non_material'), default='material')
-            else:
+            elif action == 'confirm':
                 command.add_argument('--revision', required=True, type=int)
+            else:
+                command.add_argument('--reason', required=True)
     line = sub.add_parser('line', help='create, resume or update one complete work line')
     ls = line.add_subparsers(dest='action', required=True)
     for action in ('create', 'packet', 'update', 'parameters'):
@@ -151,6 +187,26 @@ def main(argv: list[str] | None = None) -> int:
                     decisions=args.decisions,
                     explicit_parameters=read_object(args.explicit) if args.explicit else None,
                     anchor_pid=args.anchor_pid, m_target=args.m, require_foundation=args.require_foundation)
+            elif args.action == 'message':
+                result = ingest_message(args.root, source=args.source_file,
+                    source_ref=args.source_ref, route_pin=args.route_pin)
+            elif args.action == 'handle':
+                result = handle_message(args.root, message_id=args.message_id,
+                    action=args.message_action, reason=args.reason)
+            elif args.action == 'lifecycle':
+                result = load_lifecycle(args.root)
+            elif args.action == 'terminate':
+                if (args.source_file is None) != (args.source_ref is None):
+                    raise ValueError('termination source file and source reference must be supplied together')
+                if args.source_file is not None:
+                    result = terminate_message(args.root, source=args.source_file, source_ref=args.source_ref,
+                        action='stop' if args.status == 'STOPPED' else 'cancel', reason=args.reason,
+                        route_pin=args.route_pin)
+                else:
+                    if args.route_pin is not None:raise ValueError('route pin requires the actual termination source')
+                    result = close_session(args.root, status=args.status, reason=args.reason)
+            elif args.action == 'recover':
+                result = recover_session(args.root, reason=args.reason)
             else:
                 result = session_report(args.root)
         elif args.command == 'foundation':
@@ -162,11 +218,15 @@ def main(argv: list[str] | None = None) -> int:
                     reason=args.reason, change_kind=args.change_kind)
             elif args.action == 'answer':
                 result = answer_foundation(args.root, args.id,
-                    revision=args.revision, user_text=args.reply_file.read_text(encoding='utf-8-sig'),
+                    revision=args.revision, user_text=read_message(args.reply_file),
                     source=args.source, effect=args.effect, change_kind=args.change_kind)
+            elif args.action == 'revoke':
+                result = revoke_foundation(args.root,
+                    user_text=read_message(args.reply_file),
+                    source=args.source, reason=args.reason)
             else:
                 result = confirm_foundation(args.root, revision=args.revision,
-                    user_text=args.reply_file.read_text(encoding='utf-8-sig'), source=args.source)
+                    user_text=read_message(args.reply_file), source=args.source)
         elif args.command == 'line':
             if args.action == 'create':
                 result = create_line(args.root, args.id, parameters=read_object(args.parameters),

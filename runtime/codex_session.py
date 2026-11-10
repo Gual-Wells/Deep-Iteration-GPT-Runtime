@@ -31,6 +31,7 @@ from .duration import parse_canonical_duration_seconds
 from .validation import require_binary, require_nonempty_text, require_nonnegative_int
 
 FORMAT = 'digr-codex-session-1'
+MANAGED_FORMAT = 'digr-codex-session-2'
 ACTIVITY_STATES = frozenset({'MAIN', 'SOURCE', 'D_EXCLUSIVE', 'V_EXCLUSIVE', 'META', 'IDLE'})
 _LINE_ID = re.compile(r'M[0-9]{2,}')
 _PROCESS_SESSION = uuid.uuid4().hex
@@ -61,8 +62,11 @@ def _write_json(path: Path, value: Mapping[str, Any], *, new: bool = False) -> N
 def _session(root: Path) -> tuple[Path, dict[str, Any]]:
     root = Path(root).resolve()
     metadata = _read_json(root / 'session.json')
-    if metadata.get('format') != FORMAT:
+    if metadata.get('format') not in {FORMAT, MANAGED_FORMAT}:
         raise ValueError('unsupported Codex session format')
+    from .codex_lifecycle import requires_lifecycle
+    if requires_lifecycle(metadata) and metadata.get('format') != MANAGED_FORMAT:
+        raise ValueError('0.8+ managed session requires format-2; legacy writers cannot bypass lifecycle')
     raw = (root / 'REQUEST.txt').read_bytes()
     if sha256(raw).hexdigest() != metadata.get('request_sha256'):
         raise ValueError('frozen original request changed')
@@ -204,6 +208,13 @@ def create_session(root: Path, *, request: Path, p_run: str,
     explicit = dict(explicit_parameters or {})
     version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)', p_run.split('@', 1)[0])
     profile_requires_foundation = bool(version and tuple(map(int, version.groups())) >= (0, 7, 0))
+    profile_requires_lifecycle = bool(version and tuple(map(int, version.groups())) >= (0, 8, 0))
+    invocation = None
+    if profile_requires_lifecycle:
+        from .codex_profile import classify_invocation
+        invocation = classify_invocation(raw.decode('utf-8-sig'))
+        if invocation['classification'] != 'EXECUTING':
+            raise ValueError('new managed session requires an EXECUTING original request; ordinary correction/help cannot create it')
     if require_foundation is None:
         require_foundation = profile_requires_foundation
     if type(require_foundation) is not bool:
@@ -224,17 +235,24 @@ def create_session(root: Path, *, request: Path, p_run: str,
             anchor = windows_process_anchor(anchor_pid)
         except (ValueError, TypeError, OSError) as exc:
             clock_issue = str(exc)
-    metadata = {'format': FORMAT, 'P_run': p_run, 'M_target': target,
+    metadata = {'format': MANAGED_FORMAT if profile_requires_lifecycle else FORMAT, 'P_run': p_run, 'M_target': target,
                 'request_origin': request.as_posix(), 'request_sha256': sha256(raw).hexdigest(),
                 'decisions': decisions.as_posix() if decisions is not None else None,
                 'explicit_parameters': explicit, 'clock_anchor': anchor, 'clock_issue': clock_issue,
                 'created_wall_ns': time.time_ns(), 'execution_started_by_helper': False,
                 'foundation_required': require_foundation}
+    if profile_requires_lifecycle:
+        metadata['lifecycle_required'] = True
+        metadata['initial_invocation'] = {key: invocation[key] for key in ('classification', 'route_key', 'reason')}
+        metadata['invocation_basis'] = 'structure only; repository acquisition is an upstream obligation'
     root.mkdir(parents=True, exist_ok=False)
     (root / 'lines').mkdir()
     (root / 'common').mkdir()
     (root / 'REQUEST.txt').write_bytes(raw)
     _write_json(root / 'session.json', metadata, new=True)
+    if profile_requires_lifecycle:
+        from .codex_lifecycle import initialize_lifecycle
+        initialize_lifecycle(root, metadata)
     return metadata
 
 
@@ -436,6 +454,9 @@ def activity(root: Path, owner: str, action: str, *, state: str | None = None,
         raise ValueError('state applies only to begin')
     if action != 'begin' and scope is not None:
         raise ValueError('scope applies only to begin; checkpoint inherits its actual scope')
+    if action in {'begin', 'checkpoint'}:
+        from .codex_lifecycle import require_active
+        require_active(root)
     if action == 'begin':
         scope = scope or 'EXECUTION'
         if scope not in {'FOUNDATION', 'EXECUTION'}:
@@ -566,7 +587,15 @@ def session_report(root: Path) -> dict[str, Any]:
         foundation_timing['single_comparable_domain'] = None
         foundation_timing['unreadable_activity_owners'] = sorted(unavailable)
         foundation_timing['scope'] = 'readable foundation activity subset only; excluded owner scope unknown'
-    return {'session': metadata, 'line_packages': packages, 'timing': timing,
+    from .codex_lifecycle import load_lifecycle
+    try:
+        lifecycle = load_lifecycle(root)
+    except (OSError, ValueError, TypeError, KeyError) as exc:
+        issue = {'component': 'lifecycle', 'path': (root / 'lifecycle.json').as_posix(),
+                 'reason': str(exc), 'effect': 'managed continuation unknown/blocked; no repair or legacy upgrade'}
+        issues.append(issue)
+        lifecycle = {'managed': True, 'status': 'UNREADABLE', 'issue': issue}
+    return {'session': metadata, 'line_packages': packages, 'timing': timing, 'lifecycle': lifecycle,
             'foundation_timing': foundation_timing,
             'registered_line_count': len(packages), 'effective_M_count': None,
             'report_status': 'PARTIAL_READ' if issues else 'READABLE', 'issues': issues,
@@ -584,6 +613,12 @@ def line_packet(root: Path, line_id: str, *, topic: str | None = None,
              '本线完整参数与作者记录如下。旧计划、下一步和状态可因新要求失效；'
              '文件准备与状态声明不证明原生代理已启动或责任完成。',
              json.dumps(package, ensure_ascii=False, indent=2, allow_nan=False)]
+    from .codex_lifecycle import load_lifecycle
+    lifecycle = load_lifecycle(root)
+    if lifecycle.get('managed'):
+        parts += ['## 当前任务生命周期与所选消息来源',
+                  json.dumps(lifecycle, ensure_ascii=False, indent=2, allow_nan=False),
+                  '生命周期状态只约束受管理入口；新消息必须改变下一行动，原文快照不认证语义同意。']
     shared_text, shared_path = None, None
     if metadata['decisions'] is not None:
         decisions = Path(metadata['decisions'])

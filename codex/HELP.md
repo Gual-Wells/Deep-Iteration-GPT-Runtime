@@ -1,4 +1,4 @@
-# DIGR Codex 0.7.0 使用说明
+# DIGR Codex 0.8.0 使用说明
 
 普通任务采用轻量交付偏好；显式 DIGR 启动高投入的问题研究、方案探索与实际制作。默认 N12/R4/D3/V3/L3/M1，只自主上调和改变方法；时间按任务补齐为软目标，来源默认 REQUIRED。
 
@@ -7,6 +7,7 @@
 | 调用 | 行为 |
 | --- | --- |
 | `DIGR：任务` / `深度迭代：任务` | 先取得真实仓库 pin，读启动切片及完整执行协议，再动态初始化。 |
+| `DIGR：只问原因，别推送` | 完整显式调用，仍为深执行；动作限于询问/研究，不获得推送授权。 |
 | `DIGR(N=18,R=5,D(4),V(4))：任务` | 显式配置；数值是实质责任，不是工具调用数。 |
 | `DIGR(M(2))：任务` | 两条完整独立 Main，各自初始化参数、推进、使用自己的D/V、收敛并比较，不能平分同一份总量。 |
 | `DIGR(target=60min)：任务` | 软时间目标，不改变其它责任，也不表示到点就结束。 |
@@ -23,7 +24,7 @@
 - **M** 各自完整推进。文件目录和脚本不会自动替代真正独立的Main。
 - **授权** 延续已有任务与资源决定；能力、预算、执行效果分别看，不为常规任务内操作反复申请。
 
-[PROTOCOL](PROTOCOL.md)、[FOUNDATION](FOUNDATION.md)、[CHARACTER](CHARACTER.md)、[PARAMETERS](PARAMETERS.md)、[COLLABORATION](COLLABORATION.md)、[PERMISSIONS](PERMISSIONS.md) 为执行正文，可从同pin聚合包一次读取。[WORKBENCH](WORKBENCH.md) 是按需使用的工具手册。
+[PROTOCOL](PROTOCOL.md)、[FOUNDATION](FOUNDATION.md)、[CHARACTER](CHARACTER.md)、[PARAMETERS](PARAMETERS.md)、[COLLABORATION](COLLABORATION.md)、[PERMISSIONS](PERMISSIONS.md)、[RETURN](RETURN.md) 为执行正文，可从同pin聚合包一次读取。默认返回包含结果、关键后果及时间—工作标识图；缺失记录明确说明。结束后普通纠错不再启动 DIGR，真正未完成的补充沿用原任务。[WORKBENCH](WORKBENCH.md) 是按需工具手册。
 
 ## 实际使用工具
 

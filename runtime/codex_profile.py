@@ -17,11 +17,12 @@ from .routing import candidate_route_key
 from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 
-PROFILE_PROTOCOL = 'digr-codex-native-v7'
+PROFILE_PROTOCOL = 'digr-codex-native-v8'
 PROFILE_CORE = (
     'codex/FOUNDATION.md',
     'codex/CHARACTER.md', 'codex/PARAMETERS.md',
     'codex/COLLABORATION.md', 'codex/PERMISSIONS.md',
+    'codex/RETURN.md',
 )
 PROFILE_FILES = (
     'codex/VERSION',
@@ -36,6 +37,7 @@ PROFILE_FILES = (
     'codex/CHARACTER.md',
     'codex/COLLABORATION.md',
     'codex/PERMISSIONS.md',
+    'codex/RETURN.md',
     'codex/EXECUTION_PROTOCOL.json',
 )
 CAPABILITY_NAMES = (
@@ -75,6 +77,52 @@ class BoundaryDecision:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+def classify_invocation(message: str) -> dict[str, Any]:
+    """Classify the versioned call surface AFTER live pinned startup acquisition.
+
+    This is deliberately separate from the thin candidate router. It neither
+    fetches a repository nor infers write/publication authority from task words.
+    Parameter text and the task are preserved for semantic interpretation.
+    """
+    if not isinstance(message, str):
+        raise TypeError('message must be str')
+    text = message.lstrip()
+    key = candidate_route_key(message)
+    base = {'classification': 'NATIVE', 'route_key': key, 'task': None,
+            'parameter_text': None, 'action_scope': 'INTERPRET_SEPARATELY',
+            'live_acquisition_performed': False, 'run_started': False}
+    if key is None:
+        return {**base, 'reason': 'no exact leading candidate prefix'}
+    tail = text[len(key):]
+    if tail.strip() == '/help':
+        return {**base, 'classification': 'HELP', 'reason': 'exact help request'}
+    if not tail.strip():
+        return {**base, 'classification': 'INVALID', 'reason': 'empty invocation'}
+    stack = []
+    pairs = {')': '(', '）': '（'}
+    separator = None
+    for index, char in enumerate(tail):
+        if char in '(（':
+            stack.append(char)
+        elif char in ')）':
+            if not stack or stack.pop() != pairs[char]:
+                return {**base, 'classification': 'INVALID', 'reason': 'unbalanced parameter parentheses'}
+        elif char in ':：' and not stack:
+            separator = index
+            break
+    if separator is None:
+        if stack:
+            return {**base, 'classification': 'INVALID', 'reason': 'unclosed parameter parentheses'}
+        return {**base, 'reason': 'protocol discussion without a complete invocation surface'}
+    prelude, task = tail[:separator], tail[separator + 1:]
+    if prelude.strip() and not (prelude.strip().startswith(('(', '（')) and prelude.strip().endswith((')', '）'))):
+        return {**base, 'reason': 'discussion text before the task separator'}
+    if not task.strip():
+        return {**base, 'classification': 'INVALID', 'reason': 'empty task'}
+    return {**base, 'classification': 'EXECUTING', 'task': task,
+            'parameter_text': prelude, 'reason': 'explicit complete DIGR invocation; question/read-only scope does not change mode'}
 
 
 def decide_boundary(
@@ -168,7 +216,7 @@ def verify_distribution(root: Path) -> dict[str, Any]:
     if manifest.get('entrypoint') != 'codex/PROTOCOL.md':
         raise ValueError('unexpected Codex entrypoint')
     if manifest.get('core') != list(PROFILE_CORE):
-        raise ValueError('Codex execution must load foundation, character, responsibility, collaboration and permissions')
+        raise ValueError('Codex execution must load foundation, character, responsibility, collaboration, permissions and return')
     if manifest.get('startup_slice') != ['codex/STARTUP.md']:
         raise ValueError('unexpected Codex startup slice')
     if manifest.get('help') != 'codex/HELP.md':

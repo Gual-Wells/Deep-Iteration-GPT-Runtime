@@ -7,7 +7,7 @@ import unittest
 
 from runtime.codex_foundation import (
     BRIEF_FIELDS, answer_foundation, confirm_foundation, foundation_packet,
-    propose_foundation, require_foundation_ready,
+    propose_foundation, require_foundation_ready, revoke_foundation,
 )
 from runtime.codex_session import (
     activity, create_line, create_session, line_packet, session_report, summarize_activity,
@@ -85,6 +85,35 @@ class FoundationBehaviorTests(unittest.TestCase):
         self.assertNotIn('answer', result['questions'][0])
         with self.assertRaises(ValueError):
             require_foundation_ready(self.root)
+
+    def test_read_only_to_public_deployment_cannot_be_editorial(self):
+        current = proposal(); current['questions'] = []
+        current['brief']['results'] = 'Local read-only explanation.'
+        propose_foundation(self.root, current, reason='Read-only fixture')
+        confirm_foundation(self.root, revision=1, user_text='SIMULATED: explain only.', source='fixture')
+        current['brief']['results'] = 'Create a production service and publish it.'
+        with self.assertRaisesRegex(ValueError, 'decision fields changed'):
+            propose_foundation(self.root, current, reason='Claimed editorial change', change_kind='non_material')
+        self.assertIn('Local read-only', foundation_packet(self.root))
+
+    def test_revocation_stops_next_operation_but_allows_clock_cleanup(self):
+        current = proposal(); current['questions'] = []
+        propose_foundation(self.root, current, reason='Initial fixture')
+        confirm_foundation(self.root, revision=1, user_text='SIMULATED: start.', source='fixture')
+        activity(self.root, 'M01', 'begin', state='MAIN')
+        result = revoke_foundation(self.root, user_text='SIMULATED: I only pointed out an earlier error.',
+            source='fixture-current-user-message', reason='The activation was mistaken.')
+        self.assertEqual(result['status'], 'REVOKED')
+        self.assertIsNone(result['confirmation'])
+        self.assertIsNotNone(result['accepted'])
+        with self.assertRaisesRegex(ValueError, 'revoked'):
+            activity(self.root, 'M01', 'checkpoint', continued=True)
+        activity(self.root, 'M01', 'end', continued=True)
+        with self.assertRaises(ValueError):
+            confirm_foundation(self.root, revision=1, user_text='SIMULATED: reuse old start.', source='fixture-old')
+        current['unaffected_lines'] = {'M01': 'Pretend the scope is unchanged.'}
+        with self.assertRaisesRegex(ValueError, 'revoked'):
+            propose_foundation(self.root, current, reason='Attempt to revive stale authority')
 
     def test_late_reply_and_scope_correction_cannot_reuse_old_consent(self):
         current = proposal()

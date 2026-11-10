@@ -81,6 +81,15 @@ class TimelineTests(unittest.TestCase):
         self.data['origin']='2026-11-10T00:00:00+08:00'
         with self.assertRaisesRegex(ValueError,'source_ref'):t.validate(self.data)
 
+    def test_short_recorded_axis_has_distinct_readable_ticks(self):
+        data=self.mini();data['events']=data['events'][:1];data['events'][0]['at']=0.06
+        svg=t.render_svg(data,736)
+        self.assertIn('data-time-unit="毫秒"',svg)
+        for value in ('0毫秒','10毫秒','60毫秒'):self.assertIn('>'+value+'<',svg)
+        data['events'][0]['at']=6
+        self.assertIn('>1秒<',t.render_svg(data,736))
+        self.assertEqual(t.time_scale(120),(1/60,'分'))
+
     def test_markup_and_json_data_are_not_executable_instructions(self):
         text='</script><script>alert("unsafe")</script>'
         self.data['events'][0]['label']=text

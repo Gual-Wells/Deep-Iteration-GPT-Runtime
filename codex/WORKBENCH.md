@@ -4,7 +4,7 @@
 
 论文辅学另有可选的[知识池技能](../.agents/skills/digr-paper-knowledge/SKILL.md)与 `python -B tools/codex.py knowledge --help`。原生 Codex 读论文、分层批量问询和教学，工具保存冻结问项、论文局部用法、真实选择、有范围证据及接续位置。个人数据与原件放在独立私有项目，不进入本公共库；可从私有项目的相对路径入口接续，本机定位缓存仅用于发现。它不替代本轮在线 DIGR 协议获取，也不需要阅读器或付费模型接口。普通读取只用标准库，摄入 PDF 另需所选 Python 环境中的 `pypdf`。具体数据与命令见技能的按需引用。
 
-需要把返回讲清时，可用[时间—工作标识图](RETURN_VISUAL.md)与 `python -B tools/codex.py timeline --help`。先给结果、静态总图及关键后果，再提供任选的互动细读；图保持时间横轴与X_i纵轴，并区分U0、议会、自举、发出/收到、决定和落实。它只渲染明确提供的工作摘要，不从参数计数自动编造历史或有效时长，也不替代原有事实报告。
+必读[RETURN](RETURN.md)规定默认返回；[时间—工作标识图](RETURN_VISUAL.md)与 `python -B tools/codex.py timeline --help`提供实现。先给结果、静态总图及关键后果，再提供任选的互动细读；图保持时间横轴与X_i纵轴，并区分U0、议会、自举、发出/收到、决定和落实。它只渲染明确提供的工作摘要，不从参数计数自动编造历史或有效时长，也不替代原有事实报告。return seal/status/close 将所选返回绑定到当前实际文件并收口任务，不认证语义质量。
 
 ## 0. 在其它项目找到工具，及时开始记录
 
@@ -41,10 +41,10 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 
 ### 新任务先形成可供决定的完整说明
 
-0.7起的新会话默认要求前置任务说明；旧会话仍保留其真实状态。显式flag也可用于旧版本工具调用。模型先研究实际材料与原话，再提供proposal；脚本不自动识别意图。
+0.7起的新会话默认要求前置任务说明；0.8起另有当前任务生命周期与消息来源闸门。旧pin仍保留其真实状态，不静默升级。模型先研究实际材料与原话，再提供proposal；脚本不自动识别意图。
 
 ```text
-python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run 0.7.0@<实际SHA> --require-foundation
+python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run 0.8.0@<实际SHA> --require-foundation
 python -B tools/codex.py clock begin --root D:/task/session --owner COMMON --scope FOUNDATION --state SOURCE
 python -B tools/codex.py foundation propose --root D:/task/session --input D:/task/proposal.json --reason "原件调查后的完整候选"
 python -B tools/codex.py foundation show --root D:/task/session
@@ -58,7 +58,39 @@ python -B tools/codex.py foundation confirm --root D:/task/session --revision <�
 python -B tools/codex.py clock end --root D:/task/session --owner COMMON --continued
 ```
 
-answer不自动确认整体。模型理解真实答复：用户已看完整说明并明确要求改后执行，可按该决定记录，无需固定口令；提出新重要取舍则先讨论。material修订默认使旧确认不再覆盖当前稿；纯文字或无实质影响事实更新可用propose --change-kind non_material，并给出真实理由，保留原确认来源及继承说明。改问题或选项后不沿用旧答案。
+answer不自动确认整体。模型理解真实答复：用户已看完整说明并明确要求改后执行，可按该决定记录，无需固定口令；提出新重要取舍则先讨论。material修订默认使旧确认不再覆盖当前稿；non_material只允许不改变决策的基础观察维护，并保留原接受内容。目标/成品/范围/粒度/依赖/路线/资源/完成字段改变会拒绝这条快捷路径。改问题或选项后不沿用旧答案；revoke立即失效旧确认，不因仍有accepted历史而可继续。
+
+### 当前输入、真实续做与结束
+
+0.8原始request必须是完整显式调用。后续用户消息先保存原文，再摄入；前缀消息仍先实际获取仓库，route-pin只引用已获取结果。普通说明无需route-pin。摄入后 begin/checkpoint 暂停，直至模型处理当前消息或有明确来源的foundation答复成功；reply-file的原文与source必须精确对应当前所选消息。
+
+```text
+python -B tools/codex.py task message --root D:/task/session --source-file D:/task/actual-reply.txt --source-ref <真实消息引用>
+python -B tools/codex.py task handle --root D:/task/session --message-id <本次返回ID> --action continue --reason "仍在实际未完成任务内，说明相应后果"
+python -B tools/codex.py task lifecycle --root D:/task/session
+```
+
+明确实质变更使用action revise，它先使旧决定失效；pause保留任务但禁止继续，resume须真实恢复指示。stop/cancel先终结，再收尾，旧确认不能复活。真实停止消息可优先越过较早pending：task terminate --status STOPPED（或CANCELLED）--source-file <真实停止原文> --source-ref <唯一消息引用> --reason <实际后果>；保留旧pending摘要，这条优先路径只能终结。无source pair时明确为操作者清理记录，不能伪引旧答复为停止来源。
+
+source-ref是本地不可变消息身份，同引用不重新编号；编辑后的真实新消息使用新的引用。它不是用户认证，模型仍须核对实际对话。结束后普通纠错可action ordinary记录并保持结束；真的新显式调用须新建任务，不能重用已终结session。handle是模型记录实际含义，不是工具判断用户同意。中断后task recover只丢弃未知活动尾段，不重新激活。0.8新会话写session-2，旧writer会拒绝；旧pin仍session-1且不静默迁移。
+
+### 返回快照与收口
+
+先结束真实活动，编写一个明确选定的返回输入，例如：
+
+```json
+{"schema_version":1,"result":"实际结果","scope":"实际范围","evidence":"依据及验证","limits":"使用限制或明确无已知限制","time_and_responsibilities":"真实责任与时间事实及缺口","artifacts":[],"decisions":[],"unhandled":[],"sources":[]}
+```
+
+文字研究可直接以result交付；文件成品使用artifacts中的label/path。sources明确选择文件，路径相对输入文件；不扫描整份聊天。可选timeline为实录对象或JSON路径，需protocol_pin与P_run一致，并有notice说明采集范围，不能用illustration替代。
+
+```text
+python -B tools/codex.py return seal --root D:/task/session --input D:/task/return-input.json
+python -B tools/codex.py return status --root D:/task/session
+python -B tools/codex.py return close --root D:/task/session --reason "约定结果已完成并交付"
+```
+
+CURRENT_RETURN.md是该任务的一个当前入口；RETURN.md、details.html与可选静态图来自同一快照。相关事实或产物改变即STALE，重核后重新seal；READY_UNCLOSED不是语义批准，close才真正收口。澄清/等待用户不close。后续新版本不改写当前任务原P_run。
 
 确认后才补齐正式参数，line create仍只是准备文件。正式clock begin默认EXECUTION；未确认时MAIN/SOURCE及独占D/V均拒绝，失效后的checkpoint也拒绝，end/recover始终可用。task report的foundation_timing单列前置，timing只算正式，不把前置分钟冲抵T/t。恢复包自动带当前任务说明与决定；无重要变化不重新盘问。
 

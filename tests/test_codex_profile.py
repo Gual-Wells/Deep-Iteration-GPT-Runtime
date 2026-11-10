@@ -10,7 +10,7 @@ import unittest
 
 from runtime.codex_profile import (
     ActiveContext, CAPABILITY_NAMES, decide_boundary, capability_report,
-    instruction_text, verify_distribution, depth_preferences,
+    instruction_text, verify_distribution, depth_preferences, classify_invocation,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,6 +24,32 @@ class CodexBoundaryTests(unittest.TestCase):
         result = decide_boundary('NEW_TURN', '继续整理文件', active=self.active)
         self.assertEqual((result.mode, result.action), ('LIGHT', 'HANDLE_ORDINARY_TASK'))
         self.assertFalse(result.preserve_task)
+
+    def test_read_only_question_is_still_an_explicit_invocation(self):
+        text = '  DIGR：研究表现，别急着推，我就问一下。\n'
+        result = classify_invocation(text)
+        self.assertEqual(result['classification'], 'EXECUTING')
+        self.assertEqual(result['task'], '研究表现，别急着推，我就问一下。\n')
+        self.assertEqual(result['action_scope'], 'INTERPRET_SEPARATELY')
+        self.assertFalse(result['run_started'])
+
+    def test_ordinary_correction_quote_and_widget_state_cannot_invoke(self):
+        for text in ['你的汇总没区分轻量与DIGR，上一轮忽视了调用。',
+                     '我上一轮没有再度唤起DIGR，只是指出错误。',
+                     '“DIGR：研究问题”是之前的请求。', '{"event":"v1-close"}',
+                     'digr：任务', 'Digr：任务']:
+            with self.subTest(text=text):
+                self.assertEqual(classify_invocation(text)['classification'], 'NATIVE')
+
+    def test_surface_help_invalid_discussion_and_parameter_preservation(self):
+        for text, expected in [('DIGR/help', 'HELP'), ('DIGR是什么？', 'NATIVE'),
+                ('DIGR', 'INVALID'), ('DIGR： ', 'INVALID'), ('DIGR（T=20min：任务', 'INVALID'),
+                ('DIGR现在的默认DIGR:模式有问题', 'NATIVE')]:
+            with self.subTest(text=text):
+                self.assertEqual(classify_invocation(text)['classification'], expected)
+        result = classify_invocation('深度迭代（N（12），S（n（3）））：讨论方案')
+        self.assertEqual(result['classification'], 'EXECUTING')
+        self.assertEqual(result['parameter_text'], '（N（12），S（n（3）））')
 
     def test_steer_preserves_task_and_mode(self):
         result = decide_boundary(

@@ -13,7 +13,7 @@ if str(ROOT) not in sys.path:
 
 from runtime.codex_profile import (
     ActiveContext, capability_report, decide_boundary,
-    instruction_text, verify_distribution, depth_preferences, refresh_distribution,
+    instruction_text, verify_distribution, depth_preferences, refresh_distribution, classify_invocation,
 )
 
 
@@ -30,6 +30,8 @@ def main(argv: list[str] | None = None) -> int:
     export.add_argument('--out', required=True, type=Path)
     boundary = sub.add_parser('boundary', help='preview an explicitly supplied host event')
     boundary.add_argument('--input', required=True, type=Path, help='UTF-8 JSON input')
+    classify = sub.add_parser('classify', help='classify the pinned call surface after live startup acquisition')
+    classify.add_argument('--message-file', required=True, type=Path)
     caps = sub.add_parser('capabilities', help='report declared availability, not run proof')
     caps.add_argument('--input', required=True, type=Path, help='UTF-8 JSON availability map')
     args = ap.parse_args(argv)
@@ -40,6 +42,8 @@ def main(argv: list[str] | None = None) -> int:
             result = refresh_distribution(ROOT)
         elif args.command == 'depth':
             result = depth_preferences(ROOT)
+        elif args.command == 'classify':
+            result = classify_invocation(args.message_file.read_bytes().decode('utf-8-sig'))
         elif args.command == 'instructions':
             print(instruction_text(ROOT, args.layer), end='')
             return 0

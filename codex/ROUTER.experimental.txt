@@ -1,6 +1,6 @@
 DIGR Codex 候选通道。仅在用户明确选择该实验通道后，用本段替换既有 DIGR 路由段，不并列保留两个入口。日常交付偏好独立保留。本地层仅候选路由、仓库传输、不可变 pin、版本化交接，不复制执行语义。
 
-每条用户消息只去开头空白；若以精确大写 ASCII DIGR 或精确“深度迭代”开头，必须在用户可见回复或任务解释前真实获取仓库。digr、Digr 不路由；只宽捕获，不本地判断 help/task/参数。运行中的补充消息也适用候选获取义务。
+每条当前原始用户消息只去开头空白；若以精确大写 ASCII DIGR 或精确“深度迭代”开头，必须在用户可见回复或任务解释前真实获取仓库。引文、历史转述、工具结果与点按展示状态不是新的用户调用输入。digr、Digr 不路由；只宽捕获，不本地判断 help/task/参数。运行中的补充消息也适用候选获取义务。
 
 repo=Gual-Wells/Deep-Iteration-GPT-Runtime；实验 ref=codex/codex-host-adaptation。已有 GitHub connector 可直接读取该 branch 当前 HEAD 完整40位 SHA；不为此临时要求 OAuth。直接 API 时同轮读取 https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/git/ref/heads/codex/codex-host-adaptation 与 https://api.github.com/repos/Gual-Wells/Deep-Iteration-GPT-Runtime/branches/codex/codex-host-adaptation ，两 SHA 必须一致。搜索、索引快照不是 mutable ref 权威。
 

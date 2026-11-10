@@ -24,11 +24,20 @@ BRIEF_FIELDS = {
     'resources': '前置与正式投入、成本依据及结束条件',
     'completion': '何时完成，什么仍只是中间产物',
 }
+# Source observations and presentation notes may be maintained without changing
+# the accepted execution decision. A different outcome/scope/resource decision
+# must not be smuggled through the caller's `non_material` label.
+DECISION_FIELDS = frozenset(BRIEF_FIELDS) - {'basis'}
 
 
 def _digest(value: Any) -> str:
     return sha256(json.dumps(value, ensure_ascii=False, sort_keys=True,
                              allow_nan=False).encode('utf-8')).hexdigest()
+
+
+def _reply_text(value: str) -> str:
+    require_nonempty_text('actual user reply', value)
+    return value  # Preserve the selected original, including BOM-decoded CRLF.
 
 
 def _present(value: Any) -> str:
@@ -84,7 +93,9 @@ def _questions(items: Any) -> list[dict[str, Any]]:
 def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
                        change_kind: str = 'material') -> dict[str, Any]:
     from .codex_session import _write_json
+    from .codex_lifecycle import require_open_decision
     root, session = _context(root)
+    require_open_decision(root)
     reason = require_nonempty_text('change reason', reason)
     if change_kind not in {'material', 'non_material'}:
         raise ValueError('change_kind must be material or non_material')
@@ -94,6 +105,10 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
     brief = json.loads(json.dumps(brief, ensure_ascii=False, allow_nan=False))
     questions = _questions(proposal.get('questions', []))
     previous = load_foundation(root) if (root / 'foundation.json').exists() else None
+    if previous and change_kind == 'non_material':
+        changed = [key for key in DECISION_FIELDS if previous['brief'].get(key) != brief.get(key)]
+        if changed:
+            raise ValueError('decision fields changed; use material revision: ' + ', '.join(sorted(changed)))
     revision = previous['revision'] + 1 if previous else 1
     # Answers survive only an unchanged decision question, not a recycled ID.
     old_questions = {q['id']: q for q in previous['questions']} if previous else {}
@@ -109,6 +124,8 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
         raise ValueError('unaffected_lines must explicitly map prepared line IDs to unchanged scope reasons')
     if unaffected and not accepted:
         raise ValueError('unchanged work needs an actual earlier accepted task brief')
+    if unaffected and previous and previous['status'] == 'REVOKED':
+        raise ValueError('revoked authority cannot be carried as unchanged scope')
     if unaffected:
         from .codex_session import _line_dir, _read_json
         for line_id in unaffected:
@@ -123,6 +140,7 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
                 raise ValueError('new unresolved decisions cannot carry an earlier confirmation')
             confirmation = deepcopy(previous['confirmation'])
             confirmation['applies_to_revision'] = revision
+            confirmation['applies_to_brief_sha256'] = _digest(brief)
             confirmation.setdefault('carry_reasons', []).append(reason)
     value = {'format': FORMAT, 'request_sha256': session['request_sha256'],
              'revision': revision, 'brief': brief, 'brief_sha256': _digest(brief),
@@ -139,7 +157,9 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
 def answer_foundation(root: Path, question_id: str, *, revision: int, user_text: str,
                       source: str, effect: str, change_kind: str = 'material') -> dict[str, Any]:
     from .codex_session import _write_json
+    from .codex_lifecycle import require_open_decision, consume_decision_message
     root, _ = _context(root)
+    decision_context = require_open_decision(root, user_text=user_text, source=source)
     value = load_foundation(root)
     if type(revision) is not int or revision != value['revision']:
         raise ValueError('answer must identify the revision containing the actual question answered')
@@ -148,7 +168,7 @@ def answer_foundation(root: Path, question_id: str, *, revision: int, user_text:
     question = next((q for q in value['questions'] if q['id'] == question_id), None)
     if question is None:
         raise ValueError('unknown current decision question')
-    question['answer'] = {'user_text': require_nonempty_text('user reply', user_text),
+    question['answer'] = {'user_text': _reply_text(user_text),
                           'source': require_nonempty_text('reply source', source),
                           'effect': require_nonempty_text('actual consequence', effect),
                           'recorded_at_revision': value['revision']}
@@ -163,17 +183,22 @@ def answer_foundation(root: Path, question_id: str, *, revision: int, user_text:
     value['latest_change'] = {'kind': change_kind, 'reason': effect}
     value['updated_wall_ns'] = time.time_ns()
     _write_json(root / 'foundation.json', value)
+    if decision_context.get('managed') is not False:
+        consume_decision_message(root, message_id=decision_context['current_message']['id'],
+            user_text=user_text, source=source, kind='answer', reason=effect)
     return value
 
 
 def confirm_foundation(root: Path, *, revision: int, user_text: str,
                        source: str) -> dict[str, Any]:
     from .codex_session import _write_json
+    from .codex_lifecycle import require_open_decision, consume_decision_message
     root, _ = _context(root)
+    decision_context = require_open_decision(root, user_text=user_text, source=source)
     value = load_foundation(root)
     if type(revision) is not int or revision != value['revision']:
         raise ValueError('confirmation must identify the current presented revision')
-    if value['status'] == 'REVISION_REQUIRED':
+    if value['status'] in {'REVISION_REQUIRED', 'REVOKED'}:
         raise ValueError('apply the user correction to the task brief with propose before confirming it')
     pending = [q['id'] for q in value['questions'] if q['blocking'] and not q.get('answer')]
     if pending:
@@ -181,7 +206,8 @@ def confirm_foundation(root: Path, *, revision: int, user_text: str,
     value['confirmation'] = {
         'user_confirmed_revision': revision, 'applies_to_revision': revision,
         'brief_sha256': value['brief_sha256'],
-        'user_text': require_nonempty_text('explicit overall user decision', user_text),
+        'applies_to_brief_sha256': value['brief_sha256'],
+        'user_text': _reply_text(user_text),
         'source': require_nonempty_text('decision source', source),
         'basis': 'operator-recorded explicit user decision; not semantic approval by helper',
     }
@@ -192,12 +218,42 @@ def confirm_foundation(root: Path, *, revision: int, user_text: str,
     value['unaffected_lines'] = {}
     value['updated_wall_ns'] = time.time_ns()
     _write_json(root / 'foundation.json', value)
+    if decision_context.get('managed') is not False:
+        consume_decision_message(root, message_id=decision_context['current_message']['id'],
+            user_text=user_text, source=source, kind='confirm', reason='recorded explicit decision on the presented task')
+    return value
+
+
+def revoke_foundation(root: Path, *, user_text: str, source: str, reason: str) -> dict[str, Any]:
+    """Invalidate managed execution now; keep the original decision as history.
+
+    The supplied message is an operator-recorded source, not authenticated
+    consent. A STOP or correction cannot be neutralized by an old JSON flag.
+    """
+    from .codex_session import _write_json
+    root, _ = _context(root)
+    value = load_foundation(root)
+    notice = {'user_text': _reply_text(user_text),
+              'source': require_nonempty_text('revocation source', source),
+              'reason': require_nonempty_text('revocation reason', reason),
+              'revision': value['revision'], 'recorded_wall_ns': time.time_ns()}
+    value.setdefault('revocations', []).append(notice)
+    value['confirmation'] = None
+    value['unaffected_lines'] = {}
+    value['status'] = 'REVOKED'
+    value['latest_change'] = {'kind': 'material', 'reason': notice['reason']}
+    value['updated_wall_ns'] = notice['recorded_wall_ns']
+    _write_json(root / 'foundation.json', value)
     return value
 
 
 def require_foundation_ready(root: Path, *, owner: str | None = None) -> dict[str, Any]:
     value = load_foundation(root)
     confirmation = value.get('confirmation')
+    if value['status'] == 'REVOKED':
+        raise ValueError('task decision was revoked; old accepted scope cannot restart execution')
+    if confirmation and confirmation.get('applies_to_brief_sha256') != value['brief_sha256']:
+        raise ValueError('confirmation is not bound to the current brief; use its pinned toolchain or establish a current decision')
     if value['status'] != 'CONFIRMED' or not confirmation or confirmation.get('applies_to_revision') != value['revision']:
         accepted = value.get('accepted')
         reason = value.get('unaffected_lines', {}).get(owner)
@@ -217,6 +273,9 @@ def foundation_packet(root: Path) -> str:
     parts = [f"# 任务说明 v{value['revision']} · {value['status']}",
              '用户原话保存在REQUEST.txt。以下是可修订解释；事实、推断、提议和已确认决定须按原身份理解。']
     accepted = value.get('accepted')
+    if accepted and value['status'] == 'CONFIRMED' and accepted['brief'].get('basis') != value['brief'].get('basis'):
+        parts += [f"## 已接受的基础（v{accepted['revision']}）", _present(accepted['brief']['basis']),
+                  '以下基础栏是当前观察维护，不扩大原执行决定；改变依赖、用途或投入须实质修订。']
     if accepted and value['status'] != 'CONFIRMED':
         parts += [f"## 沿用与待决变化（上次接受 v{accepted['revision']}）",
                   value['latest_change']['reason']]
