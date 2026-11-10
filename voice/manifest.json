@@ -1,0 +1,18 @@
+{
+  "name": "DIGR Voice Companion",
+  "version": "0.1.0",
+  "kind": "conversation_companion",
+  "resident": "voice/RESIDENT.txt",
+  "session_start": "voice/START.txt",
+  "project_export": "voice/ChatGPT-Voice-Companion.md",
+  "skill": ".agents/skills/digr-voice-companion",
+  "examples": ".agents/skills/digr-voice-companion/references/examples.md",
+  "hosts": ".agents/skills/digr-voice-companion/references/hosts.md",
+  "professional": ".agents/skills/digr-voice-companion/references/professional.md",
+  "coaching_language": "English",
+  "primary_help_cue": "Coach, help me out",
+  "compatible_help_cue": "sorry please your turn",
+  "formal_digr_execution": false,
+  "requires_model_api": false,
+  "activation": "Confirmed live Voice is ready; explicit rehearsal opt-in is the fallback. Ordinary text and task intent are preserved."
+}

@@ -36,15 +36,16 @@ def read_object(path: Path) -> dict:
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else list(argv)
     # Pass through argument parsing rather than duplicate mature CLI surfaces.
-    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline'):
-        from tools import codex_experience, codex_profile, codex_workbench, codex_knowledge, codex_timeline
+    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice'):
+        from tools import codex_experience, codex_profile, codex_workbench, codex_knowledge, codex_timeline, codex_voice
         return {'profile': codex_profile.main, 'workbench': codex_workbench.main,
                 'experience': codex_experience.main,
                 'knowledge': codex_knowledge.main,
-                'timeline': codex_timeline.main}[argv[0]](argv[1:])
+                'timeline': codex_timeline.main,
+                'voice': codex_voice.main}[argv[0]](argv[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
-    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline'):
+    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice'):
         sub.add_parser(name, help=f'{name} commands; append --help for details')
     acquire = sub.add_parser('acquire', help='actually acquire a live, immutable Codex profile')
     acquire.add_argument('--stage', choices=('startup', 'help', 'execution'), default='startup')

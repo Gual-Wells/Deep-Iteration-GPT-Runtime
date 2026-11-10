@@ -19,6 +19,7 @@ DIGR 是一套由模型承担研究、判断与制作的工作协议。它鼓励
 | 在普通任务中采用这些交付偏好 | 将 [轻量工作约定](codex/AGENTS.light.md) 合并到适用的 AGENTS 指令；照常提问，不建立 DIGR 参数与计时。 |
 | 明确让 Codex 为一个任务投入深研究与独立协作 | 按下节启用 [实验路由](codex/ROUTER.experimental.txt)，再发送显式任务。当前协议入口为 [codex/manifest.json](codex/manifest.json)。 |
 | 只想取回材料、整理正在进行的工作或接续一个任务 | 使用下方的本地工具。工作台可直接用于普通任务。 |
+| 在英语语音里需要伙伴帮忙接话、构思或共同创作 | 使用独立的 [Voice Companion](voice/README.md)：短常驻核待命，完整技能按需；附可直接上传的自足文件，不启动 DIGR 参数。 |
 | 继续使用既有 stable 通道 | 使用根 [manifest.json](manifest.json)、[启动协议](entry/STARTUP.md) 与 [帮助](entry/HELP.md)。根版本保持 **5.0.0-alpha.5**。 |
 
 Codex 与根 stable 分别版本化。选择 Codex 时，按 `codex/` 解释参数、时钟前提和返回；stable 保留自己的执行器与证明语义。
