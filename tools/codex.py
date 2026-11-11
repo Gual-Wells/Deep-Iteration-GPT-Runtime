@@ -45,7 +45,7 @@ def read_message(path: Path) -> str:
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else list(argv)
     # Pass through argument parsing rather than duplicate mature CLI surfaces.
-    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint'):
+    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal'):
         from tools import codex_experience, codex_profile, codex_workbench, codex_knowledge, codex_timeline, codex_voice
         if argv[0] == 'return':
             from tools.codex_return import main as return_main
@@ -53,6 +53,9 @@ def main(argv: list[str] | None = None) -> int:
         if argv[0] == 'preprint':
             from tools.codex_preprint import main as preprint_main
             return preprint_main(argv[1:])
+        if argv[0] == 'personal':
+            from tools.codex_personal import main as personal_main
+            return personal_main(argv[1:])
         return {'profile': codex_profile.main, 'workbench': codex_workbench.main,
                 'experience': codex_experience.main,
                 'knowledge': codex_knowledge.main,
@@ -60,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
                 'voice': codex_voice.main}[argv[0]](argv[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
-    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint'):
+    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal'):
         sub.add_parser(name, help=f'{name} commands; append --help for details')
     acquire = sub.add_parser('acquire', help='actually acquire a live, immutable Codex profile')
     acquire.add_argument('--stage', choices=('startup', 'help', 'execution'), default='startup')

@@ -7,6 +7,8 @@ description: "Create or continue English-Spoken-Preprint: actual independent fic
 
 Create a scene worth hearing, then make it easy to carry to a phone. ESP is a production workflow, not a DIGR execution protocol. Respect an actual acquired DIGR profile when explicitly invoked; never count fictional M/D/world roles as formal protocol responsibilities.
 
+The purpose is understanding and later reusing language in personally relevant difficult situations. A frictionless expert exchange or wrong-domain interview can be unsuitable even if accurate. Distinguish situational difficulty from incomprehensible learning input. Do not impose failure quotas or a cognitive knowledge allowlist. General reasoning remains available; invented personal experience, observed tests and outcomes do not.
+
 Current scope: the user listens. Do not add role takeover, user insertion, mobile handoff, tests for the listener or a new reader. Human-involved Codex training is a separate design exploration, not an ESP dependency. Constructing ESP does not activate English rehearsal in this chat.
 
 ## Find the book and tools
@@ -44,3 +46,9 @@ The phone performs the preprint's roles in natural sequence for listening. It is
 Read the actual output, compare representative dialogue to the original native returns, check private canaries are absent, and run `verify` against the current source. Source identity and clean exports do not prove dramatic quality, listening improvement or successful phone Voice playback.
 
 Annotate language after the real dialogue exists. Bind exact surface spans, meanings, communicative functions and register to public source events; verify frequency claims with actual corpus evidence or say unverified. Do not infer mastery from fictional actor success or a finished book. Deliver one current entry, the phone package, optional creator edition, sources and real limits.
+
+For current production read `spoken-preprint/LEARNING.md` and `CONTEXT.md` under the tool root. Select complete continuous public exchanges as cases: Chinese situation/intent, exact language meanings and conditions, the actual next response, and distinctly authored short variants. Cross-book exact-use, handling-function and contrastive-use are different relations; only actual matching surfaces can be lexical recurrence. Search explicit roots only.
+
+When useful, make a separate source-bound bilingual `study/PHONE-STUDY.txt`: authored narrator explanations, exact source replay, meaning/referent/commitment contrasts and labelled applications. Keep `phone/PHONE.txt` as the whole independent scene. Characters do not become teachers; the listener need not respond. Read actual explanations as carefully as source dialogue. Finalize cases/lesson before recording a current substantive review; its useful flag is not semantic certification or proof of learning.
+
+Personal Context is an optional provider of selected current book/role capsules, not a mandatory whole-person database. Preserve claims/resources/unknowns and source scope; do not infer incapacity or mastery. Use owned material reads, frozen history, bounded world territories and finite feedback when they solve a concrete scene problem. D affects its own fictional inner conditions, not physical facts or another mind. Check personal-source currency before new use and keep any capsule-derived book private. Never recover deleted private material.

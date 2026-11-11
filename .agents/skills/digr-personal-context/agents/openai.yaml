@@ -1,0 +1,4 @@
+interface:
+  display_name: "个人资料与能力依据"
+  short_description: "选定简历、项目与辅学资料，保存来源边界并按任务提供最小私人视图"
+  default_prompt: "Use $digr-personal-context to select source-bound personal context for this task without inferring mastery."

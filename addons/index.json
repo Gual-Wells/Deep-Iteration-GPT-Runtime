@@ -13,5 +13,10 @@
     "id": "english-spoken-preprint",
     "name": "English-Spoken-Preprint",
     "path": "spoken-preprint/README.md"
+  },
+  {
+    "id": "personal-context",
+    "name": "DIGR Personal Context",
+    "path": "personal-context/README.md"
   }
 ]

@@ -83,6 +83,9 @@ def initialize(root, spec):
     need(len({d['id'] for d in directors})==len(directors),'duplicate director id')
     need(isinstance(spec.get('initial_state',{}),dict),'initial_state must be an object')
     need(isinstance(spec.get('sources',[]),list),'sources must be a list')
+    from runtime import codex_preprint_context, codex_preprint_learning
+    codex_preprint_context.validate_spec(spec)
+    codex_preprint_learning.validate_spec(spec)
     state={'schema_version':SCHEMA,'revision':0,'spec':deepcopy(spec),'spec_sha256':digest(spec),
         'world':deepcopy(spec.get('initial_state',{})),'events':[],
         'language':[],'learner_evidence':[],
@@ -108,8 +111,11 @@ def _event_view(event, aid, channel):
     """Do not reveal unseen causes, global revisions or sequence-number gaps."""
     kind=event['kind'];public='public' in event.get('audience',[]) or aid in event.get('audience',[])
     if kind in {'speech','action'} and public:
-        return {'id':event['id'],'kind':kind,'actor':event.get('actor'),'text':event['text']}
-    if kind=='world':
+        view={'id':event['id'],'kind':kind,'actor':event.get('actor'),'text':event['text']}
+        if event.get('actor')==aid and event.get('material_results'):
+            view['own_material_results']=deepcopy(event['material_results'])
+        return view
+    if kind in {'world','perturbation'}:
         perceptions=[p['text'] for p in event.get('percepts',[]) if 'public' in p['to'] or aid in p['to']]
         if perceptions:return {'id':event['id'],'kind':'observation','percepts':perceptions}
     if kind in {'inner','inner_reply'} and event.get('actor')==aid:
@@ -129,6 +135,8 @@ def actor_packet(root, aid, channel='outward'):
         'cast':[{'id':a['id'],'name':a['name'],'public_role':a.get('public_role','')} for a in state['spec']['actors']],
         'observed':[p for e in state['events'] if (p:=_event_view(e,aid,channel)) is not None],
         'instruction':'Use only this view. Another character claim is not certified world truth. Choose your own response, including silence or refusal.'}
+    from runtime.codex_preprint_context import actor_additions
+    view.update(actor_additions(state,aid,channel))
     return {'packet_sha256':digest(view),'view':view}
 
 
@@ -139,13 +147,15 @@ def director_packet(root, director_id):
     for event in state['events']:
         if event['kind'] in {'speech','action'} and 'public' in event.get('audience',[]):
             public_events.append({'id':event['id'],'kind':event['kind'],'actor':event['actor'],'text':event['text']})
-        elif event['kind']=='world' and event['decision']=='apply':
+        elif (event['kind']=='world' and event['decision']=='apply') or event['kind']=='perturbation':
             percepts=[item['text'] for item in event.get('percepts',[]) if 'public' in item['to']]
             if percepts:public_events.append({'id':event['id'],'kind':'observation','percepts':percepts})
     view={'director':deepcopy(director),'scene':state['spec']['public_scene'],
         'world':deepcopy(state['world']),
         'public_events':public_events,
         'instruction':'Propose or refrain. Affect situations and perceived events, not another participant private mind. Do not write other characters dialogue.'}
+    from runtime.codex_preprint_context import director_additions
+    view.update(director_additions(state,director_id))
     return {'packet_sha256':digest(view),'view':view}
 
 
@@ -169,7 +179,7 @@ def append_event(root, payload, *, expected_revision, operation_id):
     """Commit an attributed result, never infer world effects from a speech."""
     need(isinstance(payload,dict),'event input must be an object')
     def change(state):
-        kind=payload.get('kind');need(kind in {'speech','action','inner','inner_reply','world','note'},'invalid event kind')
+        kind=payload.get('kind');need(kind in {'speech','action','inner','inner_reply','world','perturbation','note'},'invalid event kind')
         event=deepcopy(payload);text(event.get('source_ref'),'actual source reference')
         event['id']='e-'+uuid.uuid4().hex[:16]
         event['recorded_at']=datetime.now(timezone.utc).isoformat(timespec='milliseconds')
@@ -183,15 +193,25 @@ def append_event(root, payload, *, expected_revision, operation_id):
             if kind in {'inner','inner_reply'}:event['audience']=['creator']
             else:event['audience']=_audience(event.get('audience',['public']),state)
             need('changes' not in event,'speech/action attribution does not certify world effects; use an explicit world decision')
+            if event.get('reads'):
+                need(kind in {'speech','action'},'physical material access belongs to outward action')
+                from runtime.codex_preprint_context import apply_material_reads
+                apply_material_reads(state,event)
         elif kind=='world':
             need(event.get('decision') in {'apply','retain','decline'},'record the actual world decision')
             text(event.get('proposal'),'world proposal');text(event.get('reason'),'world handling reason')
             event['audience']=['creator']
             changes=event.get('changes',{});need(isinstance(changes,dict),'world changes must be an object')
+            from runtime.codex_preprint_context import validate_world
+            validate_world(state,event,root)
             for p in event.get('percepts',[]):text(p.get('text'),'perceived event');_audience(p.get('to'),state)
             if event['decision']=='apply':state['world'].update(deepcopy(changes))
             else:
                 need(not event.get('percepts'),'unapplied proposals cannot be delivered as experienced events')
+                need(not changes,'unapplied proposals cannot change world state')
+        elif kind=='perturbation':
+            from runtime.codex_preprint_context import apply_perturbation
+            apply_perturbation(state,event,root)
         else:event['audience']=['creator']
         state['events'].append(event)
         return {'event_id':event['id'],'kind':kind,'semantic_certification':False}

@@ -1,0 +1,14 @@
+{
+  "id": "personal-context",
+  "name": "DIGR Personal Context",
+  "version": "0.1.0",
+  "status": "source-bound-intake-and-selected-views",
+  "entry": "personal-context/README.md",
+  "skill": ".agents/skills/digr-personal-context/SKILL.md",
+  "cli": "tools/codex.py personal",
+  "data_schema": 1,
+  "requires": ["Python 3.10+", "explicitly selected current sources and private destination"],
+  "optional": {"pdf": "existing pypdf", "ESP": "book/role-bound selected view, private publication", "paper-knowledge": "actual scoped evidence references; no automatic mastery migration"},
+  "core": {"relationship": "adjunct; no routing or execution authority"},
+  "limits": "File currency and source attribution are not present personal truth, skill diagnosis, a predictive twin, or model memory."
+}

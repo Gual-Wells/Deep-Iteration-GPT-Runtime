@@ -1,4 +1,6 @@
 from hashlib import sha256
+from contextlib import redirect_stdout, redirect_stderr
+import io
 import json
 from pathlib import Path
 import tempfile
@@ -6,6 +8,10 @@ import unittest
 
 from runtime import codex_preprint as p
 from runtime import codex_preprint_export as publication
+from runtime import codex_preprint_learning as learning
+from runtime import codex_preprint_study as study
+from runtime import codex_preprint_context as context
+from tools import codex_preprint as cli
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -262,6 +268,188 @@ class PreprintExportTests(unittest.TestCase):
         self.assertNotIn(self.private['event_id'],review)
         self.assertNotIn('ESP_PRIVATE_CANARY',review)
         self.assertEqual(p.load(self.root)['learner_evidence'],[])
+
+    def _learning_contract(self):
+        def change(state):
+            state['spec']['learning_contract'] = {'schema_version': 1,
+                'target_domain': 'international-daily', 'why_relevant': 'A favour has a real limit.',
+                'difficulty_focus': 'A request must coexist with unfinished work.',
+                'intended_uses': ['Understand a limited agreement.']}
+            state['spec_sha256'] = p.digest(state['spec'])
+            return {'constructed_contract': True}
+        p._mutate(self.root, {'constructed_contract': True}, p.load(self.root)['revision'],
+                  'contract-fixture', change)
+
+    def _case_payload(self):
+        events = publication._public_events(p.load(self.root))
+        return {'cases': [{'id': 'limited-favour', 'cue': '请求安静时间但对方还有工作',
+            'intent': '理解请求与回应之间的边界', 'why_hard': '各有眼前要做的事情',
+            'what_changed': '对方说仍需整理书，没有许诺所有事情已完成',
+            'event_ids': [event['id'] for event in events],
+            'usage': [{'event_id': self.public['event_id'], 'surface': 'six quiet minutes',
+                'meaning': '一段有限的安静时间', 'function': '请求有界帮助',
+                'conditions': '对方是否可以答应仍要看回应', 'register': '礼貌口语',
+                'frequency_status': 'not checked'}]}]}
+
+    def _add_case(self):
+        learning.add_cases(self.root, self._case_payload(), expected_revision=p.load(self.root)['revision'],
+                           operation_id='case-fixture')
+
+    def _lesson_payload(self):
+        return {'public_source_sha256': study.source_digest(p.load(self.root)),
+            'lessons': [{'id': 'favour-study', 'title': '听见请求的范围', 'author': 'Constructed editor',
+                'purpose': '让原来往返中的词义可以听懂', 'sections': [
+                    {'id': 'source', 'kind': 'source', 'purpose': '保留原话与回应',
+                     'event_ids': [event['id'] for event in publication._public_events(p.load(self.root))]},
+                    {'id': 'explanation', 'kind': 'explanation', 'purpose': '作者讲解',
+                     'text': '这段讲解由编辑编写。six quiet minutes 是有边界的请求。',
+                     'source_section_ids': ['source']}]}]}
+
+    def _review_payload(self, decision='useful'):
+        state = p.load(self.root)
+        return {'content_sha256': learning.content_digest(state), 'decision': decision,
+            'reviewer': 'Constructed substantive reviewer',
+            'reason': 'The complete exchange and authored explanation retain the visible limit.',
+            'case_findings': [{'case_id': case['id'], 'judgment': decision,
+                'reason': 'The source fragment contains the actual request and response.'}
+                for case in state['learning_cases']]}
+
+    def _approve(self, decision='useful'):
+        learning.review(self.root, self._review_payload(decision),
+            expected_revision=p.load(self.root)['revision'],
+            operation_id='review-fixture-' + str(p.load(self.root)['revision']))
+
+    def test_learning_contract_publication_requires_current_useful_judgement(self):
+        self._learning_contract(); self._add_case()
+        for decision in (None, 'reject', 'revise'):
+            if decision:self._approve(decision)
+            with self.subTest(decision=decision), self.assertRaisesRegex(ValueError, 'current recorded useful'):
+                publication.export(self.root, self.out)
+            self.assertFalse(self.out.exists())
+        self._approve()
+        study.add_lessons(self.root, self._lesson_payload(), expected_revision=p.load(self.root)['revision'],
+                          operation_id='lesson-fixture')
+        with self.assertRaisesRegex(ValueError, 'current recorded useful'):
+            publication.export(self.root, self.out)
+        self._approve()
+        self.assertEqual(publication.export(self.root, self.out)['status'], 'CURRENT')
+        self.assertFalse(json.loads((self.out / publication.MANIFEST).read_text(encoding='utf-8'))
+                         ['learning_review']['semantic_certification'])
+        manifest = p.read(self.out / publication.MANIFEST)
+        manifest['learning_review']['semantic_certification'] = True
+        (self.out / publication.MANIFEST).write_text(json.dumps(manifest), encoding='utf-8')
+        self.assertEqual(publication.verify_export(self.root, self.out)['status'], 'REVIEW_REQUIRED')
+
+    def test_study_inventory_and_complete_scene_stay_separate(self):
+        self._learning_contract(); self._add_case()
+        state = p.load(self.root)
+        original = publication._phone(state, {}, publication._cast(state), publication._public_events(state))
+        study.add_lessons(self.root, self._lesson_payload(), expected_revision=state['revision'],
+                          operation_id='lesson-fixture')
+        self._approve()
+        state = p.load(self.root)
+        self.assertEqual(original, publication._phone(state, {}, publication._cast(state), publication._public_events(state)))
+        result = publication.export(self.root, self.out)
+        self.assertEqual(result['status'], 'CURRENT')
+        scene = (self.out / 'phone/PHONE.txt').read_text(encoding='utf-8')
+        lesson = (self.out / 'study/PHONE-STUDY.txt').read_text(encoding='utf-8')
+        review = (self.out / 'phone/PUBLIC-REVIEW.md').read_text(encoding='utf-8')
+        self.assertNotIn('这段讲解由编辑编写', scene)
+        self.assertIn('这段讲解由编辑编写', lesson)
+        self.assertIn('请求安静时间', review)
+        self.assertIn('Preserve hesitation', scene)
+        for secret in self.secrets:self.assertNotIn(secret, lesson + review)
+        manifest = p.read(self.out / publication.MANIFEST)
+        self.assertEqual(manifest['study_files'], ['study/PHONE-STUDY.txt'])
+        (self.out / 'study/CREATOR.md').write_text('Unexpected creator material', encoding='utf-8')
+        report = publication.verify_export(self.root, self.out)
+        self.assertEqual(report['status'], 'MODIFIED_EXPORT')
+        self.assertIn('study/CREATOR.md', report['unexpected_files'])
+        (self.out / 'study/CREATOR.md').unlink()
+        (self.out / 'study/PHONE-STUDY.txt').unlink()
+        (self.out / 'study').rmdir()
+        manifest['files'].pop('study/PHONE-STUDY.txt')
+        manifest['study_files'] = []
+        (self.out / publication.MANIFEST).write_text(json.dumps(manifest), encoding='utf-8')
+        report = publication.verify_export(self.root, self.out)
+        self.assertEqual(report['status'], 'MODIFIED_EXPORT')
+        self.assertIn('study/PHONE-STUDY.txt', report['changed_files'])
+
+    def test_capsule_always_requires_private_distribution_even_for_public_sharing(self):
+        root = self.work / 'capsule-source'
+        p.initialize(root, self.spec)
+        view = {'audience': 'actor', 'book_id': self.spec['id'], 'role_id': 'len',
+                'entries': [{'id': 'constructed-public-entry', 'sharing': 'public',
+                             'text': 'ESP_PRIVATE_CAPSULE_CANARY'}],
+                'unavailable': [], 'requires_private_publication': False}
+        packet = {'view': view, 'view_sha256': p.digest(view)}
+        context.bind_personal(root, 'len', packet, expected_revision=0, operation_id='bind-fixture')
+        with self.assertRaisesRegex(ValueError, 'requires private distribution'):
+            publication.export(root, self.out, distribution='public')
+        self.assertFalse(self.out.exists())
+        report = publication.export(root, self.out)
+        self.assertEqual(report['distribution'], 'private')
+        self.assertNotIn('ESP_PRIVATE_CAPSULE_CANARY', (self.out / 'phone/PHONE.txt').read_text(encoding='utf-8'))
+        manifest = p.read(self.out / publication.MANIFEST)
+        manifest['distribution'] = 'public'
+        (self.out / publication.MANIFEST).write_text(json.dumps(manifest), encoding='utf-8')
+        self.assertEqual(publication.verify_export(root, self.out)['status'], 'DISTRIBUTION_MISMATCH')
+
+    def test_old_schema_one_manifests_remain_verifiable(self):
+        publication.export(self.root, self.out)
+        manifest = p.read(self.out / publication.MANIFEST)
+        for key in ('study_files', 'distribution', 'private_distribution_required', 'learning_review'):
+            manifest.pop(key)
+        (self.out / publication.MANIFEST).write_text(json.dumps(manifest), encoding='utf-8')
+        self.assertEqual(publication.verify_export(self.root, self.out)['status'], 'CURRENT')
+
+    def test_public_perturbation_projection_keeps_only_explicit_public_percepts(self):
+        state = p.load(self.root)
+        state['events'].append({'id': 'constructed-perturbation-public-projection',
+            'kind': 'perturbation', 'audience': ['creator'],
+            'definition': {'hidden': 'PRIVATE_PERTURBATION_DEF'},
+            'percepts': [{'to': ['public'], 'text': 'The shared screen goes dark.'},
+                         {'to': ['jo'], 'text': 'PRIVATE_PERTURBATION_PERCEPT'}]})
+        event = publication._public_events(state)[-1]
+        self.assertEqual(event['kind'], 'observation')
+        self.assertEqual(event['text'], 'The shared screen goes dark.')
+        self.assertNotIn('PRIVATE_', json.dumps(event))
+
+    def test_actual_cli_cases_lesson_review_find_publish_and_bind_context(self):
+        def invoke(args):
+            output, errors = io.StringIO(), io.StringIO()
+            with redirect_stdout(output), redirect_stderr(errors):code = cli.main(args)
+            self.assertEqual(code, 0, errors.getvalue())
+            return json.loads(output.getvalue())
+
+        def input_file(name, value):
+            path = self.work / (name + '.json')
+            path.write_text(json.dumps(value, ensure_ascii=False), encoding='utf-8')
+            return str(path)
+
+        def mutate(command, name, payload):
+            return invoke([command, '--root', str(self.root), '--input', input_file(name, payload),
+                '--expected-revision', str(p.load(self.root)['revision']), '--operation-id', name])
+
+        self._learning_contract()
+        mutate('cases', 'cli-cases', self._case_payload())
+        self.assertEqual(invoke(['learning-status', '--root', str(self.root)])['status'], 'UNREVIEWED')
+        self.assertEqual(invoke(['find', '--root', str(self.root), '--query', '安静'])['results'][0]
+                         ['case']['id'], 'limited-favour')
+        source_status = invoke(['study-status', '--root', str(self.root)])
+        self.assertEqual(source_status['public_source_sha256'], study.source_digest(p.load(self.root)))
+        mutate('lesson', 'cli-lesson', self._lesson_payload())
+        mutate('review', 'cli-review', self._review_payload())
+        self.assertEqual(invoke(['publish', '--root', str(self.root), '--out', str(self.out),
+                                 '--distribution', 'public'])['status'], 'CURRENT')
+        root = self.work / 'cli-personal-book'; p.initialize(root, self.spec)
+        view = {'audience': 'actor', 'book_id': self.spec['id'], 'role_id': 'len',
+                'entries': [], 'unavailable': []}
+        packet = {'view': view, 'view_sha256': p.digest(view)}
+        receipt = invoke(['bind-context', '--root', str(root), '--actor', 'len',
+            '--input', input_file('capsule', packet), '--expected-revision', '0', '--operation-id', 'cli-bind'])
+        self.assertEqual(receipt['actor'], 'len')
+        self.assertEqual(p.load(root)['spec']['actors'][1]['personal_context'], packet)
 
 
 if __name__ == '__main__':

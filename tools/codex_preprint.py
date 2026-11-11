@@ -9,6 +9,9 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 from runtime import codex_preprint as p
+from runtime import codex_preprint_context as context
+from runtime import codex_preprint_learning as learning
+from runtime import codex_preprint_study as study
 from runtime.codex_preprint_export import export,verify_export
 from runtime.codex_preprint_sources import archive_sources,audit_sources
 
@@ -22,10 +25,16 @@ def main(argv=None):
     packet.add_argument('--out',type=Path,help='save the exact bounded packet to a new UTF-8 file')
     director.add_argument('--out',type=Path,help='save the exact bounded packet to a new UTF-8 file')
     show=commands.add_parser('inspect');show.add_argument('--root',required=True,type=Path);show.add_argument('--creator',action='store_true')
-    for name in ('record','annotate'):
+    for name in ('record','annotate','cases','review','lesson','bind-context'):
         sub=commands.add_parser(name);sub.add_argument('--root',required=True,type=Path)
         sub.add_argument('--input',required=True,type=Path);sub.add_argument('--expected-revision',required=True,type=int);sub.add_argument('--operation-id',required=True)
+        if name=='bind-context':sub.add_argument('--actor',required=True)
+    for name in ('learning-status','study-status'):
+        sub=commands.add_parser(name);sub.add_argument('--root',required=True,type=Path)
+    find=commands.add_parser('find');find.add_argument('--root',required=True,action='append',type=Path)
+    find.add_argument('--query',required=True);find.add_argument('--limit',type=int,default=20)
     publish=commands.add_parser('publish');publish.add_argument('--root',required=True,type=Path);publish.add_argument('--out',required=True,type=Path)
+    publish.add_argument('--distribution',choices=('public','private'),help='personal-context works always require private distribution')
     verify=commands.add_parser('verify');verify.add_argument('--root',required=True,type=Path);verify.add_argument('--edition',required=True,type=Path)
     archive=commands.add_parser('archive');archive.add_argument('--root',required=True,type=Path);archive.add_argument('--source-base',required=True,type=Path);archive.add_argument('--out',required=True,type=Path)
     audit=commands.add_parser('audit-sources');audit.add_argument('--root',required=True,type=Path)
@@ -34,7 +43,11 @@ def main(argv=None):
         if args.command=='init':result=p.initialize(args.out,p.read(args.spec))
         elif args.command=='packet':result=p.actor_packet(args.root,args.actor,args.channel)
         elif args.command=='director':result=p.director_packet(args.root,args.id)
-        elif args.command=='publish':result=export(args.root,args.out)
+        elif args.command=='publish':result=export(args.root,args.out,distribution=args.distribution)
+        elif args.command=='learning-status':result=learning.status(p.load(args.root))
+        elif args.command=='study-status':result=study.status(p.load(args.root))
+        elif args.command=='find':result=learning.find(args.root,args.query,limit=args.limit)
+        elif args.command=='bind-context':result=context.bind_personal(args.root,args.actor,p.read(args.input),expected_revision=args.expected_revision,operation_id=args.operation_id)
         elif args.command=='verify':result=verify_export(args.root,args.edition)
         elif args.command=='archive':result=archive_sources(args.root,args.source_base,args.out)
         elif args.command=='audit-sources':result=audit_sources(args.root)
@@ -45,7 +58,9 @@ def main(argv=None):
                 'inner_channels':len(state['spec']['actors']),'learner_evidence':len(state['learner_evidence']),
                 'scope':'summary only; use explicit actor packet or creator view'}
         else:
-            operation={'record':p.append_event,'annotate':p.annotate}[args.command]
+            operation={'record':p.append_event,'annotate':p.annotate,
+                       'cases':learning.add_cases,'review':learning.review,
+                       'lesson':study.add_lessons}[args.command]
             result=operation(args.root,p.read(args.input),expected_revision=args.expected_revision,operation_id=args.operation_id)
         if args.command in {'packet','director'} and args.out:
             args.out.parent.mkdir(parents=True,exist_ok=True)

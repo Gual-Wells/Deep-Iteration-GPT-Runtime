@@ -1,6 +1,6 @@
 # DIGR Codex 附属项目入口
 
-这里登记与 DIGR Codex 共存、各有用途的三个附属项目。按要做的动作进入，接续时回到该项目的原数据；目录不保存个人进度，不判断宿主是否已经具备某种能力，也不负责安装或依赖解析。
+这里登记与 DIGR Codex 共存、各有用途的四个附属项目。按要做的动作进入，接续时回到该项目的原数据；目录不保存个人进度，不判断宿主是否已经具备某种能力，也不负责安装或依赖解析。
 
 [index.json](index.json) 仅提供项目 ID、名称和仓库相对入口。发行版本以项目已有的发行材料为准；数据格式、历史协议 pin、产物身份与私人数据 revision 各自表达。登记为附属不意味着彼此成为运行依赖。
 
@@ -9,6 +9,7 @@
 | DIGR Voice Companion | 在英语语音陪练中帮助构思、接话、创作与继续交流；提供本机短核、完整技能及手机自足材料。 | [使用说明](../voice/README.md)、[手机短核](../voice/MOBILE.txt)、[完整手机材料](../voice/ChatGPT-Voice-Companion.md)、[开始一句话](../voice/START.txt) |
 | DIGR Paper Knowledge | 在 Codex 读论文时保留来源、论文局部用法、真实选择、已讲内容和有范围的学习证据，并按实际位置接续。当前数据格式为 schema 2；这不是独立产品 2.0。 | [技能与接续流程](../.agents/skills/digr-paper-knowledge/SKILL.md)、[数据/命令契约](../.agents/skills/digr-paper-knowledge/references/data-contract.md)、[CLI](../tools/codex_knowledge.py) |
 | English-Spoken-Preprint | 在 Codex 中由真实独立人物及伴生内心生成场景日志，制作供手机顺畅多角色场景演绎、用户跟听的预印本；台前与幕后分别交付。 | [项目与工作流](../spoken-preprint/README.md)、[统一 CLI 的 preprint 入口](../tools/codex.py)、[具体命令](../tools/codex_preprint.py) |
+| DIGR Personal Context | 保存选定简历、项目、自述与参考材料的来源、版本、使用边界；按任务或人物提供最小私人视图，不自动诊断能力。 | [使用说明](../personal-context/README.md)、[数据契约](../personal-context/DATA.md)、[技能](../.agents/skills/digr-personal-context/SKILL.md) |
 
 ## Voice Companion：练习与导出分别进入
 
@@ -44,6 +45,8 @@ python -B tools/codex.py knowledge --pool <private-pool> check-sources
 原 `preprint.json` 及其实际事件仍是原生制作的世界/角色权威；完整世界、伴生内心和幕后议会材料留在相应私人工作区，手机仅带台前包。ESP 不设置用户接手、插入或回传后真实 D 接续的路径。发行说明和工具命令说明各自能力，目录中的链接不代表产物已经生成、宿主已经加载或真实手机路径已经验证。
 
 ## 核心与附属的边界
+
+Personal Context 可向 ESP 提供本册/本角色的冻结资料胶囊；ESP 也可直接使用选定材料或明确虚构，不依赖建立完整个人档案。Paper Knowledge 继续独立保存真实学习证据，ESP 的演员表现与语言资源不回写掌握。个人资料和依它衍生的出版物留在私人项目；舞台 public 不等于公共发行。具体摄入/改版/撤出流程见 [Personal Context](../personal-context/README.md)。
 
 本目录不会修改、替换或覆盖根 [stable profile](../manifest.json) 与其[启动协议](../entry/STARTUP.md)，也不会另设 DIGR 执行路由。显式调用沿用户已选择的通道取得协议；Codex 入口仍为 [codex/manifest.json](../codex/manifest.json)。附属的说明、历史 pin 或手机材料不取得核心执行权威。
 
