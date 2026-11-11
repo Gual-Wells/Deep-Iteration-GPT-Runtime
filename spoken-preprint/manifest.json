@@ -1,7 +1,7 @@
 {
   "id": "english-spoken-preprint",
   "name": "English-Spoken-Preprint",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "status": "difficulty-understanding-and-reuse",
   "entry": "spoken-preprint/README.md",
   "skill": ".agents/skills/digr-spoken-preprint/SKILL.md",
@@ -16,5 +16,6 @@
   },
   "optional_relations": {"voice-companion": "separately requested voice help", "paper-knowledge": "source/use/evidence design reference; no private pool import", "personal-context": "optional selected current source capsule per book/role; private publication"},
   "core": {"relationship": "adjunct; no routing or execution authority", "construction_profile": "0.8.0@314e513d439829fa1159e6801d1421ed1e569e0a", "initial_release_profile": "0.8.0@ca5d6083edb0f60c8167ba16a78d45970d68c3fd"},
-  "capability_note": "Requirements are declarations, not host detection or mobile verification."
+  "capability_note": "Requirements are declarations, not host detection or mobile verification.",
+  "maintenance": {"from_version": "0.2.0", "run_profile": "0.8.1@22caca339cab2ac635b7d6241b20a4e39e6d02f3", "notes": "docs/ESP_0_2_1_INSPECTION.md", "data_and_engine_changed": false}
 }
