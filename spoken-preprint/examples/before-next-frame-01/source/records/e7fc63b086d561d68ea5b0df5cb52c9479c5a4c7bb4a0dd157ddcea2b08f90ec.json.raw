@@ -1,0 +1,73 @@
+{
+  "packet_sha256": "21c8a89589c5a5f96c07fdc5e52ea851306f4668c96a16c005a610ca8156c426",
+  "view": {
+    "director": {
+      "id": "lab",
+      "domain": "The diagnostic fixture, output ownership and physical console results. Preserve frozen model/input/output facts; never write either actor's dialogue, private mind or hiring decision.",
+      "reads": [
+        "fixture",
+        "result_map",
+        "diagnostic_slots",
+        "console_status",
+        "latest_diagnostic"
+      ],
+      "writes": [
+        "diagnostic_slots",
+        "console_status",
+        "latest_diagnostic"
+      ]
+    },
+    "scene": "A technical video interview for an on-device inference software internship at a fictional mobile-app team. Nora, the applicant, is sharing a small Android inference integration patch and a saved two-frame history. Sam, a runtime engineer, is interviewing her. The history shows the same tag beside two different captured objects. Nora has brought a native-runner reference and a short patch excerpt. A reserved diagnostic console can replay this small fixture during the interview; no new test has run in this encounter and no selection decision has been made.",
+    "world": {
+      "fixture": {
+        "identity": "Explicit original fiction; no actual phone/model measurement",
+        "runtime_basis": "ExecuTorch v1.5.0 source reference f7140a46ff38e919c557d45b102d3ff26097c8c9, portable non-USE_ATEN_LIB Android ARM64 CPU path; no built runtime in this production",
+        "inputs": "A and B differ; both match their native reference at the invocation boundary; owned buffers survive each call",
+        "computation": "Deterministic stateless FP32 three-score fixture; no quantization/mutable cache; same loaded method runs A then B sequentially",
+        "ownership": "This chosen method uses reusable planned output storage. Returned Tensor wrappers alias it. A wrapper is not an independently owned value snapshot. The Module remains alive.",
+        "raw_scores": {
+          "A": [
+            2,
+            0,
+            -1
+          ],
+          "B": [
+            -1,
+            2,
+            0
+          ]
+        },
+        "late_history": "After B, both retained wrappers read B values. An owned A copy taken before B remains A.",
+        "performance": "No measured latency, power, memory saving, general accuracy or end-to-end speedup exists."
+      },
+      "result_map": {
+        "boundary_inputs": "A app snapshot matches A reference; B matches B reference; A differs from B. This narrows input repetition/preprocessing for the fixture.",
+        "immediate_vs_late": "An independently owned immediate copy after each call and before the next has A=[2,0,-1], B=[-1,2,0]. Read the retained A wrapper after B and it gives [-1,2,0]. This supports an application retention/timing mismatch in this fixture.",
+        "late_copy": "A copy made only after B contains B values; it cannot restore old A.",
+        "single_thread": "Sequential inference already exists; delayed reads still reproduce the symptom.",
+        "new_module": "If a distinct Module per result is retained through last read, separate result storage can mask the symptom; it also changes allocation/initialization and establishes no performance benefit.",
+        "retain_final_values": "Read label and raw top score immediately after each call, before the next call, associate with frame ID and retain those owned values: A label0/top2, B label1/top2 remain stable later. Does not retain the full distribution or prove speedup.",
+        "other_tests": "If a request does not map to these constraints, do not invent device bytes or timings. Report what is unknown or propose a bounded, clearly authored additional fixture interpretation to controller."
+      },
+      "diagnostic_slots": 2,
+      "console_status": "reserved but not opened in this encounter",
+      "latest_diagnostic": "none"
+    },
+    "public_events": [],
+    "instruction": "Propose or refrain. Affect situations and perceived events, not another participant private mind. Do not write other characters dialogue.",
+    "territory": {
+      "writes": [
+        "diagnostic_slots",
+        "console_status",
+        "latest_diagnostic"
+      ],
+      "frozen_keys": [
+        "fixture",
+        "result_map",
+        "booking_context",
+        "ui_contract"
+      ],
+      "scope": "Domain-authorized present consequences; cannot rewrite important history or another private mind."
+    }
+  }
+}

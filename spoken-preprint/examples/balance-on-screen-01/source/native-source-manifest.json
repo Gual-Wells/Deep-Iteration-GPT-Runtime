@@ -1,0 +1,520 @@
+{
+  "schema_version": 1,
+  "kind": "english-spoken-preprint-native-sources",
+  "source": {
+    "file": "preprint.json",
+    "baseline_id": "balance-on-screen-01",
+    "snapshot_sha256": "0467d3eb41e3889887e1fb042c8b6532ef07d520cd82c627203affa605178247",
+    "source_file_sha256": "eae64c987bcaa4aa736acab3f1e003d474c3d4fe816bd38c011f97334895ec56"
+  },
+  "records": {
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-billing-01.json": {
+      "path": "records/072391eb419ac945872923ea3544e391544c7e33cb3fcb88b1153c89d99cee39.json.raw",
+      "sha256": "072391eb419ac945872923ea3544e391544c7e33cb3fcb88b1153c89d99cee39",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-2239554e70ab42af",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/w-billing-01.json": {
+      "path": "records/e64730a1d71e4ecd53aca6d20c599e5a00e05e672f2a026376a520225efc03a1.json.raw",
+      "sha256": "e64730a1d71e4ecd53aca6d20c599e5a00e05e672f2a026376a520225efc03a1",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-2239554e70ab42af",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-timing-01.json": {
+      "path": "records/648fb8e7e82f5b054a4d7b43875693a44bf66ce7441ed08926e9e835ea7f9094.json.raw",
+      "sha256": "648fb8e7e82f5b054a4d7b43875693a44bf66ce7441ed08926e9e835ea7f9094",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-6fffe2dee57e41f7",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/w-timing-01.json": {
+      "path": "records/dc88cfb8ef327022967b28ef6f570a63fe5aa2a1f2f04760c44aaeaab82339c8.json.raw",
+      "sha256": "dc88cfb8ef327022967b28ef6f570a63fe5aa2a1f2f04760c44aaeaab82339c8",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-6fffe2dee57e41f7",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-mara-01.json": {
+      "path": "records/e2c3773b29b02b508985a3881404bca47e7d1079c33b89d59f38fc681cfd6fb0.json.raw",
+      "sha256": "e2c3773b29b02b508985a3881404bca47e7d1079c33b89d59f38fc681cfd6fb0",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-fe36679731bd45c7",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/d-mara-01.json": {
+      "path": "records/5caba621e5980dac886f42a6c9f3f003fe9f4d8f8ecdfd4528db3057877aba93.json.raw",
+      "sha256": "5caba621e5980dac886f42a6c9f3f003fe9f4d8f8ecdfd4528db3057877aba93",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-fe36679731bd45c7",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-eli-01.json": {
+      "path": "records/37c2a18ad28e6a04b03cac8c7de2a43ccfcb7d5fac3860f60cd4e2a14f729121.json.raw",
+      "sha256": "37c2a18ad28e6a04b03cac8c7de2a43ccfcb7d5fac3860f60cd4e2a14f729121",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-abcf0a0a320840b5",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/d-eli-01.json": {
+      "path": "records/f16df740a4452203a26f8aa775dccb09ba30f44d2a4b5cad508cc00299e27083.json.raw",
+      "sha256": "f16df740a4452203a26f8aa775dccb09ba30f44d2a4b5cad508cc00299e27083",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-abcf0a0a320840b5",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-01.json": {
+      "path": "records/591e33ccc166a634043ae97b5e5ad0c61ac62ed2f9559b7c89b7d74f8cecf31f.json.raw",
+      "sha256": "591e33ccc166a634043ae97b5e5ad0c61ac62ed2f9559b7c89b7d74f8cecf31f",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7f1c6098562d4d50",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-01.json": {
+      "path": "records/3be87371dc52d1ae7a671eda4bad31cce369d6d603cbee571686930e977a7468.json.raw",
+      "sha256": "3be87371dc52d1ae7a671eda4bad31cce369d6d603cbee571686930e977a7468",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7f1c6098562d4d50",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-01.json": {
+      "path": "records/af7e64b864ab1615be116a93c155d74c40cecac88b531045e6711f1080ba258c.json.raw",
+      "sha256": "af7e64b864ab1615be116a93c155d74c40cecac88b531045e6711f1080ba258c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-406b535b377a4ab9",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-01.json": {
+      "path": "records/9da41e5c24a5ccffc955afd67f26f8ce0e2361cb967798400c368482c8aee4a6.json.raw",
+      "sha256": "9da41e5c24a5ccffc955afd67f26f8ce0e2361cb967798400c368482c8aee4a6",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-406b535b377a4ab9",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-02.json": {
+      "path": "records/0dccd7cec4825b54dce77a4c74709b964b6a0f0ea4fb09e000a4c6dac8851d74.json.raw",
+      "sha256": "0dccd7cec4825b54dce77a4c74709b964b6a0f0ea4fb09e000a4c6dac8851d74",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-415efbc15c11456e",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-02.json": {
+      "path": "records/d29e54cd23168da0df8af3927a580c59902c7a2dd6c54a267b838bfd896742ec.json.raw",
+      "sha256": "d29e54cd23168da0df8af3927a580c59902c7a2dd6c54a267b838bfd896742ec",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-415efbc15c11456e",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-billing-02.json": {
+      "path": "records/3852863f180c3c31ba38be026ae0a263a47dfa1932659b018165d28214be544a.json.raw",
+      "sha256": "3852863f180c3c31ba38be026ae0a263a47dfa1932659b018165d28214be544a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-5bc976498a1b4aec",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/w-billing-02.json": {
+      "path": "records/13b2193c94fc6e034415d0d7e695609a2d7664348ad8f9a43b7aef8cdd8bb46d.json.raw",
+      "sha256": "13b2193c94fc6e034415d0d7e695609a2d7664348ad8f9a43b7aef8cdd8bb46d",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-5bc976498a1b4aec",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-02r.json": {
+      "path": "records/7efc7d19b4d235cc6149574f90b7ee94b7315180d43b01d864e8f6624267f32b.json.raw",
+      "sha256": "7efc7d19b4d235cc6149574f90b7ee94b7315180d43b01d864e8f6624267f32b",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7eb5c7dbbe08499b",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-02r.json": {
+      "path": "records/42626119eea99b2c7302613795888e5f938dfd891736fe02f52014989f5b94b5.json.raw",
+      "sha256": "42626119eea99b2c7302613795888e5f938dfd891736fe02f52014989f5b94b5",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7eb5c7dbbe08499b",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-03.json": {
+      "path": "records/b3972a37f3b80926d634d01e834d8389b15785a8a4666f73dffbd27ad724329d.json.raw",
+      "sha256": "b3972a37f3b80926d634d01e834d8389b15785a8a4666f73dffbd27ad724329d",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-c8e51fe97c724093",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-03.json": {
+      "path": "records/dbd2a52b6f7383ced8746a4b0b809c90ee0905cab993c718c51122d39321ab45.json.raw",
+      "sha256": "dbd2a52b6f7383ced8746a4b0b809c90ee0905cab993c718c51122d39321ab45",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-c8e51fe97c724093",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-mara-03.json": {
+      "path": "records/f40e2fcb12d41a4e6facdac406927e95f98d226525614383b4261774a0c8634a.json.raw",
+      "sha256": "f40e2fcb12d41a4e6facdac406927e95f98d226525614383b4261774a0c8634a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-43168309ac47470e",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/d-mara-03.json": {
+      "path": "records/d21438d76287b875ad42469954bee64c884b329ba0791f7d6fa5603d9f799702.json.raw",
+      "sha256": "d21438d76287b875ad42469954bee64c884b329ba0791f7d6fa5603d9f799702",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-43168309ac47470e",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-03.json": {
+      "path": "records/afba7ff744fc63697a06c8bcb58d71cf9b848a3b46d016d4134a0d6ae5e600c9.json.raw",
+      "sha256": "afba7ff744fc63697a06c8bcb58d71cf9b848a3b46d016d4134a0d6ae5e600c9",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-86159428862c4034",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-03.json": {
+      "path": "records/1b494f8ab5484b5a8e69326149de8dbc2c71d6a07d78648e4c6fe2154ba43f06.json.raw",
+      "sha256": "1b494f8ab5484b5a8e69326149de8dbc2c71d6a07d78648e4c6fe2154ba43f06",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-86159428862c4034",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-04.json": {
+      "path": "records/5901c8bf0f581ed9a60168c7d2aed066d48d540c594c8e5b9aace4a9373bd3a6.json.raw",
+      "sha256": "5901c8bf0f581ed9a60168c7d2aed066d48d540c594c8e5b9aace4a9373bd3a6",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a84617fb614f47db",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-04.json": {
+      "path": "records/e6645d64a64839e6d9a077dc9055ccf64a14f01eb7ac6975bef5f26262719f07.json.raw",
+      "sha256": "e6645d64a64839e6d9a077dc9055ccf64a14f01eb7ac6975bef5f26262719f07",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a84617fb614f47db",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-eli-02.json": {
+      "path": "records/d3c0724df7ea0d69ad9c51a389aa3646eb01791bd3e0d208f7ebfd4af3d083e6.json.raw",
+      "sha256": "d3c0724df7ea0d69ad9c51a389aa3646eb01791bd3e0d208f7ebfd4af3d083e6",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ff2f0f617c0d4461",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/d-eli-02.json": {
+      "path": "records/c0a1f3aab339f122a19658a8b8dc975bd63c3fe1fa487f81f355db23108935d1.json.raw",
+      "sha256": "c0a1f3aab339f122a19658a8b8dc975bd63c3fe1fa487f81f355db23108935d1",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ff2f0f617c0d4461",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-04.json": {
+      "path": "records/e5537a96c5667bc40b36c355984aac491c469eb9082cad343e93e716bc5dbb3c.json.raw",
+      "sha256": "e5537a96c5667bc40b36c355984aac491c469eb9082cad343e93e716bc5dbb3c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-28341b5753f14fb3",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-04.json": {
+      "path": "records/54f1821b33d4e78aa845b6ebf92f3eb72837851817bd7ace4f1ec8faf6c8f8c3.json.raw",
+      "sha256": "54f1821b33d4e78aa845b6ebf92f3eb72837851817bd7ace4f1ec8faf6c8f8c3",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-28341b5753f14fb3",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-05.json": {
+      "path": "records/ed5ac24d5054cef7e8bca508e4eefb058fdfaa6c4f88ca8f12089c0a302af477.json.raw",
+      "sha256": "ed5ac24d5054cef7e8bca508e4eefb058fdfaa6c4f88ca8f12089c0a302af477",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-451c76a4f22a4861",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-05.json": {
+      "path": "records/71cc3f99fb28e707092554d6bbdb222b8f5e7544f1609c5ffd53b773034baea4.json.raw",
+      "sha256": "71cc3f99fb28e707092554d6bbdb222b8f5e7544f1609c5ffd53b773034baea4",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-451c76a4f22a4861",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-05.json": {
+      "path": "records/4dff2f4ecd74b6bca3be0236ac0950cf7c79c53fcb47fb820ace06e403c88505.json.raw",
+      "sha256": "4dff2f4ecd74b6bca3be0236ac0950cf7c79c53fcb47fb820ace06e403c88505",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-3b1b64296f2f493e",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-05.json": {
+      "path": "records/339a73da1a96754e0143df990bdd5039a854094a6431cee72ff3f016757a6919.json.raw",
+      "sha256": "339a73da1a96754e0143df990bdd5039a854094a6431cee72ff3f016757a6919",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-3b1b64296f2f493e",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-06.json": {
+      "path": "records/b3ca7044cf17493f6389acc7b22229912e6195f4af668bf20f433d2e576f96ad.json.raw",
+      "sha256": "b3ca7044cf17493f6389acc7b22229912e6195f4af668bf20f433d2e576f96ad",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-1fbee59c5f93441d",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-06.json": {
+      "path": "records/fc45f7e8dd38241662da023ede2d7528aaf65927d47ad40fba305985bbd3d916.json.raw",
+      "sha256": "fc45f7e8dd38241662da023ede2d7528aaf65927d47ad40fba305985bbd3d916",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-1fbee59c5f93441d",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-private-01.json": {
+      "path": "records/e8c636c6a86619a59ddfbf103dc29c21cd29df257c4f552cabb18c3415638d5a.json.raw",
+      "sha256": "e8c636c6a86619a59ddfbf103dc29c21cd29df257c4f552cabb18c3415638d5a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-969faaec92b94e13",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-private-01.json": {
+      "path": "records/4572ecb770e51deefd36db3ed2bf9352da648344d4e368ff14b294b3d938d4c9.json.raw",
+      "sha256": "4572ecb770e51deefd36db3ed2bf9352da648344d4e368ff14b294b3d938d4c9",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-969faaec92b94e13",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-mara-04.json": {
+      "path": "records/ddf76dc6e2c9efe9c6f029afa8911259f7cdb9176385ed9e4a1921302e0c1558.json.raw",
+      "sha256": "ddf76dc6e2c9efe9c6f029afa8911259f7cdb9176385ed9e4a1921302e0c1558",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-0201f9f7362940bc",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/d-mara-04.json": {
+      "path": "records/8740bc536f108f6589786217f271e152c92fa2affabcf3bb9c9ae35608c53f7d.json.raw",
+      "sha256": "8740bc536f108f6589786217f271e152c92fa2affabcf3bb9c9ae35608c53f7d",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-0201f9f7362940bc",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-timing-02.json": {
+      "path": "records/9faaeacc5c8792de20dd3841d29c9f7dc7fae747d9230609479f842c3a9ee384.json.raw",
+      "sha256": "9faaeacc5c8792de20dd3841d29c9f7dc7fae747d9230609479f842c3a9ee384",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-717ccd2c242443c0",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/w-timing-02.json": {
+      "path": "records/9dbf454285e9ea2ccd800c8f3ea9231e3870746321cb29a9a3bae48e11bc5435.json.raw",
+      "sha256": "9dbf454285e9ea2ccd800c8f3ea9231e3870746321cb29a9a3bae48e11bc5435",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-717ccd2c242443c0",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-06.json": {
+      "path": "records/3b249cb1a4132f935354276537a7b2cb743aef945c9a846068ab339f5791ddd9.json.raw",
+      "sha256": "3b249cb1a4132f935354276537a7b2cb743aef945c9a846068ab339f5791ddd9",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d26f673a62454d56",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-06.json": {
+      "path": "records/054d11349df8d2fd01d8568af9a47e538a6f5090c71e0f54cb2784679c728422.json.raw",
+      "sha256": "054d11349df8d2fd01d8568af9a47e538a6f5090c71e0f54cb2784679c728422",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d26f673a62454d56",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-07.json": {
+      "path": "records/63140ba2185fa65e879904a678046b61e81f146346ede063e5d2dfb80be380d3.json.raw",
+      "sha256": "63140ba2185fa65e879904a678046b61e81f146346ede063e5d2dfb80be380d3",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7d350f790e9a46a1",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-07.json": {
+      "path": "records/841a4b1372dfa0d14efe1cfff80110033fc704dc126256967624c2d0fd6f2541.json.raw",
+      "sha256": "841a4b1372dfa0d14efe1cfff80110033fc704dc126256967624c2d0fd6f2541",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7d350f790e9a46a1",
+          "field": "input_ref"
+        }
+      ]
+    }
+  },
+  "missing_inputs": [],
+  "limits": "Creator-only selected file archive, not a phone package. Native text and saved packet checks are file consistency checks. Executor strings are operator attribution, not authenticated independent identities or input delivery. Missing inputs are not reconstructed. No hostile filesystem-race guarantee; the manifest does not hash or authenticate itself."
+}

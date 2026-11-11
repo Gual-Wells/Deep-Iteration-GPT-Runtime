@@ -1,0 +1,5 @@
+{
+  "kind": "speech",
+  "text": "Ah—the timer starts after model loading and frame preparation, just before forward, and stops when forward returns. So forty is the forward call. I can't call that cold start. The saved trace puts the displayed result at 210 milliseconds from process launch. That's one launch, though. I need to correct the card.",
+  "actual_native_return": "Ah—the timer starts after model loading and frame preparation, just before forward, and stops when forward returns. So forty is the forward call. I can't call that cold start. The saved trace puts the displayed result at 210 milliseconds from process launch. That's one launch, though. I need to correct the card."
+}

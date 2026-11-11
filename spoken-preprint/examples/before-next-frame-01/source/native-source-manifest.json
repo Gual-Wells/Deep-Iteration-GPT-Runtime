@@ -1,0 +1,542 @@
+{
+  "schema_version": 1,
+  "kind": "english-spoken-preprint-native-sources",
+  "source": {
+    "file": "preprint.json",
+    "baseline_id": "before-next-frame-01",
+    "snapshot_sha256": "f7143ab096525070c4351d95447ae61234bacbd3e5b1912b066c59dd21f317b4",
+    "source_file_sha256": "03de71aaa820edda3e6b188361516c93818b921bf7ef8e2ecb4600ff1c0d286f"
+  },
+  "records": {
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\w-lab-01.json": {
+      "path": "records/64ccfe46223404b0ffec9153ed1fc6b2826affe4ec1b06b540fb8c1739276d9a.json.raw",
+      "sha256": "64ccfe46223404b0ffec9153ed1fc6b2826affe4ec1b06b540fb8c1739276d9a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7eac3856eff1427e",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-lab-01.json": {
+      "path": "records/e7fc63b086d561d68ea5b0df5cb52c9479c5a4c7bb4a0dd157ddcea2b08f90ec.json.raw",
+      "sha256": "e7fc63b086d561d68ea5b0df5cb52c9479c5a4c7bb4a0dd157ddcea2b08f90ec",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7eac3856eff1427e",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\w-booking-01.json": {
+      "path": "records/92544bd7c2b52ab0d8c88b744da74a897323e80d9b0b289da67f8f4be5c862fe.json.raw",
+      "sha256": "92544bd7c2b52ab0d8c88b744da74a897323e80d9b0b289da67f8f4be5c862fe",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-10b93f7023594b10",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-booking-01.json": {
+      "path": "records/409194e9d83a3eb7dc25011988bf87e617dd2035cae14a97f9e2e1996d560da0.json.raw",
+      "sha256": "409194e9d83a3eb7dc25011988bf87e617dd2035cae14a97f9e2e1996d560da0",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-10b93f7023594b10",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-01.json": {
+      "path": "records/a9edcf8c56067d71fdc14f3569cc68968bcdfbead11edfa68eb64a3b6a81156b.json.raw",
+      "sha256": "a9edcf8c56067d71fdc14f3569cc68968bcdfbead11edfa68eb64a3b6a81156b",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-864b5396e75a46a7",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-01.json": {
+      "path": "records/ed09e4e5d120a82553b25500ac3f70e5ae26c91f11ae136704022595d883ef65.json.raw",
+      "sha256": "ed09e4e5d120a82553b25500ac3f70e5ae26c91f11ae136704022595d883ef65",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-864b5396e75a46a7",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-01.json": {
+      "path": "records/fe117ebcf20274d626431c8eab6daf4bb8dfaabe133cf16af63e1d02758c59f6.json.raw",
+      "sha256": "fe117ebcf20274d626431c8eab6daf4bb8dfaabe133cf16af63e1d02758c59f6",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7ea5c40f96cb4efb",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-01.json": {
+      "path": "records/1bfb7e29f357a95117f90c18c536e43672bf7f54f7e007c97d3294136c7429ba.json.raw",
+      "sha256": "1bfb7e29f357a95117f90c18c536e43672bf7f54f7e007c97d3294136c7429ba",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7ea5c40f96cb4efb",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\d-nora-01.json": {
+      "path": "records/e90ee250c4586abe16e2197ab0b0e4409f786a307e16778a72f2d64de11e31d5.json.raw",
+      "sha256": "e90ee250c4586abe16e2197ab0b0e4409f786a307e16778a72f2d64de11e31d5",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ccfc0050bff44bd6",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-nora-01.json": {
+      "path": "records/3a6344c55c1ecec8313514700456733090fa85fa11637c630b80c8016d5ba6fc.json.raw",
+      "sha256": "3a6344c55c1ecec8313514700456733090fa85fa11637c630b80c8016d5ba6fc",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ccfc0050bff44bd6",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\d-sam-01.json": {
+      "path": "records/3c57d8b400ae1dd2fcbd5ac77bad6b5160a653d65c7c35f4df443400f127b063.json.raw",
+      "sha256": "3c57d8b400ae1dd2fcbd5ac77bad6b5160a653d65c7c35f4df443400f127b063",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-b1c89ded0b2241dc",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-sam-01.json": {
+      "path": "records/554663c9769283e873dc65eb2f54f1421deb256431a7cb4e9f15a29e960d4298.json.raw",
+      "sha256": "554663c9769283e873dc65eb2f54f1421deb256431a7cb4e9f15a29e960d4298",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-b1c89ded0b2241dc",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-02.json": {
+      "path": "records/4153ca6c8bc3b55a527e1f4faeddc4604f234a6c9a4799033e6fe6a26e0f74da.json.raw",
+      "sha256": "4153ca6c8bc3b55a527e1f4faeddc4604f234a6c9a4799033e6fe6a26e0f74da",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ba788d06a0874666",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-02.json": {
+      "path": "records/e4b38c114872537c707e27eeaa8cd1b249bbc6c7d066d33528443d13f4f56562.json.raw",
+      "sha256": "e4b38c114872537c707e27eeaa8cd1b249bbc6c7d066d33528443d13f4f56562",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ba788d06a0874666",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-02.json": {
+      "path": "records/bdb494f6943f82398eb2fd276d625d52f53992b8d9496c3acf1b9b9d73cbaa78.json.raw",
+      "sha256": "bdb494f6943f82398eb2fd276d625d52f53992b8d9496c3acf1b9b9d73cbaa78",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-af24a393cdfa41a7",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-02.json": {
+      "path": "records/8544b98c431344ace0de208616f88a9da89c8c823d009f8fcd0b2e44e394c002.json.raw",
+      "sha256": "8544b98c431344ace0de208616f88a9da89c8c823d009f8fcd0b2e44e394c002",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-af24a393cdfa41a7",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-03.json": {
+      "path": "records/8576fd3d1ec431672b7a1c81d2943e38ab4471bd37a2543b92c9cda05f0998ae.json.raw",
+      "sha256": "8576fd3d1ec431672b7a1c81d2943e38ab4471bd37a2543b92c9cda05f0998ae",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-0c33f3a9b90e438f",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-03.json": {
+      "path": "records/0f29f231a973e764211c3f6795d9eaf57752335092438d6df1206e5f09251932.json.raw",
+      "sha256": "0f29f231a973e764211c3f6795d9eaf57752335092438d6df1206e5f09251932",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-0c33f3a9b90e438f",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-04.json": {
+      "path": "records/f2c5aba03723b2e634633038802025a1277d5a867000cb6daa00ce3936241b66.json.raw",
+      "sha256": "f2c5aba03723b2e634633038802025a1277d5a867000cb6daa00ce3936241b66",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-314258bc217b4875",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-04.json": {
+      "path": "records/f6e7063854541b332cd944b7ede0c40a405148819a98cc2581c0dee7ca487e0e.json.raw",
+      "sha256": "f6e7063854541b332cd944b7ede0c40a405148819a98cc2581c0dee7ca487e0e",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-314258bc217b4875",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\w-lab-02.json": {
+      "path": "records/2a9e24ce14094fadc77a74b9b02272feead2003146a5636711c9367b8f8e5274.json.raw",
+      "sha256": "2a9e24ce14094fadc77a74b9b02272feead2003146a5636711c9367b8f8e5274",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-968b587662dd4831",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-lab-02.json": {
+      "path": "records/b6174b273eecf687c679207f0da25919cf4b645d9d5bcdd250a9869d68c8d4c4.json.raw",
+      "sha256": "b6174b273eecf687c679207f0da25919cf4b645d9d5bcdd250a9869d68c8d4c4",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-968b587662dd4831",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\d-nora-02r.json": {
+      "path": "records/043c0715812e8fc4cd421bc866caa3af003d6c8d47245e08381ccdee74cec045.json.raw",
+      "sha256": "043c0715812e8fc4cd421bc866caa3af003d6c8d47245e08381ccdee74cec045",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-2cb567c044c44962",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-nora-02r.json": {
+      "path": "records/dae4a2d38e2aeab9e5672cf9d2d5b5cd6b08c9315362ed8bc1f8f2518abd9e66.json.raw",
+      "sha256": "dae4a2d38e2aeab9e5672cf9d2d5b5cd6b08c9315362ed8bc1f8f2518abd9e66",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-2cb567c044c44962",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-05r.json": {
+      "path": "records/3cb167d176cb1164a4766b51cdcdff16d255e9eefd944170d6b8b6a58e78344c.json.raw",
+      "sha256": "3cb167d176cb1164a4766b51cdcdff16d255e9eefd944170d6b8b6a58e78344c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-9010dbf81d5e40ee",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-05r.json": {
+      "path": "records/15a5fba26772fed79020b1c798472b2b4cdf712d3b05c20c539d71bfc2aa516b.json.raw",
+      "sha256": "15a5fba26772fed79020b1c798472b2b4cdf712d3b05c20c539d71bfc2aa516b",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-9010dbf81d5e40ee",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\w-booking-02.json": {
+      "path": "records/613062d378d2a505b2e8a92251c066251366420dbe62007f8d3bfd6bcf827cef.json.raw",
+      "sha256": "613062d378d2a505b2e8a92251c066251366420dbe62007f8d3bfd6bcf827cef",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ebe8dae804014879",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-booking-02.json": {
+      "path": "records/0d2223e1adf064d927980be081609327e154e189da521fbc7c97ffc47cd6ee06.json.raw",
+      "sha256": "0d2223e1adf064d927980be081609327e154e189da521fbc7c97ffc47cd6ee06",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ebe8dae804014879",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-03.json": {
+      "path": "records/77ac970113420273c790b2684429b76704d9ad539970f5ee1d4afb898ba11d06.json.raw",
+      "sha256": "77ac970113420273c790b2684429b76704d9ad539970f5ee1d4afb898ba11d06",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-4ecac46f2bf64859",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-03.json": {
+      "path": "records/2e2a6e91124db46deb221d47eec19f75c8089fe2bd34a21d1a40872bab5905ee.json.raw",
+      "sha256": "2e2a6e91124db46deb221d47eec19f75c8089fe2bd34a21d1a40872bab5905ee",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-4ecac46f2bf64859",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-06.json": {
+      "path": "records/b1bd3b2a5806969e582f8a5756f4605a62698c5ab973416ac17a27ca7723fe91.json.raw",
+      "sha256": "b1bd3b2a5806969e582f8a5756f4605a62698c5ab973416ac17a27ca7723fe91",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-35b39e4ee8f348f2",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-06.json": {
+      "path": "records/b5ba9cb3a08d7de20d529ef132e1fa537e0d8ec3d7f44a6efae77ef99cdadaf5.json.raw",
+      "sha256": "b5ba9cb3a08d7de20d529ef132e1fa537e0d8ec3d7f44a6efae77ef99cdadaf5",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-35b39e4ee8f348f2",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-04.json": {
+      "path": "records/c60f3fcee57b92964803314d5945861c45f9d2b2fba05407a33ad88a3c75ebe7.json.raw",
+      "sha256": "c60f3fcee57b92964803314d5945861c45f9d2b2fba05407a33ad88a3c75ebe7",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-1aca05bcb26244da",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-04.json": {
+      "path": "records/1c22744bff4b77569d0ceef379088b5ed808e5c5e0bfd827be5e9129e78c6f25.json.raw",
+      "sha256": "1c22744bff4b77569d0ceef379088b5ed808e5c5e0bfd827be5e9129e78c6f25",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-1aca05bcb26244da",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-07.json": {
+      "path": "records/6302f854bb641ba041b5c3060a9586980204a5331a1429ba02f103bc72396b64.json.raw",
+      "sha256": "6302f854bb641ba041b5c3060a9586980204a5331a1429ba02f103bc72396b64",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-58592dc4d28e475c",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-07.json": {
+      "path": "records/5163fa3b0d972dd3f871978789ceac9add50145947bb038aff5625d8c8dc01f3.json.raw",
+      "sha256": "5163fa3b0d972dd3f871978789ceac9add50145947bb038aff5625d8c8dc01f3",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-58592dc4d28e475c",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\w-lab-03.json": {
+      "path": "records/97eca6d7bad1742decc07cca90dcd0f84dc8aa4d66ff3dd74cccd2d6c2d5803d.json.raw",
+      "sha256": "97eca6d7bad1742decc07cca90dcd0f84dc8aa4d66ff3dd74cccd2d6c2d5803d",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ee3e7b10beda49f1",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-lab-03.json": {
+      "path": "records/542ff32072399e364f59d03a15e813a26cd28edaa845aa6c2e6142dd4332d18c.json.raw",
+      "sha256": "542ff32072399e364f59d03a15e813a26cd28edaa845aa6c2e6142dd4332d18c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ee3e7b10beda49f1",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\d-sam-02.json": {
+      "path": "records/95f9a34593352ea20f2b44f00f098ffbe20a75b9145ef41ba6cbeac639d2303d.json.raw",
+      "sha256": "95f9a34593352ea20f2b44f00f098ffbe20a75b9145ef41ba6cbeac639d2303d",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-f5b58053336243f8",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-sam-02.json": {
+      "path": "records/d32e432ee1b16433f619f9d8058f8392586800c0f98e1e368c0fd83aaa73905d.json.raw",
+      "sha256": "d32e432ee1b16433f619f9d8058f8392586800c0f98e1e368c0fd83aaa73905d",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-f5b58053336243f8",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-08.json": {
+      "path": "records/5048396c948bfb5ad943ae29156ccb361b330f5fac54971cf6bdbf4750cd41ea.json.raw",
+      "sha256": "5048396c948bfb5ad943ae29156ccb361b330f5fac54971cf6bdbf4750cd41ea",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ea14a6fd83e6429c",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-08.json": {
+      "path": "records/1beac59d5faf55e69ee954d9d0f895cf1b9b1d6573cbabdbcfb1891b84be3bca.json.raw",
+      "sha256": "1beac59d5faf55e69ee954d9d0f895cf1b9b1d6573cbabdbcfb1891b84be3bca",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ea14a6fd83e6429c",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-05.json": {
+      "path": "records/49d3e98bd07c045bee717654cd6b02d49a6270a8a723ac5db6b53990567a0e18.json.raw",
+      "sha256": "49d3e98bd07c045bee717654cd6b02d49a6270a8a723ac5db6b53990567a0e18",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-1e07794c2f9a479a",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-05.json": {
+      "path": "records/6cdcd53164ba53709266874b2a942405af3942f4f2ff99cb2bff6add266a768c.json.raw",
+      "sha256": "6cdcd53164ba53709266874b2a942405af3942f4f2ff99cb2bff6add266a768c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-1e07794c2f9a479a",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-09.json": {
+      "path": "records/0ed12798bb411beeedc1d82e06bdba22e1a0d6c1f1a95581e96895794b367c5a.json.raw",
+      "sha256": "0ed12798bb411beeedc1d82e06bdba22e1a0d6c1f1a95581e96895794b367c5a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-e5cf365c807542b2",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-09.json": {
+      "path": "records/fd303228f60475c27aee881baac26c6d7539e76069cef5f569c01eaf30db9d3d.json.raw",
+      "sha256": "fd303228f60475c27aee881baac26c6d7539e76069cef5f569c01eaf30db9d3d",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-e5cf365c807542b2",
+          "field": "input_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-06.json": {
+      "path": "records/0d6c746eaeaaac91d06388cce3f5efb9e25301e176c710edb0d8ee26fbfa9f58.json.raw",
+      "sha256": "0d6c746eaeaaac91d06388cce3f5efb9e25301e176c710edb0d8ee26fbfa9f58",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-03e9a56e1dd74af9",
+          "field": "source_ref"
+        }
+      ]
+    },
+    "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-06.json": {
+      "path": "records/48f6a1acee51e55194249cbe94a44e2f5501725a6353f27911c2233d078ed0e9.json.raw",
+      "sha256": "48f6a1acee51e55194249cbe94a44e2f5501725a6353f27911c2233d078ed0e9",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-03e9a56e1dd74af9",
+          "field": "input_ref"
+        }
+      ]
+    }
+  },
+  "missing_inputs": [],
+  "limits": "Creator-only selected file archive, not a phone package. Native text and saved packet checks are file consistency checks. Executor strings are operator attribution, not authenticated independent identities or input delivery. Missing inputs are not reconstructed. No hostile filesystem-race guarantee; the manifest does not hash or authenticate itself."
+}

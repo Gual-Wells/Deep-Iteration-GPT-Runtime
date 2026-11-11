@@ -1,0 +1,1 @@
+{"kind":"speech","text":"Here: I add A's wrapper to history, run B on the same module, then read both wrappers later when I render the entries. I was treating that wrapper like a saved result, but the scores might still point at something the next call reuses. Could we read A immediately, run B, and then read the retained A again?"}

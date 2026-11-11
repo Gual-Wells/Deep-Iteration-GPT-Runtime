@@ -1,0 +1,5 @@
+{
+  "kind": "speech",
+  "text": "The frame capture, the runtime-call adapter, and the small output and timing screen were mine. The wrapper was reused. I can't point to a specific change I made inside it, so I shouldn't list it as something I wrote. My teammate supplied the classifier and runner. I was proud of getting those pieces working together—that's what I should have put forward.",
+  "actual_native_return": "The frame capture, the runtime-call adapter, and the small output and timing screen were mine. The wrapper was reused. I can't point to a specific change I made inside it, so I shouldn't list it as something I wrote. My teammate supplied the classifier and runner. I was proud of getting those pieces working together—that's what I should have put forward."
+}

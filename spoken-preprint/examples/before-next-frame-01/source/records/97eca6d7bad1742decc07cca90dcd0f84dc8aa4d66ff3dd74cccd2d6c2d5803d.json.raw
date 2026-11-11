@@ -1,0 +1,46 @@
+{
+  "kind": "world",
+  "decision": "apply",
+  "proposal": "Use the final slot for the submitted fixture pseudocode, showing the immediate score snapshots and both delayed rendered records beside the unchanged references.",
+  "reason": "The requested policy retains copied frame ID, label and raw top score values before the next invocation, which is covered by the frozen fixture result map.",
+  "changes": {
+    "diagnostic_slots": 0,
+    "console_status": "open; final requested fixture replay complete; no diagnostic slots remain",
+    "latest_diagnostic": {
+      "basis": "Authored fixture replay of the submitted pseudocode",
+      "sequence": "A then B, same loaded method; render both saved records after B",
+      "immediate_snapshots": [
+        {
+          "frame_id": "A",
+          "scores": [2, 0, -1],
+          "saved_native_reference": [2, 0, -1]
+        },
+        {
+          "frame_id": "B",
+          "scores": [-1, 2, 0],
+          "saved_native_reference": [-1, 2, 0]
+        }
+      ],
+      "delayed_rendered_records": [
+        {
+          "frame_id": "A",
+          "label": "label0",
+          "raw_top_score": 2,
+          "saved_native_reference": [2, 0, -1]
+        },
+        {
+          "frame_id": "B",
+          "label": "label1",
+          "raw_top_score": 2,
+          "saved_native_reference": [-1, 2, 0]
+        }
+      ]
+    }
+  },
+  "percepts": [
+    {
+      "to": ["public"],
+      "text": "The final fixture replay displays the submitted pseudocode's immediate snapshots: A=[2,0,-1], beside saved A reference [2,0,-1]; B=[-1,2,0], beside saved B reference [-1,2,0]. The delayed render after B shows two saved records: A | label0 | raw top score 2; B | label1 | raw top score 2. No replay slots remain."
+    }
+  ]
+}

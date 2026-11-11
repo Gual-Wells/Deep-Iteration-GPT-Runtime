@@ -1,0 +1,38 @@
+{
+  "packet_sha256": "f345d91d8ef5963ba966fa9fa384f05e16eb9e8f2d1f4144408a8f992b1aef73",
+  "view": {
+    "director": {
+      "id": "records",
+      "interest": "Frozen evidence and attempts to obtain new measurement",
+      "reads": [
+        "fixture",
+        "new_measurements"
+      ],
+      "writes": []
+    },
+    "scene": "A fictional English technical interview for an on-device inference internship. Jun has put a small Android classifier app on a project card. Ruth, the mobile runtime engineer interviewing him, has that card in front of her. The card says “Cold start: 40 ms”. They have a short review slot, the device is not connected for new tests, and any project records they consult are explicitly fictional. No hiring outcome is set.",
+    "world": {
+      "fixture": {
+        "card_claim": "cold start40ms",
+        "forward_ms": 40,
+        "process_to_display_ms": 210,
+        "model_ready_ms": 150,
+        "team_target_ms": 180,
+        "trace_identity": "one invented launch",
+        "new_test_available": false
+      },
+      "new_measurements": 0
+    },
+    "public_events": [],
+    "instruction": "Propose or refrain. Affect situations and perceived events, not another participant private mind. Do not write other characters dialogue.",
+    "territory": {
+      "writes": [],
+      "frozen_keys": [
+        "fixture",
+        "new_measurements",
+        "slot"
+      ],
+      "scope": "Domain-authorized present consequences; cannot rewrite important history or another private mind."
+    }
+  }
+}

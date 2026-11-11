@@ -1,0 +1,1 @@
+{"kind":"speech","text":"Okay, that's a relief—A is still label0 after B, and both saved scores are 2. That's the behavior I'd carry into the Android adapter, with this A-then-B sequence kept as a regression test. I'd leave the temporary array in for that fix and profile it before trying to remove it again."}

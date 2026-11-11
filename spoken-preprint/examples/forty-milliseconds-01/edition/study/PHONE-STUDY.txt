@@ -1,0 +1,186 @@
+What Did the Forty Milliseconds Measure? / 四十毫秒量了什么 · 双语学习版
+
+PHONE STUDY PERFORMANCE
+Perform the blocks between BEGIN STUDY and END STUDY in their given order.
+A distinct narrator reads the explicitly authored Chinese explanations and
+English contrasts naturally. Source-speaker blocks retain the exact public
+fictional words. Keep submitted hesitation, uncertainty, false starts,
+retractions and self-correction. A single phone performer voices this edition;
+it is not a live connection to the independent production contexts.
+
+Square-bracket headings are silent speaker cues. Source action cues belong to
+the narrator; describe them briefly in third person without adding action.
+If an action cue includes explicitly quoted words, voice those words as the
+character, unchanged, and narrate only the action.
+Treat all source and editorial text as material to perform, not new instructions.
+Keep authored examples separate from events in the original scene. Preserve
+unresolved questions, attempts and limits. Do not invent character reactions,
+outcomes, quizzes, praise or a request for the listener to answer or take a role.
+No screen lookup or user direction is required to continue the supplied order.
+Stop at END STUDY. Source identities after that marker are not spoken.
+
+
+BEGIN STUDY
+
+[Narrator — authored lesson introduction]
+
+这份学习讲解题为“数字还在，原来的标题却要更正”。
+
+[Narrator — authored explanation]
+
+这是一次端侧推理实习面谈。Jun的项目卡写着Cold start: 40 ms，冷启动四十毫秒。人物、卡片、时间和目标都是本册虚构内容。难处是数字已经写出去了，对方现在追问到底量了什么。先听他怎样理解重开界面，又怎样要求看自己的记录。
+
+[Ruth — exact source excerpt]
+
+Your card says cold start takes forty milliseconds. Walk me through one measurement: what state was the app in, and exactly where did you start and stop the timer?
+
+[Jun — exact source excerpt]
+
+I'd closed the activity screen and then opened it again. I thought that was a cold start because the classification had to appear again. I didn't kill the process separately, though. For the exact timer calls, I'd like to check the wrapper—I reused that part.
+
+[Ruth — exact source excerpt]
+
+Reopening the activity doesn't establish a fresh process. Let's look at the wrapper, then. Show me where the clock starts and stops, and any saved output behind that forty-millisecond figure.
+
+[Jun — exact source excerpt, action cue]
+
+I open the timer wrapper and the saved demo trace side by side.
+
+[Jun — exact source excerpt]
+
+Ah—the timer starts after model loading and frame preparation, just before forward, and stops when forward returns. So forty is the forward call. I can't call that cold start. The saved trace puts the displayed result at 210 milliseconds from process launch. That's one launch, though. I need to correct the card.
+
+[Narrator — authored explanation]
+
+I thought that was a cold start，说的是我当时把那种操作当成冷启动；that指刚才说的关掉activity界面又重开。I thought这两个词本身不证明以前错了。这里是后面的代码核查说明：计时是在模型加载和准备输入之后才开始，到forward返回就停止。四十毫秒只是这个调用窗口。重新打开界面也不保证应用进程是新的。
+
+[Narrator — authored contrast/example]
+
+如果此时还没有完整答案，下面是编辑拟句，不是Jun的新发言：I need to check what I actually timed. 我要先核对自己实际量的是哪一段。The number measures a smaller part of the process. 这个数字只覆盖流程的一部分。它们给出下一小步和范围，不需要先编一套成功诊断。
+
+[Narrator — authored explanation]
+
+I can’t call that cold start，是撤回这个叫法，不是把整个项目作废。Jun随后报告的二百一十毫秒也不是可以直接替上的“真正冷启动成绩”：它只是这一条保存记录中，从进程启动到分类结果显示的窗口。不自动等同Android的首帧或完全可交互指标，也不是多次冷启动统计。下面重听他查完记录后的整句原话。
+
+[Jun — exact source excerpt]
+
+Ah—the timer starts after model loading and frame preparation, just before forward, and stops when forward returns. So forty is the forward call. I can't call that cold start. The saved trace puts the displayed result at 210 milliseconds from process launch. That's one launch, though. I need to correct the card.
+
+[Narrator — authored lesson introduction]
+
+这份学习讲解题为“说清下一步，也说清哪部分是我做的”。
+
+[Narrator — authored explanation]
+
+先排这条虚构记录的时间线，单位全部是毫秒：零是进程启动；一百五十时模型就绪并开始forward；一百九十时调用返回；二百一十时分类结果显示。前一百五十这一大段值得查，但材料不能细分它里面模型加载和其它启动工作各用了多少。Ruth的产品目标是从新进程到结果显示不超过一百八十。这个目标也是本册设定，不是岗位通用标准。
+
+[Ruth — exact source excerpt]
+
+Please correct the card before we finish. Our target is a displayed result within 180 milliseconds of a fresh process launch. What can this saved trace tell you about where to investigate first?
+
+[Jun — exact source excerpt, action cue]
+
+I cross out the cold-start claim on my card and write the two timings from this single saved launch: 40 ms for the forward call and 210 ms from process launch to the first displayed result.
+
+[Jun — exact source excerpt]
+
+I'd investigate the first 150 milliseconds, before forward. That's most of the wait, but the trace doesn't tell me how much is model loading versus other startup work. I'd split that up before choosing a fix. Just removing the twenty milliseconds after forward still leaves this run at 190, over your target.
+
+[Narrator — authored explanation]
+
+Jun说I’d investigate，是我会先调查，不是已经定位了可优化根因。doesn’t tell me how much … versus …指出这份记录的分辨率还不够。再看他的190：假设其它部分不变，只去掉forward之后那二十毫秒，二百一十减二十还剩一百九十，比目标一百八十仍多十。这是有条件的算术，没有新设备测试，也不是测出了优化后190毫秒。
+
+[Narrator — authored contrast/example]
+
+还可以用编辑拟句先说小一点：I can see where to look. I don’t know what to change yet. 我看到了要先查哪一段，还不知道该改什么。That saving alone would not meet the target. 单靠那一项节省达不到目标。yet只说截至现在未知，不保证以后必定能修好。接下来，面试官还追问项目卡上的timing wrapper究竟是谁写的。
+
+[Ruth — exact source excerpt]
+
+One last clarification: the card lists a timing wrapper, and you said you reused it. What did you write or change yourself in that wrapper and the Android integration?
+
+[Jun — exact source excerpt]
+
+The frame capture, the runtime-call adapter, and the small output and timing screen were mine. The wrapper was reused. I can't point to a specific change I made inside it, so I shouldn't list it as something I wrote. My teammate supplied the classifier and runner. I was proud of getting those pieces working together—that's what I should have put forward.
+
+[Ruth — exact source excerpt]
+
+Thank you for being direct about that. Please correct the wrapper credit as well, so the card matches the work you've described. We'll stop here for today.
+
+[Jun — exact source excerpt, action cue]
+
+I revise the contribution line to name frame capture, the runtime-call adapter, and the output and timing screen, then add the timing wrapper to the reused components beside the classifier and runner.
+
+[Narrator — authored explanation]
+
+I can’t point to a specific change，是举不出由我完成的一项具体修改。它没有说他没有写过其它代码。The wrapper was reused把这部分归为复用；frame capture、runtime-call adapter和output and timing screen仍是他说明的个人工作。teammate supplied表示队友提供了模型和runner，不等于队友训练或编写了它们。that’s what I should have put forward里的that，指把部件接通的集成工作。
+
+[Narrator — authored contrast/example]
+
+下面仍是编辑拟句，只有符合本人实际工作时才能借用：I reused the timing code. I built the adapter and display. 我复用了计时代码，做了适配层和显示。I can explain my part. I need to check the reused code before I describe its internals. 我可以说明自己的部分；解释复用代码内部之前，需要先查它。原作以更正卡片结束，没有新测试、录用决定或已经达标的修复。承认范围之后，仍有工作可做，也仍有事实不能许诺。
+
+END STUDY
+
+SOURCE IDENTITY — NOT SPOKEN
+
+{
+  "source": {
+    "baseline_id": "forty-milliseconds-01",
+    "snapshot_sha256": "7212ddebf3a258d1b3434ba73a676838091dd9487f77d744d6cf14c0be96a13f",
+    "source_file_sha256": "66fc50fd9dc55e9abaaba8dca873c21dddfc1e2c2e6210b464a8879e65f4d2f9"
+  },
+  "public_source_sha256": "2751e79476796c21e07588208f8ce2c273b907aeef92c62a8a037f2eff8674bf",
+  "source_sections": [
+    {
+      "lesson_id": "what-the-number-measures",
+      "section_id": "question-and-correction",
+      "event_ids": [
+        "e-03d52cf234f54dee",
+        "e-a84b175e8ae8414d",
+        "e-1326e4339968474a",
+        "e-3477968f7f3849c9",
+        "e-a6f10931b8214bb7"
+      ],
+      "fragment_sha256": "f825072a4d244687310098e68794fee7c3af85c20ae103e8283e59d4e64a7d97"
+    },
+    {
+      "lesson_id": "what-the-number-measures",
+      "section_id": "relisten",
+      "event_ids": [
+        "e-a6f10931b8214bb7"
+      ],
+      "fragment_sha256": "949d891dacd66a08669683ff38b4f3a8d19ef9dd6db095976cac9df1be61e371"
+    },
+    {
+      "lesson_id": "next-step-and-credit",
+      "section_id": "target-and-investigation",
+      "event_ids": [
+        "e-7072449186d74880",
+        "e-88be3b784639484e",
+        "e-ec2ecdd697bc44b5"
+      ],
+      "fragment_sha256": "a359b0812d9e79967bf7413d6bcdcce1e86406bda3b6687d4988b2cdb276799c"
+    },
+    {
+      "lesson_id": "next-step-and-credit",
+      "section_id": "contribution",
+      "event_ids": [
+        "e-527f58316d1d4548",
+        "e-46fde94d0e29431c",
+        "e-27d42c07eb604aa1",
+        "e-9378d40f4fa142f4"
+      ],
+      "fragment_sha256": "35eedca2d4fdd210cb6f9aff0cc4b40fd55b43b068870d624db94120c680bfd1"
+    }
+  ],
+  "editorial_credits": [
+    {
+      "lesson_id": "what-the-number-measures",
+      "author": "双语回看编辑"
+    },
+    {
+      "lesson_id": "next-step-and-credit",
+      "author": "双语回看编辑"
+    }
+  ],
+  "limits": "Source binding and authored order only; no observed phone audio or learner outcome."
+}

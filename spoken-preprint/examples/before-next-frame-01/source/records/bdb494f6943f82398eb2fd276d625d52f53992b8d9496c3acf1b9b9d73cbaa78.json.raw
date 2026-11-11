@@ -1,0 +1,1 @@
+{"kind":"speech","text":"Yes—let’s check that. Keep the frame IDs and raw scores in the log, not just the displayed tags, and make A’s first read an independent value snapshot so our baseline can’t change too. Can you put the native reference for each frame beside those reads?"}

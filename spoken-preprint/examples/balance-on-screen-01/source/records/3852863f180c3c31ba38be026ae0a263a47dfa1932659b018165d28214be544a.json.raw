@@ -1,0 +1,18 @@
+{
+  "kind": "world",
+  "director": "billing",
+  "decision": "apply",
+  "proposal": "Resolve Mara's attempt to forward the complete account email as successful: a complete copy is now available for Eli to open. This does not establish that Eli has opened or read it.",
+  "reason": "Public event e-415efbc15c11456e records Mara addressing the complete email to Eli and tapping Send. Making that copy available is a present consequence within the billing and materials territory. It requires no alteration to the bill, past commitments or either participant's private state.",
+  "changes": {
+    "eli_email_access": "available",
+    "bill_copy_status": "shared"
+  },
+  "percepts": [
+    {
+      "recipient": "eli",
+      "kind": "document_availability",
+      "text": "A forwarded copy of the complete energy-account email is available to open."
+    }
+  ]
+}

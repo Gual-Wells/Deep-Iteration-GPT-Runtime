@@ -2,6 +2,7 @@
 from copy import deepcopy
 import json
 from pathlib import Path
+import shutil
 import tempfile
 import unittest
 
@@ -233,6 +234,7 @@ class LearningTests(unittest.TestCase):
         found = result['results'][0]
         self.assertEqual(found['case']['public_fragment'][0]['id'], self.first)
         self.assertEqual(found['series_relations'][0]['target_binding'], 'CURRENT_CASE')
+
         self.assertNotIn('target_root', found['series_relations'][0])
         self.assertNotIn('PRIVATE_', json.dumps(found['case']))
         self.assertEqual(learning.find(self.root, 'timing')['results'][0]['series_relations'][0]
@@ -280,6 +282,42 @@ class LearningTests(unittest.TestCase):
             expected_revision=core.load(self.root)['revision'], operation_id='reanchor-relation')
         self.judge()
         self.assertTrue(learning.status(core.load(self.root))['review_current'])
+
+
+    def test_relative_relation_survives_copy_and_uses_the_copied_series(self):
+        self.add()
+        other_root=Path(self.temp.name)/'other'
+        core.initialize(other_root,spec('portable-other'))
+        a=self.event('speech','a','We have a timing figure for this device.',root=other_root)
+        b=self.event('speech','b','That is one measurement.',root=other_root)
+        other=self.case('other-case');other['event_ids']=[a,b];other['usage'][0]['event_id']=a
+        self.add(other,root=other_root)
+        learning.add_cases(self.root,{'series_relations':[{'id':'portable','kind':'handling-function',
+            'source_case_id':'evidence','target_root':'../other','target_case_id':'other-case',
+            'explanation':'Both limit the measurement claim.','differences':'Different decisions remain.'}]},
+            expected_revision=core.load(self.root)['revision'],operation_id='relative-link')
+        self.judge()
+        moved=Path(self.temp.name)/'portable-series';moved.mkdir()
+        shutil.copytree(self.root,moved/'book');shutil.copytree(other_root,moved/'other')
+        self.assertTrue(learning.status(core.load(moved/'book'),root=moved/'book')['review_current'])
+        other['cue']='Changed original, not the copy.'
+        self.add(other,root=other_root,replace=True,operation_id='change-original-target')
+        self.assertFalse(learning.status(core.load(self.root),root=self.root)['bindings_current'])
+        self.assertTrue(learning.status(core.load(moved/'book'),root=moved/'book')['bindings_current'])
+        result=learning.find([moved/'book',moved/'other'],'发货')
+        self.assertEqual(result['results'][0]['series_relations'][0]['target_binding'],'CURRENT_CASE')
+        out=moved/'edition';self.assertEqual(publisher.export(moved/'book',out)['status'],'CURRENT')
+        self.assertNotIn(str(other_root),(out/'phone/PUBLIC-REVIEW.md').read_text(encoding='utf-8'))
+
+
+    def test_new_learning_write_promotes_legacy_without_rewriting_native_events(self):
+        state=core.load(self.root);state['schema_version']=1
+        core._write(self.root/'preprint.json',core._sealed(state))
+        original_events=deepcopy(state['events'])
+        result=self.add()
+        self.assertEqual(result['schema_migration'],{'from':1,'to':2})
+        self.assertEqual(core.load(self.root)['events'],original_events)
+        self.assertEqual(core.load(self.root)['schema_version'],2)
 
 
 if __name__ == '__main__':

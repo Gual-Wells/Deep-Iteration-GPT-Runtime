@@ -1,0 +1,6 @@
+{
+  "kind": "action",
+  "actor": "eli",
+  "text": "I open the forwarded email on my phone and read it from the beginning through the payment details.",
+  "reads": ["eli-email"]
+}

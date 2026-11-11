@@ -1,10 +1,11 @@
 # 预印本样例
 
-人物、项目与经历均为明确虚构。源、幕后版、手机场景稿和学习编辑稿各有身份；不是用户履历、真人录音或学习效果证明。
+当前0.2材料均为原创虚构。原场景与学习编辑分开，人物成功、听过和代码校验不代表用户掌握。
 
-历史 0.1 样例保留原件：
+- [What Did the Forty Milliseconds Measure? / 四十毫秒量了什么](forty-milliseconds-01/README.md)：端侧推理实习面试：已写出的40ms性能标题与个人贡献被追问，查记录、改口、实际修订卡片；没有新测试或录用结论。
+- [The Balance on the Screen / 屏幕上的余额](balance-on-screen-01/README.md)：英格兰合租账单：旧欠额与月付、分摊提议与支付能力、记录发出与实际转账分开。附有有边界的议论应用。
+- [Before the Next Frame / 下一帧之前](before-next-frame-01/README.md)：对照样品：Android输出保留问题。诊断与组织仍偏顺畅，适合看证据范围及较短编辑变式，不作困难覆盖的旗舰证据。
 
-- [Under the Work Light／工作灯下](under-the-work-light/README.md)：展具工作室原型助理面试，与端侧推理岗位技术深谈有差别，保留为旧样品。
-- [Leave the Lamp On／灯先留着](leave-the-lamp-on/README.md)：日常关系机制样本。
+历史0.1样品保留原件：[工作灯下](under-the-work-light/README.md)（展具工作室原型助手，不能替代端侧AI专业面试）与[灯先留着](leave-the-lamp-on/README.md)（日常机制样本）。
 
-0.2 生产与学习接口见 [LEARNING](../LEARNING.md)。当前已完成作品在本目录登记；示例身份与实际手机/学习观察分别说明。
+实际工作流见[学习与复用](../LEARNING.md)、[场景边界](../CONTEXT.md)。

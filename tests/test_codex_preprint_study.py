@@ -77,6 +77,9 @@ class StudyTests(unittest.TestCase):
         self.assertIn('authored contrast/example', text)
         self.assertIn('END STUDY\n\nSOURCE IDENTITY', text)
         self.assertNotIn('PRIVATE_', text)
+        spoken=text.split('BEGIN STUDY',1)[1].split('END STUDY',1)[0]
+        self.assertNotIn('Constructed editorial author',spoken)
+        self.assertIn('Constructed editorial author',text.split('END STUDY',1)[1])
         # With the same binding, editorial additions never enter the full-scene script.
         self.assertEqual(original_phone,
             publication._phone(state, {}, publication._cast(state), publication._public_events(state)))

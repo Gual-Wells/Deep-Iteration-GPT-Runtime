@@ -1,0 +1,8 @@
+{
+  "kind": "world",
+  "decision": "retain",
+  "proposal": "Leave the booking in progress and continue to withhold the next-booking notice.",
+  "reason": "Nora has proposed one check using the single remaining replay slot. No public event establishes that this scoped use would intrude on the following reservation, so a scheduling notice is not yet called for.",
+  "changes": {},
+  "percepts": []
+}

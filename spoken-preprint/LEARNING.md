@@ -17,9 +17,11 @@ python -B tools/codex.py preprint find --root <book-A> --root <book-B> --query "
 
 cases 输入含 cases 列表，可附 series_relations。每个 case 有 id/cue（中文处境）/intent/why_hard/what_changed/event_ids/usage。event_ids 要保留一段连续公开投影，至少两轮 speech，不省略中间回应或动作。usage 逐项给 event_id/surface/meaning/function/conditions/register/frequency_status，可附作者 variants{text,explanation} 与 public_sources。解释实际指代、义项和语气；没有语料证据就标未核实，不给伪造词频排名。
 
-系列关系：exact-use 保存同一实际表达两端的义项/条件；handling-function 表示不同说法承担相近动作；contrastive-use 比较不同义项或处境。后两者不算词汇复现，三者都不表示用户掌握。关系带 id/kind/source_case_id/target_root/target_case_id/explanation；exact-use 另给两端 surface，冻结具体片段。find 只搜显式根，目标未包含时不冒称已核查。书面回看不暴露 target_root 私人绝对路径。
+系列关系：exact-use 保存同一实际表达两端的义项/条件；handling-function 表示不同说法承担相近动作；contrastive-use 比较不同义项或处境。后两者不算词汇复现，三者都不表示用户掌握。关系带 id/kind/source_case_id/target_root/target_case_id/explanation/differences；exact-use 与 contrastive-use 另给两端 surface，冻结具体片段。find 只搜显式根，目标未包含时不冒称已核查。书面回看不暴露 target_root 私人绝对路径。
 
 ## 独立手机学习稿
+
+为搬迁整个系列，target_root 可写相对本册源目录的路径，例如 `../../another-book/source`；CLI 自动传入实际根，Python status/review_markdown 则用 `root=<actual-book-root>`。沿用绝对路径的旧关系仍可读取。复制两册后，关系核对新位置的目标，不回到原机器路径；缺目标仍明确失效。
 
 lesson 输入带 public_source_sha256（`study.source_digest(state)`）及 lessons。每课有 id/title/author/purpose/sections：source 段给 id/kind:source/purpose/连续 event_ids，由工具提取精确原话，不接受改写；explanation/contrast 段给 id/kind/purpose/text，可用 source_section_ids 指回源段，明确属于编辑作者。
 

@@ -1,0 +1,5 @@
+{
+  "kind": "speech",
+  "text": "I'd investigate the first 150 milliseconds, before forward. That's most of the wait, but the trace doesn't tell me how much is model loading versus other startup work. I'd split that up before choosing a fix. Just removing the twenty milliseconds after forward still leaves this run at 190, over your target.",
+  "actual_native_return": "I'd investigate the first 150 milliseconds, before forward. That's most of the wait, but the trace doesn't tell me how much is model loading versus other startup work. I'd split that up before choosing a fix. Just removing the twenty milliseconds after forward still leaves this run at 190, over your target."
+}

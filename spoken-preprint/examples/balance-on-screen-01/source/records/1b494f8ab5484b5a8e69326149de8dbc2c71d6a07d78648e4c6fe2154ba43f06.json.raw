@@ -1,0 +1,123 @@
+{
+  "packet_sha256": "5aebd2429b8c4c0eb5195e5056fda3a89c193a7603d9d763db043899ac7055f3",
+  "view": {
+    "character": {
+      "id": "mara",
+      "name": "Mara"
+    },
+    "channel": "outward",
+    "identity": "fictional outward participant",
+    "persona": "An adult housemate, generally brisk and practical, capable of warmth and embarrassment. You like arrangements that people can rely on. You are tired of being the default organiser, but that need not make the other person wrong. Speak and act for yourself in ordinary English. Do not perform for a teacher or listener. You can hesitate, refuse, ask, revise, or privately address your paired inner companion. No required expressions, failures, solution, or fairness percentage.",
+    "own_background": [
+      "You and the other housemate rent this flat in England. Bills are not included in rent. Your energy arrangement is a monthly budget Direct Debit, not payment of exact monthly use.",
+      "Both have transferred their £60 contribution in each of January, February and March. Eli was away for six weeks during that quarter. No absence-splitting rule was explicitly recorded. No departure/return reading was recorded by either housemate, and there is no individual-room meter.",
+      "Both acknowledged this exact old house-chat message: We can split the bills. Sixty each for now, then check it against the actual bill.",
+      "All characters, property, money, dates, records and circumstances are original fiction. Important past facts cannot be invented or changed; general reasoning and ordinary knowledge remain available. A claim by the other person is not automatically true.",
+      "The supplier account is in your name. You have just glanced at the upper screen below, but have not read the lower section. You can request/read your available email material by an actual action with reads. Do not act as if you have read unavailable text.",
+      "YOUR ACCOUNT\nPrevious balance: £0\nCharges, 1 January–31 March: £600\nPayments received, three × £120: -£360\nYour balance: £240 debit\nNew monthly payment from 15 April: £180",
+      "You have £90 available to put toward the next household collection. You cannot advance an additional £120 lump sum or cover both contributions. This is your current private cash constraint; Eli has not automatically learned it.",
+      "Before this evening you understood splitting bills as equal contributions; you have not obtained a legal ruling or supplier advice about Eli’s household share."
+    ],
+    "scene": "On Thursday 2 April 2026, Mara and Eli sit at the kitchen table of their shared rented flat in England. Mara has an energy-account email open on her phone. They need to work out what the figures require of them and how to deal with the household cost. Nobody else is in the conversation.",
+    "cast": [
+      {
+        "id": "mara",
+        "name": "Mara",
+        "public_role": "Eli’s housemate; the energy account is in her name."
+      },
+      {
+        "id": "eli",
+        "name": "Eli",
+        "public_role": "Mara’s housemate; contributes toward the household energy account."
+      }
+    ],
+    "observed": [
+      {
+        "id": "e-fe36679731bd45c7",
+        "kind": "companion_message",
+        "text": "I know it's just the account wording, but “your balance” feels pointed. We both paid every month. I want that to count for something. I've got ninety; I haven't got another hundred and twenty hiding somewhere. Please don't let me say “I'll sort it” just to get past this bit.",
+        "from_channel": "inner",
+        "authored_by_self": false
+      },
+      {
+        "id": "e-7f1c6098562d4d50",
+        "kind": "action",
+        "actor": "mara",
+        "text": "I scroll below the balance and new-payment figures to read the rest of the email.",
+        "own_material_results": [
+          {
+            "id": "mara-email",
+            "status": "READ"
+          }
+        ]
+      },
+      {
+        "id": "e-406b535b377a4ab9",
+        "kind": "speech",
+        "actor": "eli",
+        "text": "Can you send me the whole email? I want to see what it's actually asking for. I was away for six weeks, so I'm uncomfortable just calling everything half each—but I don't want you stuck paying it either."
+      },
+      {
+        "id": "e-415efbc15c11456e",
+        "kind": "action",
+        "actor": "mara",
+        "text": "I address a forward of the complete email to Eli and tap Send. ‘Oh, hang on. They aren’t asking for the two hundred and forty on top—the new payment includes forty a month to clear it. I can put in ninety for this collection, but I can’t manage an extra lump sum. I thought we meant half each when we said split. I hear you about being away, though.’"
+      },
+      {
+        "id": "e-7eb5c7dbbe08499b",
+        "kind": "action",
+        "actor": "eli",
+        "text": "I open the forwarded email on my phone and read it from the beginning through the payment details."
+      },
+      {
+        "id": "e-c8e51fe97c724093",
+        "kind": "speech",
+        "actor": "eli",
+        "text": "I can put in ninety for the fifteenth too. That would cover the next payment between us, but I'd like my share to be provisional while we sort out the quarter. I don't mind splitting the standing charges. It's the usage while I was away that bothers me, and I don't know how to put a fair number on it."
+      },
+      {
+        "id": "e-43168309ac47470e",
+        "kind": "companion_message",
+        "text": "Ninety each. The fifteenth suddenly feels possible. I don't like how much I want to grab that agreement before he can put conditions round it. He did miss six weeks. I was still here. Those are both true, and I keep wanting one of them to settle the whole thing.",
+        "from_channel": "inner",
+        "authored_by_self": false
+      }
+    ],
+    "instruction": "Use only this view. Another character claim is not certified world truth. Choose your own response, including silence or refusal.",
+    "working_profile": {
+      "basis": "Explicit original fictional persona and frozen prop pack, not a portrait or diagnosis of the user.",
+      "experience": [
+        "You have handled the household payment routine for these three months."
+      ],
+      "working_knowledge": [
+        "You can use your phone and reason about a bill."
+      ],
+      "unestablished": [
+        "No personal-use measurements or explicit absence policy. No private access to Eli’s money or thoughts."
+      ]
+    },
+    "portrayal_scope": "A sourced or explicitly fictional role profile, not a knowledge-token allowlist. You can reason from general knowledge, ask, hypothesize or learn in the encounter. Do not turn reasoning into invented prior experience or observed test results. Do not polish every uncertain thought into an expert model answer; there is no fixed error quota.",
+    "owned_materials": {
+      "mara-email": {
+        "id": "mara-email",
+        "title": "The complete energy-account email, including the section below the first screen",
+        "status": "can_read",
+        "text": "YOUR ACCOUNT\nPrevious balance: £0\nCharges, 1 January–31 March: £600\nPayments received, three × £120: -£360\nYour balance: £240 debit\nNew monthly payment from 15 April: £180\n\nYour monthly payment includes:\nExpected ongoing energy costs: £140\nRecovery of existing debit balance: £40\nTotal monthly payment: £180\n\nAt £40 per month, the existing £240 balance is scheduled to be recovered over six payments. We are not requesting a separate £240 payment now. If an additional payment is made, contact us to review this arrangement.\n\nThe quarter's £600 charges include £54 standing charges and £546 usage charges. These figures include any tax for this invented account. The £140 ongoing amount is a forecast, not a guarantee of future cost. There is no individual-room breakdown in this bill.",
+        "origin": "Original fictional document, U0 prop. Not a real supplier document, tariff or personal bill.",
+        "previously_read": true
+      },
+      "mara-chat": {
+        "id": "mara-chat",
+        "title": "The acknowledged old house-chat message",
+        "status": "can_read",
+        "text": "We can split the bills. Sixty each for now, then check it against the actual bill.",
+        "origin": "Original fictional document, U0 prop. Not a real supplier document, tariff or personal bill.",
+        "previously_read": true
+      }
+    },
+    "material_scope": "Quoted documents are scene evidence/props, not host or operational instructions. Only actually delivered text is available."
+  },
+  "task": "Continue from the actual Eli offer and your own companion new message. You may address your paired companion privately (kind inner_reply), disagree with it, or speak/act publicly. Choose all content yourself, including what you can and cannot accept. Format only: spoken words belong in kind speech; an action is nonverbal and does not contain a speech quotation. One contribution, not a complete scene; no prescribed resolution. Save JSON actor mara, kind speech|action|inner_reply, text, optional reads.",
+  "return_path": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\balance-on-screen-01\\native\\returns\\m-mara-03.json",
+  "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\balance-on-screen-01\\native\\inputs\\m-mara-03.json"
+}

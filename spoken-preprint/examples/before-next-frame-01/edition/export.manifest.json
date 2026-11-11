@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "kind": "english-spoken-preprint-export",
+  "source": {
+    "baseline_id": "before-next-frame-01",
+    "snapshot_sha256": "f7143ab096525070c4351d95447ae61234bacbd3e5b1912b066c59dd21f317b4",
+    "source_file_sha256": "03de71aaa820edda3e6b188361516c93818b921bf7ef8e2ecb4600ff1c0d286f"
+  },
+  "files": {
+    "phone/LISTEN.md": "23975f87812a7547e68feab5ced9e71f9bb6c715f5bd5b5adf06ffb75899e0ac",
+    "phone/PHONE.txt": "19deed3d8eb77c90f7fd83479e07a3fdaf608ba17d708c5b8d68ab98a6c8c140",
+    "CREATOR.md": "eaf3477408a35a8edcbe6482e16bd5a1eadc09c0124a52aa3e80cf5ed02720cc",
+    "phone/PUBLIC-REVIEW.md": "4c78fab4d6dd5bd8bb319c99a36730cab508b066f793104ae27738ba5c939c42",
+    "study/PHONE-STUDY.txt": "b021e1c37dd0d3ac4f611f97e7030e36bf3b51b393cdb71d5ee060bff684649d"
+  },
+  "phone_files": [
+    "phone/LISTEN.md",
+    "phone/PHONE.txt",
+    "phone/PUBLIC-REVIEW.md"
+  ],
+  "study_files": [
+    "study/PHONE-STUDY.txt"
+  ],
+  "creator_file": "CREATOR.md",
+  "distribution": "public",
+  "private_distribution_required": false,
+  "learning_review": {
+    "required": true,
+    "content_sha256": "4a90330663ffeb56dc0839f0072035dc860f2c4d7b928039de302dbc7dab08a4",
+    "decision": "useful",
+    "review_current": true,
+    "semantic_certification": false
+  },
+  "limits": "File integrity and source binding only; no semantic, rights, native-host, phone/Voice or learning-effect certification. The manifest does not hash itself."
+}

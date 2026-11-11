@@ -1,0 +1,126 @@
+{
+  "packet_sha256": "9d5c19236fde3cb3d64f474d85e2cb5619335ca4b2fcf2839fbe0f73bb21d313",
+  "view": {
+    "director": {
+      "id": "timing",
+      "name": "Timing and household records world",
+      "territory": "Present scene time, household note/document actions, and mundane communication attempts. There is no imposed countdown or mandatory interruption. Confirm only warranted attempted actions; no actual bank, payment system or external supplier is contacted. A promise stays a promise. You may refrain. Do not decide fairness or alter billing figures.",
+      "reads": [
+        "scene_time",
+        "household_note_status",
+        "communication_status",
+        "important_past"
+      ],
+      "writes": [
+        "scene_time",
+        "household_note_status",
+        "communication_status"
+      ]
+    },
+    "scene": "On Thursday 2 April 2026, Mara and Eli sit at the kitchen table of their shared rented flat in England. Mara has an energy-account email open on her phone. They need to work out what the figures require of them and how to deal with the household cost. Nobody else is in the conversation.",
+    "world": {
+      "scene_time": "Thursday 2 April 2026, early evening; no urgent external countdown is established",
+      "household_note_status": "No note for this evening’s arrangement has been made.",
+      "communication_status": "No external supplier contact or bank transfer has occurred in this scene.",
+      "important_past": {
+        "fiction": true,
+        "location": "England",
+        "old_chat": "We can split the bills. Sixty each for now, then check it against the actual bill.",
+        "contributions": "£60 each in January, February and March, all made",
+        "absence": "Eli away six weeks in that quarter",
+        "absence_policy": "not explicitly recorded",
+        "individual_measurements": "no room meter, no household departure/return readings",
+        "account_holder": "Mara",
+        "private_available_cash": {
+          "mara": 90,
+          "eli": 90
+        },
+        "no_invented_prior_agreement": true
+      }
+    },
+    "public_events": [
+      {
+        "id": "e-7f1c6098562d4d50",
+        "kind": "action",
+        "actor": "mara",
+        "text": "I scroll below the balance and new-payment figures to read the rest of the email."
+      },
+      {
+        "id": "e-406b535b377a4ab9",
+        "kind": "speech",
+        "actor": "eli",
+        "text": "Can you send me the whole email? I want to see what it's actually asking for. I was away for six weeks, so I'm uncomfortable just calling everything half each—but I don't want you stuck paying it either."
+      },
+      {
+        "id": "e-415efbc15c11456e",
+        "kind": "action",
+        "actor": "mara",
+        "text": "I address a forward of the complete email to Eli and tap Send. ‘Oh, hang on. They aren’t asking for the two hundred and forty on top—the new payment includes forty a month to clear it. I can put in ninety for this collection, but I can’t manage an extra lump sum. I thought we meant half each when we said split. I hear you about being away, though.’"
+      },
+      {
+        "id": "e-7eb5c7dbbe08499b",
+        "kind": "action",
+        "actor": "eli",
+        "text": "I open the forwarded email on my phone and read it from the beginning through the payment details."
+      },
+      {
+        "id": "e-c8e51fe97c724093",
+        "kind": "speech",
+        "actor": "eli",
+        "text": "I can put in ninety for the fifteenth too. That would cover the next payment between us, but I'd like my share to be provisional while we sort out the quarter. I don't mind splitting the standing charges. It's the usage while I was away that bothers me, and I don't know how to put a fair number on it."
+      },
+      {
+        "id": "e-86159428862c4034",
+        "kind": "speech",
+        "actor": "mara",
+        "text": "All right—ninety each for the fifteenth, with the quarter still open. Please get yours to me a couple of days before; I can’t bridge it if it’s late. Twenty-seven each for standing charges sounds fair to me. With the usage, I don’t want to charge you as if you’d been here all along, but I don’t think taking all six weeks onto myself would be fair either."
+      },
+      {
+        "id": "e-a84617fb614f47db",
+        "kind": "speech",
+        "actor": "eli",
+        "text": "I'll send the ninety by the thirteenth. And yes, twenty-seven each for the standing charges. I don't expect you to take on everything while I was away; I just want the absence to count for something. Would you consider fifty pounds off my half of the quarter—so two hundred and fifty for me, three hundred and fifty for you? I haven't got a calculation that proves fifty. It's an offer, and you can tell me if it feels too much."
+      },
+      {
+        "id": "e-28341b5753f14fb3",
+        "kind": "speech",
+        "actor": "mara",
+        "text": "Fifty feels like a compromise I could accept. That’s a hundred and seventy still to come from me and seventy from you, after what we’ve both already paid. I need us to agree how to do that through the monthly payments, though. I’ve only got ninety for April, and I don’t want to say yes now and leave you chasing me for the difference."
+      },
+      {
+        "id": "e-451c76a4f22a4861",
+        "kind": "speech",
+        "actor": "eli",
+        "text": "Could we keep April at ninety each, then do eighty from me and a hundred from you for the next five payments? Counting seventy each towards the ongoing estimate, April puts twenty each towards the old balance. That leaves fifty for me and a hundred and fifty for you, so ten and thirty a month would clear those. We'd still need to check the new bills against the estimate. Is a hundred from May manageable for you, though?"
+      },
+      {
+        "id": "e-3b1b64296f2f493e",
+        "kind": "speech",
+        "actor": "mara",
+        "text": "The figures make sense. I need to check whether I can manage the hundred, though; I know I’ve got ninety for April, and that’s all I can promise tonight. Can we keep that payment firm and come back to the May-to-September plan on Sunday? Could you put your proposal in the house chat before then? I’d like us both keeping track of this."
+      },
+      {
+        "id": "e-1fbee59c5f93441d",
+        "kind": "action",
+        "actor": "eli",
+        "text": "I type a summary in the house chat: April at £90 each, my transfer by 13 April; proposed quarter totals of £250 for me and £350 for Mara, with £180 each already paid; proposed May–September payments of £80 from me and £100 from Mara, allowing £70 each towards the ongoing forecast. I mark the later payments as awaiting Sunday's discussion and note that future bills still need checking against the forecast. I tap Send."
+      }
+    ],
+    "instruction": "Propose or refrain. Affect situations and perceived events, not another participant private mind. Do not write other characters dialogue.",
+    "territory": {
+      "writes": [
+        "scene_time",
+        "household_note_status",
+        "communication_status"
+      ],
+      "frozen_keys": [
+        "important_past",
+        "billing_facts"
+      ],
+      "scope": "Domain-authorized present consequences; cannot rewrite important history or another private mind."
+    }
+  },
+  "task": "Actual public event records Eli typing the specific household proposal, marking later payments awaiting Sunday and tapping Send. Independently confirm warranted household-record or communication consequences, or refrain. No bank transfer, supplier contact or future affordability is established; no new deadline or obstacle. Save world JSON kind world, director timing, decision, proposal, reason, changes, percepts. Percept schema precisely [{to:[public|mara|eli],text:...}]. Preserve quoted record scope and distinguish an attempted/sent note from an agreed later plan.",
+  "return_path": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\balance-on-screen-01\\native\\returns\\w-timing-02.json",
+  "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\balance-on-screen-01\\native\\inputs\\w-timing-02.json"
+}

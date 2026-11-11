@@ -1,0 +1,9 @@
+{
+  "kind": "world",
+  "director": "timing",
+  "decision": "retain",
+  "proposal": "Keep the scene in early evening, with no household note yet made and no external supplier contact or bank transfer having occurred.",
+  "reason": "There is no public action to advance or confirm. A deadline, interruption, completed note or communication attempt would impose an unwarranted consequence before either participant acts.",
+  "changes": {},
+  "percepts": []
+}

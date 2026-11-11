@@ -1,0 +1,14 @@
+{
+  "decision": "apply",
+  "proposal": "Make the existing booking boundary visible through a neutral notice.",
+  "reason": "The short review slot and the next applicant's booking are already established. A factual notice can expose that constraint without inventing a countdown, an emergency, or a hiring consequence.",
+  "changes": {
+    "notice": "The next applicant is booked after this short review slot."
+  },
+  "percepts": [
+    {
+      "to": ["jun", "ruth"],
+      "text": "A booking notice reads: The next applicant is booked after this short review slot."
+    }
+  ]
+}

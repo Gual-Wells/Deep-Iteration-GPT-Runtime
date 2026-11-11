@@ -1,0 +1,17 @@
+{
+  "kind": "world",
+  "director": "timing",
+  "decision": "apply",
+  "proposal": "Record the household summary Eli has sent, preserving the distinction between April's firm arrangement, his promised transfer, and the later proposal awaiting discussion.",
+  "reason": "The public actions establish that Eli received and opened Mara's email forward, then typed and sent the specified house-chat summary. They warrant a present communication record without establishing any transfer, supplier contact, later agreement or future affordability.",
+  "changes": {
+    "household_note_status": "Eli has sent a summary to the house chat: April at £90 each, with Eli's promised transfer by 13 April; proposed quarter totals of £250 for Eli and £350 for Mara, with £180 each already paid; proposed May–September payments of £80 from Eli and £100 from Mara, allowing £70 each towards the ongoing forecast. The later payments are marked as awaiting Sunday's discussion, and future bills still need checking against the forecast. The note does not establish agreement to the later plan or completion of any transfer.",
+    "communication_status": "Mara's complete email forward reached Eli, who opened and read it. Eli's household summary has been sent to the house chat; no reading acknowledgement of that summary is established. No external supplier contact or bank transfer has occurred in this scene."
+  },
+  "percepts": [
+    {
+      "to": ["public"],
+      "text": "Eli's house-chat summary is sent. It records April at £90 each and his promised transfer by 13 April, labels the quarter totals and May–September schedule as proposals, and leaves the later payments awaiting Sunday's discussion. It also records the need to check future bills against the forecast."
+    }
+  ]
+}

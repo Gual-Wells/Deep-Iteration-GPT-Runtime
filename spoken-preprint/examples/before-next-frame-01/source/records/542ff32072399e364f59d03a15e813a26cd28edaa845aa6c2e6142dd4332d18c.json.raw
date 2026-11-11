@@ -1,0 +1,200 @@
+{
+  "packet_sha256": "6a43a18c03359244400861d66c2f1e0c02f2690cfdf44bef075cc299d37a04c8",
+  "view": {
+    "director": {
+      "id": "lab",
+      "domain": "The diagnostic fixture, output ownership and physical console results. Preserve frozen model/input/output facts; never write either actor's dialogue, private mind or hiring decision.",
+      "reads": [
+        "fixture",
+        "result_map",
+        "diagnostic_slots",
+        "console_status",
+        "latest_diagnostic"
+      ],
+      "writes": [
+        "diagnostic_slots",
+        "console_status",
+        "latest_diagnostic"
+      ]
+    },
+    "scene": "A technical video interview for an on-device inference software internship at a fictional mobile-app team. Nora, the applicant, is sharing a small Android inference integration patch and a saved two-frame history. Sam, a runtime engineer, is interviewing her. The history shows the same tag beside two different captured objects. Nora has brought a native-runner reference and a short patch excerpt. A reserved diagnostic console can replay this small fixture during the interview; no new test has run in this encounter and no selection decision has been made.",
+    "world": {
+      "fixture": {
+        "identity": "Explicit original fiction; no actual phone/model measurement",
+        "runtime_basis": "ExecuTorch v1.5.0 source reference f7140a46ff38e919c557d45b102d3ff26097c8c9, portable non-USE_ATEN_LIB Android ARM64 CPU path; no built runtime in this production",
+        "inputs": "A and B differ; both match their native reference at the invocation boundary; owned buffers survive each call",
+        "computation": "Deterministic stateless FP32 three-score fixture; no quantization/mutable cache; same loaded method runs A then B sequentially",
+        "ownership": "This chosen method uses reusable planned output storage. Returned Tensor wrappers alias it. A wrapper is not an independently owned value snapshot. The Module remains alive.",
+        "raw_scores": {
+          "A": [
+            2,
+            0,
+            -1
+          ],
+          "B": [
+            -1,
+            2,
+            0
+          ]
+        },
+        "late_history": "After B, both retained wrappers read B values. An owned A copy taken before B remains A.",
+        "performance": "No measured latency, power, memory saving, general accuracy or end-to-end speedup exists."
+      },
+      "result_map": {
+        "boundary_inputs": "A app snapshot matches A reference; B matches B reference; A differs from B. This narrows input repetition/preprocessing for the fixture.",
+        "immediate_vs_late": "An independently owned immediate copy after each call and before the next has A=[2,0,-1], B=[-1,2,0]. Read the retained A wrapper after B and it gives [-1,2,0]. This supports an application retention/timing mismatch in this fixture.",
+        "late_copy": "A copy made only after B contains B values; it cannot restore old A.",
+        "single_thread": "Sequential inference already exists; delayed reads still reproduce the symptom.",
+        "new_module": "If a distinct Module per result is retained through last read, separate result storage can mask the symptom; it also changes allocation/initialization and establishes no performance benefit.",
+        "retain_final_values": "Read label and raw top score immediately after each call, before the next call, associate with frame ID and retain those owned values: A label0/top2, B label1/top2 remain stable later. Does not retain the full distribution or prove speedup.",
+        "other_tests": "If a request does not map to these constraints, do not invent device bytes or timings. Report what is unknown or propose a bounded, clearly authored additional fixture interpretation to controller."
+      },
+      "diagnostic_slots": 1,
+      "console_status": "open; requested sequential replay complete; one diagnostic slot remains",
+      "latest_diagnostic": {
+        "sequence": "A then B, same live module",
+        "reads": [
+          {
+            "frame_id": "A",
+            "read": "immediate scores copied into an independent array before B",
+            "scores": [
+              2,
+              0,
+              -1
+            ],
+            "saved_native_reference": [
+              2,
+              0,
+              -1
+            ]
+          },
+          {
+            "frame_id": "B",
+            "read": "immediate scores copied into an independent array after B",
+            "scores": [
+              -1,
+              2,
+              0
+            ],
+            "saved_native_reference": [
+              -1,
+              2,
+              0
+            ]
+          },
+          {
+            "frame_id": "A",
+            "read": "retained A wrapper read and copied after B",
+            "scores": [
+              -1,
+              2,
+              0
+            ],
+            "saved_native_reference": [
+              2,
+              0,
+              -1
+            ]
+          }
+        ]
+      }
+    },
+    "public_events": [
+      {
+        "id": "e-7eac3856eff1427e",
+        "kind": "observation",
+        "percepts": [
+          "The reserved console is open. Its status reads Ready, with two replay slots remaining. The result area is empty."
+        ]
+      },
+      {
+        "id": "e-864b5396e75a46a7",
+        "kind": "speech",
+        "actor": "sam",
+        "text": "Before we run anything, walk me through one captured frame—from the native output to its entry in this history. My first suspicion is that a result is getting attached to the wrong frame, but I haven’t seen enough to tell. Can you show me the bit you changed when you removed the copy?"
+      },
+      {
+        "id": "e-7ea5c40f96cb4efb",
+        "kind": "speech",
+        "actor": "nora",
+        "text": "Let me pull up the exact lines. I used to copy the output into a new float array for the history entry; the patch keeps the returned Tensor instead. I wanted to avoid that allocation, but I haven't checked what that Tensor actually owns."
+      },
+      {
+        "id": "e-ba788d06a0874666",
+        "kind": "speech",
+        "actor": "nora",
+        "text": "Here: I add A's wrapper to history, run B on the same module, then read both wrappers later when I render the entries. I was treating that wrapper like a saved result, but the scores might still point at something the next call reuses. Could we read A immediately, run B, and then read the retained A again?"
+      },
+      {
+        "id": "e-af24a393cdfa41a7",
+        "kind": "speech",
+        "actor": "sam",
+        "text": "Yes—let’s check that. Keep the frame IDs and raw scores in the log, not just the displayed tags, and make A’s first read an independent value snapshot so our baseline can’t change too. Can you put the native reference for each frame beside those reads?"
+      },
+      {
+        "id": "e-0c33f3a9b90e438f",
+        "kind": "action",
+        "actor": "nora",
+        "text": "I open my saved native reference to get the exact A and B scores for the comparison."
+      },
+      {
+        "id": "e-314258bc217b4875",
+        "kind": "action",
+        "actor": "nora",
+        "text": "I submit one sequential A-then-B replay to the console: run A on the live module, copy its scores into an independent array labelled A, retain its Tensor wrapper, run B on that same module, copy B's immediate scores into an independent array labelled B, then read and copy the retained A wrapper's scores again. I request frame IDs on every read and put the saved references A=[2,0,-1] and B=[-1,2,0] beside the corresponding entries."
+      },
+      {
+        "id": "e-968b587662dd4831",
+        "kind": "observation",
+        "percepts": [
+          "The console completes one sequential replay on the same module. Its log shows: A | immediate independent snapshot before B | [2,0,-1] | saved A reference [2,0,-1]; B | immediate independent snapshot after B | [-1,2,0] | saved B reference [-1,2,0]; A | retained A wrapper read after B | [-1,2,0] | saved A reference [2,0,-1]. One replay slot remains."
+        ]
+      },
+      {
+        "id": "e-9010dbf81d5e40ee",
+        "kind": "speech",
+        "actor": "nora",
+        "text": "Oh—that retained A has B's scores now. Keeping the Tensor hasn't preserved A's result in this run. I'd restore the independent copy immediately after each call and use the last replay to check both history entries after B."
+      },
+      {
+        "id": "e-4ecac46f2bf64859",
+        "kind": "speech",
+        "actor": "sam",
+        "text": "That log makes a frame mix-up less convincing; the retained A read has actually changed. Before you spend the last replay, there’s a requirement I haven’t given you: history only needs each frame’s label and raw top score. Does that change what you’d save? Talk me through the change you’d put up for review and what the last replay would establish."
+      },
+      {
+        "id": "e-35b39e4ee8f348f2",
+        "kind": "speech",
+        "actor": "nora",
+        "text": "Yes—that's smaller than putting the whole array back. For review I'd replace the history Tensor with a frame ID, label and float score, taking the maximum and copying those values before the next inference. I'd still need to check whether reading the scores through this wrapper requires a temporary array. Then I'd use the last replay to render both entries after B and compare them with the references: different labels, both raw scores 2. If that passes, we've checked this two-frame history case; we haven't measured a speedup."
+      },
+      {
+        "id": "e-1aca05bcb26244da",
+        "kind": "speech",
+        "actor": "sam",
+        "text": "Show me the edit and the rendering path, then run that version through the last replay. I want to see whether the code actually does what you’ve just described, especially what the history entry holds by the time B starts."
+      },
+      {
+        "id": "e-58592dc4d28e475c",
+        "kind": "action",
+        "actor": "nora",
+        "text": "I write a replacement for the fixture in explicit pseudocode: `saveFrame(id, input) { scores = independentFloatArrayImmediatelyAfter(runSameMethod(input)); k = argmax(scores); history.add(HistoryEntry(copyValue(id), copyValue(labelFor(k)), floatValue(scores[k]))); } saveFrame(A, ownedInputA); saveFrame(B, ownedInputB); later { for (entry in history) render(entry.frameId, entry.label, entry.rawTopScore); }`. I use the old independent-array conversion for this version, with the array local to saveFrame and only copied ID, label and score values retained in history. I submit that edit and rendering path for the final A-then-B replay, requesting the immediate score snapshots and the two delayed rendered records alongside the unchanged references."
+      }
+    ],
+    "instruction": "Propose or refrain. Affect situations and perceived events, not another participant private mind. Do not write other characters dialogue.",
+    "territory": {
+      "writes": [
+        "diagnostic_slots",
+        "console_status",
+        "latest_diagnostic"
+      ],
+      "frozen_keys": [
+        "fixture",
+        "result_map",
+        "booking_context",
+        "ui_contract"
+      ],
+      "scope": "Domain-authorized present consequences; cannot rewrite important history or another private mind."
+    }
+  }
+}

@@ -1,4 +1,30 @@
 [
-  {"id":"under-the-work-light-01","name":"Under the Work Light / 工作灯下","path":"under-the-work-light/README.md"},
-  {"id":"leave-the-lamp-on-01","name":"Leave the Lamp On / 灯先留着","path":"leave-the-lamp-on/README.md"}
+  {
+    "id": "forty-milliseconds-01",
+    "name": "What Did the Forty Milliseconds Measure? / 四十毫秒量了什么",
+    "path": "forty-milliseconds-01/README.md",
+    "role": "field-specific-technical-case"
+  },
+  {
+    "id": "balance-on-screen-01",
+    "name": "The Balance on the Screen / 屏幕上的余额",
+    "path": "balance-on-screen-01/README.md",
+    "role": "international-life-and-argument-case"
+  },
+  {
+    "id": "before-next-frame-01",
+    "name": "Before the Next Frame / 下一帧之前",
+    "path": "before-next-frame-01/README.md",
+    "role": "comparison-case-not-flagship"
+  },
+  {
+    "id": "under-the-work-light-01",
+    "name": "Under the Work Light / 工作灯下",
+    "path": "under-the-work-light/README.md"
+  },
+  {
+    "id": "leave-the-lamp-on-01",
+    "name": "Leave the Lamp On / 灯先留着",
+    "path": "leave-the-lamp-on/README.md"
+  }
 ]

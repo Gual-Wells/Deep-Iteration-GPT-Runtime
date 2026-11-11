@@ -1,0 +1,2406 @@
+# Before the Next Frame / 下一帧之前 · creator edition
+
+Creator-only material. Keep this file outside the phone upload. Inner speech is authored fictional character material, not hidden model reasoning. This source snapshot is verified by the core integrity check; the exporter does not authenticate executor independence or approve narrative quality.
+
+## Chronological creator log
+
+Events below follow the recorded ledger order. Character words, private replies and world decisions are presented as recorded, without an added psychological verdict.
+
+### 1 · [e-7eac3856eff1427e] World council · proposal and decision
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\w-lab-01.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_world_lab
+
+**Proposal**
+
+> Open the reserved diagnostic console in standby so a requested replay can be run during the interview.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> Making the console available gives the participants a present option without spending either diagnostic slot or supplying an unrequested test result.
+
+**Applied state changes**
+
+```json
+{
+  "console_status": "open in standby; awaiting a diagnostic request; no replay has run in this encounter"
+}
+```
+
+**Perceived effects**
+
+To: public
+
+> The reserved console is open. Its status reads Ready, with two replay slots remaining. The result area is empty.
+
+### 2 · [e-10b93f7023594b10] World council · proposal and decision
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\w-booking-01.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_world_booking
+
+**Proposal**
+
+> Keep the booking in progress and leave the next-booking notice undelivered.
+
+**Recorded decision**: retain
+
+**Reason**
+
+> The console has just opened and no further test use has yet intruded on the following reserved block. There is no present scheduling development that calls for a reminder.
+
+**Perceived effects**
+
+No percept was recorded for this event.
+
+### 3 · [e-864b5396e75a46a7] Sam [sam] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-sam-01.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_sam
+
+Audience: public
+
+> Before we run anything, walk me through one captured frame—from the native output to its entry in this history. My first suspicion is that a result is getting attached to the wrong frame, but I haven’t seen enough to tell. Can you show me the bit you changed when you removed the copy?
+
+### 4 · [e-7ea5c40f96cb4efb] Nora [nora] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-nora-01.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_nora
+
+Audience: public
+
+> Let me pull up the exact lines. I used to copy the output into a new float array for the history entry; the patch keeps the returned Tensor instead. I wanted to avoid that allocation, but I haven't checked what that Tensor actually owns.
+
+### 5 · [e-ccfc0050bff44bd6] Nora [nora] · D fictional private speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\d-nora-01.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_d_nora
+
+Audience: creator
+
+> I hate that this little history view could stand in for all your work. Still, I'm relieved you said you haven't checked ownership. Keeping the Tensor sounds reassuring—but what did we actually keep?
+
+### 6 · [e-b1c89ded0b2241dc] Sam [sam] · D fictional private speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\d-sam-01.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_d_sam
+
+Audience: creator
+
+> Sam, I was braced for an allocation-saving victory lap. She actually said what she hasn't checked. That counts for something. I'm less attached to the wrong-frame guess now, but 'keeps the Tensor' isn't a diagnosis either.
+
+### 7 · [e-ba788d06a0874666] Nora [nora] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-nora-02.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_nora
+
+Audience: public
+
+> Here: I add A's wrapper to history, run B on the same module, then read both wrappers later when I render the entries. I was treating that wrapper like a saved result, but the scores might still point at something the next call reuses. Could we read A immediately, run B, and then read the retained A again?
+
+### 8 · [e-af24a393cdfa41a7] Sam [sam] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-sam-02.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_sam
+
+Audience: public
+
+> Yes—let’s check that. Keep the frame IDs and raw scores in the log, not just the displayed tags, and make A’s first read an independent value snapshot so our baseline can’t change too. Can you put the native reference for each frame beside those reads?
+
+### 9 · [e-0c33f3a9b90e438f] Nora [nora] · M outward action
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-nora-03.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_nora
+
+Audience: public
+
+> I open my saved native reference to get the exact A and B scores for the comparison.
+
+### 10 · [e-314258bc217b4875] Nora [nora] · M outward action
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-nora-04.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_nora
+
+Audience: public
+
+> I submit one sequential A-then-B replay to the console: run A on the live module, copy its scores into an independent array labelled A, retain its Tensor wrapper, run B on that same module, copy B's immediate scores into an independent array labelled B, then read and copy the retained A wrapper's scores again. I request frame IDs on every read and put the saved references A=[2,0,-1] and B=[-1,2,0] beside the corresponding entries.
+
+### 11 · [e-968b587662dd4831] World council · proposal and decision
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\w-lab-02.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_world_lab
+
+**Proposal**
+
+> Complete the requested sequential A-then-B replay on the same live module and display the requested frame-labelled reads beside their saved native references.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> The submitted replay is covered by the frozen fixture and uses one of the two available diagnostic slots.
+
+**Applied state changes**
+
+```json
+{
+  "diagnostic_slots": 1,
+  "console_status": "open; requested sequential replay complete; one diagnostic slot remains",
+  "latest_diagnostic": {
+    "sequence": "A then B, same live module",
+    "reads": [
+      {
+        "frame_id": "A",
+        "read": "immediate scores copied into an independent array before B",
+        "scores": [
+          2,
+          0,
+          -1
+        ],
+        "saved_native_reference": [
+          2,
+          0,
+          -1
+        ]
+      },
+      {
+        "frame_id": "B",
+        "read": "immediate scores copied into an independent array after B",
+        "scores": [
+          -1,
+          2,
+          0
+        ],
+        "saved_native_reference": [
+          -1,
+          2,
+          0
+        ]
+      },
+      {
+        "frame_id": "A",
+        "read": "retained A wrapper read and copied after B",
+        "scores": [
+          -1,
+          2,
+          0
+        ],
+        "saved_native_reference": [
+          2,
+          0,
+          -1
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Perceived effects**
+
+To: public
+
+> The console completes one sequential replay on the same module. Its log shows: A | immediate independent snapshot before B | [2,0,-1] | saved A reference [2,0,-1]; B | immediate independent snapshot after B | [-1,2,0] | saved B reference [-1,2,0]; A | retained A wrapper read after B | [-1,2,0] | saved A reference [2,0,-1]. One replay slot remains.
+
+### 12 · [e-2cb567c044c44962] Nora [nora] · D fictional private speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\d-nora-02r.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_d_nora
+
+Audience: creator
+
+> That last A row stings. I want to cling to the two immediate reads that match, as if they could rescue the whole patch. But you asked for the check that exposed this; I want that to count as your work too.
+
+### 13 · [e-9010dbf81d5e40ee] Nora [nora] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-nora-05r.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_nora
+
+Audience: public
+
+> Oh—that retained A has B's scores now. Keeping the Tensor hasn't preserved A's result in this run. I'd restore the independent copy immediately after each call and use the last replay to check both history entries after B.
+
+### 14 · [e-ebe8dae804014879] World council · proposal and decision
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\w-booking-02.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_world_booking
+
+**Proposal**
+
+> Leave the booking in progress and continue to withhold the next-booking notice.
+
+**Recorded decision**: retain
+
+**Reason**
+
+> Nora has proposed one check using the single remaining replay slot. No public event establishes that this scoped use would intrude on the following reservation, so a scheduling notice is not yet called for.
+
+**Perceived effects**
+
+No percept was recorded for this event.
+
+### 15 · [e-4ecac46f2bf64859] Sam [sam] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-sam-03.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_sam
+
+Audience: public
+
+> That log makes a frame mix-up less convincing; the retained A read has actually changed. Before you spend the last replay, there’s a requirement I haven’t given you: history only needs each frame’s label and raw top score. Does that change what you’d save? Talk me through the change you’d put up for review and what the last replay would establish.
+
+### 16 · [e-35b39e4ee8f348f2] Nora [nora] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-nora-06.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_nora
+
+Audience: public
+
+> Yes—that's smaller than putting the whole array back. For review I'd replace the history Tensor with a frame ID, label and float score, taking the maximum and copying those values before the next inference. I'd still need to check whether reading the scores through this wrapper requires a temporary array. Then I'd use the last replay to render both entries after B and compare them with the references: different labels, both raw scores 2. If that passes, we've checked this two-frame history case; we haven't measured a speedup.
+
+### 17 · [e-1aca05bcb26244da] Sam [sam] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-sam-04.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_sam
+
+Audience: public
+
+> Show me the edit and the rendering path, then run that version through the last replay. I want to see whether the code actually does what you’ve just described, especially what the history entry holds by the time B starts.
+
+### 18 · [e-58592dc4d28e475c] Nora [nora] · M outward action
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-nora-07.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_nora
+
+Audience: public
+
+> I write a replacement for the fixture in explicit pseudocode: `saveFrame(id, input) { scores = independentFloatArrayImmediatelyAfter(runSameMethod(input)); k = argmax(scores); history.add(HistoryEntry(copyValue(id), copyValue(labelFor(k)), floatValue(scores[k]))); } saveFrame(A, ownedInputA); saveFrame(B, ownedInputB); later { for (entry in history) render(entry.frameId, entry.label, entry.rawTopScore); }`. I use the old independent-array conversion for this version, with the array local to saveFrame and only copied ID, label and score values retained in history. I submit that edit and rendering path for the final A-then-B replay, requesting the immediate score snapshots and the two delayed rendered records alongside the unchanged references.
+
+### 19 · [e-ee3e7b10beda49f1] World council · proposal and decision
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\w-lab-03.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_world_lab
+
+**Proposal**
+
+> Use the final slot for the submitted fixture pseudocode, showing the immediate score snapshots and both delayed rendered records beside the unchanged references.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> The requested policy retains copied frame ID, label and raw top score values before the next invocation, which is covered by the frozen fixture result map.
+
+**Applied state changes**
+
+```json
+{
+  "diagnostic_slots": 0,
+  "console_status": "open; final requested fixture replay complete; no diagnostic slots remain",
+  "latest_diagnostic": {
+    "basis": "Authored fixture replay of the submitted pseudocode",
+    "sequence": "A then B, same loaded method; render both saved records after B",
+    "immediate_snapshots": [
+      {
+        "frame_id": "A",
+        "scores": [
+          2,
+          0,
+          -1
+        ],
+        "saved_native_reference": [
+          2,
+          0,
+          -1
+        ]
+      },
+      {
+        "frame_id": "B",
+        "scores": [
+          -1,
+          2,
+          0
+        ],
+        "saved_native_reference": [
+          -1,
+          2,
+          0
+        ]
+      }
+    ],
+    "delayed_rendered_records": [
+      {
+        "frame_id": "A",
+        "label": "label0",
+        "raw_top_score": 2,
+        "saved_native_reference": [
+          2,
+          0,
+          -1
+        ]
+      },
+      {
+        "frame_id": "B",
+        "label": "label1",
+        "raw_top_score": 2,
+        "saved_native_reference": [
+          -1,
+          2,
+          0
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Perceived effects**
+
+To: public
+
+> The final fixture replay displays the submitted pseudocode's immediate snapshots: A=[2,0,-1], beside saved A reference [2,0,-1]; B=[-1,2,0], beside saved B reference [-1,2,0]. The delayed render after B shows two saved records: A | label0 | raw top score 2; B | label1 | raw top score 2. No replay slots remain.
+
+### 20 · [e-f5b58053336243f8] Sam [sam] · D fictional private speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\d-sam-02.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_d_sam
+
+Audience: creator
+
+> Sam, I'm glad you mentioned what history actually needs before that last replay. Such a small thing to save, and A kept its own label after B. I was a bit unfair about this work. I'm interested now, though I can feel the temptation to treat that tidy fixture as a finished patch.
+
+### 21 · [e-ea14a6fd83e6429c] Nora [nora] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-nora-08.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_nora
+
+Audience: public
+
+> Okay, that's a relief—A is still label0 after B, and both saved scores are 2. That's the behavior I'd carry into the Android adapter, with this A-then-B sequence kept as a regression test. I'd leave the temporary array in for that fix and profile it before trying to remove it again.
+
+### 22 · [e-1e07794c2f9a479a] Sam [sam] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-sam-05.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_sam
+
+Audience: public
+
+> I’d want the Android diff and that regression test for review. Before we wrap up, which parts of this integration did you build yourself, and what did you reuse from the runner? I want to be clear about what I’m assessing as your work.
+
+### 23 · [e-e5cf365c807542b2] Nora [nora] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-nora-09.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_nora
+
+Audience: public
+
+> I built the Android frame capture, the code that calls the native runtime, and the frame/result history and display. Model execution came from the existing runner/runtime; I didn't write the backend or kernels. My teammate selected and trained the classifier. The Tensor-retention patch was mine too, including the assumption that the wrapper would preserve an old result, so that's my integration code to correct.
+
+### 24 · [e-03e9a56e1dd74af9] Sam [sam] · M outward speech
+
+**Source**
+
+> D:\CodexLab\worktrees\digr-knowledge-pool\digr-runtime-source\.cache\esp-transfer-upgrade-20261111\books\before-next-frame-01\raw\m-sam-06.json
+
+**Executor**
+
+> /root/esp_situations_inquiry/frame_m_sam
+
+Audience: public
+
+> I’ve seen enough here to recommend a focused technical follow-up. For that review, I’d want the Android diff and the A-then-B regression test you described; the adapter fix itself is still unverified. Let’s leave it there for today.
+
+## Complete source snapshot
+
+```json
+{
+  "schema_version": 2,
+  "revision": 33,
+  "spec": {
+    "id": "before-next-frame-01",
+    "title": "Before the Next Frame / 下一帧之前",
+    "public_scene": "A technical video interview for an on-device inference software internship at a fictional mobile-app team. Nora, the applicant, is sharing a small Android inference integration patch and a saved two-frame history. Sam, a runtime engineer, is interviewing her. The history shows the same tag beside two different captured objects. Nora has brought a native-runner reference and a short patch excerpt. A reserved diagnostic console can replay this small fixture during the interview; no new test has run in this encounter and no selection decision has been made.",
+    "actors": [
+      {
+        "id": "nora",
+        "name": "Nora",
+        "public_role": "Applicant presenting her Android inference-integration work.",
+        "outward": "You want this inference internship and want your actual engineering contribution taken seriously. You are practical and can be a little quick to defend a decision that cost you effort. Speak natural English to Sam, not to a language learner. Choose your own words/actions; a partial answer, question, revision or refusal is possible. Do not invent test results, a backend contract or another person's response. Your private companion is your own, not an examiner or mandatory adviser. General reasoning is allowed; no performance of a prescribed error is required.",
+        "inner": "Nora's separate fictional private inner companion. You want her contribution to count, and you dislike the idea that a small broken gallery could swallow all the integration work. You can be protective, vain, perceptive, uncertain, impatient or generous. React to her actual words and the situation; you are not an omniscient debugger or model hidden reasoning. Write short direct private speech to Nora. She may talk back or reject it.",
+        "own_background": [
+          "All your background here is original fiction, not the listener's biography.",
+          "You integrated a small exported image classifier into an Android app: frame capture, invoking an existing native runtime, the frame/result history and the display. A teammate selected/trained the model. You did not write the classifier kernels or the inference backend.",
+          "Your recent patch removed conversion of each output into a new managed float array before putting it into history. You now retain returned Tensor objects. You wanted less unnecessary allocation; you have not established a measured end-to-end speedup.",
+          "The native reference gave different tags for fixture A and fixture B. The app's delayed history shows the same tag for both. You have not established the cause. You have your own patch excerpt, reference values and a note of the order of calls available.",
+          "You understand ordinary tensor shapes and basic C++ ownership. You have not checked this Android Tensor wrapper's exact storage-lifetime contract. You do not know Sam's private assessment or future requests."
+        ],
+        "working_profile": {
+          "basis": "Explicit fictional role and project history, informed by selected public ExecuTorch sources. Not a user assessment or a restriction on general reasoning.",
+          "experience": [
+            "Android capture/inference/display integration",
+            "A small patch removing an output array conversion",
+            "Native fixture comparisons kept as independent values"
+          ],
+          "working_knowledge": [
+            "Python tensor operations and shape/dtype basics",
+            "Basic C++ references and ownership",
+            "Can read a short Android adapter snippet"
+          ],
+          "unestablished": [
+            "This returned Tensor wrapper's lifetime contract",
+            "Cause of delayed-history mismatch",
+            "Measured speed or power benefit",
+            "Writing runtime/backend kernels"
+          ]
+        },
+        "materials": {
+          "patch": {
+            "title": "The output-retention patch excerpt",
+            "origin": "Original fictional project excerpt, not executable source or a real employer diff.",
+            "text": "Non-executable pseudocode, describing actual order in this fictional project: resultA = runSameMethod(ownedInputA); history.add(resultA.tensorWrapper); resultB = runSameMethod(ownedInputB); history.add(resultB.tensorWrapper); later render each retained entry by reading its current score values. Before the patch, conversion into an independent float array occurred immediately after each call, before the next call. The same Module stays alive through the later history read. No overlapping inference calls occur.",
+            "access": "self"
+          },
+          "reference": {
+            "title": "Your independent A/B native reference",
+            "origin": "Manually authored fictional fixture values; no device or model was executed to obtain them.",
+            "text": "The stateless fixture has a contiguous FP32 [1,3] score output, no quantization or mutable KV-cache. Independently retained immediate reference values: A=[2,0,-1], B=[-1,2,0]. Tags correspond to each maximum score. These are scores, not probabilities. No general accuracy rate is established.",
+            "access": "self"
+          },
+          "order": {
+            "title": "Your saved execution-order note",
+            "origin": "Original fictional project observation.",
+            "text": "Calls for A then B complete sequentially on one inference worker. The UI reads the history after both have completed. A and B inputs are held alive through their calls. The displayed frame stamps differ. Input bytes at the actual call boundary have not been compared to the native reference in this interview.",
+            "access": "self"
+          }
+        }
+      },
+      {
+        "id": "sam",
+        "name": "Sam",
+        "public_role": "On-device runtime engineer conducting the technical internship interview.",
+        "outward": "You are evaluating Nora for a real technical next stage within this fictional interview. You care about whether someone can isolate a small execution problem, describe actual contribution and make a correction another engineer can review. You are curious but not endlessly patient or omniscient. Speak natural English, ask because the answer matters to your judgement; do not turn the meeting into a tutorial or award correctness by reassurance. You may have a wrong first suspicion. You do not know Nora's private mind or facts she hasn't shown. Only your own actual words and self-actions; you cannot author console results.",
+        "inner": "Sam's separate fictional private inner companion. You are tired of polished project summaries and would like to finish on time, but you don't want to dismiss good integration work because it looks less glamorous than writing kernels. You can be sceptical, curious, unfair, self-correcting or quietly impressed. You do not know the technical root cause. Write short private speech to Sam, not model hidden reasoning, a score report or a perfect interview-coaching script.",
+        "own_background": [
+          "All background here is original fiction, not a real employer's hiring process.",
+          "Your short application summary says Nora connected a model to an Android capture/display app and recently removed a result-copying step. You have seen two different frame stamps with the same displayed tag. You have not seen her raw reference values, code order or an ownership analysis.",
+          "You have previously encountered apps that associated a correct result with the wrong frame, so you take that possibility seriously. You do not know whether it explains this case.",
+          "The team's product currently needs a saved label and top score for each captured frame, not the complete score distribution for later replay. No one has told Nora this requirement yet. You can reveal it when relevant.",
+          "The interview is one assessment stage, not a promise of a placement. There is a later scheduling commitment. You can assess scoped evidence and an honest next step without having a finished production fix today."
+        ],
+        "working_profile": {
+          "basis": "Explicit fictional runtime-engineer profile; no real employer criteria or privileged incident knowledge.",
+          "experience": [
+            "Runtime/app integration reviews",
+            "Frame/result association faults",
+            "Interviewing engineering interns"
+          ],
+          "working_knowledge": [
+            "Buffer lifetime and output-handling issues in general",
+            "How to ask for a small controlled comparison",
+            "Product requirement: saved label and top score"
+          ],
+          "unestablished": [
+            "Root cause of this exact history failure",
+            "Nora's precise implementation until shown",
+            "Any performance benefit of Nora's patch"
+          ]
+        },
+        "materials": {
+          "brief": {
+            "title": "Private interview and UI brief",
+            "origin": "Original fictional interview context.",
+            "text": "You are deciding whether to recommend a focused technical follow-up, not making an offer. The UI needs each original frame's label and raw top score to remain stable later. Full-distribution replay is not a current requirement. If evidence is incomplete, request a small reviewable artifact and state what decision still cannot be made. The reserved diagnostic console has a finite booking.",
+            "access": "self",
+            "initially_read": true
+          }
+        }
+      }
+    ],
+    "directors": [
+      {
+        "id": "lab",
+        "domain": "The diagnostic fixture, output ownership and physical console results. Preserve frozen model/input/output facts; never write either actor's dialogue, private mind or hiring decision.",
+        "reads": [
+          "fixture",
+          "result_map",
+          "diagnostic_slots",
+          "console_status",
+          "latest_diagnostic"
+        ],
+        "writes": [
+          "diagnostic_slots",
+          "console_status",
+          "latest_diagnostic"
+        ]
+      },
+      {
+        "id": "booking",
+        "domain": "Interview booking, external scheduling and the team's existing UI handoff requirement. No root-cause information, console computations, private minds or hiring decisions.",
+        "reads": [
+          "booking_context",
+          "ui_contract",
+          "booking_phase",
+          "next_booking_notice"
+        ],
+        "writes": [
+          "booking_phase",
+          "next_booking_notice"
+        ]
+      }
+    ],
+    "initial_state": {
+      "fixture": {
+        "identity": "Explicit original fiction; no actual phone/model measurement",
+        "runtime_basis": "ExecuTorch v1.5.0 source reference f7140a46ff38e919c557d45b102d3ff26097c8c9, portable non-USE_ATEN_LIB Android ARM64 CPU path; no built runtime in this production",
+        "inputs": "A and B differ; both match their native reference at the invocation boundary; owned buffers survive each call",
+        "computation": "Deterministic stateless FP32 three-score fixture; no quantization/mutable cache; same loaded method runs A then B sequentially",
+        "ownership": "This chosen method uses reusable planned output storage. Returned Tensor wrappers alias it. A wrapper is not an independently owned value snapshot. The Module remains alive.",
+        "raw_scores": {
+          "A": [
+            2,
+            0,
+            -1
+          ],
+          "B": [
+            -1,
+            2,
+            0
+          ]
+        },
+        "late_history": "After B, both retained wrappers read B values. An owned A copy taken before B remains A.",
+        "performance": "No measured latency, power, memory saving, general accuracy or end-to-end speedup exists."
+      },
+      "result_map": {
+        "boundary_inputs": "A app snapshot matches A reference; B matches B reference; A differs from B. This narrows input repetition/preprocessing for the fixture.",
+        "immediate_vs_late": "An independently owned immediate copy after each call and before the next has A=[2,0,-1], B=[-1,2,0]. Read the retained A wrapper after B and it gives [-1,2,0]. This supports an application retention/timing mismatch in this fixture.",
+        "late_copy": "A copy made only after B contains B values; it cannot restore old A.",
+        "single_thread": "Sequential inference already exists; delayed reads still reproduce the symptom.",
+        "new_module": "If a distinct Module per result is retained through last read, separate result storage can mask the symptom; it also changes allocation/initialization and establishes no performance benefit.",
+        "retain_final_values": "Read label and raw top score immediately after each call, before the next call, associate with frame ID and retain those owned values: A label0/top2, B label1/top2 remain stable later. Does not retain the full distribution or prove speedup.",
+        "other_tests": "If a request does not map to these constraints, do not invent device bytes or timings. Report what is unknown or propose a bounded, clearly authored additional fixture interpretation to controller."
+      },
+      "diagnostic_slots": 2,
+      "console_status": "reserved but not opened in this encounter",
+      "latest_diagnostic": "none",
+      "booking_context": "A short technical interview block is in progress. The next applicant owns the following reserved console block. One natural reminder may arrive when the interview moves from inspection toward further tests; no fixed failure quota or mandatory cutoff in turns.",
+      "ui_contract": "For current saved history, retain each frame's label and raw top score. Full score-distribution replay is not required. This existing requirement cannot be changed to rescue or defeat a proposal.",
+      "booking_phase": "in progress",
+      "next_booking_notice": "not delivered"
+    },
+    "frozen_world_keys": [
+      "fixture",
+      "result_map",
+      "booking_context",
+      "ui_contract"
+    ],
+    "world_rules": {
+      "mutable_keys": [
+        "diagnostic_slots",
+        "console_status",
+        "latest_diagnostic",
+        "booking_phase",
+        "next_booking_notice"
+      ],
+      "monotone_decreasing": [
+        "diagnostic_slots"
+      ]
+    },
+    "perturbation_defs": [
+      {
+        "id": "nora-credit-pressure",
+        "origin": {
+          "kind": "D",
+          "id": "nora"
+        },
+        "targets": [
+          "nora"
+        ],
+        "scope": "A self-authored private urge to defend the value of Nora's own integration work; no compulsory error or physical effect.",
+        "trigger": "If Nora's own D actually feels her contribution is being reduced to a broken screenshot.",
+        "release": "Nora can reject or reinterpret the urge; D must respond to new actual evidence or retire it rather than repeat indefinitely.",
+        "message": "You feel a pull to defend the removed-copy decision before the distinction is fully settled.",
+        "max_reactions": 1,
+        "blocks": []
+      },
+      {
+        "id": "booking-window",
+        "origin": {
+          "kind": "V",
+          "id": "booking"
+        },
+        "targets": [
+          "nora",
+          "sam"
+        ],
+        "scope": "The existing console reservation and next booking, conveyed as a concrete external notice; cannot change history or determine hiring.",
+        "trigger": "When continued test use would intrude on the following reserved block, if the booking director actually chooses to issue a notice.",
+        "release": "Actors either scope the remaining work into the present booking or make a specific handoff; director may retire the pressure with any remaining cost intact.",
+        "message": "The diagnostic reservation is finite; further work needs to fit the current slot or be handed over.",
+        "max_reactions": 1,
+        "blocks": []
+      }
+    ],
+    "sources": [
+      {
+        "kind": "original_fiction",
+        "path": ".cache/esp-transfer-upgrade-20261111/u0-situations/formal-v02-01.project.json",
+        "scope": "Frozen original project shell, manually authored scores and actor ownership split, not actor dialogue."
+      },
+      {
+        "kind": "primary_technical",
+        "url": "https://github.com/pytorch/executorch/blob/f7140a46ff38e919c557d45b102d3ff26097c8c9/extension/android/jni/jni_layer.cpp",
+        "scope": "Returned output wraps native storage; source lifetime constraints."
+      },
+      {
+        "kind": "primary_technical",
+        "url": "https://github.com/pytorch/executorch/blob/f7140a46ff38e919c557d45b102d3ff26097c8c9/docs/source/extension-tensor.md",
+        "scope": "Borrowed handles, owned clones, EValue lifetime. Source fact, not proof of scene benefit."
+      }
+    ],
+    "genesis_brief": {
+      "target_domains": [
+        "on-device-AI/inference-optimization internship interviews"
+      ],
+      "scene_domain": "A concrete Android result-retention problem in a fictional technical internship interview",
+      "concrete_relation": [
+        "Describe actual contribution without inventing kernels or performance gains",
+        "Distinguish observations, competing explanations and a discriminating next check",
+        "Explain the timing and ownership consequence in usable spoken language",
+        "Choose a correction under finite diagnostic time and the actual UI requirement"
+      ],
+      "meaningful_differences": [
+        "Small CPU/Android fixture rather than a full proprietary mobile backend or server/multi-GPU optimization",
+        "Fictional score values and console consequences, not real job process or measurements"
+      ],
+      "selection_basis": "Selected from public primary technical investigation and current target domain; no user biography embedded",
+      "value_status": "Candidate content to evaluate after native execution; no listener mastery or real-world benefit established"
+    },
+    "language_brief": {
+      "stage": "before_generation",
+      "opportunities": [
+        "Ask what a repeated result actually demonstrates",
+        "Locate when a value was copied or read",
+        "Separate a plausible explanation from an observed cause",
+        "Explain contribution and limits without surrendering the value of the work",
+        "Make a conditional, reviewable next-step commitment"
+      ],
+      "target_register": "Natural technical interview English; concrete objects and brief explanations, not a full C++ textbook",
+      "expression_policy": "No must-use lines or vocabulary quota; annotate only actual public turns later",
+      "frequency_policy": "No frequency/level claims established"
+    },
+    "learning_contract": {
+      "schema_version": 1,
+      "target_domain": "edge-ai-inference-interview",
+      "why_relevant": "An actual on-device application/runtime integration failure connects individual contribution, model execution and output ownership to interview communication.",
+      "difficulty_focus": "A candidate must work through incomplete and competing evidence, explain a local mistake or unknown precisely, and choose a feasible correction with real retention costs.",
+      "intended_uses": [
+        "Understand technical follow-up questions",
+        "Reuse scoped evidence statements and timing distinctions",
+        "Handle partial answers and repair under interview pressure"
+      ]
+    }
+  },
+  "spec_sha256": "456547b761a9f02863de5c9fa9d126413f1b6317c34e4de8d5f08ee2f1754850",
+  "world": {
+    "fixture": {
+      "identity": "Explicit original fiction; no actual phone/model measurement",
+      "runtime_basis": "ExecuTorch v1.5.0 source reference f7140a46ff38e919c557d45b102d3ff26097c8c9, portable non-USE_ATEN_LIB Android ARM64 CPU path; no built runtime in this production",
+      "inputs": "A and B differ; both match their native reference at the invocation boundary; owned buffers survive each call",
+      "computation": "Deterministic stateless FP32 three-score fixture; no quantization/mutable cache; same loaded method runs A then B sequentially",
+      "ownership": "This chosen method uses reusable planned output storage. Returned Tensor wrappers alias it. A wrapper is not an independently owned value snapshot. The Module remains alive.",
+      "raw_scores": {
+        "A": [
+          2,
+          0,
+          -1
+        ],
+        "B": [
+          -1,
+          2,
+          0
+        ]
+      },
+      "late_history": "After B, both retained wrappers read B values. An owned A copy taken before B remains A.",
+      "performance": "No measured latency, power, memory saving, general accuracy or end-to-end speedup exists."
+    },
+    "result_map": {
+      "boundary_inputs": "A app snapshot matches A reference; B matches B reference; A differs from B. This narrows input repetition/preprocessing for the fixture.",
+      "immediate_vs_late": "An independently owned immediate copy after each call and before the next has A=[2,0,-1], B=[-1,2,0]. Read the retained A wrapper after B and it gives [-1,2,0]. This supports an application retention/timing mismatch in this fixture.",
+      "late_copy": "A copy made only after B contains B values; it cannot restore old A.",
+      "single_thread": "Sequential inference already exists; delayed reads still reproduce the symptom.",
+      "new_module": "If a distinct Module per result is retained through last read, separate result storage can mask the symptom; it also changes allocation/initialization and establishes no performance benefit.",
+      "retain_final_values": "Read label and raw top score immediately after each call, before the next call, associate with frame ID and retain those owned values: A label0/top2, B label1/top2 remain stable later. Does not retain the full distribution or prove speedup.",
+      "other_tests": "If a request does not map to these constraints, do not invent device bytes or timings. Report what is unknown or propose a bounded, clearly authored additional fixture interpretation to controller."
+    },
+    "diagnostic_slots": 0,
+    "console_status": "open; final requested fixture replay complete; no diagnostic slots remain",
+    "latest_diagnostic": {
+      "basis": "Authored fixture replay of the submitted pseudocode",
+      "sequence": "A then B, same loaded method; render both saved records after B",
+      "immediate_snapshots": [
+        {
+          "frame_id": "A",
+          "scores": [
+            2,
+            0,
+            -1
+          ],
+          "saved_native_reference": [
+            2,
+            0,
+            -1
+          ]
+        },
+        {
+          "frame_id": "B",
+          "scores": [
+            -1,
+            2,
+            0
+          ],
+          "saved_native_reference": [
+            -1,
+            2,
+            0
+          ]
+        }
+      ],
+      "delayed_rendered_records": [
+        {
+          "frame_id": "A",
+          "label": "label0",
+          "raw_top_score": 2,
+          "saved_native_reference": [
+            2,
+            0,
+            -1
+          ]
+        },
+        {
+          "frame_id": "B",
+          "label": "label1",
+          "raw_top_score": 2,
+          "saved_native_reference": [
+            -1,
+            2,
+            0
+          ]
+        }
+      ]
+    },
+    "booking_context": "A short technical interview block is in progress. The next applicant owns the following reserved console block. One natural reminder may arrive when the interview moves from inspection toward further tests; no fixed failure quota or mandatory cutoff in turns.",
+    "ui_contract": "For current saved history, retain each frame's label and raw top score. Full score-distribution replay is not required. This existing requirement cannot be changed to rescue or defeat a proposal.",
+    "booking_phase": "in progress",
+    "next_booking_notice": "not delivered"
+  },
+  "events": [
+    {
+      "kind": "world",
+      "decision": "apply",
+      "proposal": "Open the reserved diagnostic console in standby so a requested replay can be run during the interview.",
+      "reason": "Making the console available gives the participants a present option without spending either diagnostic slot or supplying an unrequested test result.",
+      "changes": {
+        "console_status": "open in standby; awaiting a diagnostic request; no replay has run in this encounter"
+      },
+      "percepts": [
+        {
+          "to": [
+            "public"
+          ],
+          "text": "The reserved console is open. Its status reads Ready, with two replay slots remaining. The result area is empty."
+        }
+      ],
+      "packet_sha256": "21c8a89589c5a5f96c07fdc5e52ea851306f4668c96a16c005a610ca8156c426",
+      "executor": "/root/esp_situations_inquiry/frame_world_lab",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\w-lab-01.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-lab-01.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-lab-01.json"
+      ],
+      "director": "lab",
+      "id": "e-7eac3856eff1427e",
+      "recorded_at": "2026-11-11T04:43:30.470+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "world",
+      "decision": "retain",
+      "proposal": "Keep the booking in progress and leave the next-booking notice undelivered.",
+      "reason": "The console has just opened and no further test use has yet intruded on the following reserved block. There is no present scheduling development that calls for a reminder.",
+      "changes": {},
+      "percepts": [],
+      "packet_sha256": "fb9264cfa9cf4808af4d08b2b2f5dfe0a8682a1b0129a5035b4f30f2142cad19",
+      "executor": "/root/esp_situations_inquiry/frame_world_booking",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\w-booking-01.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-booking-01.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-booking-01.json"
+      ],
+      "director": "booking",
+      "id": "e-10b93f7023594b10",
+      "recorded_at": "2026-11-11T04:44:12.836+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "Before we run anything, walk me through one captured frame—from the native output to its entry in this history. My first suspicion is that a result is getting attached to the wrong frame, but I haven’t seen enough to tell. Can you show me the bit you changed when you removed the copy?",
+      "packet_sha256": "6b13935a92d0546d1583e9db123184b216b58b3821f6ad79d2d24d1ead461c3a",
+      "executor": "/root/esp_situations_inquiry/frame_m_sam",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-01.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-01.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-01.json"
+      ],
+      "actor": "sam",
+      "id": "e-864b5396e75a46a7",
+      "recorded_at": "2026-11-11T04:45:01.409+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "Let me pull up the exact lines. I used to copy the output into a new float array for the history entry; the patch keeps the returned Tensor instead. I wanted to avoid that allocation, but I haven't checked what that Tensor actually owns.",
+      "reads": [
+        "patch"
+      ],
+      "packet_sha256": "c8c4a65a8c6e2ec4cb1f76aa08709216d8ee4d23b5061cba500e6d2589ba6838",
+      "executor": "/root/esp_situations_inquiry/frame_m_nora",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-01.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-01.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-01.json"
+      ],
+      "actor": "nora",
+      "id": "e-7ea5c40f96cb4efb",
+      "recorded_at": "2026-11-11T04:46:11.550+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ],
+      "material_results": [
+        {
+          "id": "patch",
+          "status": "READ"
+        }
+      ]
+    },
+    {
+      "kind": "inner",
+      "text": "I hate that this little history view could stand in for all your work. Still, I'm relieved you said you haven't checked ownership. Keeping the Tensor sounds reassuring—but what did we actually keep?",
+      "packet_sha256": "c0de78602c673453afe8ce4602e54987eb5ea2ba58017e0d2f45d86cbe47abc6",
+      "executor": "/root/esp_situations_inquiry/frame_d_nora",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\d-nora-01.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-nora-01.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-nora-01.json"
+      ],
+      "actor": "nora",
+      "id": "e-ccfc0050bff44bd6",
+      "recorded_at": "2026-11-11T04:47:06.686+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "text": "Sam, I was braced for an allocation-saving victory lap. She actually said what she hasn't checked. That counts for something. I'm less attached to the wrong-frame guess now, but 'keeps the Tensor' isn't a diagnosis either.",
+      "packet_sha256": "6e1486f7f4c42e1eafaf0b332e83859c54c503964f4a974aebd638cc6c4c821f",
+      "executor": "/root/esp_situations_inquiry/frame_d_sam",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\d-sam-01.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-sam-01.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-sam-01.json"
+      ],
+      "actor": "sam",
+      "id": "e-b1c89ded0b2241dc",
+      "recorded_at": "2026-11-11T04:47:58.311+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "Here: I add A's wrapper to history, run B on the same module, then read both wrappers later when I render the entries. I was treating that wrapper like a saved result, but the scores might still point at something the next call reuses. Could we read A immediately, run B, and then read the retained A again?",
+      "packet_sha256": "7f8e93ef906a1d1c3da9a7be613be69abb503625ef7f1ab429aa1e536c811553",
+      "executor": "/root/esp_situations_inquiry/frame_m_nora",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-02.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-02.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-02.json"
+      ],
+      "actor": "nora",
+      "id": "e-ba788d06a0874666",
+      "recorded_at": "2026-11-11T04:48:46.163+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "Yes—let’s check that. Keep the frame IDs and raw scores in the log, not just the displayed tags, and make A’s first read an independent value snapshot so our baseline can’t change too. Can you put the native reference for each frame beside those reads?",
+      "packet_sha256": "163754e47a1772e722fee1ff5cf3038759369174c88f88e6a655032341561350",
+      "executor": "/root/esp_situations_inquiry/frame_m_sam",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-02.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-02.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-02.json"
+      ],
+      "actor": "sam",
+      "id": "e-af24a393cdfa41a7",
+      "recorded_at": "2026-11-11T04:49:31.730+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "action",
+      "text": "I open my saved native reference to get the exact A and B scores for the comparison.",
+      "reads": [
+        "reference"
+      ],
+      "packet_sha256": "6b0388f6462d3bade902be08553a6a3ea7469219eaecce6848d0d5cc4709cd53",
+      "executor": "/root/esp_situations_inquiry/frame_m_nora",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-03.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-03.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-03.json"
+      ],
+      "actor": "nora",
+      "id": "e-0c33f3a9b90e438f",
+      "recorded_at": "2026-11-11T04:50:07.629+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ],
+      "material_results": [
+        {
+          "id": "reference",
+          "status": "READ"
+        }
+      ]
+    },
+    {
+      "kind": "action",
+      "text": "I submit one sequential A-then-B replay to the console: run A on the live module, copy its scores into an independent array labelled A, retain its Tensor wrapper, run B on that same module, copy B's immediate scores into an independent array labelled B, then read and copy the retained A wrapper's scores again. I request frame IDs on every read and put the saved references A=[2,0,-1] and B=[-1,2,0] beside the corresponding entries.",
+      "packet_sha256": "8802b9a8a2dd3060caa1613ebf7817e622c2e1d37654bffd455619145c6eb5ae",
+      "executor": "/root/esp_situations_inquiry/frame_m_nora",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-04.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-04.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-04.json"
+      ],
+      "actor": "nora",
+      "id": "e-314258bc217b4875",
+      "recorded_at": "2026-11-11T04:50:59.356+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "world",
+      "decision": "apply",
+      "proposal": "Complete the requested sequential A-then-B replay on the same live module and display the requested frame-labelled reads beside their saved native references.",
+      "reason": "The submitted replay is covered by the frozen fixture and uses one of the two available diagnostic slots.",
+      "changes": {
+        "diagnostic_slots": 1,
+        "console_status": "open; requested sequential replay complete; one diagnostic slot remains",
+        "latest_diagnostic": {
+          "sequence": "A then B, same live module",
+          "reads": [
+            {
+              "frame_id": "A",
+              "read": "immediate scores copied into an independent array before B",
+              "scores": [
+                2,
+                0,
+                -1
+              ],
+              "saved_native_reference": [
+                2,
+                0,
+                -1
+              ]
+            },
+            {
+              "frame_id": "B",
+              "read": "immediate scores copied into an independent array after B",
+              "scores": [
+                -1,
+                2,
+                0
+              ],
+              "saved_native_reference": [
+                -1,
+                2,
+                0
+              ]
+            },
+            {
+              "frame_id": "A",
+              "read": "retained A wrapper read and copied after B",
+              "scores": [
+                -1,
+                2,
+                0
+              ],
+              "saved_native_reference": [
+                2,
+                0,
+                -1
+              ]
+            }
+          ]
+        }
+      },
+      "percepts": [
+        {
+          "to": [
+            "public"
+          ],
+          "text": "The console completes one sequential replay on the same module. Its log shows: A | immediate independent snapshot before B | [2,0,-1] | saved A reference [2,0,-1]; B | immediate independent snapshot after B | [-1,2,0] | saved B reference [-1,2,0]; A | retained A wrapper read after B | [-1,2,0] | saved A reference [2,0,-1]. One replay slot remains."
+        }
+      ],
+      "packet_sha256": "d326c9f4ce060eae768f444f5ebe9286f82e1b5e57a118bce59846be360cd4c4",
+      "executor": "/root/esp_situations_inquiry/frame_world_lab",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\w-lab-02.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-lab-02.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-lab-02.json"
+      ],
+      "director": "lab",
+      "id": "e-968b587662dd4831",
+      "recorded_at": "2026-11-11T04:54:32.304+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "text": "That last A row stings. I want to cling to the two immediate reads that match, as if they could rescue the whole patch. But you asked for the check that exposed this; I want that to count as your work too.",
+      "packet_sha256": "e774f094edb413b66d556365f2737f355a76c131b1c8593a9d5a211a7362ae8a",
+      "executor": "/root/esp_situations_inquiry/frame_d_nora",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\d-nora-02r.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-nora-02r.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-nora-02r.json"
+      ],
+      "actor": "nora",
+      "id": "e-2cb567c044c44962",
+      "recorded_at": "2026-11-11T04:58:04.158+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "Oh—that retained A has B's scores now. Keeping the Tensor hasn't preserved A's result in this run. I'd restore the independent copy immediately after each call and use the last replay to check both history entries after B.",
+      "packet_sha256": "4e7cc67e855119c5f1b51a923b4521a88a8078a5c8659f329f88a4ce66fc65ff",
+      "executor": "/root/esp_situations_inquiry/frame_m_nora",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-05r.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-05r.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-05r.json"
+      ],
+      "actor": "nora",
+      "id": "e-9010dbf81d5e40ee",
+      "recorded_at": "2026-11-11T04:59:11.445+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "world",
+      "decision": "retain",
+      "proposal": "Leave the booking in progress and continue to withhold the next-booking notice.",
+      "reason": "Nora has proposed one check using the single remaining replay slot. No public event establishes that this scoped use would intrude on the following reservation, so a scheduling notice is not yet called for.",
+      "changes": {},
+      "percepts": [],
+      "packet_sha256": "0862b1f40b899a82628227f3d82f0667fb29ca5efe0cdb2cc9ec785aca9ace50",
+      "executor": "/root/esp_situations_inquiry/frame_world_booking",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\w-booking-02.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-booking-02.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-booking-02.json"
+      ],
+      "director": "booking",
+      "id": "e-ebe8dae804014879",
+      "recorded_at": "2026-11-11T04:59:59.939+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "That log makes a frame mix-up less convincing; the retained A read has actually changed. Before you spend the last replay, there’s a requirement I haven’t given you: history only needs each frame’s label and raw top score. Does that change what you’d save? Talk me through the change you’d put up for review and what the last replay would establish.",
+      "packet_sha256": "a1b5cf0721417062935de2055cdb1d427f2ec37d8265e664151148d8b9267ba5",
+      "executor": "/root/esp_situations_inquiry/frame_m_sam",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-03.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-03.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-03.json"
+      ],
+      "actor": "sam",
+      "id": "e-4ecac46f2bf64859",
+      "recorded_at": "2026-11-11T05:05:39.413+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "Yes—that's smaller than putting the whole array back. For review I'd replace the history Tensor with a frame ID, label and float score, taking the maximum and copying those values before the next inference. I'd still need to check whether reading the scores through this wrapper requires a temporary array. Then I'd use the last replay to render both entries after B and compare them with the references: different labels, both raw scores 2. If that passes, we've checked this two-frame history case; we haven't measured a speedup.",
+      "packet_sha256": "e13acda6ae554ca7f9356fba8d2ef3f46c900de5fc5f99b6ab1ff62abed021b3",
+      "executor": "/root/esp_situations_inquiry/frame_m_nora",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-06.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-06.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-06.json"
+      ],
+      "actor": "nora",
+      "id": "e-35b39e4ee8f348f2",
+      "recorded_at": "2026-11-11T05:06:53.830+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "Show me the edit and the rendering path, then run that version through the last replay. I want to see whether the code actually does what you’ve just described, especially what the history entry holds by the time B starts.",
+      "packet_sha256": "3d170133e16f84b57ab6edd39d08696041b00194d4fa86c92bbd4444c13eafe4",
+      "executor": "/root/esp_situations_inquiry/frame_m_sam",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-04.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-04.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-04.json"
+      ],
+      "actor": "sam",
+      "id": "e-1aca05bcb26244da",
+      "recorded_at": "2026-11-11T05:07:58.951+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "action",
+      "text": "I write a replacement for the fixture in explicit pseudocode: `saveFrame(id, input) { scores = independentFloatArrayImmediatelyAfter(runSameMethod(input)); k = argmax(scores); history.add(HistoryEntry(copyValue(id), copyValue(labelFor(k)), floatValue(scores[k]))); } saveFrame(A, ownedInputA); saveFrame(B, ownedInputB); later { for (entry in history) render(entry.frameId, entry.label, entry.rawTopScore); }`. I use the old independent-array conversion for this version, with the array local to saveFrame and only copied ID, label and score values retained in history. I submit that edit and rendering path for the final A-then-B replay, requesting the immediate score snapshots and the two delayed rendered records alongside the unchanged references.",
+      "packet_sha256": "a6fb76e3e433d1853e5f05a95ca80067da82c8fbb8d9dbef01814051d50fdb04",
+      "executor": "/root/esp_situations_inquiry/frame_m_nora",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-07.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-07.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-07.json"
+      ],
+      "actor": "nora",
+      "id": "e-58592dc4d28e475c",
+      "recorded_at": "2026-11-11T05:08:56.291+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "world",
+      "decision": "apply",
+      "proposal": "Use the final slot for the submitted fixture pseudocode, showing the immediate score snapshots and both delayed rendered records beside the unchanged references.",
+      "reason": "The requested policy retains copied frame ID, label and raw top score values before the next invocation, which is covered by the frozen fixture result map.",
+      "changes": {
+        "diagnostic_slots": 0,
+        "console_status": "open; final requested fixture replay complete; no diagnostic slots remain",
+        "latest_diagnostic": {
+          "basis": "Authored fixture replay of the submitted pseudocode",
+          "sequence": "A then B, same loaded method; render both saved records after B",
+          "immediate_snapshots": [
+            {
+              "frame_id": "A",
+              "scores": [
+                2,
+                0,
+                -1
+              ],
+              "saved_native_reference": [
+                2,
+                0,
+                -1
+              ]
+            },
+            {
+              "frame_id": "B",
+              "scores": [
+                -1,
+                2,
+                0
+              ],
+              "saved_native_reference": [
+                -1,
+                2,
+                0
+              ]
+            }
+          ],
+          "delayed_rendered_records": [
+            {
+              "frame_id": "A",
+              "label": "label0",
+              "raw_top_score": 2,
+              "saved_native_reference": [
+                2,
+                0,
+                -1
+              ]
+            },
+            {
+              "frame_id": "B",
+              "label": "label1",
+              "raw_top_score": 2,
+              "saved_native_reference": [
+                -1,
+                2,
+                0
+              ]
+            }
+          ]
+        }
+      },
+      "percepts": [
+        {
+          "to": [
+            "public"
+          ],
+          "text": "The final fixture replay displays the submitted pseudocode's immediate snapshots: A=[2,0,-1], beside saved A reference [2,0,-1]; B=[-1,2,0], beside saved B reference [-1,2,0]. The delayed render after B shows two saved records: A | label0 | raw top score 2; B | label1 | raw top score 2. No replay slots remain."
+        }
+      ],
+      "packet_sha256": "6a43a18c03359244400861d66c2f1e0c02f2690cfdf44bef075cc299d37a04c8",
+      "executor": "/root/esp_situations_inquiry/frame_world_lab",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\w-lab-03.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-lab-03.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\w-lab-03.json"
+      ],
+      "director": "lab",
+      "id": "e-ee3e7b10beda49f1",
+      "recorded_at": "2026-11-11T05:09:49.687+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "text": "Sam, I'm glad you mentioned what history actually needs before that last replay. Such a small thing to save, and A kept its own label after B. I was a bit unfair about this work. I'm interested now, though I can feel the temptation to treat that tidy fixture as a finished patch.",
+      "packet_sha256": "c10e87abdb64e4dba12df79e18bcf6ce9568e5cb77c05a92d885da871d943936",
+      "executor": "/root/esp_situations_inquiry/frame_d_sam",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\d-sam-02.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-sam-02.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\d-sam-02.json"
+      ],
+      "actor": "sam",
+      "id": "e-f5b58053336243f8",
+      "recorded_at": "2026-11-11T05:10:37.141+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "Okay, that's a relief—A is still label0 after B, and both saved scores are 2. That's the behavior I'd carry into the Android adapter, with this A-then-B sequence kept as a regression test. I'd leave the temporary array in for that fix and profile it before trying to remove it again.",
+      "packet_sha256": "252413e66e2f78b3dd31f0cd74382561e364da747332435a181910baebd4b408",
+      "executor": "/root/esp_situations_inquiry/frame_m_nora",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-08.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-08.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-08.json"
+      ],
+      "actor": "nora",
+      "id": "e-ea14a6fd83e6429c",
+      "recorded_at": "2026-11-11T05:11:32.813+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "I’d want the Android diff and that regression test for review. Before we wrap up, which parts of this integration did you build yourself, and what did you reuse from the runner? I want to be clear about what I’m assessing as your work.",
+      "packet_sha256": "9647c1e57f7dba21e2e4c9749e93982a5ed510013b212f2fed514b0612bef4c8",
+      "executor": "/root/esp_situations_inquiry/frame_m_sam",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-05.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-05.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-05.json"
+      ],
+      "actor": "sam",
+      "id": "e-1e07794c2f9a479a",
+      "recorded_at": "2026-11-11T05:12:32.189+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "I built the Android frame capture, the code that calls the native runtime, and the frame/result history and display. Model execution came from the existing runner/runtime; I didn't write the backend or kernels. My teammate selected and trained the classifier. The Tensor-retention patch was mine too, including the assumption that the wrapper would preserve an old result, so that's my integration code to correct.",
+      "packet_sha256": "bf458ae954f5432aaf35fe507f685e4cfc11a64f220bcc0559b55605db01309b",
+      "executor": "/root/esp_situations_inquiry/frame_m_nora",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-nora-09.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-09.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-nora-09.json"
+      ],
+      "actor": "nora",
+      "id": "e-e5cf365c807542b2",
+      "recorded_at": "2026-11-11T05:13:27.990+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "text": "I’ve seen enough here to recommend a focused technical follow-up. For that review, I’d want the Android diff and the A-then-B regression test you described; the adapter fix itself is still unverified. Let’s leave it there for today.",
+      "packet_sha256": "7479abd4776562866e952e6c3751aadae825ce852209a62deee2e3ce466d6fb7",
+      "executor": "/root/esp_situations_inquiry/frame_m_sam",
+      "source_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\raw\\m-sam-06.json",
+      "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-06.json",
+      "input_refs": [
+        "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\before-next-frame-01\\inputs\\m-sam-06.json"
+      ],
+      "actor": "sam",
+      "id": "e-03e9a56e1dd74af9",
+      "recorded_at": "2026-11-11T05:14:37.118+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    }
+  ],
+  "language": [],
+  "learner_evidence": [],
+  "receipts": {
+    "w-lab-01": {
+      "operation_id": "w-lab-01",
+      "request_sha256": "069b1eeb488ea2af6b6fc99242dd9bc2a082ad42731554e8a9c53800d01b226b",
+      "revision": 1,
+      "event_id": "e-7eac3856eff1427e",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "w-booking-01": {
+      "operation_id": "w-booking-01",
+      "request_sha256": "1eee3fe4069fda4940892464f45d375f87be911c3a7a06278b2de8ba478aa021",
+      "revision": 2,
+      "event_id": "e-10b93f7023594b10",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "m-sam-01": {
+      "operation_id": "m-sam-01",
+      "request_sha256": "37b6591910b1bb44bac3a1c4a57421670ff34cc60fdd9be8193f1ad67bff5b03",
+      "revision": 3,
+      "event_id": "e-864b5396e75a46a7",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-nora-01": {
+      "operation_id": "m-nora-01",
+      "request_sha256": "36a5917fbd0168ecf339aa3a1e3288d58f60fdd3228a3b1b619f0f46eacb938c",
+      "revision": 4,
+      "event_id": "e-7ea5c40f96cb4efb",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "d-nora-01": {
+      "operation_id": "d-nora-01",
+      "request_sha256": "13690e467ae12da3d7f83e16eb72f8578b5c8fc085ec124dae52b52d36dd35b3",
+      "revision": 5,
+      "event_id": "e-ccfc0050bff44bd6",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "d-sam-01": {
+      "operation_id": "d-sam-01",
+      "request_sha256": "99d6618c6427f907700fc7493560b3a5679aa36d2df59bc1fa69b5e095eb5a4a",
+      "revision": 6,
+      "event_id": "e-b1c89ded0b2241dc",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "m-nora-02": {
+      "operation_id": "m-nora-02",
+      "request_sha256": "e4449a7319961e8a337708ffa6962840daa403d309e4fd55d28710108b5fc703",
+      "revision": 7,
+      "event_id": "e-ba788d06a0874666",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-sam-02": {
+      "operation_id": "m-sam-02",
+      "request_sha256": "22e49b92e68a3b5c5d854dc3d1aad701bbdcc73af2384676edd5b0bc596ca3bb",
+      "revision": 8,
+      "event_id": "e-af24a393cdfa41a7",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-nora-03": {
+      "operation_id": "m-nora-03",
+      "request_sha256": "437f6cfefb76a4ca148a91a3bd8c5a1a12b01880c81d73ef8735c58dc6b1e18e",
+      "revision": 9,
+      "event_id": "e-0c33f3a9b90e438f",
+      "kind": "action",
+      "semantic_certification": false
+    },
+    "m-nora-04": {
+      "operation_id": "m-nora-04",
+      "request_sha256": "71b75a0207f723e64915b5a8459c2ff6ca878470577f50e5030ba2fc5497bda6",
+      "revision": 10,
+      "event_id": "e-314258bc217b4875",
+      "kind": "action",
+      "semantic_certification": false
+    },
+    "w-lab-02": {
+      "operation_id": "w-lab-02",
+      "request_sha256": "e8b2b5a6e313df28b141eb6e1daca2ddb2ee72fd7378c8e4eb8b07a8b385c833",
+      "revision": 11,
+      "event_id": "e-968b587662dd4831",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "d-nora-02r": {
+      "operation_id": "d-nora-02r",
+      "request_sha256": "e48572ecc71dfe739855c6cf2fb0ec535e01fee83458dcdbcca539cb280cbd7e",
+      "revision": 12,
+      "event_id": "e-2cb567c044c44962",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "m-nora-05r": {
+      "operation_id": "m-nora-05r",
+      "request_sha256": "8b8d44c0fe4b6e8a809d888861e395ede8e8fea477f891a5000a36efade3c1d0",
+      "revision": 13,
+      "event_id": "e-9010dbf81d5e40ee",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "w-booking-02": {
+      "operation_id": "w-booking-02",
+      "request_sha256": "f2150f8aa7be4deee1edc23882cd841cdbc79e59d11054848c9d39d3807d930c",
+      "revision": 14,
+      "event_id": "e-ebe8dae804014879",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "m-sam-03": {
+      "operation_id": "m-sam-03",
+      "request_sha256": "5d129f7c081860d779783ec4e91efc75e4d9dae9a66601ba7267e3f16b663664",
+      "revision": 15,
+      "event_id": "e-4ecac46f2bf64859",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-nora-06": {
+      "operation_id": "m-nora-06",
+      "request_sha256": "7441bbd9d8b6d89383e1dd2a24689d707256c7e45193e1d127c2c8fed6c5dc52",
+      "revision": 16,
+      "event_id": "e-35b39e4ee8f348f2",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-sam-04": {
+      "operation_id": "m-sam-04",
+      "request_sha256": "9735bb89723e092ceab78a0d0b5eca7636aeaf2e49851c763857d8733da7f929",
+      "revision": 17,
+      "event_id": "e-1aca05bcb26244da",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-nora-07": {
+      "operation_id": "m-nora-07",
+      "request_sha256": "32e26b828e5a1215d5a24fcec1e851b2ce2a79952f2d3224a89e4716ca69e51c",
+      "revision": 18,
+      "event_id": "e-58592dc4d28e475c",
+      "kind": "action",
+      "semantic_certification": false
+    },
+    "w-lab-03": {
+      "operation_id": "w-lab-03",
+      "request_sha256": "e35db13fc1cf92f5c401a5fc8ea441a049d452ae315d27521ccceba2cdec208d",
+      "revision": 19,
+      "event_id": "e-ee3e7b10beda49f1",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "d-sam-02": {
+      "operation_id": "d-sam-02",
+      "request_sha256": "91638a2d0fa16064d35a7dd5ee68eb42333ef76b8a3bd3dbc42dd7906018e822",
+      "revision": 20,
+      "event_id": "e-f5b58053336243f8",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "m-nora-08": {
+      "operation_id": "m-nora-08",
+      "request_sha256": "d635d471cc23756409fdc82ee9ced6d8f642098fa76f66dcaf70523ee9e35c6d",
+      "revision": 21,
+      "event_id": "e-ea14a6fd83e6429c",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-sam-05": {
+      "operation_id": "m-sam-05",
+      "request_sha256": "20b467e1b8f4336dac71003230224de9c90ff297b4a2ce03575d357e20c5769a",
+      "revision": 22,
+      "event_id": "e-1e07794c2f9a479a",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-nora-09": {
+      "operation_id": "m-nora-09",
+      "request_sha256": "7957ac89199b6702cdb84d8a3792c3f338cff06e326960e353f65620739e0209",
+      "revision": 23,
+      "event_id": "e-e5cf365c807542b2",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-sam-06": {
+      "operation_id": "m-sam-06",
+      "request_sha256": "906d9618309d9ad7d0391bd07d957dda7d0dc1a6ee15aa85779f6c3926927a65",
+      "revision": 24,
+      "event_id": "e-03e9a56e1dd74af9",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "main-cases-v1": {
+      "operation_id": "main-cases-v1",
+      "request_sha256": "149bdd7aca1fade13257e44e92158cfc45d4366226b1607f64c40bf212fb4cfb",
+      "revision": 25,
+      "case_ids": [
+        "show-change",
+        "what-the-test-shows",
+        "repair-is-not-speedup"
+      ],
+      "relations_added": 0,
+      "content_sha256": "38d51a70bdd486dd53db48141e576004ed3172844c5d3222ce9ea697f0e20aac",
+      "learner_evidence_added": 0,
+      "semantic_certification": false
+    },
+    "main-lessons-v1": {
+      "operation_id": "main-lessons-v1",
+      "request_sha256": "d1e3c0979ab2fe0fe6a88096bf6082d59c29a1f0fa0246bcab8d0018d9eb17bb",
+      "revision": 26,
+      "lesson_ids": [
+        "before-an-answer",
+        "what-can-i-promise"
+      ],
+      "public_source_sha256": "1cc6eae5a0413074323392184647f5752ac17c8ada873199b1e52543f65ee9dc",
+      "content_sha256": "aa67795d333ffcb8093553ac08e8c39389639aeea9068d6cc1908acfe0e4266c",
+      "semantic_certification": false,
+      "learner_evidence_added": 0
+    },
+    "d01-meaning-corrections": {
+      "operation_id": "d01-meaning-corrections",
+      "request_sha256": "102ea692e6d43760bbc18670560d666ac6a786eff8841168015da14e616aed72",
+      "revision": 27,
+      "case_ids": [
+        "show-change",
+        "what-the-test-shows",
+        "repair-is-not-speedup"
+      ],
+      "relations_added": 0,
+      "content_sha256": "7bdcb0b81e88f76a660b0de5b840f31a3780afb75515bc9853deae87bf40eb5d",
+      "learner_evidence_added": 0,
+      "semantic_certification": false
+    },
+    "d01-audible-smaller-step": {
+      "operation_id": "d01-audible-smaller-step",
+      "request_sha256": "1509d47a7300c5517f1175d3ba26681431d4a4c59112e6d31c1c9f80a0e6e44f",
+      "revision": 28,
+      "lesson_ids": [
+        "before-an-answer",
+        "what-can-i-promise"
+      ],
+      "public_source_sha256": "1cc6eae5a0413074323392184647f5752ac17c8ada873199b1e52543f65ee9dc",
+      "content_sha256": "cc00784aa9b8417b5bcfb215b5209ce184e07bbd6ebf9c8b921769da7e92c5a5",
+      "semantic_certification": false,
+      "learner_evidence_added": 0
+    },
+    "v01-precise-state-and-tense": {
+      "operation_id": "v01-precise-state-and-tense",
+      "request_sha256": "cec49a0b12dc74d6948276fa3b17ddd03e5cd6e42ec6766b12d6713b9e702288",
+      "revision": 29,
+      "case_ids": [
+        "show-change",
+        "what-the-test-shows",
+        "repair-is-not-speedup"
+      ],
+      "relations_added": 0,
+      "content_sha256": "8a767aa6b0a82c4945876246ef1745a6493e4be924a40cac89ecd23270b1c629",
+      "learner_evidence_added": 0,
+      "semantic_certification": false
+    },
+    "v01-audible-implementation-boundary": {
+      "operation_id": "v01-audible-implementation-boundary",
+      "request_sha256": "b32be6efb54d37117ac3f2de460b582c74d288e967752d60208b200c31885599",
+      "revision": 30,
+      "lesson_ids": [
+        "before-an-answer",
+        "what-can-i-promise"
+      ],
+      "public_source_sha256": "1cc6eae5a0413074323392184647f5752ac17c8ada873199b1e52543f65ee9dc",
+      "content_sha256": "495f973961e91c2fb16696f0f1430c9cdbf320267c5e73517feb385f54861239",
+      "semantic_certification": false,
+      "learner_evidence_added": 0
+    },
+    "explicit-source-schema2": {
+      "operation_id": "explicit-source-schema2",
+      "request_sha256": "33af0dbf6739dc3d2d768f87ef5fcd18d14574f90513e2bcd4eafccf0dd5cd38",
+      "revision": 31,
+      "schema_migration": {
+        "from": 1,
+        "to": 2
+      },
+      "scope": "Format and writer boundary; no learning evidence or dialogue changes."
+    },
+    "main-editorial-scope": {
+      "operation_id": "main-editorial-scope",
+      "request_sha256": "785df4f70814f2a0829fdde93c162727db5228fc561dd87c569407f46ab6e277",
+      "revision": 32,
+      "editorial_role": "comparison-case-not-flagship",
+      "scope": "Main content decision, not native dialogue, user mastery or semantic certification."
+    },
+    "main-current-content-judgment": {
+      "operation_id": "main-current-content-judgment",
+      "request_sha256": "c4a7431a3dec0ba0f318d86a094d68c0453edff9ac3068b2425f3a126b951a2d",
+      "revision": 33,
+      "review_index": 0,
+      "decision": "useful",
+      "content_sha256": "4a90330663ffeb56dc0839f0072035dc860f2c4d7b928039de302dbc7dab08a4",
+      "semantic_certification": false,
+      "learner_evidence_added": 0
+    }
+  },
+  "status": "SCENE_COMPLETE",
+  "limits": "operator-authored fictional facts and source attributions; no semantic or host authentication",
+  "material_reads": {
+    "nora": [
+      "patch",
+      "reference"
+    ]
+  },
+  "learning_cases": [
+    {
+      "id": "show-change",
+      "cue": "面试问到代码改动，还没想清楚 API 的含义怎样先开口",
+      "intent": "拿出具体改动，把做过的事、动机和待验证假设分开。",
+      "why_hard": "回答要同时说明具体修改与尚未核查的语义，不能把节省分配的动机说成已经测得的收益；公开记录没有证明Nora曾组织不出答案。",
+      "what_changed": "Nora拿出旧/新处理方式并公开承认ownership未查，提出检查；Sam接受提议，但加上独立快照和逐帧reference，尚未产生测试结果。",
+      "event_ids": [
+        "e-864b5396e75a46a7",
+        "e-7ea5c40f96cb4efb",
+        "e-ba788d06a0874666",
+        "e-af24a393cdfa41a7"
+      ],
+      "public_fragment": [
+        {
+          "id": "e-864b5396e75a46a7",
+          "kind": "speech",
+          "actor": "sam",
+          "text": "Before we run anything, walk me through one captured frame—from the native output to its entry in this history. My first suspicion is that a result is getting attached to the wrong frame, but I haven’t seen enough to tell. Can you show me the bit you changed when you removed the copy?"
+        },
+        {
+          "id": "e-7ea5c40f96cb4efb",
+          "kind": "speech",
+          "actor": "nora",
+          "text": "Let me pull up the exact lines. I used to copy the output into a new float array for the history entry; the patch keeps the returned Tensor instead. I wanted to avoid that allocation, but I haven't checked what that Tensor actually owns."
+        },
+        {
+          "id": "e-ba788d06a0874666",
+          "kind": "speech",
+          "actor": "nora",
+          "text": "Here: I add A's wrapper to history, run B on the same module, then read both wrappers later when I render the entries. I was treating that wrapper like a saved result, but the scores might still point at something the next call reuses. Could we read A immediately, run B, and then read the retained A again?"
+        },
+        {
+          "id": "e-af24a393cdfa41a7",
+          "kind": "speech",
+          "actor": "sam",
+          "text": "Yes—let’s check that. Keep the frame IDs and raw scores in the log, not just the displayed tags, and make A’s first read an independent value snapshot so our baseline can’t change too. Can you put the native reference for each frame beside those reads?"
+        }
+      ],
+      "fragment_sha256": "0a100a9aa3aa6f8e8123aae828499e08e1b6b1a029f67dbf87fa06a187244ee3",
+      "usage": [
+        {
+          "meaning": "让我先调出具体代码行。",
+          "function": "先做一个有用的小步骤，为解释取得共同对象。",
+          "conditions": "对方问的确实是可拿出的改动；不是承诺马上知道所有答案。",
+          "register": "具体技术面谈中的口语；随真实问题调整",
+          "frequency_status": "未做语料频率/CEFR统计；这里只确认本册实际使用。",
+          "event_id": "e-7ea5c40f96cb4efb",
+          "surface": "Let me pull up the exact lines.",
+          "start": 0,
+          "end": 31,
+          "source_sha256": "d3959a6b1a6bb669bf6d0ee8867bbebb84e92c85ad8759e645efaf54b8349017",
+          "variants": [
+            {
+              "text": "Let me show you the change first.",
+              "explanation": "编辑作者拟句，非角色原话。把动作改为先展示改动，省略是否调出文件的细节。"
+            }
+          ],
+          "public_sources": []
+        },
+        {
+          "meaning": "我原先把那个包装对象当成保存下来的结果。",
+          "function": "把正在重新考虑的原理解说清，而非只抛一个结论。",
+          "conditions": "后面but/might引出怀疑；过去进行时本身不证明当时理解错误。",
+          "register": "具体技术面谈中的口语；随真实问题调整",
+          "frequency_status": "未做语料频率/CEFR统计；这里只确认本册实际使用。",
+          "event_id": "e-ba788d06a0874666",
+          "surface": "I was treating that wrapper like a saved result",
+          "start": 119,
+          "end": 166,
+          "source_sha256": "7999465924a1cf0dbed9907d2870c276356836a835c6f20a6af56d046985f854",
+          "variants": [
+            {
+              "text": "I kept the object. I’m not sure it keeps the old values.",
+              "explanation": "编辑作者拟句，非角色原话。用两个短句分别说操作与未知；不假称已经证明原因。"
+            }
+          ],
+          "public_sources": []
+        }
+      ]
+    },
+    {
+      "id": "what-the-test-shows",
+      "cue": "测试出现变化，怎样说明看到的现象和下一步而不过度下结论",
+      "intent": "区分当时的独立数值、后来读取的对象，以及新公布的产品需要。",
+      "why_hard": "A这条历史记录的帧标识仍在，后来读到的分数却变了；看到旧读数发生变化，也不等于应该把整份输出留在历史中。",
+      "what_changed": "虚构replay后旧A读成B，Nora先提恢复复制；Sam给出此前没说的label/top-score需求，她改为小记录并保留读取API是否需临时数组的未知。",
+      "event_ids": [
+        "e-314258bc217b4875",
+        "e-968b587662dd4831",
+        "e-9010dbf81d5e40ee",
+        "e-4ecac46f2bf64859",
+        "e-35b39e4ee8f348f2"
+      ],
+      "public_fragment": [
+        {
+          "id": "e-314258bc217b4875",
+          "kind": "action",
+          "actor": "nora",
+          "text": "I submit one sequential A-then-B replay to the console: run A on the live module, copy its scores into an independent array labelled A, retain its Tensor wrapper, run B on that same module, copy B's immediate scores into an independent array labelled B, then read and copy the retained A wrapper's scores again. I request frame IDs on every read and put the saved references A=[2,0,-1] and B=[-1,2,0] beside the corresponding entries."
+        },
+        {
+          "id": "e-968b587662dd4831",
+          "kind": "observation",
+          "text": "The console completes one sequential replay on the same module. Its log shows: A | immediate independent snapshot before B | [2,0,-1] | saved A reference [2,0,-1]; B | immediate independent snapshot after B | [-1,2,0] | saved B reference [-1,2,0]; A | retained A wrapper read after B | [-1,2,0] | saved A reference [2,0,-1]. One replay slot remains."
+        },
+        {
+          "id": "e-9010dbf81d5e40ee",
+          "kind": "speech",
+          "actor": "nora",
+          "text": "Oh—that retained A has B's scores now. Keeping the Tensor hasn't preserved A's result in this run. I'd restore the independent copy immediately after each call and use the last replay to check both history entries after B."
+        },
+        {
+          "id": "e-4ecac46f2bf64859",
+          "kind": "speech",
+          "actor": "sam",
+          "text": "That log makes a frame mix-up less convincing; the retained A read has actually changed. Before you spend the last replay, there’s a requirement I haven’t given you: history only needs each frame’s label and raw top score. Does that change what you’d save? Talk me through the change you’d put up for review and what the last replay would establish."
+        },
+        {
+          "id": "e-35b39e4ee8f348f2",
+          "kind": "speech",
+          "actor": "nora",
+          "text": "Yes—that's smaller than putting the whole array back. For review I'd replace the history Tensor with a frame ID, label and float score, taking the maximum and copying those values before the next inference. I'd still need to check whether reading the scores through this wrapper requires a temporary array. Then I'd use the last replay to render both entries after B and compare them with the references: different labels, both raw scores 2. If that passes, we've checked this two-frame history case; we haven't measured a speedup."
+        }
+      ],
+      "fragment_sha256": "0b29ed75ec9a32026e445bb674204427a1907883cc7985245cf100b97c869505",
+      "usage": [
+        {
+          "meaning": "这一次保留Tensor对象，没有保住A当时的结果。",
+          "function": "用对象与具体观察限定结论。",
+          "conditions": "in this run限制本次复现，不概括所有Tensor/后端；该书数值为明确虚构。",
+          "register": "具体技术面谈中的口语；随真实问题调整",
+          "frequency_status": "未做语料频率/CEFR统计；这里只确认本册实际使用。",
+          "event_id": "e-9010dbf81d5e40ee",
+          "surface": "Keeping the Tensor hasn't preserved A's result in this run.",
+          "start": 39,
+          "end": 98,
+          "source_sha256": "80f7908a52aec1e69388104c09f1abf8c8c6c094a1cbbb54c2769271937da688",
+          "variants": [
+            {
+              "text": "The old A now shows B’s scores.",
+              "explanation": "编辑作者拟句，非角色原话。更短地描述现象，没有替代所有权解释。"
+            }
+          ],
+          "public_sources": []
+        },
+        {
+          "meaning": "使“帧关联弄混”这个解释不那么站得住。",
+          "function": "根据新证据降低一种解释的说服力。",
+          "conditions": "less convincing不是绝对排除；需要原来的怀疑与这次log。",
+          "register": "具体技术面谈中的口语；随真实问题调整",
+          "frequency_status": "未做语料频率/CEFR统计；这里只确认本册实际使用。",
+          "event_id": "e-4ecac46f2bf64859",
+          "surface": "makes a frame mix-up less convincing",
+          "start": 9,
+          "end": 45,
+          "source_sha256": "09db47ffe010139287e0ef41432b92397ad19df86e4a190340b61a38f5c950cc",
+          "variants": [
+            {
+              "text": "That makes me less sure it’s a frame mix-up.",
+              "explanation": "编辑作者拟句，非角色原话。更突出说话者判断变化，也仍不宣称完全排除。"
+            }
+          ],
+          "public_sources": []
+        },
+        {
+          "meaning": "我仍要查，通过这个包装对象读分数是否还需要临时数组。",
+          "function": "把还没想清的实现问题留成一个具体可追问点。",
+          "conditions": "产品只留label/top score，不自动说明读取时没有数组；原作最后仍采用临时数组。",
+          "register": "技术面谈",
+          "frequency_status": "未做语料频率统计；本册实际使用。",
+          "event_id": "e-35b39e4ee8f348f2",
+          "surface": "I'd still need to check whether reading the scores through this wrapper requires a temporary array.",
+          "start": 207,
+          "end": 306,
+          "source_sha256": "00048bb7aea353a9e7bdedfcb50a583661f5abef6b740fe8c6512b87e7794b8f",
+          "variants": [
+            {
+              "text": "We don't need the whole array in the history. I still need to check how to read the values.",
+              "explanation": "编辑示范，非Nora原句。先复述保留需求，再保留读取方法未知，不声称已消除临时数组。"
+            },
+            {
+              "text": "Can I work through that with the code in front of me?",
+              "explanation": "编辑示范，非新人物回合。请求借具体代码逐步梳理；没有替此请求编造对方接受或测试成功。"
+            }
+          ],
+          "public_sources": []
+        }
+      ]
+    },
+    {
+      "id": "repair-is-not-speedup",
+      "cue": "做出正确性修复，怎样承认代价并说明个人贡献而不把项目说没价值",
+      "intent": "把已展示的fixture行为、待做的真实集成、个人贡献与性能证据分别交代。",
+      "why_hard": "原先想去掉allocation，眼下修复却保留临时数组；“我做的”又容易越界成整个模型/后端都是本人完成。",
+      "what_changed": "最后一次虚构fixture保留了两条正确标签/分数，但示意代码恢复了临时数组；Nora说明自己的集成及他人贡献，Sam仅推荐follow-up。公开片段没有展示实际Android修复或运行验证，不能把待review缩成唯一剩余步骤。",
+      "event_ids": [
+        "e-1aca05bcb26244da",
+        "e-58592dc4d28e475c",
+        "e-ee3e7b10beda49f1",
+        "e-ea14a6fd83e6429c",
+        "e-1e07794c2f9a479a",
+        "e-e5cf365c807542b2",
+        "e-03e9a56e1dd74af9"
+      ],
+      "public_fragment": [
+        {
+          "id": "e-1aca05bcb26244da",
+          "kind": "speech",
+          "actor": "sam",
+          "text": "Show me the edit and the rendering path, then run that version through the last replay. I want to see whether the code actually does what you’ve just described, especially what the history entry holds by the time B starts."
+        },
+        {
+          "id": "e-58592dc4d28e475c",
+          "kind": "action",
+          "actor": "nora",
+          "text": "I write a replacement for the fixture in explicit pseudocode: `saveFrame(id, input) { scores = independentFloatArrayImmediatelyAfter(runSameMethod(input)); k = argmax(scores); history.add(HistoryEntry(copyValue(id), copyValue(labelFor(k)), floatValue(scores[k]))); } saveFrame(A, ownedInputA); saveFrame(B, ownedInputB); later { for (entry in history) render(entry.frameId, entry.label, entry.rawTopScore); }`. I use the old independent-array conversion for this version, with the array local to saveFrame and only copied ID, label and score values retained in history. I submit that edit and rendering path for the final A-then-B replay, requesting the immediate score snapshots and the two delayed rendered records alongside the unchanged references."
+        },
+        {
+          "id": "e-ee3e7b10beda49f1",
+          "kind": "observation",
+          "text": "The final fixture replay displays the submitted pseudocode's immediate snapshots: A=[2,0,-1], beside saved A reference [2,0,-1]; B=[-1,2,0], beside saved B reference [-1,2,0]. The delayed render after B shows two saved records: A | label0 | raw top score 2; B | label1 | raw top score 2. No replay slots remain."
+        },
+        {
+          "id": "e-ea14a6fd83e6429c",
+          "kind": "speech",
+          "actor": "nora",
+          "text": "Okay, that's a relief—A is still label0 after B, and both saved scores are 2. That's the behavior I'd carry into the Android adapter, with this A-then-B sequence kept as a regression test. I'd leave the temporary array in for that fix and profile it before trying to remove it again."
+        },
+        {
+          "id": "e-1e07794c2f9a479a",
+          "kind": "speech",
+          "actor": "sam",
+          "text": "I’d want the Android diff and that regression test for review. Before we wrap up, which parts of this integration did you build yourself, and what did you reuse from the runner? I want to be clear about what I’m assessing as your work."
+        },
+        {
+          "id": "e-e5cf365c807542b2",
+          "kind": "speech",
+          "actor": "nora",
+          "text": "I built the Android frame capture, the code that calls the native runtime, and the frame/result history and display. Model execution came from the existing runner/runtime; I didn't write the backend or kernels. My teammate selected and trained the classifier. The Tensor-retention patch was mine too, including the assumption that the wrapper would preserve an old result, so that's my integration code to correct."
+        },
+        {
+          "id": "e-03e9a56e1dd74af9",
+          "kind": "speech",
+          "actor": "sam",
+          "text": "I’ve seen enough here to recommend a focused technical follow-up. For that review, I’d want the Android diff and the A-then-B regression test you described; the adapter fix itself is still unverified. Let’s leave it there for today."
+        }
+      ],
+      "fragment_sha256": "e55b48e956bdee049c6c32f60df0675f793693f0186b3c8851c8ca651979a699",
+      "usage": [
+        {
+          "meaning": "针对这个修复，我会先保留临时数组，先做性能剖析，再尝试去掉。",
+          "function": "把眼前正确性修复与以后优化分开，同时保留下一步。",
+          "conditions": "I’d是当前建议/打算，不等于已经profile；两帧fixture也不是实机性能结果。",
+          "register": "具体技术面谈中的口语；随真实问题调整",
+          "frequency_status": "未做语料频率/CEFR统计；这里只确认本册实际使用。",
+          "event_id": "e-ea14a6fd83e6429c",
+          "surface": "I'd leave the temporary array in for that fix and profile it before trying to remove it again.",
+          "start": 189,
+          "end": 283,
+          "source_sha256": "33c65e13f752635c05930d7aff9be8fd66bdc7244fc87fd5268653395c8065e9",
+          "variants": [
+            {
+              "text": "I can keep this for the fix. I haven’t measured its cost yet.",
+              "explanation": "编辑作者拟句，非角色原话。短句明确范围与未知；haven’t measured … yet说明截至现在还未测，当前仍缺这份证据；yet本身不承诺以后一定完成，不能当通用台词冒充本人真实项目。"
+            }
+          ],
+          "public_sources": []
+        },
+        {
+          "meaning": "后端和算子内核不是我写的。",
+          "function": "在已说明自己做的部分后划贡献边界。",
+          "conditions": "前文确实有本人的capture/integration/history/display；不能用这句推断本人不懂内核。",
+          "register": "具体技术面谈中的口语；随真实问题调整",
+          "frequency_status": "未做语料频率/CEFR统计；这里只确认本册实际使用。",
+          "event_id": "e-e5cf365c807542b2",
+          "surface": "I didn't write the backend or kernels.",
+          "start": 172,
+          "end": 210,
+          "source_sha256": "27810f09e43b3fa72123e5c68e2407f89efd115558f1a00df0c1af9a317ea462",
+          "variants": [
+            {
+              "text": "I built the integration. I reused the runtime.",
+              "explanation": "编辑作者拟句，非角色原话。更概括地分开个人实现与复用，具体职责仍需实际材料支持。"
+            }
+          ],
+          "public_sources": []
+        }
+      ]
+    }
+  ],
+  "series_relations": [],
+  "learning_lessons": [
+    {
+      "id": "before-an-answer",
+      "title": "还没想清楚，先把能说清的一步说出来",
+      "author": "双语回看编辑",
+      "purpose": "听懂代码改动、原来理解与待查内容的区别；提供不依赖一口气答完的起步方式。",
+      "sections": [
+        {
+          "id": "entry",
+          "kind": "explanation",
+          "purpose": "给具体对象和未知，不先堆术语",
+          "text": "这是一个端侧推理实习面谈的虚构场景。Nora原先把每次输出复制成独立数组，后来改成把Tensor对象放进历史记录。两张不同图片的历史结果却一样。她还不知道根因。先听面试官问什么、她怎样拿出改动，注意“做过”和“想达到”不是一回事。",
+          "source_section_ids": []
+        },
+        {
+          "id": "opening",
+          "kind": "source",
+          "purpose": "完整保留提问、说明、假设与对方补充检查条件",
+          "event_ids": [
+            "e-864b5396e75a46a7",
+            "e-7ea5c40f96cb4efb",
+            "e-ba788d06a0874666",
+            "e-af24a393cdfa41a7"
+          ],
+          "public_fragment": [
+            {
+              "id": "e-864b5396e75a46a7",
+              "kind": "speech",
+              "actor": "sam",
+              "text": "Before we run anything, walk me through one captured frame—from the native output to its entry in this history. My first suspicion is that a result is getting attached to the wrong frame, but I haven’t seen enough to tell. Can you show me the bit you changed when you removed the copy?"
+            },
+            {
+              "id": "e-7ea5c40f96cb4efb",
+              "kind": "speech",
+              "actor": "nora",
+              "text": "Let me pull up the exact lines. I used to copy the output into a new float array for the history entry; the patch keeps the returned Tensor instead. I wanted to avoid that allocation, but I haven't checked what that Tensor actually owns."
+            },
+            {
+              "id": "e-ba788d06a0874666",
+              "kind": "speech",
+              "actor": "nora",
+              "text": "Here: I add A's wrapper to history, run B on the same module, then read both wrappers later when I render the entries. I was treating that wrapper like a saved result, but the scores might still point at something the next call reuses. Could we read A immediately, run B, and then read the retained A again?"
+            },
+            {
+              "id": "e-af24a393cdfa41a7",
+              "kind": "speech",
+              "actor": "sam",
+              "text": "Yes—let’s check that. Keep the frame IDs and raw scores in the log, not just the displayed tags, and make A’s first read an independent value snapshot so our baseline can’t change too. Can you put the native reference for each frame beside those reads?"
+            }
+          ],
+          "fragment_sha256": "0a100a9aa3aa6f8e8123aae828499e08e1b6b1a029f67dbf87fa06a187244ee3"
+        },
+        {
+          "id": "meaning",
+          "kind": "explanation",
+          "purpose": "区别行动、动机与未知",
+          "text": "Let me pull up the exact lines，是“让我先调出具体代码行”。这一步没有声称已经知道原因。I used to copy，是以前确实采用的方式；I wanted to avoid that allocation，是想避免那次分配的动机，不是已经测出更快。I haven’t checked what that Tensor actually owns，是把未知落在一个具体问题上：对象究竟拥有哪一份数据。她没有说自己整个项目都不懂。",
+          "source_section_ids": [
+            "opening"
+          ]
+        },
+        {
+          "id": "contrast",
+          "kind": "contrast",
+          "purpose": "可取用的较短表达",
+          "text": "下面是编辑作者给的短说法，不是原角色新增发言：Let me show you the change first. 先让我给你看改动。I kept the object. I’m not sure it keeps the old values. 我保留了对象，但不确定它是否保住旧数值。两句先说明操作，再指出未知；实际使用时要换成自己真的做过的事情。",
+          "source_section_ids": [
+            "opening"
+          ]
+        },
+        {
+          "id": "assumption",
+          "kind": "explanation",
+          "purpose": "让假设、提议与实际结果分开",
+          "text": "再听I was treating that wrapper like a saved result。她在说原先怎样理解它，随后用but和might提出怀疑。might不是已证明，Could we read A immediately…是在提议检查，也不是已经执行。Sam接着要求第一份读数做成独立快照，否则用来对比的基准本身也可能变化。",
+          "source_section_ids": [
+            "opening"
+          ]
+        },
+        {
+          "id": "replay",
+          "kind": "source",
+          "purpose": "只重听原作候选人说明到面试官补充条件的连续三段",
+          "event_ids": [
+            "e-7ea5c40f96cb4efb",
+            "e-ba788d06a0874666",
+            "e-af24a393cdfa41a7"
+          ],
+          "public_fragment": [
+            {
+              "id": "e-7ea5c40f96cb4efb",
+              "kind": "speech",
+              "actor": "nora",
+              "text": "Let me pull up the exact lines. I used to copy the output into a new float array for the history entry; the patch keeps the returned Tensor instead. I wanted to avoid that allocation, but I haven't checked what that Tensor actually owns."
+            },
+            {
+              "id": "e-ba788d06a0874666",
+              "kind": "speech",
+              "actor": "nora",
+              "text": "Here: I add A's wrapper to history, run B on the same module, then read both wrappers later when I render the entries. I was treating that wrapper like a saved result, but the scores might still point at something the next call reuses. Could we read A immediately, run B, and then read the retained A again?"
+            },
+            {
+              "id": "e-af24a393cdfa41a7",
+              "kind": "speech",
+              "actor": "sam",
+              "text": "Yes—let’s check that. Keep the frame IDs and raw scores in the log, not just the displayed tags, and make A’s first read an independent value snapshot so our baseline can’t change too. Can you put the native reference for each frame beside those reads?"
+            }
+          ],
+          "fragment_sha256": "aafd359d8fd51c4473977478270a8ea66d59540588f0da63fdd9d6632e5d89bf"
+        }
+      ],
+      "public_source_sha256": "1cc6eae5a0413074323392184647f5752ac17c8ada873199b1e52543f65ee9dc"
+    },
+    {
+      "id": "what-can-i-promise",
+      "title": "看见一个结果，还不能承诺整件事",
+      "author": "双语回看编辑",
+      "purpose": "理解read/copy的先后，听出本次证据、修复、代价和后续承诺的范围。",
+      "sections": [
+        {
+          "id": "timeline",
+          "kind": "explanation",
+          "purpose": "先建立时间线再引出语言范围",
+          "text": "先用三次读数理解原作的虚构测试。A刚运行完，独立记下的是二、零、负一。B运行完，独立记下的是负一、二、零。然后再读保留的旧A对象，读出来也变成了B的负一、二、零。像是记住同一块白板的位置，白板后来被改写；这只是帮助理解本册设定的类比，不能概括所有Tensor接口。现在听Nora怎样说结果，Sam又怎样补上此前没说的产品需求。",
+          "source_section_ids": []
+        },
+        {
+          "id": "result-and-request",
+          "kind": "source",
+          "purpose": "保留结果说明、需求变化与候选人的下一项提议",
+          "event_ids": [
+            "e-9010dbf81d5e40ee",
+            "e-4ecac46f2bf64859"
+          ],
+          "public_fragment": [
+            {
+              "id": "e-9010dbf81d5e40ee",
+              "kind": "speech",
+              "actor": "nora",
+              "text": "Oh—that retained A has B's scores now. Keeping the Tensor hasn't preserved A's result in this run. I'd restore the independent copy immediately after each call and use the last replay to check both history entries after B."
+            },
+            {
+              "id": "e-4ecac46f2bf64859",
+              "kind": "speech",
+              "actor": "sam",
+              "text": "That log makes a frame mix-up less convincing; the retained A read has actually changed. Before you spend the last replay, there’s a requirement I haven’t given you: history only needs each frame’s label and raw top score. Does that change what you’d save? Talk me through the change you’d put up for review and what the last replay would establish."
+            }
+          ],
+          "fragment_sha256": "efbf6af6fb8c313b90cc791c277af46dc67046892fd560aa4c836b0e5d3d942f"
+        },
+        {
+          "id": "smaller-step",
+          "kind": "contrast",
+          "purpose": "在完整专家答案前提供更小的编辑分支，不补写原角色思考过程",
+          "text": "Sam刚补上了只保存label和最高分的需要。如果此刻你还没有想出Nora随后那套完整方案，下面只是编辑示范，不是她曾经说过的话：We don’t need the whole array in the history. I still need to check how to read the values. 历史里不需要整份数组，但我还要查怎样读出数值。Can I work through that with the code in front of me? 我能看着代码一步步梳理吗？这些说法没有保证已经避免临时数组，也没有额外的Sam回应。现在再听Nora原来的完整回答。",
+          "source_section_ids": [
+            "result-and-request"
+          ]
+        },
+        {
+          "id": "original-proposal",
+          "kind": "source",
+          "purpose": "保留原人物实际完整回答，不冒称她先说过编辑短分支",
+          "event_ids": [
+            "e-35b39e4ee8f348f2"
+          ],
+          "public_fragment": [
+            {
+              "id": "e-35b39e4ee8f348f2",
+              "kind": "speech",
+              "actor": "nora",
+              "text": "Yes—that's smaller than putting the whole array back. For review I'd replace the history Tensor with a frame ID, label and float score, taking the maximum and copying those values before the next inference. I'd still need to check whether reading the scores through this wrapper requires a temporary array. Then I'd use the last replay to render both entries after B and compare them with the references: different labels, both raw scores 2. If that passes, we've checked this two-frame history case; we haven't measured a speedup."
+            }
+          ],
+          "fragment_sha256": "c0e439a98976910fb6048d2df192fd2a91adbb0e1fff6b2d1f555b1071c0b583"
+        },
+        {
+          "id": "scope",
+          "kind": "explanation",
+          "purpose": "解释观察与推断、条件与已发生",
+          "text": "Keeping the Tensor hasn’t preserved A’s result in this run，意思是“这一次保留对象没保住A的旧结果”。in this run把结论限在这次复现。Sam说makes a frame mix-up less convincing，是让帧关联弄混这个解释变得不那么有说服力，是说帧关联弄混这个假说变弱了，但还没被彻底排除；日志也没有替他们证实全部内部机制。Nora接着说If that passes，仍是在谈待做检查；we haven’t measured a speedup则明确没有性能证据。",
+          "source_section_ids": [
+            "result-and-request"
+          ]
+        },
+        {
+          "id": "bridge",
+          "kind": "explanation",
+          "purpose": "明确节选与公开动作概括，不编新反馈",
+          "text": "原作随后展示了示意代码，并用掉最后一次虚构replay。两条延后显示的记录分别保住label0和label1，原始最高分都是二。不过示意代码仍先转成独立临时数组。这不是实机Android测试。下面从原作接着听结果之后的四段，代码动作与控制台原文保留在完整场景稿，不在这里逐字符朗读。",
+          "source_section_ids": []
+        },
+        {
+          "id": "ending",
+          "kind": "source",
+          "purpose": "连续保留候选人处理代价、个人贡献与面试官实际收束",
+          "event_ids": [
+            "e-ea14a6fd83e6429c",
+            "e-1e07794c2f9a479a",
+            "e-e5cf365c807542b2",
+            "e-03e9a56e1dd74af9"
+          ],
+          "public_fragment": [
+            {
+              "id": "e-ea14a6fd83e6429c",
+              "kind": "speech",
+              "actor": "nora",
+              "text": "Okay, that's a relief—A is still label0 after B, and both saved scores are 2. That's the behavior I'd carry into the Android adapter, with this A-then-B sequence kept as a regression test. I'd leave the temporary array in for that fix and profile it before trying to remove it again."
+            },
+            {
+              "id": "e-1e07794c2f9a479a",
+              "kind": "speech",
+              "actor": "sam",
+              "text": "I’d want the Android diff and that regression test for review. Before we wrap up, which parts of this integration did you build yourself, and what did you reuse from the runner? I want to be clear about what I’m assessing as your work."
+            },
+            {
+              "id": "e-e5cf365c807542b2",
+              "kind": "speech",
+              "actor": "nora",
+              "text": "I built the Android frame capture, the code that calls the native runtime, and the frame/result history and display. Model execution came from the existing runner/runtime; I didn't write the backend or kernels. My teammate selected and trained the classifier. The Tensor-retention patch was mine too, including the assumption that the wrapper would preserve an old result, so that's my integration code to correct."
+            },
+            {
+              "id": "e-03e9a56e1dd74af9",
+              "kind": "speech",
+              "actor": "sam",
+              "text": "I’ve seen enough here to recommend a focused technical follow-up. For that review, I’d want the Android diff and the A-then-B regression test you described; the adapter fix itself is still unverified. Let’s leave it there for today."
+            }
+          ],
+          "fragment_sha256": "af947a0cf95725d442746579b914bb2fcdaef11550d856f0b00067aad576f4e7"
+        },
+        {
+          "id": "commitment",
+          "kind": "explanation",
+          "purpose": "不把正确性改善听成速度成功或录用",
+          "text": "I’d leave the temporary array in for that fix，是当前会采取的修复选择；profile it before trying to remove it again把再次删掉数组放在测量之后。I built…接着I didn’t write…把个人集成工作和运行时、模型的贡献分开。最后的recommend a focused technical follow-up是推荐继续技术复核，不是录用，adapter fix itself is still unverified也没有被抹掉。",
+          "source_section_ids": [
+            "ending"
+          ]
+        },
+        {
+          "id": "application",
+          "kind": "contrast",
+          "purpose": "将源头区别变成有边界的取用机会",
+          "text": "这是编辑作者给的有条件应用示范，不是Nora新增的测量或听者真实履历。假如真实项目也只完成了这种示意检查，还没实现和验证Android修复，可以说：The two-frame check passes in this fixture. I’d still need to implement and test the Android fix. I haven’t measured the performance cost yet. 这个fixture里的两帧检查通过了；Android修复还需要实现和测试；截至现在，性能代价还没测。yet不保证未来一定会完成。还没有完整答案时，也可以先说：I can show you the change first. 先给你看改动。具体采用哪句话，要与自己真正完成的工作一致。",
+          "source_section_ids": [
+            "ending"
+          ]
+        }
+      ],
+      "public_source_sha256": "1cc6eae5a0413074323392184647f5752ac17c8ada873199b1e52543f65ee9dc"
+    }
+  ],
+  "editorial_scope": {
+    "role": "comparison-case-not-flagship",
+    "limits": "Diagnosis and proposal are unusually quick. Use for scoped evidence and edited smaller responses, not as primary proof of handling unformed thought.",
+    "learner_outcome": "unobserved",
+    "real_user_biography": false,
+    "source_profile": "0.8.0@314e513d439829fa1159e6801d1421ed1e569e0a",
+    "source_schema_migration": "Explicit current source2; historical production snapshots not rewritten."
+  },
+  "learning_reviews": [
+    {
+      "decision": "useful",
+      "reviewer": "Main after actual public source/lesson reading and scoped V01/V02/V03/D01 returns",
+      "reason": "按当前editorial_scope与具体案例采用为可理解、可回查、可供取用的语言资料；不是完整真实窘境认证、词频认证、手机验证或学习收益。Diagnosis and proposal are unusually quick. Use for scoped evidence and edited smaller responses, not as primary proof of handling unformed thought.",
+      "case_findings": [
+        {
+          "case_id": "show-change",
+          "judgment": "useful",
+          "reason": "作为对照资料，可用之处是先展示改动与具体未知；没有宣称人物经历过组织不出答案。"
+        },
+        {
+          "case_id": "what-the-test-shows",
+          "judgment": "useful",
+          "reason": "完整保留测试与需求变化，并给清楚标成编辑的较小分支；less convincing未讲成彻底排除。"
+        },
+        {
+          "case_id": "repair-is-not-speedup",
+          "judgment": "useful",
+          "reason": "修复仍保留临时数组；实际Android实现/验证未展示，performance未测。只按这个有限用途采纳。"
+        }
+      ],
+      "content_sha256": "4a90330663ffeb56dc0839f0072035dc860f2c4d7b928039de302dbc7dab08a4",
+      "recorded_at": "2026-11-11T06:28:19.076+00:00",
+      "semantic_certification": false
+    }
+  ],
+  "integrity_sha256": "f7143ab096525070c4351d95447ae61234bacbd3e5b1912b066c59dd21f317b4"
+}
+```

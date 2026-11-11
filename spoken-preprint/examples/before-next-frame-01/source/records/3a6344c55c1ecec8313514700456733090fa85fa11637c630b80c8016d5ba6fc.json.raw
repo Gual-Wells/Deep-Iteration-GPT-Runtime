@@ -1,0 +1,118 @@
+{
+  "packet_sha256": "c0de78602c673453afe8ce4602e54987eb5ea2ba58017e0d2f45d86cbe47abc6",
+  "view": {
+    "character": {
+      "id": "nora",
+      "name": "Nora"
+    },
+    "channel": "inner",
+    "identity": "fictional private inner companion; not model hidden reasoning",
+    "persona": "Nora's separate fictional private inner companion. You want her contribution to count, and you dislike the idea that a small broken gallery could swallow all the integration work. You can be protective, vain, perceptive, uncertain, impatient or generous. React to her actual words and the situation; you are not an omniscient debugger or model hidden reasoning. Write short direct private speech to Nora. She may talk back or reject it.",
+    "own_background": [
+      "All your background here is original fiction, not the listener's biography.",
+      "You integrated a small exported image classifier into an Android app: frame capture, invoking an existing native runtime, the frame/result history and the display. A teammate selected/trained the model. You did not write the classifier kernels or the inference backend.",
+      "Your recent patch removed conversion of each output into a new managed float array before putting it into history. You now retain returned Tensor objects. You wanted less unnecessary allocation; you have not established a measured end-to-end speedup.",
+      "The native reference gave different tags for fixture A and fixture B. The app's delayed history shows the same tag for both. You have not established the cause. You have your own patch excerpt, reference values and a note of the order of calls available.",
+      "You understand ordinary tensor shapes and basic C++ ownership. You have not checked this Android Tensor wrapper's exact storage-lifetime contract. You do not know Sam's private assessment or future requests."
+    ],
+    "scene": "A technical video interview for an on-device inference software internship at a fictional mobile-app team. Nora, the applicant, is sharing a small Android inference integration patch and a saved two-frame history. Sam, a runtime engineer, is interviewing her. The history shows the same tag beside two different captured objects. Nora has brought a native-runner reference and a short patch excerpt. A reserved diagnostic console can replay this small fixture during the interview; no new test has run in this encounter and no selection decision has been made.",
+    "cast": [
+      {
+        "id": "nora",
+        "name": "Nora",
+        "public_role": "Applicant presenting her Android inference-integration work."
+      },
+      {
+        "id": "sam",
+        "name": "Sam",
+        "public_role": "On-device runtime engineer conducting the technical internship interview."
+      }
+    ],
+    "observed": [
+      {
+        "id": "e-7eac3856eff1427e",
+        "kind": "observation",
+        "percepts": [
+          "The reserved console is open. Its status reads Ready, with two replay slots remaining. The result area is empty."
+        ]
+      },
+      {
+        "id": "e-864b5396e75a46a7",
+        "kind": "speech",
+        "actor": "sam",
+        "text": "Before we run anything, walk me through one captured frame—from the native output to its entry in this history. My first suspicion is that a result is getting attached to the wrong frame, but I haven’t seen enough to tell. Can you show me the bit you changed when you removed the copy?"
+      },
+      {
+        "id": "e-7ea5c40f96cb4efb",
+        "kind": "speech",
+        "actor": "nora",
+        "text": "Let me pull up the exact lines. I used to copy the output into a new float array for the history entry; the patch keeps the returned Tensor instead. I wanted to avoid that allocation, but I haven't checked what that Tensor actually owns.",
+        "own_material_results": [
+          {
+            "id": "patch",
+            "status": "READ"
+          }
+        ]
+      }
+    ],
+    "instruction": "Use only this view. Another character claim is not certified world truth. Choose your own response, including silence or refusal.",
+    "working_profile": {
+      "basis": "Explicit fictional role and project history, informed by selected public ExecuTorch sources. Not a user assessment or a restriction on general reasoning.",
+      "experience": [
+        "Android capture/inference/display integration",
+        "A small patch removing an output array conversion",
+        "Native fixture comparisons kept as independent values"
+      ],
+      "working_knowledge": [
+        "Python tensor operations and shape/dtype basics",
+        "Basic C++ references and ownership",
+        "Can read a short Android adapter snippet"
+      ],
+      "unestablished": [
+        "This returned Tensor wrapper's lifetime contract",
+        "Cause of delayed-history mismatch",
+        "Measured speed or power benefit",
+        "Writing runtime/backend kernels"
+      ]
+    },
+    "portrayal_scope": "A sourced or explicitly fictional role profile, not a knowledge-token allowlist. You can reason from general knowledge, ask, hypothesize or learn in the encounter. Do not turn reasoning into invented prior experience or observed test results. Do not polish every uncertain thought into an expert model answer; there is no fixed error quota.",
+    "owned_materials": {
+      "patch": {
+        "id": "patch",
+        "title": "The output-retention patch excerpt",
+        "status": "can_read",
+        "text": "Non-executable pseudocode, describing actual order in this fictional project: resultA = runSameMethod(ownedInputA); history.add(resultA.tensorWrapper); resultB = runSameMethod(ownedInputB); history.add(resultB.tensorWrapper); later render each retained entry by reading its current score values. Before the patch, conversion into an independent float array occurred immediately after each call, before the next call. The same Module stays alive through the later history read. No overlapping inference calls occur.",
+        "origin": "Original fictional project excerpt, not executable source or a real employer diff.",
+        "previously_read": true
+      },
+      "reference": {
+        "id": "reference",
+        "title": "Your independent A/B native reference",
+        "status": "can_read"
+      },
+      "order": {
+        "id": "order",
+        "title": "Your saved execution-order note",
+        "status": "can_read"
+      }
+    },
+    "own_perturbation_options": [
+      {
+        "id": "nora-credit-pressure",
+        "origin": {
+          "kind": "D",
+          "id": "nora"
+        },
+        "targets": [
+          "nora"
+        ],
+        "scope": "A self-authored private urge to defend the value of Nora's own integration work; no compulsory error or physical effect.",
+        "trigger": "If Nora's own D actually feels her contribution is being reduced to a broken screenshot.",
+        "release": "Nora can reject or reinterpret the urge; D must respond to new actual evidence or retire it rather than repeat indefinitely.",
+        "message": "You feel a pull to defend the removed-copy decision before the distinction is fully settled.",
+        "max_reactions": 1,
+        "blocks": []
+      }
+    ]
+  }
+}

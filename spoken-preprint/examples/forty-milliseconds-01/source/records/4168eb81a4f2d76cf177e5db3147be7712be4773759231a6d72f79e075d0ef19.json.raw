@@ -1,0 +1,5 @@
+{
+  "kind": "speech",
+  "text": "I'd closed the activity screen and then opened it again. I thought that was a cold start because the classification had to appear again. I didn't kill the process separately, though. For the exact timer calls, I'd like to check the wrapper—I reused that part.",
+  "actual_native_return": "I'd closed the activity screen and then opened it again. I thought that was a cold start because the classification had to appear again. I didn't kill the process separately, though. For the exact timer calls, I'd like to check the wrapper—I reused that part."
+}

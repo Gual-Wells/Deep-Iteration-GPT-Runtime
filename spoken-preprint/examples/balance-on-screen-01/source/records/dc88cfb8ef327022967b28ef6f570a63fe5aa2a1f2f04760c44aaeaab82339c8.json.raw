@@ -1,0 +1,59 @@
+{
+  "packet_sha256": "eea2033293ba9c4ccc706783548e907f9ad3d6e40af1d9b410ece39fda6a2801",
+  "view": {
+    "director": {
+      "id": "timing",
+      "name": "Timing and household records world",
+      "territory": "Present scene time, household note/document actions, and mundane communication attempts. There is no imposed countdown or mandatory interruption. Confirm only warranted attempted actions; no actual bank, payment system or external supplier is contacted. A promise stays a promise. You may refrain. Do not decide fairness or alter billing figures.",
+      "reads": [
+        "scene_time",
+        "household_note_status",
+        "communication_status",
+        "important_past"
+      ],
+      "writes": [
+        "scene_time",
+        "household_note_status",
+        "communication_status"
+      ]
+    },
+    "scene": "On Thursday 2 April 2026, Mara and Eli sit at the kitchen table of their shared rented flat in England. Mara has an energy-account email open on her phone. They need to work out what the figures require of them and how to deal with the household cost. Nobody else is in the conversation.",
+    "world": {
+      "scene_time": "Thursday 2 April 2026, early evening; no urgent external countdown is established",
+      "household_note_status": "No note for this evening’s arrangement has been made.",
+      "communication_status": "No external supplier contact or bank transfer has occurred in this scene.",
+      "important_past": {
+        "fiction": true,
+        "location": "England",
+        "old_chat": "We can split the bills. Sixty each for now, then check it against the actual bill.",
+        "contributions": "£60 each in January, February and March, all made",
+        "absence": "Eli away six weeks in that quarter",
+        "absence_policy": "not explicitly recorded",
+        "individual_measurements": "no room meter, no household departure/return readings",
+        "account_holder": "Mara",
+        "private_available_cash": {
+          "mara": 90,
+          "eli": 90
+        },
+        "no_invented_prior_agreement": true
+      }
+    },
+    "public_events": [],
+    "instruction": "Propose or refrain. Affect situations and perceived events, not another participant private mind. Do not write other characters dialogue.",
+    "territory": {
+      "writes": [
+        "scene_time",
+        "household_note_status",
+        "communication_status"
+      ],
+      "frozen_keys": [
+        "important_past",
+        "billing_facts"
+      ],
+      "scope": "Domain-authorized present consequences; cannot rewrite important history or another private mind."
+    }
+  },
+  "task": "Genesis. Independently consider your timing/household-record territory. You may refrain; no forced deadline, arbitrary nuisance or dialogue. Preserve frozen facts and no actual bank or supplier execution. Save one JSON world proposal to return_path with kind world, director timing, decision apply/retain/decline, proposal, reason, changes, percepts.",
+  "return_path": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\balance-on-screen-01\\native\\returns\\w-timing-01.json",
+  "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\balance-on-screen-01\\native\\inputs\\w-timing-01.json"
+}

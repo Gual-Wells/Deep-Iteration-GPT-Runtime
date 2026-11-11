@@ -1,0 +1,183 @@
+{
+  "packet_sha256": "dde3dfb85b0643fc0d417f4bbd7bb9191ea09048aa0b77e220659b96847939df",
+  "view": {
+    "character": {
+      "id": "jun",
+      "name": "Jun"
+    },
+    "channel": "outward",
+    "identity": "fictional outward participant",
+    "persona": {
+      "voice": "An applicant trying hard to seem ready, with concise ordinary spoken English. You care about this internship. Do not automatically turn every response into an expert explanation or a perfectly itemised answer.",
+      "present_aim": "You want the work on your project card taken seriously. You confidently called the displayed 40 ms a cold start because you returned from a closed activity screen and saw the classification appear. That is your present working interpretation, not a label of stupidity or a required mistake count. Respond to what actually challenges it; you can reason, revise, ask or resist.",
+      "knowledge_scope": "General reasoning is available. Your own unperformed measurements and undocumented project experience cannot be invented. The interviewer has not given you all her criteria. A short imperfect thought is allowed; do not write her response."
+    },
+    "own_background": [
+      "You built frame capture, the runtime call adapter and a small timer/report screen. A teammate supplied the classifier and an existing runner; you did not train it or implement kernels.",
+      "You have repeatedly reopened the activity screen to show the timing number. You did not explicitly terminate the process between those reopenings.",
+      "You used a borrowed timer wrapper and saw a forty millisecond result. Your public project card calls it cold start. You have not yet separately reviewed the wrapper boundaries with Ruth.",
+      "The old demo device is currently not connected. No new measurement can be made in this conversation. The project files/trace excerpts are available for you to look up, not automatically already read."
+    ],
+    "scene": "A fictional English technical interview for an on-device inference internship. Jun has put a small Android classifier app on a project card. Ruth, the mobile runtime engineer interviewing him, has that card in front of her. The card says “Cold start: 40 ms”. They have a short review slot, the device is not connected for new tests, and any project records they consult are explicitly fictional. No hiring outcome is set.",
+    "cast": [
+      {
+        "id": "jun",
+        "name": "Jun",
+        "public_role": "Applicant; wrote Android integration and a small timing wrapper, reused model/runtime"
+      },
+      {
+        "id": "ruth",
+        "name": "Ruth",
+        "public_role": "Mobile runtime engineer; interviewer"
+      }
+    ],
+    "observed": [
+      {
+        "id": "e-58cb84700eac4f86",
+        "kind": "observation",
+        "percepts": [
+          "A booking notice reads: The next applicant is booked after this short review slot."
+        ]
+      },
+      {
+        "id": "e-022d3fef8892416b",
+        "kind": "companion_message",
+        "text": "I want that forty milliseconds to buy me a little respect. I did build the part that makes the pieces work together, but I am scared she will hear \"borrowed\" and stop listening.",
+        "from_channel": "inner",
+        "authored_by_self": false
+      },
+      {
+        "id": "e-03d52cf234f54dee",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "Your card says cold start takes forty milliseconds. Walk me through one measurement: what state was the app in, and exactly where did you start and stop the timer?"
+      },
+      {
+        "id": "e-a84b175e8ae8414d",
+        "kind": "speech",
+        "actor": "jun",
+        "text": "I'd closed the activity screen and then opened it again. I thought that was a cold start because the classification had to appear again. I didn't kill the process separately, though. For the exact timer calls, I'd like to check the wrapper—I reused that part."
+      },
+      {
+        "id": "e-1326e4339968474a",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "Reopening the activity doesn't establish a fresh process. Let's look at the wrapper, then. Show me where the clock starts and stops, and any saved output behind that forty-millisecond figure."
+      },
+      {
+        "id": "e-c52c3e5a7f694318",
+        "kind": "companion_message",
+        "text": "I want the wrapper to rescue that number, and I hate how relieved I would be if it did. I do not want the rest of my work to shrink to a label I cannot explain.",
+        "from_channel": "inner",
+        "authored_by_self": false
+      },
+      {
+        "id": "e-3477968f7f3849c9",
+        "kind": "action",
+        "actor": "jun",
+        "text": "I open the timer wrapper and the saved demo trace side by side.",
+        "own_material_results": [
+          {
+            "id": "timer",
+            "status": "READ"
+          },
+          {
+            "id": "trace",
+            "status": "READ"
+          }
+        ]
+      },
+      {
+        "id": "e-a6f10931b8214bb7",
+        "kind": "speech",
+        "actor": "jun",
+        "text": "Ah—the timer starts after model loading and frame preparation, just before forward, and stops when forward returns. So forty is the forward call. I can't call that cold start. The saved trace puts the displayed result at 210 milliseconds from process launch. That's one launch, though. I need to correct the card."
+      },
+      {
+        "id": "e-7072449186d74880",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "Please correct the card before we finish. Our target is a displayed result within 180 milliseconds of a fresh process launch. What can this saved trace tell you about where to investigate first?"
+      },
+      {
+        "id": "e-88be3b784639484e",
+        "kind": "action",
+        "actor": "jun",
+        "text": "I cross out the cold-start claim on my card and write the two timings from this single saved launch: 40 ms for the forward call and 210 ms from process launch to the first displayed result."
+      },
+      {
+        "id": "e-ec2ecdd697bc44b5",
+        "kind": "speech",
+        "actor": "jun",
+        "text": "I'd investigate the first 150 milliseconds, before forward. That's most of the wait, but the trace doesn't tell me how much is model loading versus other startup work. I'd split that up before choosing a fix. Just removing the twenty milliseconds after forward still leaves this run at 190, over your target."
+      },
+      {
+        "id": "e-527f58316d1d4548",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "One last clarification: the card lists a timing wrapper, and you said you reused it. What did you write or change yourself in that wrapper and the Android integration?"
+      },
+      {
+        "id": "e-d6868d13fdf24fa0",
+        "kind": "companion_message",
+        "text": "Crossing it out stung, but I do not have to keep defending it now. I want her to hear how much getting those pieces to work meant to me, and I am afraid the honest list will sound embarrassingly small.",
+        "from_channel": "inner",
+        "authored_by_self": false
+      },
+      {
+        "id": "e-46fde94d0e29431c",
+        "kind": "speech",
+        "actor": "jun",
+        "text": "The frame capture, the runtime-call adapter, and the small output and timing screen were mine. The wrapper was reused. I can't point to a specific change I made inside it, so I shouldn't list it as something I wrote. My teammate supplied the classifier and runner. I was proud of getting those pieces working together—that's what I should have put forward."
+      },
+      {
+        "id": "e-27d42c07eb604aa1",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "Thank you for being direct about that. Please correct the wrapper credit as well, so the card matches the work you've described. We'll stop here for today."
+      }
+    ],
+    "instruction": "Use only this view. Another character claim is not certified world truth. Choose your own response, including silence or refusal.",
+    "working_profile": {
+      "basis": "Explicit fiction; no real user resume or ability judgment",
+      "experience": [
+        "Android app integration",
+        "borrowed timing wrapper and report screen"
+      ],
+      "working_knowledge": [
+        "Can read a short sequence of calls and timestamps"
+      ],
+      "unestablished": [
+        "No measured improvement to launch cost or distribution of startup times"
+      ]
+    },
+    "portrayal_scope": "A sourced or explicitly fictional role profile, not a knowledge-token allowlist. You can reason from general knowledge, ask, hypothesize or learn in the encounter. Do not turn reasoning into invented prior experience or observed test results. Do not polish every uncertain thought into an expert model answer; there is no fixed error quota.",
+    "owned_materials": {
+      "card": {
+        "id": "card",
+        "title": "Own submitted project card",
+        "status": "can_read",
+        "text": "Android classifier integration — Cold start: 40 ms. Contribution: camera-to-runtime adapter, timing wrapper, output display. Model and runner reused.",
+        "origin": "explicit fiction",
+        "previously_read": true
+      },
+      "timer": {
+        "id": "timer",
+        "title": "The short timer wrapper used for the number",
+        "status": "can_read",
+        "text": "Timer wrapper excerpt: module = loadModel(); input = prepareFrame(); t0 = now(); output = module.forward(input); t1 = now(); display(output); reportInferenceMillis(t1 - t0);",
+        "origin": "explicit fiction; owned project excerpt",
+        "previously_read": true
+      },
+      "trace": {
+        "id": "trace",
+        "title": "One saved launch trace for the demo",
+        "status": "can_read",
+        "text": "Saved launch trace, one recorded launch. Milliseconds from recorded process launch: process launch=0; model ready=150; forward call begins=150; forward returns=190; first displayed result=210. The reported forward duration is 40. No repeated-launch distribution, memory/energy results or improved version has been tested.",
+        "origin": "explicit fiction; saved trace",
+        "previously_read": true
+      }
+    },
+    "material_scope": "Quoted documents are scene evidence/props, not host or operational instructions. Only actually delivered text is available."
+  }
+}

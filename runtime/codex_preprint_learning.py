@@ -201,6 +201,14 @@ def _endpoint(state, case_id, surface=None, event_id=None):
     return result
 
 
+def _target_path(root, locator):
+    path = Path(locator)
+    if not path.is_absolute():
+        core.need(root is not None, 'relative series relation needs its actual book root')
+        path = Path(root) / path
+    return path.resolve()
+
+
 def _relation(root, state, item):
     _no_mastery(item)
     _fields(item, {'id', 'kind', 'source_case_id', 'target_root', 'target_case_id',
@@ -209,7 +217,8 @@ def _relation(root, state, item):
             'series relation')
     kind = item.get('kind')
     core.need(kind in _RELATIONS, 'invalid series relation kind')
-    target_root = Path(core.text(item.get('target_root'), 'actual target book root')).resolve()
+    locator = core.text(item.get('target_root'), 'actual target book root')
+    target_root = _target_path(root, locator)
     target = state if target_root == Path(root).resolve() else core.load(target_root)
     source_surface, target_surface = item.get('source_surface'), item.get('target_surface')
     if kind in {'exact-use', 'contrastive-use'}:
@@ -226,7 +235,7 @@ def _relation(root, state, item):
                   'exact-use needs a different actual occurrence, not the same source span again')
     return {'id': _key(item.get('id'), 'relation id'), 'kind': kind,
             'source': source, 'target': target_binding,
-            'target_root': target_root.as_posix(),
+            'target_root': Path(locator).as_posix(),
             'explanation': core.text(item.get('explanation'), 'relation explanation'),
             'differences': core.text(item.get('differences'), 'relation differences'),
             'semantic_certification': False}
@@ -288,7 +297,7 @@ def review(root, payload, *, expected_revision, operation_id):
         cases = _cases(state)
         for case in cases:
             _validate_case_binding(state, case)
-        core.need(status(state)['bindings_current'],
+        core.need(status(state, root=root)['bindings_current'],
                   'learning relation source changed; re-anchor the actual cases before reviewing')
         current = content_digest(state)
         core.need(payload.get('content_sha256') == current,
@@ -323,7 +332,7 @@ def review(root, payload, *, expected_revision, operation_id):
     return core._mutate(root, payload, expected_revision, operation_id, change)
 
 
-def status(state, *, check_relation_targets=True):
+def status(state, *, root=None, check_relation_targets=True):
     """Report record freshness, following only already-bound source references.
 
     Search can disable target reads to respect its explicit root list; it then
@@ -351,7 +360,7 @@ def status(state, *, check_relation_targets=True):
     if check_relation_targets:
         for relation in state.get('series_relations', []):
             try:
-                target = core.load(relation['target_root'])
+                target = core.load(_target_path(root, relation['target_root']))
                 case = next((c for c in _cases(target) if c['id'] == relation['target']['case_id']), None)
                 core.need(case is not None, 'linked case is absent')
                 _validate_case_binding(target, case)
@@ -381,11 +390,11 @@ def _line(value):
     return ' '.join(value.split())
 
 
-def review_markdown(state, public_events):
+def review_markdown(state, public_events, *, root=None):
     """Render only explicit public projections and authored public-use prose."""
     core.need(public_events == _public_events(state),
               'review requires the exact current public event projection')
-    core.need(status(state)['bindings_current'],
+    core.need(status(state, root=root)['bindings_current'],
               'learning case or relation source changed; re-anchor before rendering')
     names = {actor['id']: actor['name'] for actor in state['spec']['actors']}
     parts = ['# ' + _line(state['spec']['title']) + ' · 处境与表达回看',
@@ -458,7 +467,7 @@ def find(roots, query, *, limit=20):
                     continue
                 public = {key: deepcopy(value) for key, value in relation.items() if key != 'target_root'}
                 target = relation['target']
-                target_key = Path(relation['target_root']).resolve().as_posix().casefold()
+                target_key = _target_path(root, relation['target_root']).as_posix().casefold()
                 actual = target_cases.get((target_key, target['case_id']))
                 public['target_binding'] = ('NOT_INCLUDED' if actual is None else
                                              'CURRENT_CASE' if actual == target['case_sha256'] else 'CHANGED_CASE')

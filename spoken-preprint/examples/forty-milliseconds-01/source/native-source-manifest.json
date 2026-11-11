@@ -1,0 +1,476 @@
+{
+  "schema_version": 1,
+  "kind": "english-spoken-preprint-native-sources",
+  "source": {
+    "file": "preprint.json",
+    "baseline_id": "forty-milliseconds-01",
+    "snapshot_sha256": "7212ddebf3a258d1b3434ba73a676838091dd9487f77d744d6cf14c0be96a13f",
+    "source_file_sha256": "66fc50fd9dc55e9abaaba8dca873c21dddfc1e2c2e6210b464a8879e65f4d2f9"
+  },
+  "records": {
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/records01.json": {
+      "path": "records/30f044c3326c55c9dada7ac4b7ef55b380bbdb871bbac59d75e7454217590b6c.json.raw",
+      "sha256": "30f044c3326c55c9dada7ac4b7ef55b380bbdb871bbac59d75e7454217590b6c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-bce50630aa7b4513",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/records01.json": {
+      "path": "records/636aebd855d65a113e1e52d172a49079746bc55abfde6837a488cf67e6c42af3.json.raw",
+      "sha256": "636aebd855d65a113e1e52d172a49079746bc55abfde6837a488cf67e6c42af3",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-bce50630aa7b4513",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/booking01.json": {
+      "path": "records/b1beff5fbfb1a186d56f42d98be5d69d7165efab2b327c12171426919b9eceee.json.raw",
+      "sha256": "b1beff5fbfb1a186d56f42d98be5d69d7165efab2b327c12171426919b9eceee",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-58cb84700eac4f86",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/booking01.json": {
+      "path": "records/be1cb4eabce32dcf0e70e2164c62df980d03590cdf53deabb5e0b3f10cc1811a.json.raw",
+      "sha256": "be1cb4eabce32dcf0e70e2164c62df980d03590cdf53deabb5e0b3f10cc1811a",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-58cb84700eac4f86",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/d-jun01.json": {
+      "path": "records/3ce099d4c863e677083a1ca1496108ac49a484bdc92012b88028e060d5408efa.json.raw",
+      "sha256": "3ce099d4c863e677083a1ca1496108ac49a484bdc92012b88028e060d5408efa",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-022d3fef8892416b",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/d-jun01.json": {
+      "path": "records/d355114a072472412a728693eefd8e6c4623a8f48f64caf668be718b002c10fd.json.raw",
+      "sha256": "d355114a072472412a728693eefd8e6c4623a8f48f64caf668be718b002c10fd",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-022d3fef8892416b",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/d-ruth01.json": {
+      "path": "records/b87a0fa4d49f289093e1205a4145b1b2b2ff5be4c3ee5323315cd595b978b510.json.raw",
+      "sha256": "b87a0fa4d49f289093e1205a4145b1b2b2ff5be4c3ee5323315cd595b978b510",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-b9b4b5133cc14bbd",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/d-ruth01.json": {
+      "path": "records/3e1034930f241c7af6f1f5b803304c55fc8d2be65c212af4e0ff4e45b224afb0.json.raw",
+      "sha256": "3e1034930f241c7af6f1f5b803304c55fc8d2be65c212af4e0ff4e45b224afb0",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-b9b4b5133cc14bbd",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-ruth01.json": {
+      "path": "records/da0e09e5c76515a1344f633445f40c4a006a9b8d57eac42f39c3eea2850b8b97.json.raw",
+      "sha256": "da0e09e5c76515a1344f633445f40c4a006a9b8d57eac42f39c3eea2850b8b97",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-03d52cf234f54dee",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-ruth01.json": {
+      "path": "records/482e55ba3c8ce174e91380fd1cfbc0a5631c2b8beb4f69783a72d68f6423d41d.json.raw",
+      "sha256": "482e55ba3c8ce174e91380fd1cfbc0a5631c2b8beb4f69783a72d68f6423d41d",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-03d52cf234f54dee",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-jun01.json": {
+      "path": "records/4168eb81a4f2d76cf177e5db3147be7712be4773759231a6d72f79e075d0ef19.json.raw",
+      "sha256": "4168eb81a4f2d76cf177e5db3147be7712be4773759231a6d72f79e075d0ef19",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a84b175e8ae8414d",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-jun01.json": {
+      "path": "records/c1887f802e895eb29a2033340bdc75bc0c0e66c543d4e429efe091b7aeac8c35.json.raw",
+      "sha256": "c1887f802e895eb29a2033340bdc75bc0c0e66c543d4e429efe091b7aeac8c35",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a84b175e8ae8414d",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-ruth02.json": {
+      "path": "records/4605077ce475bf66ab8218025d8364552247ad48d9781befa8b9b125fd405595.json.raw",
+      "sha256": "4605077ce475bf66ab8218025d8364552247ad48d9781befa8b9b125fd405595",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-1326e4339968474a",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-ruth02.json": {
+      "path": "records/00b66e6f694a2f3e10a0da94a68d47dd11e20cada4cfd4756fefb5bee9225756.json.raw",
+      "sha256": "00b66e6f694a2f3e10a0da94a68d47dd11e20cada4cfd4756fefb5bee9225756",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-1326e4339968474a",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/d-jun02.json": {
+      "path": "records/593ec9538e125a8b91011cd2132a5127f86d979eaf41e077b848056ff86edbc1.json.raw",
+      "sha256": "593ec9538e125a8b91011cd2132a5127f86d979eaf41e077b848056ff86edbc1",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-c52c3e5a7f694318",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/d-jun02.json": {
+      "path": "records/aff229ccc7d887652a290e8d731de2d9439e408c5cd9fccc495eb68e69783472.json.raw",
+      "sha256": "aff229ccc7d887652a290e8d731de2d9439e408c5cd9fccc495eb68e69783472",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-c52c3e5a7f694318",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-jun02.json": {
+      "path": "records/17fa4e94193a1856fe7a5c8d0ee4cc4297419cb2dd4f90d933bc997b9fe40adf.json.raw",
+      "sha256": "17fa4e94193a1856fe7a5c8d0ee4cc4297419cb2dd4f90d933bc997b9fe40adf",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-3477968f7f3849c9",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-jun02.json": {
+      "path": "records/25a9719824dad85fa3b040a0d7f04e4d24fd5f73daed5c1616da13ed7a0283c0.json.raw",
+      "sha256": "25a9719824dad85fa3b040a0d7f04e4d24fd5f73daed5c1616da13ed7a0283c0",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-3477968f7f3849c9",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-jun03r.json": {
+      "path": "records/c0a9a1192a9df9c6502d636067371a715bb017c0a196cb8c7050f1ed193af211.json.raw",
+      "sha256": "c0a9a1192a9df9c6502d636067371a715bb017c0a196cb8c7050f1ed193af211",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a6f10931b8214bb7",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-jun03r.json": {
+      "path": "records/bec296931fa1a2ebfc3aa163479b2ebe7cf7a652ece86f003d56998821d068e9.json.raw",
+      "sha256": "bec296931fa1a2ebfc3aa163479b2ebe7cf7a652ece86f003d56998821d068e9",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-a6f10931b8214bb7",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-ruth03.json": {
+      "path": "records/15354acbd3f7e5260c60f2e8f3c2f63bfabf3ca53b30844ac45fe55eb99ebaca.json.raw",
+      "sha256": "15354acbd3f7e5260c60f2e8f3c2f63bfabf3ca53b30844ac45fe55eb99ebaca",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7072449186d74880",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-ruth03.json": {
+      "path": "records/afcf8360d658597cb9d0e56586e3ed90d453b160362edffddae9412b4bf99eaf.json.raw",
+      "sha256": "afcf8360d658597cb9d0e56586e3ed90d453b160362edffddae9412b4bf99eaf",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-7072449186d74880",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-jun04.json": {
+      "path": "records/67195ec1d15c9e4d35cfcb6c4ae837e97fa37c0f6600eb1d28dd273162f00eae.json.raw",
+      "sha256": "67195ec1d15c9e4d35cfcb6c4ae837e97fa37c0f6600eb1d28dd273162f00eae",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-88be3b784639484e",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-jun04.json": {
+      "path": "records/449e9c190399d4f717d2411abd14c4316b15626fc70cdeaa8a7b257cf1ca23ec.json.raw",
+      "sha256": "449e9c190399d4f717d2411abd14c4316b15626fc70cdeaa8a7b257cf1ca23ec",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-88be3b784639484e",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-jun05.json": {
+      "path": "records/ceb43750a62c7be018bbcb1277761518eb0d448968c302d8f679f0c60b04385c.json.raw",
+      "sha256": "ceb43750a62c7be018bbcb1277761518eb0d448968c302d8f679f0c60b04385c",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ec2ecdd697bc44b5",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-jun05.json": {
+      "path": "records/80b90344840fbb6df33560e5dad6655c471b4a99ba0039bcef69a2aa481ab032.json.raw",
+      "sha256": "80b90344840fbb6df33560e5dad6655c471b4a99ba0039bcef69a2aa481ab032",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-ec2ecdd697bc44b5",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/d-ruth02.json": {
+      "path": "records/8be9fd594830c20cd6866a79e8500dd0c923a79e7c8011d6819aac8a7753c9d6.json.raw",
+      "sha256": "8be9fd594830c20cd6866a79e8500dd0c923a79e7c8011d6819aac8a7753c9d6",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-cb270a41547c43c8",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/d-ruth02.json": {
+      "path": "records/dd974e3624cdf06c92e42644a8d25bdcc120c9fc81c4bd5461ba5cd3c91241df.json.raw",
+      "sha256": "dd974e3624cdf06c92e42644a8d25bdcc120c9fc81c4bd5461ba5cd3c91241df",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-cb270a41547c43c8",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-ruth04.json": {
+      "path": "records/f3accf0ed4b3cb3f60bb514c2bb36a97e3c91877be8084945811f8c26c2b2b89.json.raw",
+      "sha256": "f3accf0ed4b3cb3f60bb514c2bb36a97e3c91877be8084945811f8c26c2b2b89",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-527f58316d1d4548",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-ruth04.json": {
+      "path": "records/eb5d69c67323cb6aecb00b7baa572f4458e85eaff66e31f37d520210df12a7a4.json.raw",
+      "sha256": "eb5d69c67323cb6aecb00b7baa572f4458e85eaff66e31f37d520210df12a7a4",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-527f58316d1d4548",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/d-jun03.json": {
+      "path": "records/b9e353ddb9f3372ae326ad011d12388ecc5bb7995846a9aeb066094d4d80081e.json.raw",
+      "sha256": "b9e353ddb9f3372ae326ad011d12388ecc5bb7995846a9aeb066094d4d80081e",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d6868d13fdf24fa0",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/d-jun03.json": {
+      "path": "records/edd444acc87bfa6fb0e3c90f71dd676a607eab71ceac706de9a2d3fc5f637ee1.json.raw",
+      "sha256": "edd444acc87bfa6fb0e3c90f71dd676a607eab71ceac706de9a2d3fc5f637ee1",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-d6868d13fdf24fa0",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-jun06.json": {
+      "path": "records/318e98dbbffa906c8596f381c0508ed640199af9113e51b280354720b01969b1.json.raw",
+      "sha256": "318e98dbbffa906c8596f381c0508ed640199af9113e51b280354720b01969b1",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-46fde94d0e29431c",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-jun06.json": {
+      "path": "records/bf212e124372c87ef17716371215b528ffca3a5f32b7f224227a4d687449fea4.json.raw",
+      "sha256": "bf212e124372c87ef17716371215b528ffca3a5f32b7f224227a4d687449fea4",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-46fde94d0e29431c",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/records02.json": {
+      "path": "records/ed741eff320c1fc6377339a5da325f14d9968d0f3356b3ecca4b346723cc7ac7.json.raw",
+      "sha256": "ed741eff320c1fc6377339a5da325f14d9968d0f3356b3ecca4b346723cc7ac7",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-16c5783ac29348dd",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/records02.json": {
+      "path": "records/c3f3251acb6f36eb8cf082d1561ac006844708d72a2fb07dc4024fa3db16b5ff.json.raw",
+      "sha256": "c3f3251acb6f36eb8cf082d1561ac006844708d72a2fb07dc4024fa3db16b5ff",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-16c5783ac29348dd",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/booking02.json": {
+      "path": "records/01d77f5e92d7adabd145637ff6634ab5ac16f92283a4b3cb3cbe2db08d134f32.json.raw",
+      "sha256": "01d77f5e92d7adabd145637ff6634ab5ac16f92283a4b3cb3cbe2db08d134f32",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-32f8addb01e14cbe",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/booking02.json": {
+      "path": "records/e9575f115642863b1d6a3ebb90c18f1a5d8578dc2ebc712987ba791f7a48ee0f.json.raw",
+      "sha256": "e9575f115642863b1d6a3ebb90c18f1a5d8578dc2ebc712987ba791f7a48ee0f",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-32f8addb01e14cbe",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-ruth05.json": {
+      "path": "records/fbd93cd6b4dbf5a4e0a53afe2ced688418a606ea46d6b9c285c1da02d1c7e5ad.json.raw",
+      "sha256": "fbd93cd6b4dbf5a4e0a53afe2ced688418a606ea46d6b9c285c1da02d1c7e5ad",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-27d42c07eb604aa1",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-ruth05.json": {
+      "path": "records/0317b49420c70c3c439749e089deabe0a80e2e0c435967b45ad7bc9e07320942.json.raw",
+      "sha256": "0317b49420c70c3c439749e089deabe0a80e2e0c435967b45ad7bc9e07320942",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-27d42c07eb604aa1",
+          "field": "input_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/raw/m-jun07.json": {
+      "path": "records/81e1c391bc38ec417e81b314ae7a2c13bb98af67c5f4183a1a5746b4ceff6058.json.raw",
+      "sha256": "81e1c391bc38ec417e81b314ae7a2c13bb98af67c5f4183a1a5746b4ceff6058",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-9378d40f4fa142f4",
+          "field": "source_ref"
+        }
+      ]
+    },
+    ".cache/esp-transfer-upgrade-20261111/books/forty-milliseconds-01/inputs/m-jun07.json": {
+      "path": "records/a2822d3a9e60a7d2972104c5cecebaad47f7e85248b2a2f044a76948330a922e.json.raw",
+      "sha256": "a2822d3a9e60a7d2972104c5cecebaad47f7e85248b2a2f044a76948330a922e",
+      "format": "json",
+      "uses": [
+        {
+          "event_id": "e-9378d40f4fa142f4",
+          "field": "input_ref"
+        }
+      ]
+    }
+  },
+  "missing_inputs": [],
+  "limits": "Creator-only selected file archive, not a phone package. Native text and saved packet checks are file consistency checks. Executor strings are operator attribution, not authenticated independent identities or input delivery. Missing inputs are not reconstructed. No hostile filesystem-race guarantee; the manifest does not hash or authenticate itself."
+}

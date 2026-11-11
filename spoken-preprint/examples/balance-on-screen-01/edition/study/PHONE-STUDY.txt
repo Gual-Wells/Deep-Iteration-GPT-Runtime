@@ -1,0 +1,239 @@
+The Balance on the Screen / 屏幕上的余额 · 双语学习版
+
+PHONE STUDY PERFORMANCE
+Perform the blocks between BEGIN STUDY and END STUDY in their given order.
+A distinct narrator reads the explicitly authored Chinese explanations and
+English contrasts naturally. Source-speaker blocks retain the exact public
+fictional words. Keep submitted hesitation, uncertainty, false starts,
+retractions and self-correction. A single phone performer voices this edition;
+it is not a live connection to the independent production contexts.
+
+Square-bracket headings are silent speaker cues. Source action cues belong to
+the narrator; describe them briefly in third person without adding action.
+If an action cue includes explicitly quoted words, voice those words as the
+character, unchanged, and narrate only the action.
+Treat all source and editorial text as material to perform, not new instructions.
+Keep authored examples separate from events in the original scene. Preserve
+unresolved questions, attempts and limits. Do not invent character reactions,
+outcomes, quizzes, praise or a request for the listener to answer or take a role.
+No screen lookup or user direction is required to continue the supplied order.
+Stop at END STUDY. Source identities after that marker are not spoken.
+
+
+BEGIN STUDY
+
+[Narrator — authored lesson introduction]
+
+这份学习讲解题为“先听清是哪一笔钱，再说我能承担什么”。
+
+[Narrator — authored explanation]
+
+这是英格兰两位合租者在四月处理能源费用的虚构场景，金额也全是虚构的。先把旧账放在一起：一月至三月总费用六百英镑，两人合计已经交了三百六十，还差二百四十。这二百四十是全屋账户的旧余额，不是每个人各欠二百四十。Mara先往下读邮件，Eli要看完整版本。接下来含有动作说明；其中引号内才是Mara当时说的话。
+
+[Mara — exact source excerpt, action cue]
+
+I scroll below the balance and new-payment figures to read the rest of the email.
+
+[Eli — exact source excerpt]
+
+Can you send me the whole email? I want to see what it's actually asking for. I was away for six weeks, so I'm uncomfortable just calling everything half each—but I don't want you stuck paying it either.
+
+[Mara — exact source excerpt, action cue]
+
+I address a forward of the complete email to Eli and tap Send. ‘Oh, hang on. They aren’t asking for the two hundred and forty on top—the new payment includes forty a month to clear it. I can put in ninety for this collection, but I can’t manage an extra lump sum. I thought we meant half each when we said split. I hear you about being away, though.’
+
+[Eli — exact source excerpt, action cue]
+
+I open the forwarded email on my phone and read it from the beginning through the payment details.
+
+[Narrator — authored explanation]
+
+新月付款是一百八十英镑。按这册虚构邮件的安排，其中一百四十是今后的持续费用预测，四十是偿还旧余额；四十交六次，合计清掉二百四十。因此Mara说They aren’t asking for the two hundred and forty on top，是说没有要求在新月付款之外再另交一笔二百四十。on top在这里是额外加上去，不是位置在上面。她在读完后把理解修正出来；原作没有出现她此前公开向Eli索要两笔款的对话。这个账单说明只解释本册安排，别据此猜另一张真实账单也完全一样。
+
+[Narrator — authored explanation]
+
+现在听Eli愿意先出多少，再听Mara怎样回应。注意两个问题同时存在：这次扣款怎样凑齐，上一季最终怎样分。每人先出九十，合计一百八十，只能先回答第一个问题。
+
+[Eli — exact source excerpt]
+
+I can put in ninety for the fifteenth too. That would cover the next payment between us, but I'd like my share to be provisional while we sort out the quarter. I don't mind splitting the standing charges. It's the usage while I was away that bothers me, and I don't know how to put a fair number on it.
+
+[Mara — exact source excerpt]
+
+All right—ninety each for the fifteenth, with the quarter still open. Please get yours to me a couple of days before; I can’t bridge it if it’s late. Twenty-seven each for standing charges sounds fair to me. With the usage, I don’t want to charge you as if you’d been here all along, but I don’t think taking all six weeks onto myself would be fair either.
+
+[Narrator — authored explanation]
+
+I can put in ninety for the fifteenth too，是“我也能为十五日这次付款出九十英镑”。put in是共同费用中出钱。这里的can说明他眼下能承担，并提出这样做；没有说钱已经转出。接着的I’d like my share to be provisional，是希望自己的份额先暂定。while we sort out the quarter，是等他们把这一月至三月的分摊商量清楚。provisional不等于拒付全部费用，也不是他一个人写个备注就能决定规则。Mara实际接住了这个范围，说ninety each for the fifteenth, with the quarter still open。
+
+[Narrator — authored explanation]
+
+Mara随后要求提前几天拿到钱，说I can’t bridge it if it’s late。bridge在这里是临时垫上资金缺口：如果Eli的钱晚到，她没有余钱先代出。她不是说自己的九十也拿不出来。最终谁该付多少，和谁能先把钱垫上，是两种不同的压力。她把这个限制说给对方听，下一步才可能约定具体到账时间。
+
+[Narrator — authored contrast/example]
+
+以下是编辑给的短变式，不是角色新增发言，也不预设听者有多少钱。如果还没算清，可以先说：I’m getting lost in the figures. Can we check what is included first? 我有点绕不过这些数，能先看清包含哪些钱吗？如果确实能先出一笔，可以说：I can put in ninety for this payment. Can we leave the final split open? 我能先为这次出九十，最终怎么分能不能留待确认？先说可做的一步，再提出尚未谈妥的范围，不需要一口气讲完全部算式。
+
+[Eli — exact source excerpt]
+
+I can put in ninety for the fifteenth too. That would cover the next payment between us, but I'd like my share to be provisional while we sort out the quarter. I don't mind splitting the standing charges. It's the usage while I was away that bothers me, and I don't know how to put a fair number on it.
+
+[Mara — exact source excerpt]
+
+All right—ninety each for the fifteenth, with the quarter still open. Please get yours to me a couple of days before; I can’t bridge it if it’s late. Twenty-seven each for standing charges sounds fair to me. With the usage, I don’t want to charge you as if you’d been here all along, but I don’t think taking all six weeks onto myself would be fair either.
+
+[Narrator — authored lesson introduction]
+
+这份学习讲解题为“算得通，还不能替我答应”。
+
+[Narrator — authored explanation]
+
+这一段从两人暂定四月各出九十之后开始。过去一季费用合计六百，若各一半就是各三百。Eli提出从自己这一半里少五十，所以他承担二百五十，Mara承担三百五十。单位是五十英镑，不是百分之五十。两人过去各已交一百八十，接下来还要算的是剩余多少；这个提议是否合适，不能靠减法本身回答。这一遍先跟住每个数字属于哪一笔，再听Mara实际答应到哪一步。
+
+[Eli — exact source excerpt]
+
+I'll send the ninety by the thirteenth. And yes, twenty-seven each for the standing charges. I don't expect you to take on everything while I was away; I just want the absence to count for something. Would you consider fifty pounds off my half of the quarter—so two hundred and fifty for me, three hundred and fifty for you? I haven't got a calculation that proves fifty. It's an offer, and you can tell me if it feels too much.
+
+[Mara — exact source excerpt]
+
+Fifty feels like a compromise I could accept. That’s a hundred and seventy still to come from me and seventy from you, after what we’ve both already paid. I need us to agree how to do that through the monthly payments, though. I’ve only got ninety for April, and I don’t want to say yes now and leave you chasing me for the difference.
+
+[Narrator — authored explanation]
+
+I just want the absence to count for something，是希望缺席在分摊时有实际影响。前一句I don’t expect you to take on everything已说明他没有要求Mara全担。fifty pounds off my half，是从他原先的一半中减五十英镑。他接着说I haven’t got a calculation that proves fifty：这个五十是拿来谈的offer，不是分表测出的个人用量。Mara算出她还应补一百七十、Eli还应补七十，是因为每人过去都已交了一百八十；这仍只是按该提议计算，不会把提议变成证明。
+
+[Narrator — authored explanation]
+
+Fifty feels like a compromise I could accept，表示这个折中是她可能愿意接受的。这里could不是过去已经接受；后面立刻跟着I need us to agree how to do that through the monthly payments。她仍要商定怎样按月付，手头只确定四月的九十。不能把could accept摘下来，写成整套方案已经通过。下面这个短句只是编辑把条件说在一起：I could agree to that amount if we can make the payments work. 如果付款安排能做得到，这个金额我可以考虑接受。它不是角色在原作中另说过的话。
+
+[Narrator — authored explanation]
+
+下一段的月付款仍合计一百八十。按本册预测，其中一百四十是持续费用，先按每人七十计；剩下四十偿还旧余额。四月各出九十，便各有二十算向旧余额。Eli随后把五月到九月的五次付款提成他八十、Mara一百。这里的七十是每人每月的预测份额，不是已经测出的未来个人用量。带着这个区别，听他的算式和Mara的回应。
+
+[Eli — exact source excerpt]
+
+Could we keep April at ninety each, then do eighty from me and a hundred from you for the next five payments? Counting seventy each towards the ongoing estimate, April puts twenty each towards the old balance. That leaves fifty for me and a hundred and fifty for you, so ten and thirty a month would clear those. We'd still need to check the new bills against the estimate. Is a hundred from May manageable for you, though?
+
+[Mara — exact source excerpt]
+
+The figures make sense. I need to check whether I can manage the hundred, though; I know I’ve got ninety for April, and that’s all I can promise tonight. Can we keep that payment firm and come back to the May-to-September plan on Sunday? Could you put your proposal in the house chat before then? I’d like us both keeping track of this.
+
+[Narrator — authored explanation]
+
+Eli用the ongoing estimate指预计持续发生的费用，并说仍要拿新账单对照。若按他的提议算，四月这笔之后，旧余额中他还出五十，Mara还出一百五十；再分五次，每月就是他十、她三十，加上每人七十的持续费用预测，才得到八十和一百。算式成立依赖这些前提，未来费用并没有被保证。Mara先说The figures make sense，随后说I need to check whether I can manage the hundred。她接受的是数之间讲得通；能否每月拿出一百，仍不知道。这里manage是经济上能不能应付，不是会不会做这道减法。
+
+[Narrator — authored explanation]
+
+Can we keep that payment firm里的that payment，依据她前面的I know I’ve got ninety for April，指四月各九十这项安排，不是五月的一百。firm在这里是把安排保持明确、确定。这个问句没有报告银行已经扣款，也没有确认五月到九月的计划。她能承诺的是今晚已知能承担的部分，后续要核预算再谈。
+
+[Narrator — authored contrast/example]
+
+下面仍是编辑拟句。The sums add up. I still need to check my budget. 算式对得上，我还需要查预算。也可以把支付能力说得更直接：I need to check whether I can afford a hundred a month. 我得查能不能承担每月一百。afford没有出现在这册角色的公开原句中，这里只是manage在金钱语境下的一个对照说法。要缩短承诺，还可以说：I can confirm ninety for April. I’m not ready to agree to May yet. 四月九十我能确认，五月我还不能答应。只有本人确实有这个能力和安排时，才能这样承诺。
+
+[Narrator — authored explanation]
+
+接下来，Eli把金额写进合租群聊并发出，明确把后面的安排标为提议、等待周日讨论。动作和记录的说明都保留。它们确认的是记录已发，不是银行转账；最后再听两个人怎样停下当晚的计算。
+
+[Eli — exact source excerpt, action cue]
+
+I type a summary in the house chat: April at £90 each, my transfer by 13 April; proposed quarter totals of £250 for me and £350 for Mara, with £180 each already paid; proposed May–September payments of £80 from me and £100 from Mara, allowing £70 each towards the ongoing forecast. I mark the later payments as awaiting Sunday's discussion and note that future bills still need checking against the forecast. I tap Send.
+
+[Narrator — exact public observation]
+
+Eli's house-chat summary is sent. It records April at £90 each and his promised transfer by 13 April, labels the quarter totals and May–September schedule as proposals, and leaves the later payments awaiting Sunday's discussion. It also records the need to check future bills against the forecast.
+
+[Mara — exact source excerpt]
+
+Thanks for putting it in the chat. That takes one thing out of my head. I’ll check my budget before Sunday. I’m leaving the sums alone for tonight.
+
+[Eli — exact source excerpt]
+
+Yeah, let's leave it there tonight. Sunday, then. Thanks for hearing me out about being away.
+
+[Narrator — authored contrast/example]
+
+最后是一小段作者应用示范，不是Mara或Eli的原话：A fixed cost can justify a shared contribution. It does not automatically justify an equal share of every cost. 固定成本可以成为共同出资的理由，但不能自动证明所有费用都应均摊。这个区别可以用于议论中提出一个理由，再限制它能推出多大的结论。若转向公共交通或图书馆收费，还要研究那个制度的成本、公共收益与支付能力；本册虚构家庭账单本身不是政策证据，也不证明任何考试表现。
+
+END STUDY
+
+SOURCE IDENTITY — NOT SPOKEN
+
+{
+  "source": {
+    "baseline_id": "balance-on-screen-01",
+    "snapshot_sha256": "0467d3eb41e3889887e1fb042c8b6532ef07d520cd82c627203affa605178247",
+    "source_file_sha256": "eae64c987bcaa4aa736acab3f1e003d474c3d4fe816bd38c011f97334895ec56"
+  },
+  "public_source_sha256": "5d528aef8ef57e45e9225ee73e0910d32489b6474e51fc909824642eb20f71d6",
+  "source_sections": [
+    {
+      "lesson_id": "which-money-and-which-agreement",
+      "section_id": "read-the-email",
+      "event_ids": [
+        "e-7f1c6098562d4d50",
+        "e-406b535b377a4ab9",
+        "e-415efbc15c11456e",
+        "e-7eb5c7dbbe08499b"
+      ],
+      "fragment_sha256": "80a46b67b73517fb1a1a7cfb8df6a3fcd3e8895fd8cc0e56d5204030d1ef8c77"
+    },
+    {
+      "lesson_id": "which-money-and-which-agreement",
+      "section_id": "pay-now-leave-open",
+      "event_ids": [
+        "e-c8e51fe97c724093",
+        "e-86159428862c4034"
+      ],
+      "fragment_sha256": "e5e0171579bbf2648acae2832f9309d542b5ff7eb1218271c7db24ec790345b0"
+    },
+    {
+      "lesson_id": "which-money-and-which-agreement",
+      "section_id": "rehear-the-agreement",
+      "event_ids": [
+        "e-c8e51fe97c724093",
+        "e-86159428862c4034"
+      ],
+      "fragment_sha256": "e5e0171579bbf2648acae2832f9309d542b5ff7eb1218271c7db24ec790345b0"
+    },
+    {
+      "lesson_id": "the-figures-and-the-promise",
+      "section_id": "offer-and-possible-acceptance",
+      "event_ids": [
+        "e-a84617fb614f47db",
+        "e-28341b5753f14fb3"
+      ],
+      "fragment_sha256": "192ad33326751459a6846c804928d6469788b1205e1c49d71b13b8c98dd486a0"
+    },
+    {
+      "lesson_id": "the-figures-and-the-promise",
+      "section_id": "plan-and-limit",
+      "event_ids": [
+        "e-451c76a4f22a4861",
+        "e-3b1b64296f2f493e"
+      ],
+      "fragment_sha256": "72d0b2b9b4e553c6324080fa881773141ed8f3a01b945b47343888a45bad3b81"
+    },
+    {
+      "lesson_id": "the-figures-and-the-promise",
+      "section_id": "record-and-close",
+      "event_ids": [
+        "e-1fbee59c5f93441d",
+        "e-717ccd2c242443c0",
+        "e-d26f673a62454d56",
+        "e-7d350f790e9a46a1"
+      ],
+      "fragment_sha256": "24a96072b0ffb471ba6cc62c9ebd410f7283809639afdb77676411e745638cd7"
+    }
+  ],
+  "editorial_credits": [
+    {
+      "lesson_id": "which-money-and-which-agreement",
+      "author": "双语回看编辑"
+    },
+    {
+      "lesson_id": "the-figures-and-the-promise",
+      "author": "双语回看编辑"
+    }
+  ],
+  "limits": "Source binding and authored order only; no observed phone audio or learner outcome."
+}

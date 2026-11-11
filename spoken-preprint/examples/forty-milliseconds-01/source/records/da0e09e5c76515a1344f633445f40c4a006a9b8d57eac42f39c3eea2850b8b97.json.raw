@@ -1,0 +1,5 @@
+{
+  "kind": "speech",
+  "text": "Your card says cold start takes forty milliseconds. Walk me through one measurement: what state was the app in, and exactly where did you start and stop the timer?",
+  "actual_native_return": "Your card says cold start takes forty milliseconds. Walk me through one measurement: what state was the app in, and exactly where did you start and stop the timer?"
+}

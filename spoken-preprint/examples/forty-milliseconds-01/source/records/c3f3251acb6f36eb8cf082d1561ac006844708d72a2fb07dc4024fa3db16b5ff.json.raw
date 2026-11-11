@@ -1,0 +1,99 @@
+{
+  "packet_sha256": "ea9841ec5851be5eadb29159b71017219df9370ad0b3fcb9f65e03139c65638f",
+  "view": {
+    "director": {
+      "id": "records",
+      "interest": "Frozen evidence and attempts to obtain new measurement",
+      "reads": [
+        "fixture",
+        "new_measurements"
+      ],
+      "writes": []
+    },
+    "scene": "A fictional English technical interview for an on-device inference internship. Jun has put a small Android classifier app on a project card. Ruth, the mobile runtime engineer interviewing him, has that card in front of her. The card says “Cold start: 40 ms”. They have a short review slot, the device is not connected for new tests, and any project records they consult are explicitly fictional. No hiring outcome is set.",
+    "world": {
+      "fixture": {
+        "card_claim": "cold start40ms",
+        "forward_ms": 40,
+        "process_to_display_ms": 210,
+        "model_ready_ms": 150,
+        "team_target_ms": 180,
+        "trace_identity": "one invented launch",
+        "new_test_available": false
+      },
+      "new_measurements": 0
+    },
+    "public_events": [
+      {
+        "id": "e-03d52cf234f54dee",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "Your card says cold start takes forty milliseconds. Walk me through one measurement: what state was the app in, and exactly where did you start and stop the timer?"
+      },
+      {
+        "id": "e-a84b175e8ae8414d",
+        "kind": "speech",
+        "actor": "jun",
+        "text": "I'd closed the activity screen and then opened it again. I thought that was a cold start because the classification had to appear again. I didn't kill the process separately, though. For the exact timer calls, I'd like to check the wrapper—I reused that part."
+      },
+      {
+        "id": "e-1326e4339968474a",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "Reopening the activity doesn't establish a fresh process. Let's look at the wrapper, then. Show me where the clock starts and stops, and any saved output behind that forty-millisecond figure."
+      },
+      {
+        "id": "e-3477968f7f3849c9",
+        "kind": "action",
+        "actor": "jun",
+        "text": "I open the timer wrapper and the saved demo trace side by side."
+      },
+      {
+        "id": "e-a6f10931b8214bb7",
+        "kind": "speech",
+        "actor": "jun",
+        "text": "Ah—the timer starts after model loading and frame preparation, just before forward, and stops when forward returns. So forty is the forward call. I can't call that cold start. The saved trace puts the displayed result at 210 milliseconds from process launch. That's one launch, though. I need to correct the card."
+      },
+      {
+        "id": "e-7072449186d74880",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "Please correct the card before we finish. Our target is a displayed result within 180 milliseconds of a fresh process launch. What can this saved trace tell you about where to investigate first?"
+      },
+      {
+        "id": "e-88be3b784639484e",
+        "kind": "action",
+        "actor": "jun",
+        "text": "I cross out the cold-start claim on my card and write the two timings from this single saved launch: 40 ms for the forward call and 210 ms from process launch to the first displayed result."
+      },
+      {
+        "id": "e-ec2ecdd697bc44b5",
+        "kind": "speech",
+        "actor": "jun",
+        "text": "I'd investigate the first 150 milliseconds, before forward. That's most of the wait, but the trace doesn't tell me how much is model loading versus other startup work. I'd split that up before choosing a fix. Just removing the twenty milliseconds after forward still leaves this run at 190, over your target."
+      },
+      {
+        "id": "e-527f58316d1d4548",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "One last clarification: the card lists a timing wrapper, and you said you reused it. What did you write or change yourself in that wrapper and the Android integration?"
+      },
+      {
+        "id": "e-46fde94d0e29431c",
+        "kind": "speech",
+        "actor": "jun",
+        "text": "The frame capture, the runtime-call adapter, and the small output and timing screen were mine. The wrapper was reused. I can't point to a specific change I made inside it, so I shouldn't list it as something I wrote. My teammate supplied the classifier and runner. I was proud of getting those pieces working together—that's what I should have put forward."
+      }
+    ],
+    "instruction": "Propose or refrain. Affect situations and perceived events, not another participant private mind. Do not write other characters dialogue.",
+    "territory": {
+      "writes": [],
+      "frozen_keys": [
+        "fixture",
+        "new_measurements",
+        "slot"
+      ],
+      "scope": "Domain-authorized present consequences; cannot rewrite important history or another private mind."
+    }
+  }
+}

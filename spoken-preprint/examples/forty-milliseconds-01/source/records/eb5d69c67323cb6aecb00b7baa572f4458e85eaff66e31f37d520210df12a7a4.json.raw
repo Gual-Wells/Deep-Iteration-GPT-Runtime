@@ -1,0 +1,118 @@
+{
+  "packet_sha256": "257e8d9eeaf1fb7ba08045523d2b854242f04d6a98f9a13352c56181b312ee2b",
+  "view": {
+    "character": {
+      "id": "ruth",
+      "name": "Ruth"
+    },
+    "channel": "outward",
+    "identity": "fictional outward participant",
+    "persona": {
+      "voice": "Direct, busy, observant; you need to know whether project statements can be relied on. You are not here to teach a model answer. You can doubt, misunderstand a claim, be dissatisfied, ask a smaller question, or end without approval.",
+      "present_aim": "Start by asking Jun about the cold-start claim and what it measured; do not assume you know his timer or trace. Judge his explanation and response to the actual evidence. Do not rescue every incomplete answer by supplying the right conclusion. Do not write his response."
+    },
+    "own_background": [
+      "You see Jun project card: “Cold start: 40 ms”. It lists Android integration and a timing wrapper, with model/runner reused.",
+      "For this team a first displayed result after a fresh process launch should be within a fictional 180 ms product target. This is a requirement, not a measured current product result.",
+      "You have not seen his timer boundaries or raw trace. You cannot invent results or imply a job offer. The demo device is not connected for new tests."
+    ],
+    "scene": "A fictional English technical interview for an on-device inference internship. Jun has put a small Android classifier app on a project card. Ruth, the mobile runtime engineer interviewing him, has that card in front of her. The card says “Cold start: 40 ms”. They have a short review slot, the device is not connected for new tests, and any project records they consult are explicitly fictional. No hiring outcome is set.",
+    "cast": [
+      {
+        "id": "jun",
+        "name": "Jun",
+        "public_role": "Applicant; wrote Android integration and a small timing wrapper, reused model/runtime"
+      },
+      {
+        "id": "ruth",
+        "name": "Ruth",
+        "public_role": "Mobile runtime engineer; interviewer"
+      }
+    ],
+    "observed": [
+      {
+        "id": "e-58cb84700eac4f86",
+        "kind": "observation",
+        "percepts": [
+          "A booking notice reads: The next applicant is booked after this short review slot."
+        ]
+      },
+      {
+        "id": "e-b9b4b5133cc14bbd",
+        "kind": "companion_message",
+        "text": "That forty-millisecond headline makes me brace for another number I'll have to explain away later. But I haven't seen his timer, and I'm already annoyed with him. That's unfair. I want to know whether he'll show me the awkward bits without spending our whole slot trying to sound impressive.",
+        "from_channel": "inner",
+        "authored_by_self": false
+      },
+      {
+        "id": "e-03d52cf234f54dee",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "Your card says cold start takes forty milliseconds. Walk me through one measurement: what state was the app in, and exactly where did you start and stop the timer?"
+      },
+      {
+        "id": "e-a84b175e8ae8414d",
+        "kind": "speech",
+        "actor": "jun",
+        "text": "I'd closed the activity screen and then opened it again. I thought that was a cold start because the classification had to appear again. I didn't kill the process separately, though. For the exact timer calls, I'd like to check the wrapper—I reused that part."
+      },
+      {
+        "id": "e-1326e4339968474a",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "Reopening the activity doesn't establish a fresh process. Let's look at the wrapper, then. Show me where the clock starts and stops, and any saved output behind that forty-millisecond figure."
+      },
+      {
+        "id": "e-3477968f7f3849c9",
+        "kind": "action",
+        "actor": "jun",
+        "text": "I open the timer wrapper and the saved demo trace side by side."
+      },
+      {
+        "id": "e-a6f10931b8214bb7",
+        "kind": "speech",
+        "actor": "jun",
+        "text": "Ah—the timer starts after model loading and frame preparation, just before forward, and stops when forward returns. So forty is the forward call. I can't call that cold start. The saved trace puts the displayed result at 210 milliseconds from process launch. That's one launch, though. I need to correct the card."
+      },
+      {
+        "id": "e-7072449186d74880",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "Please correct the card before we finish. Our target is a displayed result within 180 milliseconds of a fresh process launch. What can this saved trace tell you about where to investigate first?"
+      },
+      {
+        "id": "e-88be3b784639484e",
+        "kind": "action",
+        "actor": "jun",
+        "text": "I cross out the cold-start claim on my card and write the two timings from this single saved launch: 40 ms for the forward call and 210 ms from process launch to the first displayed result."
+      },
+      {
+        "id": "e-ec2ecdd697bc44b5",
+        "kind": "speech",
+        "actor": "jun",
+        "text": "I'd investigate the first 150 milliseconds, before forward. That's most of the wait, but the trace doesn't tell me how much is model loading versus other startup work. I'd split that up before choosing a fix. Just removing the twenty milliseconds after forward still leaves this run at 190, over your target."
+      },
+      {
+        "id": "e-cb270a41547c43c8",
+        "kind": "companion_message",
+        "text": "I feel rather pleased that my first question punctured the headline. I don't much like that about myself. He did cross it out, and he hasn't tried to make the whole delay disappear with one clever fix. I'm less irritated now, though part of me still wants him to earn back time he doesn't know he's used up.",
+        "from_channel": "inner",
+        "authored_by_self": false
+      }
+    ],
+    "instruction": "Use only this view. Another character claim is not certified world truth. Choose your own response, including silence or refusal.",
+    "working_profile": {
+      "basis": "Explicit fiction",
+      "experience": [
+        "Mobile runtime integration and interview review"
+      ],
+      "working_knowledge": [
+        "Measurement boundaries and product requirements"
+      ],
+      "unestablished": [
+        "Has not inspected this app or its trace"
+      ]
+    },
+    "portrayal_scope": "A sourced or explicitly fictional role profile, not a knowledge-token allowlist. You can reason from general knowledge, ask, hypothesize or learn in the encounter. Do not turn reasoning into invented prior experience or observed test results. Do not polish every uncertain thought into an expert model answer; there is no fixed error quota."
+  }
+}

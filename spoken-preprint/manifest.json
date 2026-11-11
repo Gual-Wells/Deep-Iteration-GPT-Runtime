@@ -6,13 +6,15 @@
   "entry": "spoken-preprint/README.md",
   "skill": ".agents/skills/digr-spoken-preprint/SKILL.md",
   "cli": "tools/codex.py preprint",
-  "data_schema": 1,
+  "data_schema": 2,
+  "readable_data_schemas": [1,2],
+  "export_and_source_archive_manifest_schema": 1,
   "actions": {
     "generate": {"requires": ["actual native independent contexts", "controlled character views", "source workspace", "Python 3.10+"]},
     "publish_verify": {"requires": ["valid source snapshot", "Python 3.10+ standard library"]},
     "listen_on_phone": {"requires": ["frontstage phone package", "host capable of reading files and actual voice enactment"]}
   },
   "optional_relations": {"voice-companion": "separately requested voice help", "paper-knowledge": "source/use/evidence design reference; no private pool import", "personal-context": "optional selected current source capsule per book/role; private publication"},
-  "core": {"relationship": "adjunct; no routing or execution authority", "construction_profile": "0.8.0@ca5d6083edb0f60c8167ba16a78d45970d68c3fd"},
+  "core": {"relationship": "adjunct; no routing or execution authority", "construction_profile": "0.8.0@314e513d439829fa1159e6801d1421ed1e569e0a", "initial_release_profile": "0.8.0@ca5d6083edb0f60c8167ba16a78d45970d68c3fd"},
   "capability_note": "Requirements are declarations, not host detection or mobile verification."
 }

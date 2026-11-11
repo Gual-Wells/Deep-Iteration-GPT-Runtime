@@ -1,0 +1,7 @@
+{
+  "decision": "retain",
+  "proposal": "Retain the current booking notice and issue no additional notification.",
+  "reason": "The current notice still states the established schedule. The supplied events establish no change to that booking or elapsed story time that would justify a stronger reminder. Repeating it would add an interruption without adding information.",
+  "changes": {},
+  "percepts": []
+}

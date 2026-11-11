@@ -2,6 +2,8 @@
 
 人物仍能推理、试探、误会和学习；个人经历和实际结果不能由一句话补造。ESP 的 U0/D/V 是创作身份，不充抵正式 DIGR 责任。
 
+0.2新书使用源schema 2，旧写入器必须拒绝。旧schema 1可读且不因读取被改写；`preprint upgrade-source --root <book> --expected-revision <R> --operation-id <id>`显式升级。向旧源写入新机制时也会晋级并在receipt记迁移，出版新机制前必须为2。旧原生快照保留历史，迁移不重写其对白。导出与来源归档的清单schema仍为1，与源格式分别版本化。
+
 可选 actor `working_profile` 保存 basis、experience、working_knowledge、unestablished 字符串列表。这是有来源或明确虚构的角色描写，**不是知识白名单**。未知不意味着不会；推理不能变成未曾做过的测试。
 
 actor `materials` 是 mid→{title,text,origin,access} 对象。access 默认 self；world 通过 access_key 的值 available 控制。packet 先给标题和状态，真实 outward speech/action 的 `reads:[mid]` 记录后才提供文本，不可用只返回 UNAVAILABLE。他人拿不到本人读取结果；材料离线不抹除先前交付内容。工具证明文本提供，不能证明模型认真读过。

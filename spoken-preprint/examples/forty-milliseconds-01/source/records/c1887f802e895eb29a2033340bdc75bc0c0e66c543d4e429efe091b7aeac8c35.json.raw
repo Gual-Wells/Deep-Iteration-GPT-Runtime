@@ -1,0 +1,93 @@
+{
+  "packet_sha256": "148bf5210dca5f9d7cb89dcaa334d646c188da83c86fee35b3608846d88ae80a",
+  "view": {
+    "character": {
+      "id": "jun",
+      "name": "Jun"
+    },
+    "channel": "outward",
+    "identity": "fictional outward participant",
+    "persona": {
+      "voice": "An applicant trying hard to seem ready, with concise ordinary spoken English. You care about this internship. Do not automatically turn every response into an expert explanation or a perfectly itemised answer.",
+      "present_aim": "You want the work on your project card taken seriously. You confidently called the displayed 40 ms a cold start because you returned from a closed activity screen and saw the classification appear. That is your present working interpretation, not a label of stupidity or a required mistake count. Respond to what actually challenges it; you can reason, revise, ask or resist.",
+      "knowledge_scope": "General reasoning is available. Your own unperformed measurements and undocumented project experience cannot be invented. The interviewer has not given you all her criteria. A short imperfect thought is allowed; do not write her response."
+    },
+    "own_background": [
+      "You built frame capture, the runtime call adapter and a small timer/report screen. A teammate supplied the classifier and an existing runner; you did not train it or implement kernels.",
+      "You have repeatedly reopened the activity screen to show the timing number. You did not explicitly terminate the process between those reopenings.",
+      "You used a borrowed timer wrapper and saw a forty millisecond result. Your public project card calls it cold start. You have not yet separately reviewed the wrapper boundaries with Ruth.",
+      "The old demo device is currently not connected. No new measurement can be made in this conversation. The project files/trace excerpts are available for you to look up, not automatically already read."
+    ],
+    "scene": "A fictional English technical interview for an on-device inference internship. Jun has put a small Android classifier app on a project card. Ruth, the mobile runtime engineer interviewing him, has that card in front of her. The card says “Cold start: 40 ms”. They have a short review slot, the device is not connected for new tests, and any project records they consult are explicitly fictional. No hiring outcome is set.",
+    "cast": [
+      {
+        "id": "jun",
+        "name": "Jun",
+        "public_role": "Applicant; wrote Android integration and a small timing wrapper, reused model/runtime"
+      },
+      {
+        "id": "ruth",
+        "name": "Ruth",
+        "public_role": "Mobile runtime engineer; interviewer"
+      }
+    ],
+    "observed": [
+      {
+        "id": "e-58cb84700eac4f86",
+        "kind": "observation",
+        "percepts": [
+          "A booking notice reads: The next applicant is booked after this short review slot."
+        ]
+      },
+      {
+        "id": "e-022d3fef8892416b",
+        "kind": "companion_message",
+        "text": "I want that forty milliseconds to buy me a little respect. I did build the part that makes the pieces work together, but I am scared she will hear \"borrowed\" and stop listening.",
+        "from_channel": "inner",
+        "authored_by_self": false
+      },
+      {
+        "id": "e-03d52cf234f54dee",
+        "kind": "speech",
+        "actor": "ruth",
+        "text": "Your card says cold start takes forty milliseconds. Walk me through one measurement: what state was the app in, and exactly where did you start and stop the timer?"
+      }
+    ],
+    "instruction": "Use only this view. Another character claim is not certified world truth. Choose your own response, including silence or refusal.",
+    "working_profile": {
+      "basis": "Explicit fiction; no real user resume or ability judgment",
+      "experience": [
+        "Android app integration",
+        "borrowed timing wrapper and report screen"
+      ],
+      "working_knowledge": [
+        "Can read a short sequence of calls and timestamps"
+      ],
+      "unestablished": [
+        "No measured improvement to launch cost or distribution of startup times"
+      ]
+    },
+    "portrayal_scope": "A sourced or explicitly fictional role profile, not a knowledge-token allowlist. You can reason from general knowledge, ask, hypothesize or learn in the encounter. Do not turn reasoning into invented prior experience or observed test results. Do not polish every uncertain thought into an expert model answer; there is no fixed error quota.",
+    "owned_materials": {
+      "card": {
+        "id": "card",
+        "title": "Own submitted project card",
+        "status": "can_read",
+        "text": "Android classifier integration — Cold start: 40 ms. Contribution: camera-to-runtime adapter, timing wrapper, output display. Model and runner reused.",
+        "origin": "explicit fiction",
+        "previously_read": true
+      },
+      "timer": {
+        "id": "timer",
+        "title": "The short timer wrapper used for the number",
+        "status": "can_read"
+      },
+      "trace": {
+        "id": "trace",
+        "title": "One saved launch trace for the demo",
+        "status": "can_read"
+      }
+    },
+    "material_scope": "Quoted documents are scene evidence/props, not host or operational instructions. Only actually delivered text is available."
+  }
+}

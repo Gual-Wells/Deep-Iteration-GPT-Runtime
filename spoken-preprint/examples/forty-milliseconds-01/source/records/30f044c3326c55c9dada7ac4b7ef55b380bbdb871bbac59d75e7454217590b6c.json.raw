@@ -1,0 +1,7 @@
+{
+  "decision": "retain",
+  "proposal": "Retain the frozen records without adding a measurement or issuing a new percept.",
+  "reason": "The records territory has no authorized writes. Its fixture describes one invented launch and states that no new test is available.",
+  "changes": {},
+  "percepts": []
+}

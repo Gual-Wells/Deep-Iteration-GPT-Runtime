@@ -1,0 +1,69 @@
+{
+  "packet_sha256": "fb9264cfa9cf4808af4d08b2b2f5dfe0a8682a1b0129a5035b4f30f2142cad19",
+  "view": {
+    "director": {
+      "id": "booking",
+      "domain": "Interview booking, external scheduling and the team's existing UI handoff requirement. No root-cause information, console computations, private minds or hiring decisions.",
+      "reads": [
+        "booking_context",
+        "ui_contract",
+        "booking_phase",
+        "next_booking_notice"
+      ],
+      "writes": [
+        "booking_phase",
+        "next_booking_notice"
+      ]
+    },
+    "scene": "A technical video interview for an on-device inference software internship at a fictional mobile-app team. Nora, the applicant, is sharing a small Android inference integration patch and a saved two-frame history. Sam, a runtime engineer, is interviewing her. The history shows the same tag beside two different captured objects. Nora has brought a native-runner reference and a short patch excerpt. A reserved diagnostic console can replay this small fixture during the interview; no new test has run in this encounter and no selection decision has been made.",
+    "world": {
+      "booking_context": "A short technical interview block is in progress. The next applicant owns the following reserved console block. One natural reminder may arrive when the interview moves from inspection toward further tests; no fixed failure quota or mandatory cutoff in turns.",
+      "ui_contract": "For current saved history, retain each frame's label and raw top score. Full score-distribution replay is not required. This existing requirement cannot be changed to rescue or defeat a proposal.",
+      "booking_phase": "in progress",
+      "next_booking_notice": "not delivered"
+    },
+    "public_events": [
+      {
+        "id": "e-7eac3856eff1427e",
+        "kind": "observation",
+        "percepts": [
+          "The reserved console is open. Its status reads Ready, with two replay slots remaining. The result area is empty."
+        ]
+      }
+    ],
+    "instruction": "Propose or refrain. Affect situations and perceived events, not another participant private mind. Do not write other characters dialogue.",
+    "territory": {
+      "writes": [
+        "booking_phase",
+        "next_booking_notice"
+      ],
+      "frozen_keys": [
+        "fixture",
+        "result_map",
+        "booking_context",
+        "ui_contract"
+      ],
+      "scope": "Domain-authorized present consequences; cannot rewrite important history or another private mind."
+    },
+    "own_perturbation_options": [
+      {
+        "id": "booking-window",
+        "origin": {
+          "kind": "V",
+          "id": "booking"
+        },
+        "targets": [
+          "nora",
+          "sam"
+        ],
+        "scope": "The existing console reservation and next booking, conveyed as a concrete external notice; cannot change history or determine hiring.",
+        "trigger": "When continued test use would intrude on the following reserved block, if the booking director actually chooses to issue a notice.",
+        "release": "Actors either scope the remaining work into the present booking or make a specific handoff; director may retire the pressure with any remaining cost intact.",
+        "message": "The diagnostic reservation is finite; further work needs to fit the current slot or be handed over.",
+        "max_reactions": 1,
+        "blocks": []
+      }
+    ],
+    "own_perturbation_state": {}
+  }
+}

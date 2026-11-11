@@ -1,0 +1,8 @@
+{
+  "kind": "world",
+  "decision": "retain",
+  "proposal": "Keep the booking in progress and leave the next-booking notice undelivered.",
+  "reason": "The console has just opened and no further test use has yet intruded on the following reserved block. There is no present scheduling development that calls for a reminder.",
+  "changes": {},
+  "percepts": []
+}

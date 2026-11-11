@@ -1,0 +1,9 @@
+{
+  "kind": "world",
+  "director": "billing",
+  "decision": "retain",
+  "proposal": "Retain the current document-access state: the energy-account email is available on Mara's phone, while Eli has no shared copy yet.",
+  "reason": "No sharing attempt or other public event is recorded at genesis. Making a copy available now would supply an unperformed action. Retaining the state leaves either participant free to initiate sharing, without adding a failure, delay or compulsory obstacle. The account figures, document contents and past commitments remain unchanged.",
+  "changes": {},
+  "percepts": []
+}

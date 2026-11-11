@@ -154,4 +154,19 @@ class PreprintTests(unittest.TestCase):
         self.assertNotIn('leave alone',view)
 
 
+    def test_legacy_read_preserves_bytes_and_explicit_upgrade_preserves_scene(self):
+        state=p.load(self.root);state['schema_version']=1
+        p._write(self.root/'preprint.json',p._sealed(state))
+        before=(self.root/'preprint.json').read_bytes()
+        self.assertEqual(p.load(self.root)['schema_version'],1)
+        self.assertEqual((self.root/'preprint.json').read_bytes(),before)
+        packet=p.actor_packet(self.root,'jo')
+        result=p.upgrade_source(self.root,expected_revision=0,operation_id='explicit-schema-upgrade')
+        self.assertEqual(result['schema_migration'],{'from':1,'to':2})
+        self.assertEqual(p.load(self.root)['events'],state['events'])
+        self.assertEqual(p.load(self.root)['world'],state['world'])
+        self.assertEqual(p.actor_packet(self.root,'jo'),packet)
+        self.assertTrue(p.upgrade_source(self.root,expected_revision=0,operation_id='explicit-schema-upgrade')['retried'])
+
+
 if __name__=='__main__':unittest.main()

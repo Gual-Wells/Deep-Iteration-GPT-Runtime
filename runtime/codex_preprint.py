@@ -14,7 +14,7 @@ from pathlib import Path
 import re
 import uuid
 
-SCHEMA = 1
+SCHEMA = 2
 KEY = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9._-]{0,100}$')
 
 
@@ -49,7 +49,7 @@ def _sealed(value):
 
 
 def load(root):
-    state=read(Path(root)/'preprint.json');need(state.get('schema_version')==SCHEMA,'unsupported preprint schema')
+    state=read(Path(root)/'preprint.json');need(type(state.get('schema_version')) is int and state['schema_version'] in {1,SCHEMA},'unsupported preprint schema')
     actual=deepcopy(state);actual.pop('integrity_sha256',None)
     need(digest(actual)==state.get('integrity_sha256'),'preprint snapshot changed outside a recorded operation')
     return state
@@ -92,7 +92,22 @@ def initialize(root, spec):
         'receipts':{},'status':'DRAFT',
         'limits':'operator-authored fictional facts and source attributions; no semantic or host authentication'}
     root.mkdir(parents=True);_write(root/'preprint.json',_sealed(state))
-    return {'root':root.as_posix(),'id':spec['id'],'revision':0,'status':'DRAFT'}
+    return {'root':root.as_posix(),'id':spec['id'],'revision':0,'status':'DRAFT','schema_version':SCHEMA}
+
+
+def requires_current_schema(state):
+    spec=state['spec']
+    return (any(k in spec for k in ('learning_contract','world_rules','frozen_world_keys','perturbation_defs')) or
+            any(any(k in a for k in ('personal_context','working_profile','materials')) for a in spec['actors']) or
+            any(state.get(k) for k in ('learning_cases','learning_lessons','series_relations','perturbations')))
+
+
+def upgrade_source(root, *, expected_revision, operation_id):
+    """Explicit format migration; historical reads never rewrite their source."""
+    def change(state):
+        previous=state['schema_version'];state['schema_version']=SCHEMA
+        return {'schema_migration':{'from':previous,'to':SCHEMA},'scope':'Format and writer boundary; no learning evidence or dialogue changes.'}
+    return _mutate(root,{'upgrade_source_schema':SCHEMA},expected_revision,operation_id,change)
 
 
 def _actor(state, aid):
@@ -169,6 +184,9 @@ def _mutate(root, payload, expected_revision, operation_id, change):
             return {**previous,'retried':True}
         need(type(expected_revision) is int and state['revision']==expected_revision,'revision conflict; reload actual state')
         result=change(state)
+        if state['schema_version']==1 and requires_current_schema(state):
+            state['schema_version']=SCHEMA
+            result['schema_migration']={'from':1,'to':SCHEMA}
         state['revision']+=1
         receipt={'operation_id':operation_id,'request_sha256':request_hash,'revision':state['revision'],**result}
         state['receipts'][operation_id]=receipt

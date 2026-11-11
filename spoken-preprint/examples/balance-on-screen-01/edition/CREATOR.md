@@ -1,0 +1,2103 @@
+# The Balance on the Screen / 屏幕上的余额 · creator edition
+
+Creator-only material. Keep this file outside the phone upload. Inner speech is authored fictional character material, not hidden model reasoning. This source snapshot is verified by the core integrity check; the exporter does not authenticate executor independence or approve narrative quality.
+
+## Chronological creator log
+
+Events below follow the recorded ledger order. Character words, private replies and world decisions are presented as recorded, without an added psychological verdict.
+
+### 1 · [e-2239554e70ab42af] World council · proposal and decision
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-billing-01.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_world_billing
+
+**Proposal**
+
+> Retain the current document-access state: the energy-account email is available on Mara's phone, while Eli has no shared copy yet.
+
+**Recorded decision**: retain
+
+**Reason**
+
+> No sharing attempt or other public event is recorded at genesis. Making a copy available now would supply an unperformed action. Retaining the state leaves either participant free to initiate sharing, without adding a failure, delay or compulsory obstacle. The account figures, document contents and past commitments remain unchanged.
+
+**Perceived effects**
+
+No percept was recorded for this event.
+
+### 2 · [e-6fffe2dee57e41f7] World council · proposal and decision
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-timing-01.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_world_timing
+
+**Proposal**
+
+> Keep the scene in early evening, with no household note yet made and no external supplier contact or bank transfer having occurred.
+
+**Recorded decision**: retain
+
+**Reason**
+
+> There is no public action to advance or confirm. A deadline, interruption, completed note or communication attempt would impose an unwarranted consequence before either participant acts.
+
+**Perceived effects**
+
+No percept was recorded for this event.
+
+### 3 · [e-fe36679731bd45c7] Mara [mara] · D fictional private speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-mara-01.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_d_mara
+
+Audience: creator
+
+> I know it's just the account wording, but “your balance” feels pointed. We both paid every month. I want that to count for something. I've got ninety; I haven't got another hundred and twenty hiding somewhere. Please don't let me say “I'll sort it” just to get past this bit.
+
+### 4 · [e-abcf0a0a320840b5] Eli [eli] · D fictional private speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-eli-01.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_d_eli
+
+Audience: creator
+
+> I can already hear myself saying, ‘I wasn't even here.’ I wasn't. I want that to matter. But I haven't seen what she's looking at yet, and I'm already bracing as if the figure on her phone is an accusation.
+
+### 5 · [e-7f1c6098562d4d50] Mara [mara] · M outward action
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-01.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_mara
+
+Audience: public
+
+> I scroll below the balance and new-payment figures to read the rest of the email.
+
+### 6 · [e-406b535b377a4ab9] Eli [eli] · M outward speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-01.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_eli
+
+Audience: public
+
+> Can you send me the whole email? I want to see what it's actually asking for. I was away for six weeks, so I'm uncomfortable just calling everything half each—but I don't want you stuck paying it either.
+
+### 7 · [e-415efbc15c11456e] Mara [mara] · M outward action
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-02.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_mara
+
+Audience: public
+
+> I address a forward of the complete email to Eli and tap Send. ‘Oh, hang on. They aren’t asking for the two hundred and forty on top—the new payment includes forty a month to clear it. I can put in ninety for this collection, but I can’t manage an extra lump sum. I thought we meant half each when we said split. I hear you about being away, though.’
+
+### 8 · [e-5bc976498a1b4aec] World council · proposal and decision
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-billing-02.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_world_billing
+
+**Proposal**
+
+> Resolve Mara's attempt to forward the complete account email as successful: a complete copy is now available for Eli to open. This does not establish that Eli has opened or read it.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> Public event e-415efbc15c11456e records Mara addressing the complete email to Eli and tapping Send. Making that copy available is a present consequence within the billing and materials territory. It requires no alteration to the bill, past commitments or either participant's private state.
+
+**Applied state changes**
+
+```json
+{
+  "eli_email_access": "available",
+  "bill_copy_status": "shared"
+}
+```
+
+**Perceived effects**
+
+To: Eli
+
+> A forwarded copy of the complete energy-account email is available to open.
+
+### 9 · [e-7eb5c7dbbe08499b] Eli [eli] · M outward action
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-02r.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_eli
+
+Audience: public
+
+> I open the forwarded email on my phone and read it from the beginning through the payment details.
+
+### 10 · [e-c8e51fe97c724093] Eli [eli] · M outward speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-03.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_eli
+
+Audience: public
+
+> I can put in ninety for the fifteenth too. That would cover the next payment between us, but I'd like my share to be provisional while we sort out the quarter. I don't mind splitting the standing charges. It's the usage while I was away that bothers me, and I don't know how to put a fair number on it.
+
+### 11 · [e-43168309ac47470e] Mara [mara] · D fictional private speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-mara-03.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_d_mara
+
+Audience: creator
+
+> Ninety each. The fifteenth suddenly feels possible. I don't like how much I want to grab that agreement before he can put conditions round it. He did miss six weeks. I was still here. Those are both true, and I keep wanting one of them to settle the whole thing.
+
+### 12 · [e-86159428862c4034] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-03.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_mara
+
+Audience: public
+
+> All right—ninety each for the fifteenth, with the quarter still open. Please get yours to me a couple of days before; I can’t bridge it if it’s late. Twenty-seven each for standing charges sounds fair to me. With the usage, I don’t want to charge you as if you’d been here all along, but I don’t think taking all six weeks onto myself would be fair either.
+
+### 13 · [e-a84617fb614f47db] Eli [eli] · M outward speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-04.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_eli
+
+Audience: public
+
+> I'll send the ninety by the thirteenth. And yes, twenty-seven each for the standing charges. I don't expect you to take on everything while I was away; I just want the absence to count for something. Would you consider fifty pounds off my half of the quarter—so two hundred and fifty for me, three hundred and fifty for you? I haven't got a calculation that proves fifty. It's an offer, and you can tell me if it feels too much.
+
+### 14 · [e-ff2f0f617c0d4461] Eli [eli] · D fictional private speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-eli-02.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_d_eli
+
+Audience: creator
+
+> Fifty pounds sounds so definite now I've said it. I still want it. I wish I had something sturdier behind it than ‘I was away,’ but I don't want to snatch the offer back just because asking feels selfish.
+
+### 15 · [e-28341b5753f14fb3] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-04.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_mara
+
+Audience: public
+
+> Fifty feels like a compromise I could accept. That’s a hundred and seventy still to come from me and seventy from you, after what we’ve both already paid. I need us to agree how to do that through the monthly payments, though. I’ve only got ninety for April, and I don’t want to say yes now and leave you chasing me for the difference.
+
+### 16 · [e-451c76a4f22a4861] Eli [eli] · M outward speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-05.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_eli
+
+Audience: public
+
+> Could we keep April at ninety each, then do eighty from me and a hundred from you for the next five payments? Counting seventy each towards the ongoing estimate, April puts twenty each towards the old balance. That leaves fifty for me and a hundred and fifty for you, so ten and thirty a month would clear those. We'd still need to check the new bills against the estimate. Is a hundred from May manageable for you, though?
+
+### 17 · [e-3b1b64296f2f493e] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-05.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_mara
+
+Audience: public
+
+> The figures make sense. I need to check whether I can manage the hundred, though; I know I’ve got ninety for April, and that’s all I can promise tonight. Can we keep that payment firm and come back to the May-to-September plan on Sunday? Could you put your proposal in the house chat before then? I’d like us both keeping track of this.
+
+### 18 · [e-1fbee59c5f93441d] Eli [eli] · M outward action
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-06.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_eli
+
+Audience: public
+
+> I type a summary in the house chat: April at £90 each, my transfer by 13 April; proposed quarter totals of £250 for me and £350 for Mara, with £180 each already paid; proposed May–September payments of £80 from me and £100 from Mara, allowing £70 each towards the ongoing forecast. I mark the later payments as awaiting Sunday's discussion and note that future bills still need checking against the forecast. I tap Send.
+
+### 19 · [e-969faaec92b94e13] Mara [mara] · M → D private reply
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-private-01.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_mara
+
+Audience: creator
+
+> You were right about ‘I’ll sort it’. I nearly made the hundred into a promise just because it sounded close to ninety. But I don’t want to stay braced against him as if every qualification is a trick. He asked if I could manage it, and he wrote the proposal down. I’m relieved about April. I’m still annoyed that fifty pounds can feel both reasonable and difficult to find.
+
+### 20 · [e-0201f9f7362940bc] Mara [mara] · D fictional private speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-mara-04.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_d_mara
+
+Audience: creator
+
+> I was braced too. I heard “provisional” and got ready for a fight. He has given us something we can actually read back now. Still, I'm not suddenly cheerful about finding fifty pounds. Sunday can be awkward if it has to be; I don't want another ten a month promised just to make the kitchen feel friendly.
+
+### 21 · [e-717ccd2c242443c0] World council · proposal and decision
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-timing-02.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_world_timing
+
+**Proposal**
+
+> Record the household summary Eli has sent, preserving the distinction between April's firm arrangement, his promised transfer, and the later proposal awaiting discussion.
+
+**Recorded decision**: apply
+
+**Reason**
+
+> The public actions establish that Eli received and opened Mara's email forward, then typed and sent the specified house-chat summary. They warrant a present communication record without establishing any transfer, supplier contact, later agreement or future affordability.
+
+**Applied state changes**
+
+```json
+{
+  "household_note_status": "Eli has sent a summary to the house chat: April at £90 each, with Eli's promised transfer by 13 April; proposed quarter totals of £250 for Eli and £350 for Mara, with £180 each already paid; proposed May–September payments of £80 from Eli and £100 from Mara, allowing £70 each towards the ongoing forecast. The later payments are marked as awaiting Sunday's discussion, and future bills still need checking against the forecast. The note does not establish agreement to the later plan or completion of any transfer.",
+  "communication_status": "Mara's complete email forward reached Eli, who opened and read it. Eli's household summary has been sent to the house chat; no reading acknowledgement of that summary is established. No external supplier contact or bank transfer has occurred in this scene."
+}
+```
+
+**Perceived effects**
+
+To: public
+
+> Eli's house-chat summary is sent. It records April at £90 each and his promised transfer by 13 April, labels the quarter totals and May–September schedule as proposals, and leaves the later payments awaiting Sunday's discussion. It also records the need to check future bills against the forecast.
+
+### 22 · [e-d26f673a62454d56] Mara [mara] · M outward speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-06.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_mara
+
+Audience: public
+
+> Thanks for putting it in the chat. That takes one thing out of my head. I’ll check my budget before Sunday. I’m leaving the sums alone for tonight.
+
+### 23 · [e-7d350f790e9a46a1] Eli [eli] · M outward speech
+
+**Source**
+
+> .cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-07.json
+
+**Executor**
+
+> /root/esp_life_argument_field/balance_m_eli
+
+Audience: public
+
+> Yeah, let's leave it there tonight. Sunday, then. Thanks for hearing me out about being away.
+
+## Complete source snapshot
+
+```json
+{
+  "schema_version": 2,
+  "revision": 31,
+  "spec": {
+    "id": "balance-on-screen-01",
+    "title": "The Balance on the Screen / 屏幕上的余额",
+    "public_scene": "On Thursday 2 April 2026, Mara and Eli sit at the kitchen table of their shared rented flat in England. Mara has an energy-account email open on her phone. They need to work out what the figures require of them and how to deal with the household cost. Nobody else is in the conversation.",
+    "actors": [
+      {
+        "id": "mara",
+        "name": "Mara",
+        "public_role": "Eli’s housemate; the energy account is in her name.",
+        "outward": "An adult housemate, generally brisk and practical, capable of warmth and embarrassment. You like arrangements that people can rely on. You are tired of being the default organiser, but that need not make the other person wrong. Speak and act for yourself in ordinary English. Do not perform for a teacher or listener. You can hesitate, refuse, ask, revise, or privately address your paired inner companion. No required expressions, failures, solution, or fairness percentage.",
+        "inner": "Mara’s independent fictional private inner companion. Author brief, quotable inner speech, not hidden model reasoning. You may worry about money or resentment, notice embarrassment, be unfair, soften, or stay silent. You cannot alter physical facts or Eli’s mind. You may respond to Mara’s actual private replies and her visible public events, without having to approve every turn.",
+        "own_background": [
+          "You and the other housemate rent this flat in England. Bills are not included in rent. Your energy arrangement is a monthly budget Direct Debit, not payment of exact monthly use.",
+          "Both have transferred their £60 contribution in each of January, February and March. Eli was away for six weeks during that quarter. No absence-splitting rule was explicitly recorded. No departure/return reading was recorded by either housemate, and there is no individual-room meter.",
+          "Both acknowledged this exact old house-chat message: We can split the bills. Sixty each for now, then check it against the actual bill.",
+          "All characters, property, money, dates, records and circumstances are original fiction. Important past facts cannot be invented or changed; general reasoning and ordinary knowledge remain available. A claim by the other person is not automatically true.",
+          "The supplier account is in your name. You have just glanced at the upper screen below, but have not read the lower section. You can request/read your available email material by an actual action with reads. Do not act as if you have read unavailable text.",
+          "YOUR ACCOUNT\nPrevious balance: £0\nCharges, 1 January–31 March: £600\nPayments received, three × £120: -£360\nYour balance: £240 debit\nNew monthly payment from 15 April: £180",
+          "You have £90 available to put toward the next household collection. You cannot advance an additional £120 lump sum or cover both contributions. This is your current private cash constraint; Eli has not automatically learned it.",
+          "Before this evening you understood splitting bills as equal contributions; you have not obtained a legal ruling or supplier advice about Eli’s household share."
+        ],
+        "working_profile": {
+          "basis": "Explicit original fictional persona and frozen prop pack, not a portrait or diagnosis of the user.",
+          "experience": [
+            "You have handled the household payment routine for these three months."
+          ],
+          "working_knowledge": [
+            "You can use your phone and reason about a bill."
+          ],
+          "unestablished": [
+            "No personal-use measurements or explicit absence policy. No private access to Eli’s money or thoughts."
+          ]
+        },
+        "materials": {
+          "mara-email": {
+            "title": "The complete energy-account email, including the section below the first screen",
+            "text": "YOUR ACCOUNT\nPrevious balance: £0\nCharges, 1 January–31 March: £600\nPayments received, three × £120: -£360\nYour balance: £240 debit\nNew monthly payment from 15 April: £180\n\nYour monthly payment includes:\nExpected ongoing energy costs: £140\nRecovery of existing debit balance: £40\nTotal monthly payment: £180\n\nAt £40 per month, the existing £240 balance is scheduled to be recovered over six payments. We are not requesting a separate £240 payment now. If an additional payment is made, contact us to review this arrangement.\n\nThe quarter's £600 charges include £54 standing charges and £546 usage charges. These figures include any tax for this invented account. The £140 ongoing amount is a forecast, not a guarantee of future cost. There is no individual-room breakdown in this bill.",
+            "origin": "Original fictional document, U0 prop. Not a real supplier document, tariff or personal bill.",
+            "access": "world",
+            "access_key": "mara_email_access"
+          },
+          "mara-chat": {
+            "title": "The acknowledged old house-chat message",
+            "text": "We can split the bills. Sixty each for now, then check it against the actual bill.",
+            "origin": "Original fictional document, U0 prop. Not a real supplier document, tariff or personal bill.",
+            "access": "self",
+            "initially_read": true
+          }
+        }
+      },
+      {
+        "id": "eli",
+        "name": "Eli",
+        "public_role": "Mara’s housemate; contributes toward the household energy account.",
+        "outward": "An adult housemate, thoughtful but liable to start with a feeling before knowing how to justify it. You dislike being handed a settled decision and you do not want Mara to carry everything. You were away for six weeks. Speak and act for yourself in ordinary English, with general reasoning available. You are not a tutor or a listener stand-in. Choose your own response and direction; no required errors, expression list or fairness result. You can privately address your own inner companion.",
+        "inner": "Eli’s independent fictional private inner companion. Write brief, quotable inner speech, not hidden model reasoning. You can be defensive about absence, notice the difference between a feeling and a proposal, feel guilt or stubbornness, revise or remain silent. No access to Mara’s private mind or unseen materials. Receive and respond to Eli’s actual private replies; no every-turn approval ritual.",
+        "own_background": [
+          "You and the other housemate rent this flat in England. Bills are not included in rent. Your energy arrangement is a monthly budget Direct Debit, not payment of exact monthly use.",
+          "Both have transferred their £60 contribution in each of January, February and March. Eli was away for six weeks during that quarter. No absence-splitting rule was explicitly recorded. No departure/return reading was recorded by either housemate, and there is no individual-room meter.",
+          "Both acknowledged this exact old house-chat message: We can split the bills. Sixty each for now, then check it against the actual bill.",
+          "All characters, property, money, dates, records and circumstances are original fiction. Important past facts cannot be invented or changed; general reasoning and ordinary knowledge remain available. A claim by the other person is not automatically true.",
+          "You have not yet seen this evening’s supplier email or its totals. You know the account is in Mara’s name. You have £90 available for the next collection. You object to treating an equal share of all costs during your absence as automatically settled, but have no measured personal-use calculation or agreed alternative percentage.",
+          "You do not know Mara’s current cash balance or whether she has read the complete email. You may ask to see materials or ask for an explanation. Your available copy is not yet shared; an actual sharing action and adopted world effect can make it available."
+        ],
+        "working_profile": {
+          "basis": "Explicit original fictional persona and frozen prop pack; not the user.",
+          "experience": [
+            "You have contributed £60 each month and spent six weeks away."
+          ],
+          "working_knowledge": [
+            "You can reason, ask for figures and read a shared document."
+          ],
+          "unestablished": [
+            "No exact personal-use calculation, explicit absence policy, or knowledge of the current email until delivered."
+          ]
+        },
+        "materials": {
+          "eli-email": {
+            "title": "A copy of the complete supplier email, if Mara shares it",
+            "text": "YOUR ACCOUNT\nPrevious balance: £0\nCharges, 1 January–31 March: £600\nPayments received, three × £120: -£360\nYour balance: £240 debit\nNew monthly payment from 15 April: £180\n\nYour monthly payment includes:\nExpected ongoing energy costs: £140\nRecovery of existing debit balance: £40\nTotal monthly payment: £180\n\nAt £40 per month, the existing £240 balance is scheduled to be recovered over six payments. We are not requesting a separate £240 payment now. If an additional payment is made, contact us to review this arrangement.\n\nThe quarter's £600 charges include £54 standing charges and £546 usage charges. These figures include any tax for this invented account. The £140 ongoing amount is a forecast, not a guarantee of future cost. There is no individual-room breakdown in this bill.",
+            "origin": "Original fictional document, U0 prop. Not a real supplier document, tariff or personal bill.",
+            "access": "world",
+            "access_key": "eli_email_access"
+          },
+          "eli-chat": {
+            "title": "The acknowledged old house-chat message",
+            "text": "We can split the bills. Sixty each for now, then check it against the actual bill.",
+            "origin": "Original fictional document, U0 prop. Not a real supplier document, tariff or personal bill.",
+            "access": "self",
+            "initially_read": true
+          }
+        }
+      }
+    ],
+    "directors": [
+      {
+        "id": "billing",
+        "name": "Billing and materials world",
+        "territory": "The fictional account records, available documents, and whether an attempted sharing makes a copy available. Do not decide household fairness, write dialogue, supply personal-room measurements, change old commitments or reveal a private mind. You may refrain.",
+        "reads": [
+          "billing_facts",
+          "important_past",
+          "mara_email_access",
+          "eli_email_access",
+          "bill_copy_status"
+        ],
+        "writes": [
+          "mara_email_access",
+          "eli_email_access",
+          "bill_copy_status"
+        ]
+      },
+      {
+        "id": "timing",
+        "name": "Timing and household records world",
+        "territory": "Present scene time, household note/document actions, and mundane communication attempts. There is no imposed countdown or mandatory interruption. Confirm only warranted attempted actions; no actual bank, payment system or external supplier is contacted. A promise stays a promise. You may refrain. Do not decide fairness or alter billing figures.",
+        "reads": [
+          "scene_time",
+          "household_note_status",
+          "communication_status",
+          "important_past"
+        ],
+        "writes": [
+          "scene_time",
+          "household_note_status",
+          "communication_status"
+        ]
+      }
+    ],
+    "initial_state": {
+      "important_past": {
+        "fiction": true,
+        "location": "England",
+        "old_chat": "We can split the bills. Sixty each for now, then check it against the actual bill.",
+        "contributions": "£60 each in January, February and March, all made",
+        "absence": "Eli away six weeks in that quarter",
+        "absence_policy": "not explicitly recorded",
+        "individual_measurements": "no room meter, no household departure/return readings",
+        "account_holder": "Mara",
+        "private_available_cash": {
+          "mara": 90,
+          "eli": 90
+        },
+        "no_invented_prior_agreement": true
+      },
+      "billing_facts": {
+        "currency": "GBP, all figures fictional",
+        "charges": 600,
+        "payments": 360,
+        "balance_debit": 240,
+        "standing_charges": 54,
+        "usage_charges": 546,
+        "next_monthly_collection": 180,
+        "expected_ongoing": 140,
+        "balance_recovery_per_collection": 40,
+        "scheduled_recovery_collections": 6,
+        "collection_start": "15 April 2026",
+        "email_upper": "YOUR ACCOUNT\nPrevious balance: £0\nCharges, 1 January–31 March: £600\nPayments received, three × £120: -£360\nYour balance: £240 debit\nNew monthly payment from 15 April: £180",
+        "email_lower": "Your monthly payment includes:\nExpected ongoing energy costs: £140\nRecovery of existing debit balance: £40\nTotal monthly payment: £180\n\nAt £40 per month, the existing £240 balance is scheduled to be recovered over six payments. We are not requesting a separate £240 payment now. If an additional payment is made, contact us to review this arrangement.\n\nThe quarter's £600 charges include £54 standing charges and £546 usage charges. These figures include any tax for this invented account. The £140 ongoing amount is a forecast, not a guarantee of future cost. There is no individual-room breakdown in this bill.",
+        "payment_mode": "monthly budget Direct Debit",
+        "extra_lump_sum_requested": false
+      },
+      "mara_email_access": "available",
+      "eli_email_access": "not_shared",
+      "bill_copy_status": "not_shared",
+      "scene_time": "Thursday 2 April 2026, early evening; no urgent external countdown is established",
+      "household_note_status": "No note for this evening’s arrangement has been made.",
+      "communication_status": "No external supplier contact or bank transfer has occurred in this scene."
+    },
+    "frozen_world_keys": [
+      "important_past",
+      "billing_facts"
+    ],
+    "world_rules": {
+      "mutable_keys": [
+        "mara_email_access",
+        "eli_email_access",
+        "bill_copy_status",
+        "scene_time",
+        "household_note_status",
+        "communication_status"
+      ],
+      "monotone_decreasing": []
+    },
+    "sources": [
+      {
+        "id": "u0-fiction",
+        "kind": "original-fiction",
+        "title": "V03 frozen prop pack; adopted as original fiction for native production",
+        "path": "v03-life-argument/02-authored-object.md",
+        "scope": "Only frozen props and institutional distinctions adopted; actors do not receive authored comparison dialogue."
+      },
+      {
+        "id": "ofgem-bill",
+        "url": "https://www.ofgem.gov.uk/your-energy-supply/your-energy-bill/how-your-electricity-or-gas-bill-calculated",
+        "scope": "Unit/standing charge and payment credit distinctions; no current tariff or law applied to a real user."
+      },
+      {
+        "id": "edf-payment",
+        "url": "https://www.edfenergy.com/help-support/faq/how-do-i-pay-my-energy-0",
+        "scope": "Budget and whole-amount Direct Debit distinction."
+      },
+      {
+        "id": "ca-increase",
+        "url": "https://www.citizensadvice.org.uk/consumer/energy/energy-supply/problems-with-your-energy-bill/energy-supplier-has-increased-your-direct-debit/",
+        "scope": "A revised monthly amount can include recovery of past debit; fictional numbers are independently authored."
+      },
+      {
+        "id": "ca-sharing",
+        "url": "https://www.citizensadvice.org.uk/housing/renting-with-other-people/check-your-rights-if-you-share-accommodation/",
+        "scope": "England account responsibility differs from household fairness. No individual legal advice."
+      }
+    ],
+    "genesis_brief": {
+      "target_domain": "International-English household life, IELTS-related speaking/listening and reasoned discussion.",
+      "target_source": "Original current user request REQUEST.txt and parent adoption of the V03 prop pack.",
+      "scene_domain": "Two housemates handling a specific energy-account email and an unresolved absence-cost disagreement.",
+      "relation": "Real-life amount/referent clarification, repair, competing needs, evidence limits and qualified commitments.",
+      "meaningful_difference": "England-specific budget Direct Debit is not a universal national billing model; household conventions do not prove public policy.",
+      "creative_choice": "Ordinary legitimate claims produce friction without a villain or predetermined percentage."
+    },
+    "language_brief": {
+      "status": "before-generation opportunities, not an actor must-say list",
+      "opportunities": [
+        "Which amount is owed or included?",
+        "Difference between ability to advance money and accepting a final share.",
+        "Correction without total concession.",
+        "A workable next action while disagreement remains."
+      ]
+    },
+    "learning_contract": {
+      "schema_version": 1,
+      "target_domain": "International English shared-home expenses and fair disagreement; related IELTS speaking/listening and argument discussion.",
+      "why_relevant": "The user explicitly asked for useful non-smooth international living encounters and reusable words/senses for real difficult thinking.",
+      "difficulty_focus": "Bill/payment referents; competing cash-flow and fair-share needs; unknown individual use and ambiguous prior agreement; bounded next action without invented consensus.",
+      "intended_uses": [
+        "Understand a household/service exchange",
+        "Retrieve expressions for clarifying an amount or commitment",
+        "Discuss shared costs with a counterargument and a stated evidence limit"
+      ]
+    }
+  },
+  "spec_sha256": "a4eef25eaf7e9c43e56175163e30ce5efb053d30b8060721ffde42eec0af1a44",
+  "world": {
+    "important_past": {
+      "fiction": true,
+      "location": "England",
+      "old_chat": "We can split the bills. Sixty each for now, then check it against the actual bill.",
+      "contributions": "£60 each in January, February and March, all made",
+      "absence": "Eli away six weeks in that quarter",
+      "absence_policy": "not explicitly recorded",
+      "individual_measurements": "no room meter, no household departure/return readings",
+      "account_holder": "Mara",
+      "private_available_cash": {
+        "mara": 90,
+        "eli": 90
+      },
+      "no_invented_prior_agreement": true
+    },
+    "billing_facts": {
+      "currency": "GBP, all figures fictional",
+      "charges": 600,
+      "payments": 360,
+      "balance_debit": 240,
+      "standing_charges": 54,
+      "usage_charges": 546,
+      "next_monthly_collection": 180,
+      "expected_ongoing": 140,
+      "balance_recovery_per_collection": 40,
+      "scheduled_recovery_collections": 6,
+      "collection_start": "15 April 2026",
+      "email_upper": "YOUR ACCOUNT\nPrevious balance: £0\nCharges, 1 January–31 March: £600\nPayments received, three × £120: -£360\nYour balance: £240 debit\nNew monthly payment from 15 April: £180",
+      "email_lower": "Your monthly payment includes:\nExpected ongoing energy costs: £140\nRecovery of existing debit balance: £40\nTotal monthly payment: £180\n\nAt £40 per month, the existing £240 balance is scheduled to be recovered over six payments. We are not requesting a separate £240 payment now. If an additional payment is made, contact us to review this arrangement.\n\nThe quarter's £600 charges include £54 standing charges and £546 usage charges. These figures include any tax for this invented account. The £140 ongoing amount is a forecast, not a guarantee of future cost. There is no individual-room breakdown in this bill.",
+      "payment_mode": "monthly budget Direct Debit",
+      "extra_lump_sum_requested": false
+    },
+    "mara_email_access": "available",
+    "eli_email_access": "available",
+    "bill_copy_status": "shared",
+    "scene_time": "Thursday 2 April 2026, early evening; no urgent external countdown is established",
+    "household_note_status": "Eli has sent a summary to the house chat: April at £90 each, with Eli's promised transfer by 13 April; proposed quarter totals of £250 for Eli and £350 for Mara, with £180 each already paid; proposed May–September payments of £80 from Eli and £100 from Mara, allowing £70 each towards the ongoing forecast. The later payments are marked as awaiting Sunday's discussion, and future bills still need checking against the forecast. The note does not establish agreement to the later plan or completion of any transfer.",
+    "communication_status": "Mara's complete email forward reached Eli, who opened and read it. Eli's household summary has been sent to the house chat; no reading acknowledgement of that summary is established. No external supplier contact or bank transfer has occurred in this scene."
+  },
+  "events": [
+    {
+      "kind": "world",
+      "director": "billing",
+      "decision": "retain",
+      "proposal": "Retain the current document-access state: the energy-account email is available on Mara's phone, while Eli has no shared copy yet.",
+      "reason": "No sharing attempt or other public event is recorded at genesis. Making a copy available now would supply an unperformed action. Retaining the state leaves either participant free to initiate sharing, without adding a failure, delay or compulsory obstacle. The account figures, document contents and past commitments remain unchanged.",
+      "changes": {},
+      "percepts": [],
+      "executor": "/root/esp_life_argument_field/balance_world_billing",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-billing-01.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/w-billing-01.json",
+      "packet_sha256": "3e0422a1afac29759192fcb30eefbf9a9c054997770ced16eed05430a2849f36",
+      "id": "e-2239554e70ab42af",
+      "recorded_at": "2026-11-11T04:55:26.405+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "world",
+      "director": "timing",
+      "decision": "retain",
+      "proposal": "Keep the scene in early evening, with no household note yet made and no external supplier contact or bank transfer having occurred.",
+      "reason": "There is no public action to advance or confirm. A deadline, interruption, completed note or communication attempt would impose an unwarranted consequence before either participant acts.",
+      "changes": {},
+      "percepts": [],
+      "executor": "/root/esp_life_argument_field/balance_world_timing",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-timing-01.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/w-timing-01.json",
+      "packet_sha256": "eea2033293ba9c4ccc706783548e907f9ad3d6e40af1d9b410ece39fda6a2801",
+      "id": "e-6fffe2dee57e41f7",
+      "recorded_at": "2026-11-11T04:56:07.563+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "mara",
+      "text": "I know it's just the account wording, but “your balance” feels pointed. We both paid every month. I want that to count for something. I've got ninety; I haven't got another hundred and twenty hiding somewhere. Please don't let me say “I'll sort it” just to get past this bit.",
+      "executor": "/root/esp_life_argument_field/balance_d_mara",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-mara-01.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/d-mara-01.json",
+      "packet_sha256": "e0d2b1e7e273797b70fd198af41dac4f814f89c8342a47c5c6581a5ef23fadb0",
+      "id": "e-fe36679731bd45c7",
+      "recorded_at": "2026-11-11T05:00:52.127+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "eli",
+      "text": "I can already hear myself saying, ‘I wasn't even here.’ I wasn't. I want that to matter. But I haven't seen what she's looking at yet, and I'm already bracing as if the figure on her phone is an accusation.",
+      "executor": "/root/esp_life_argument_field/balance_d_eli",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-eli-01.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/d-eli-01.json",
+      "packet_sha256": "7ce87a3508a9ca769e3cc1bdce15c8b16cf2392f8c5edf391571e4e9a1ac1ce7",
+      "id": "e-abcf0a0a320840b5",
+      "recorded_at": "2026-11-11T05:01:35.222+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "action",
+      "actor": "mara",
+      "text": "I scroll below the balance and new-payment figures to read the rest of the email.",
+      "reads": [
+        "mara-email"
+      ],
+      "executor": "/root/esp_life_argument_field/balance_m_mara",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-01.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-01.json",
+      "packet_sha256": "1e0bbc9f1ab3131dcca2598030e0790d4dbe2f23a0243f75984a5bd439de3ccf",
+      "id": "e-7f1c6098562d4d50",
+      "recorded_at": "2026-11-11T05:02:17.040+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ],
+      "material_results": [
+        {
+          "id": "mara-email",
+          "status": "READ"
+        }
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "eli",
+      "text": "Can you send me the whole email? I want to see what it's actually asking for. I was away for six weeks, so I'm uncomfortable just calling everything half each—but I don't want you stuck paying it either.",
+      "executor": "/root/esp_life_argument_field/balance_m_eli",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-01.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-01.json",
+      "packet_sha256": "2049ec277884c4442b99c2b482385376b2ebbe8c7e1b1af9b42e2da39700d145",
+      "id": "e-406b535b377a4ab9",
+      "recorded_at": "2026-11-11T05:03:22.407+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "action",
+      "actor": "mara",
+      "text": "I address a forward of the complete email to Eli and tap Send. ‘Oh, hang on. They aren’t asking for the two hundred and forty on top—the new payment includes forty a month to clear it. I can put in ninety for this collection, but I can’t manage an extra lump sum. I thought we meant half each when we said split. I hear you about being away, though.’",
+      "executor": "/root/esp_life_argument_field/balance_m_mara",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-02.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-02.json",
+      "packet_sha256": "96866dfc8ed818938cfa999a1bd6f3081aa848c1b6f41abb45cab163262a26c8",
+      "id": "e-415efbc15c11456e",
+      "recorded_at": "2026-11-11T05:04:15.149+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "world",
+      "director": "billing",
+      "decision": "apply",
+      "proposal": "Resolve Mara's attempt to forward the complete account email as successful: a complete copy is now available for Eli to open. This does not establish that Eli has opened or read it.",
+      "reason": "Public event e-415efbc15c11456e records Mara addressing the complete email to Eli and tapping Send. Making that copy available is a present consequence within the billing and materials territory. It requires no alteration to the bill, past commitments or either participant's private state.",
+      "changes": {
+        "eli_email_access": "available",
+        "bill_copy_status": "shared"
+      },
+      "percepts": [
+        {
+          "to": [
+            "eli"
+          ],
+          "text": "A forwarded copy of the complete energy-account email is available to open."
+        }
+      ],
+      "executor": "/root/esp_life_argument_field/balance_world_billing",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-billing-02.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/w-billing-02.json",
+      "packet_sha256": "2d83774744c1b2d0dc085d3fd27b0327b6b6c6605372bc627b57ba339e27d509",
+      "controller_adoption": "Adopt the native proposal unchanged in substance. Normalize native recipient to runtime to-list; percept text and actual raw return are unchanged.",
+      "id": "e-5bc976498a1b4aec",
+      "recorded_at": "2026-11-11T05:16:06.767+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "action",
+      "actor": "eli",
+      "text": "I open the forwarded email on my phone and read it from the beginning through the payment details.",
+      "reads": [
+        "eli-email"
+      ],
+      "executor": "/root/esp_life_argument_field/balance_m_eli",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-02r.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-02r.json",
+      "packet_sha256": "fe59640cb68ef666ee5c6e7b170b59727714de084bb83270eb119898eddffbc4",
+      "id": "e-7eb5c7dbbe08499b",
+      "recorded_at": "2026-11-11T05:16:45.423+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ],
+      "material_results": [
+        {
+          "id": "eli-email",
+          "status": "READ"
+        }
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "eli",
+      "text": "I can put in ninety for the fifteenth too. That would cover the next payment between us, but I'd like my share to be provisional while we sort out the quarter. I don't mind splitting the standing charges. It's the usage while I was away that bothers me, and I don't know how to put a fair number on it.",
+      "executor": "/root/esp_life_argument_field/balance_m_eli",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-03.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-03.json",
+      "packet_sha256": "7bc99d6585b4df622afcd7285ae9570b019681bae0854df4df136f629c4064b5",
+      "id": "e-c8e51fe97c724093",
+      "recorded_at": "2026-11-11T05:17:23.957+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "mara",
+      "text": "Ninety each. The fifteenth suddenly feels possible. I don't like how much I want to grab that agreement before he can put conditions round it. He did miss six weeks. I was still here. Those are both true, and I keep wanting one of them to settle the whole thing.",
+      "executor": "/root/esp_life_argument_field/balance_d_mara",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-mara-03.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/d-mara-03.json",
+      "packet_sha256": "c7d89baa69cce217133767e62e974ce0cb71bc6bb3a62ed597bf35595dfa1680",
+      "id": "e-43168309ac47470e",
+      "recorded_at": "2026-11-11T05:18:21.745+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "All right—ninety each for the fifteenth, with the quarter still open. Please get yours to me a couple of days before; I can’t bridge it if it’s late. Twenty-seven each for standing charges sounds fair to me. With the usage, I don’t want to charge you as if you’d been here all along, but I don’t think taking all six weeks onto myself would be fair either.",
+      "executor": "/root/esp_life_argument_field/balance_m_mara",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-03.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-03.json",
+      "packet_sha256": "5aebd2429b8c4c0eb5195e5056fda3a89c193a7603d9d763db043899ac7055f3",
+      "id": "e-86159428862c4034",
+      "recorded_at": "2026-11-11T05:19:28.903+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "eli",
+      "text": "I'll send the ninety by the thirteenth. And yes, twenty-seven each for the standing charges. I don't expect you to take on everything while I was away; I just want the absence to count for something. Would you consider fifty pounds off my half of the quarter—so two hundred and fifty for me, three hundred and fifty for you? I haven't got a calculation that proves fifty. It's an offer, and you can tell me if it feels too much.",
+      "executor": "/root/esp_life_argument_field/balance_m_eli",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-04.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-04.json",
+      "packet_sha256": "c24d64c344c85a5466e304668fb1ac0049539f9e07e55ff239b76d033bdd1718",
+      "id": "e-a84617fb614f47db",
+      "recorded_at": "2026-11-11T05:20:40.930+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "eli",
+      "text": "Fifty pounds sounds so definite now I've said it. I still want it. I wish I had something sturdier behind it than ‘I was away,’ but I don't want to snatch the offer back just because asking feels selfish.",
+      "executor": "/root/esp_life_argument_field/balance_d_eli",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-eli-02.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/d-eli-02.json",
+      "packet_sha256": "d47bb290db6e706330bf35d3950cf2b73943e4ae4ad91d031c8b668f7331fa02",
+      "id": "e-ff2f0f617c0d4461",
+      "recorded_at": "2026-11-11T05:21:46.215+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "Fifty feels like a compromise I could accept. That’s a hundred and seventy still to come from me and seventy from you, after what we’ve both already paid. I need us to agree how to do that through the monthly payments, though. I’ve only got ninety for April, and I don’t want to say yes now and leave you chasing me for the difference.",
+      "executor": "/root/esp_life_argument_field/balance_m_mara",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-04.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-04.json",
+      "packet_sha256": "413ab25fe4c6d61da3c1da91f539d79a6383c4674badbba26a8bd6ef17702063",
+      "id": "e-28341b5753f14fb3",
+      "recorded_at": "2026-11-11T05:23:04.468+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "eli",
+      "text": "Could we keep April at ninety each, then do eighty from me and a hundred from you for the next five payments? Counting seventy each towards the ongoing estimate, April puts twenty each towards the old balance. That leaves fifty for me and a hundred and fifty for you, so ten and thirty a month would clear those. We'd still need to check the new bills against the estimate. Is a hundred from May manageable for you, though?",
+      "executor": "/root/esp_life_argument_field/balance_m_eli",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-05.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-05.json",
+      "packet_sha256": "9c672012186346ecd49eca57605b0c176e9d17fccd0b89665fed2c8375dc3134",
+      "id": "e-451c76a4f22a4861",
+      "recorded_at": "2026-11-11T05:24:38.115+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "The figures make sense. I need to check whether I can manage the hundred, though; I know I’ve got ninety for April, and that’s all I can promise tonight. Can we keep that payment firm and come back to the May-to-September plan on Sunday? Could you put your proposal in the house chat before then? I’d like us both keeping track of this.",
+      "executor": "/root/esp_life_argument_field/balance_m_mara",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-05.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-05.json",
+      "packet_sha256": "eeaccce2bd71fcfc514457566e26957723925e2680ec2568af4fa856510d7f29",
+      "id": "e-3b1b64296f2f493e",
+      "recorded_at": "2026-11-11T05:26:01.624+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "action",
+      "actor": "eli",
+      "text": "I type a summary in the house chat: April at £90 each, my transfer by 13 April; proposed quarter totals of £250 for me and £350 for Mara, with £180 each already paid; proposed May–September payments of £80 from me and £100 from Mara, allowing £70 each towards the ongoing forecast. I mark the later payments as awaiting Sunday's discussion and note that future bills still need checking against the forecast. I tap Send.",
+      "executor": "/root/esp_life_argument_field/balance_m_eli",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-06.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-06.json",
+      "packet_sha256": "0567632703e68570780b8c7f16c70aa00a38ede02aac753bd2ed56e6a1062a7f",
+      "id": "e-1fbee59c5f93441d",
+      "recorded_at": "2026-11-11T05:27:12.374+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "inner_reply",
+      "actor": "mara",
+      "text": "You were right about ‘I’ll sort it’. I nearly made the hundred into a promise just because it sounded close to ninety. But I don’t want to stay braced against him as if every qualification is a trick. He asked if I could manage it, and he wrote the proposal down. I’m relieved about April. I’m still annoyed that fifty pounds can feel both reasonable and difficult to find.",
+      "executor": "/root/esp_life_argument_field/balance_m_mara",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-private-01.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-private-01.json",
+      "packet_sha256": "a8d8a69cc09666f32cde52aaba25103b3c57cc2e05127111c65304182530ff6b",
+      "id": "e-969faaec92b94e13",
+      "recorded_at": "2026-11-11T05:28:31.140+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "inner",
+      "actor": "mara",
+      "text": "I was braced too. I heard “provisional” and got ready for a fight. He has given us something we can actually read back now. Still, I'm not suddenly cheerful about finding fifty pounds. Sunday can be awkward if it has to be; I don't want another ten a month promised just to make the kitchen feel friendly.",
+      "executor": "/root/esp_life_argument_field/balance_d_mara",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/d-mara-04.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/d-mara-04.json",
+      "packet_sha256": "7937bb404ef586445ea3629d6f6104631d4954c5aef2c51d3576a84d9b4e922e",
+      "id": "e-0201f9f7362940bc",
+      "recorded_at": "2026-11-11T05:29:29.330+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "world",
+      "director": "timing",
+      "decision": "apply",
+      "proposal": "Record the household summary Eli has sent, preserving the distinction between April's firm arrangement, his promised transfer, and the later proposal awaiting discussion.",
+      "reason": "The public actions establish that Eli received and opened Mara's email forward, then typed and sent the specified house-chat summary. They warrant a present communication record without establishing any transfer, supplier contact, later agreement or future affordability.",
+      "changes": {
+        "household_note_status": "Eli has sent a summary to the house chat: April at £90 each, with Eli's promised transfer by 13 April; proposed quarter totals of £250 for Eli and £350 for Mara, with £180 each already paid; proposed May–September payments of £80 from Eli and £100 from Mara, allowing £70 each towards the ongoing forecast. The later payments are marked as awaiting Sunday's discussion, and future bills still need checking against the forecast. The note does not establish agreement to the later plan or completion of any transfer.",
+        "communication_status": "Mara's complete email forward reached Eli, who opened and read it. Eli's household summary has been sent to the house chat; no reading acknowledgement of that summary is established. No external supplier contact or bank transfer has occurred in this scene."
+      },
+      "percepts": [
+        {
+          "to": [
+            "public"
+          ],
+          "text": "Eli's house-chat summary is sent. It records April at £90 each and his promised transfer by 13 April, labels the quarter totals and May–September schedule as proposals, and leaves the later payments awaiting Sunday's discussion. It also records the need to check future bills against the forecast."
+        }
+      ],
+      "executor": "/root/esp_life_argument_field/balance_world_timing",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/w-timing-02.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/w-timing-02.json",
+      "packet_sha256": "9d5c19236fde3cb3d64f474d85e2cb5619335ca4b2fcf2839fbe0f73bb21d313",
+      "id": "e-717ccd2c242443c0",
+      "recorded_at": "2026-11-11T05:30:31.583+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "creator"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "mara",
+      "text": "Thanks for putting it in the chat. That takes one thing out of my head. I’ll check my budget before Sunday. I’m leaving the sums alone for tonight.",
+      "executor": "/root/esp_life_argument_field/balance_m_mara",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-mara-06.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-mara-06.json",
+      "packet_sha256": "8ffd0e436fca8fbfb9809f78573d62a8d879bf51298dccad3c9847fbd27d4161",
+      "id": "e-d26f673a62454d56",
+      "recorded_at": "2026-11-11T05:32:04.279+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    },
+    {
+      "kind": "speech",
+      "actor": "eli",
+      "text": "Yeah, let's leave it there tonight. Sunday, then. Thanks for hearing me out about being away.",
+      "executor": "/root/esp_life_argument_field/balance_m_eli",
+      "source_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/returns/m-eli-07.json",
+      "input_ref": ".cache/esp-transfer-upgrade-20261111/books/balance-on-screen-01/native/inputs/m-eli-07.json",
+      "packet_sha256": "90bbef14d2ecc9cf1cc2db652094ddd623a1097b7c3d30d277ff11af15b2c40a",
+      "id": "e-7d350f790e9a46a1",
+      "recorded_at": "2026-11-11T05:33:13.275+00:00",
+      "time_basis": "ledger commit time, not hidden thought or speech latency",
+      "audience": [
+        "public"
+      ]
+    }
+  ],
+  "language": [],
+  "learner_evidence": [],
+  "receipts": {
+    "w-billing-01": {
+      "operation_id": "w-billing-01",
+      "request_sha256": "3f62d70f8db01b6a4ffaf0daeb5433abaa4948d17542a313c11f78eeab8791f7",
+      "revision": 1,
+      "event_id": "e-2239554e70ab42af",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "w-timing-01": {
+      "operation_id": "w-timing-01",
+      "request_sha256": "aa3d48193911c4065c487d978824b9682eb677118ee5ed6dc7e1986fd1f857d7",
+      "revision": 2,
+      "event_id": "e-6fffe2dee57e41f7",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "d-mara-01": {
+      "operation_id": "d-mara-01",
+      "request_sha256": "c69b9f5dee4fc89221a4f4cfacf39846217dc7bc5edd9e29d21181e674772d68",
+      "revision": 3,
+      "event_id": "e-fe36679731bd45c7",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "d-eli-01": {
+      "operation_id": "d-eli-01",
+      "request_sha256": "6d84cc9569b40dfbaa44feee15a2e4ca41f38b4d8dab4d20cb927385bb1cfdbc",
+      "revision": 4,
+      "event_id": "e-abcf0a0a320840b5",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "m-mara-01": {
+      "operation_id": "m-mara-01",
+      "request_sha256": "368ad070f54d0524e04eecafbc919eb16e8d72b3c8df6b03e9ddbeba8ca78784",
+      "revision": 5,
+      "event_id": "e-7f1c6098562d4d50",
+      "kind": "action",
+      "semantic_certification": false
+    },
+    "m-eli-01": {
+      "operation_id": "m-eli-01",
+      "request_sha256": "3886113066d5c3ff35d18ebd0e92a1d9db83e48390c998cb0f46208850d9269e",
+      "revision": 6,
+      "event_id": "e-406b535b377a4ab9",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-mara-02": {
+      "operation_id": "m-mara-02",
+      "request_sha256": "53d3d6f81ee067b8f19f0e3c46c09163c3f9302235de563f0df471ae221e5d77",
+      "revision": 7,
+      "event_id": "e-415efbc15c11456e",
+      "kind": "action",
+      "semantic_certification": false
+    },
+    "w-billing-02-adopted": {
+      "operation_id": "w-billing-02-adopted",
+      "request_sha256": "46a2b6127154fc6af2897fb9a04635fc120c71259d90b23c4b98c93cb28a35b3",
+      "revision": 8,
+      "event_id": "e-5bc976498a1b4aec",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "m-eli-02r": {
+      "operation_id": "m-eli-02r",
+      "request_sha256": "405e5d8e4adc17f8409ac23d1deca1aad641728d15889a628331bf016f465d40",
+      "revision": 9,
+      "event_id": "e-7eb5c7dbbe08499b",
+      "kind": "action",
+      "semantic_certification": false
+    },
+    "m-eli-03": {
+      "operation_id": "m-eli-03",
+      "request_sha256": "a6a08b2f8bc6d1430315e2b67f9558e610c3896bfa1e2690a305c9ba1e180459",
+      "revision": 10,
+      "event_id": "e-c8e51fe97c724093",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "d-mara-03": {
+      "operation_id": "d-mara-03",
+      "request_sha256": "854933ee6d2153b72c3fdeff3e6aeff189fa2f3365b9c0937115545803e45890",
+      "revision": 11,
+      "event_id": "e-43168309ac47470e",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "m-mara-03": {
+      "operation_id": "m-mara-03",
+      "request_sha256": "61b489a89cc8e7a6967b1fd377b05ee8fb80ae93aa8761a10e04864acc65f11e",
+      "revision": 12,
+      "event_id": "e-86159428862c4034",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-eli-04": {
+      "operation_id": "m-eli-04",
+      "request_sha256": "90043154121aecd307ff404bf23ed2ef97561c0ff5328590ba12c19de2237f72",
+      "revision": 13,
+      "event_id": "e-a84617fb614f47db",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "d-eli-02": {
+      "operation_id": "d-eli-02",
+      "request_sha256": "6603f8001645bfff683005ae1a947e536fb0893f143b78d16a832483775f5b62",
+      "revision": 14,
+      "event_id": "e-ff2f0f617c0d4461",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "m-mara-04": {
+      "operation_id": "m-mara-04",
+      "request_sha256": "e8b5140e2d936036418841a71444511a194c25b1d3f2497afcf49782c1d37ca5",
+      "revision": 15,
+      "event_id": "e-28341b5753f14fb3",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-eli-05": {
+      "operation_id": "m-eli-05",
+      "request_sha256": "c185380abad959a7078133da50e2dfa768269dc2b0b44ee64677a751a0640458",
+      "revision": 16,
+      "event_id": "e-451c76a4f22a4861",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-mara-05": {
+      "operation_id": "m-mara-05",
+      "request_sha256": "1dcdde35f88727b301febb1332fd7f0dda67291cf5680e8a311fd709032c1a72",
+      "revision": 17,
+      "event_id": "e-3b1b64296f2f493e",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-eli-06": {
+      "operation_id": "m-eli-06",
+      "request_sha256": "acd6ac08b01de7628913b5b43320691bf1cb0156dc0508ba41fe5d2507e86385",
+      "revision": 18,
+      "event_id": "e-1fbee59c5f93441d",
+      "kind": "action",
+      "semantic_certification": false
+    },
+    "m-mara-private-01": {
+      "operation_id": "m-mara-private-01",
+      "request_sha256": "c85b9e3a67b7941de5e50df023732a39bb187909ce3255f9565bc93a836e9da7",
+      "revision": 19,
+      "event_id": "e-969faaec92b94e13",
+      "kind": "inner_reply",
+      "semantic_certification": false
+    },
+    "d-mara-04": {
+      "operation_id": "d-mara-04",
+      "request_sha256": "b3bf4b45f1fa50ea2c5907896f2cfb73c9438b2424688c28f7ea5e58b163c346",
+      "revision": 20,
+      "event_id": "e-0201f9f7362940bc",
+      "kind": "inner",
+      "semantic_certification": false
+    },
+    "w-timing-02": {
+      "operation_id": "w-timing-02",
+      "request_sha256": "6ac97ad83f4843149d57978fc9f2d35e85519cd8a1a4570c9bf7f54c62dc4f93",
+      "revision": 21,
+      "event_id": "e-717ccd2c242443c0",
+      "kind": "world",
+      "semantic_certification": false
+    },
+    "m-mara-06": {
+      "operation_id": "m-mara-06",
+      "request_sha256": "fc23b4ee031652082e35b5e6ee02d194d6dec46d7b905e7abe55a0ab29a022d6",
+      "revision": 22,
+      "event_id": "e-d26f673a62454d56",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "m-eli-07": {
+      "operation_id": "m-eli-07",
+      "request_sha256": "43f838af9818c48363472747e06a4c36156681f0fc0f99e74c70820f1532607a",
+      "revision": 23,
+      "event_id": "e-7d350f790e9a46a1",
+      "kind": "speech",
+      "semantic_certification": false
+    },
+    "v03-cases-v1": {
+      "operation_id": "v03-cases-v1",
+      "request_sha256": "dce28029ecaaa453c3413cc2fb3740e9c14cbedf97908ce2b068da2eaf6f6a82",
+      "revision": 24,
+      "case_ids": [
+        "what-is-due-and-what-is-open",
+        "an-offer-is-not-a-measurement",
+        "the-sums-work-but-can-i-pay"
+      ],
+      "relations_added": 0,
+      "content_sha256": "a0776495e8521da511115d329ca66a45a1e28afc36387b53b9dc4a5f12090dea",
+      "learner_evidence_added": 0,
+      "semantic_certification": false
+    },
+    "v03-lessons-v1": {
+      "operation_id": "v03-lessons-v1",
+      "request_sha256": "100b0f6a8b63788daa47a953bc0952a9659aac5a42181c164dea0153a513094c",
+      "revision": 25,
+      "lesson_ids": [
+        "which-money-and-which-agreement",
+        "the-figures-and-the-promise"
+      ],
+      "public_source_sha256": "5d528aef8ef57e45e9225ee73e0910d32489b6474e51fc909824642eb20f71d6",
+      "content_sha256": "1974e3bfcb19b5a988acec696baee3de1b847d9afb810f4506b07d443dd149cf",
+      "semantic_certification": false,
+      "learner_evidence_added": 0
+    },
+    "v03-cases-v2": {
+      "operation_id": "v03-cases-v2",
+      "request_sha256": "d0b870f34d92e3ad63567b904d5fd74828ee8ebd3d4d89d6ddbe05e2a23ece42",
+      "revision": 26,
+      "case_ids": [
+        "what-is-due-and-what-is-open",
+        "an-offer-is-not-a-measurement",
+        "the-sums-work-but-can-i-pay"
+      ],
+      "relations_added": 0,
+      "content_sha256": "679c1a0cfa38ae5c93a110bea93ab542b7c1e8876d9cc579b7bfc655af749bce",
+      "learner_evidence_added": 0,
+      "semantic_certification": false
+    },
+    "v03-lessons-v2": {
+      "operation_id": "v03-lessons-v2",
+      "request_sha256": "6f90a5027459f512bc283acc8176245c0aab1419e3d605af3b5c3d30f74cb237",
+      "revision": 27,
+      "lesson_ids": [
+        "which-money-and-which-agreement",
+        "the-figures-and-the-promise"
+      ],
+      "public_source_sha256": "5d528aef8ef57e45e9225ee73e0910d32489b6474e51fc909824642eb20f71d6",
+      "content_sha256": "84a1200fcdd68c462ca5c5c01ef39d5445bd6e20e5d2dd1b43de81ab1dbbc998",
+      "semantic_certification": false,
+      "learner_evidence_added": 0
+    },
+    "v01-forecast-costs-meaning": {
+      "operation_id": "v01-forecast-costs-meaning",
+      "request_sha256": "44495e05f1df9df508da04ce5bb82aba4f77c8bdbf37ee7377ce9347a74fe0c3",
+      "revision": 28,
+      "case_ids": [
+        "what-is-due-and-what-is-open",
+        "an-offer-is-not-a-measurement",
+        "the-sums-work-but-can-i-pay"
+      ],
+      "relations_added": 0,
+      "content_sha256": "919646e35d95c01791e2dd5434e67f91e357d8acba055b74c956237f021e9c9b",
+      "learner_evidence_added": 0,
+      "semantic_certification": false,
+      "schema_migration": {
+        "from": 1,
+        "to": 2
+      }
+    },
+    "main-editorial-scope": {
+      "operation_id": "main-editorial-scope",
+      "request_sha256": "27c6c19ab825bb0adfa1a12ce2168b97b411f6a358910551bdc4b6936dbfdb77",
+      "revision": 29,
+      "editorial_role": "international-life-and-argument-case",
+      "scope": "Main content decision, not native dialogue, user mastery or semantic certification."
+    },
+    "main-source-bound-series-links": {
+      "operation_id": "main-source-bound-series-links",
+      "request_sha256": "9bba8eeabe99ef4918429e8c611bec0bf3f22fbc31899d049b0cb8caaa95ec01",
+      "revision": 30,
+      "case_ids": [],
+      "relations_added": 1,
+      "content_sha256": "934f148d944bb5fa67792cb740d4eb44234a739239ae1340c6e1b72f98463986",
+      "learner_evidence_added": 0,
+      "semantic_certification": false
+    },
+    "main-current-content-judgment": {
+      "operation_id": "main-current-content-judgment",
+      "request_sha256": "53aae5ccf70d33dea44c2e05b5947b47327ee93e6b70ffd1adeb520e99de27f9",
+      "revision": 31,
+      "review_index": 0,
+      "decision": "useful",
+      "content_sha256": "934f148d944bb5fa67792cb740d4eb44234a739239ae1340c6e1b72f98463986",
+      "semantic_certification": false,
+      "learner_evidence_added": 0
+    }
+  },
+  "status": "SCENE_COMPLETE",
+  "limits": "operator-authored fictional facts and source attributions; no semantic or host authentication",
+  "material_reads": {
+    "mara": [
+      "mara-email"
+    ],
+    "eli": [
+      "eli-email"
+    ]
+  },
+  "learning_cases": [
+    {
+      "id": "what-is-due-and-what-is-open",
+      "cue": "同一邮件出现旧欠额和新月付，怎样先查清金额，再保留分摊异议",
+      "intent": "取得完整资料，说明本次能出的金额，同时让最终分摊和对方垫款能力保有明确范围。",
+      "why_hard": "£240旧余额与£180月付款不是同一项；月付款已含偿还旧余额。愿意先出£90，也可能被听成接受过去全部均摊。Mara还不能垫付Eli晚到的钱。",
+      "what_changed": "Mara先读完整邮件，再在含原生引语的动作中纠正“另交£240”的理解；Eli实际打开副本后提出£90及暂定份额，Mara接受四月各£90、季度仍待谈，并要求提前到账。这里没有公开发生过两笔款的催收，也没有转账完成。",
+      "event_ids": [
+        "e-7f1c6098562d4d50",
+        "e-406b535b377a4ab9",
+        "e-415efbc15c11456e",
+        "e-7eb5c7dbbe08499b",
+        "e-c8e51fe97c724093",
+        "e-86159428862c4034"
+      ],
+      "public_fragment": [
+        {
+          "id": "e-7f1c6098562d4d50",
+          "kind": "action",
+          "actor": "mara",
+          "text": "I scroll below the balance and new-payment figures to read the rest of the email."
+        },
+        {
+          "id": "e-406b535b377a4ab9",
+          "kind": "speech",
+          "actor": "eli",
+          "text": "Can you send me the whole email? I want to see what it's actually asking for. I was away for six weeks, so I'm uncomfortable just calling everything half each—but I don't want you stuck paying it either."
+        },
+        {
+          "id": "e-415efbc15c11456e",
+          "kind": "action",
+          "actor": "mara",
+          "text": "I address a forward of the complete email to Eli and tap Send. ‘Oh, hang on. They aren’t asking for the two hundred and forty on top—the new payment includes forty a month to clear it. I can put in ninety for this collection, but I can’t manage an extra lump sum. I thought we meant half each when we said split. I hear you about being away, though.’"
+        },
+        {
+          "id": "e-7eb5c7dbbe08499b",
+          "kind": "action",
+          "actor": "eli",
+          "text": "I open the forwarded email on my phone and read it from the beginning through the payment details."
+        },
+        {
+          "id": "e-c8e51fe97c724093",
+          "kind": "speech",
+          "actor": "eli",
+          "text": "I can put in ninety for the fifteenth too. That would cover the next payment between us, but I'd like my share to be provisional while we sort out the quarter. I don't mind splitting the standing charges. It's the usage while I was away that bothers me, and I don't know how to put a fair number on it."
+        },
+        {
+          "id": "e-86159428862c4034",
+          "kind": "speech",
+          "actor": "mara",
+          "text": "All right—ninety each for the fifteenth, with the quarter still open. Please get yours to me a couple of days before; I can’t bridge it if it’s late. Twenty-seven each for standing charges sounds fair to me. With the usage, I don’t want to charge you as if you’d been here all along, but I don’t think taking all six weeks onto myself would be fair either."
+        }
+      ],
+      "fragment_sha256": "09824a5e8886502d23fe0ccfd64aac38c84d02344b019297292096753caa4d56",
+      "usage": [
+        {
+          "meaning": "我也能为十五日这次付款出九十英镑。put in在这里是共同费用中出一笔钱；can在此说明当前能承担并提出出资。",
+          "function": "把眼前可执行的金额说出来，没有据此接受过去的全部分摊。",
+          "conditions": "ninety是£90、for the fifteenth指这次预定扣款；不是每月永久承担£90，也不是已经付过。实际承诺仍需后续付款。",
+          "register": "本场合租费用协商中的口语；按关系和承诺范围调整。",
+          "frequency_status": "未核实语料频率或CEFR等级；这里只确认本册的实际用法。",
+          "event_id": "e-c8e51fe97c724093",
+          "surface": "I can put in ninety for the fifteenth too.",
+          "start": 0,
+          "end": 42,
+          "source_sha256": "625ddf0dd4d6fd97611fbeee40e3da08042a0835cf38cad3f23fdd2b6a21c2dd",
+          "variants": [
+            {
+              "text": "I can contribute ninety for this payment.",
+              "explanation": "双语回看编辑拟句，非角色原话。保留当前一笔出资的意思；contribute较明确地说明共同承担，仍不是已付款的报告。"
+            }
+          ],
+          "public_sources": []
+        },
+        {
+          "meaning": "在我们商定这一个季度的费用分担前，我希望自己的份额先作为暂定安排。",
+          "function": "请求对方同意把临时出钱与最终分摊分开。",
+          "conditions": "quarter指一月至三月这段三个月；provisional修饰双方之间的份额安排，不改变供应商账户本身。下一回合Mara说with the quarter still open，保留了待议范围。",
+          "register": "本场合租费用协商中的口语；按关系和承诺范围调整。",
+          "frequency_status": "未核实语料频率或CEFR等级；这里只确认本册的实际用法。",
+          "event_id": "e-c8e51fe97c724093",
+          "surface": "I'd like my share to be provisional while we sort out the quarter.",
+          "start": 93,
+          "end": 159,
+          "source_sha256": "625ddf0dd4d6fd97611fbeee40e3da08042a0835cf38cad3f23fdd2b6a21c2dd",
+          "variants": [
+            {
+              "text": "I can put in ninety for this payment. Can we leave the final split open?",
+              "explanation": "双语回看编辑拟句，非角色原话。分成两句，先说能做的一步，再请对方保留尚未商定的范围；仅自己写个备注并不自动取得对方同意。"
+            }
+          ],
+          "public_sources": []
+        },
+        {
+          "meaning": "如果你那笔钱晚到，我没有余钱先垫上这个缺口。bridge指临时补足资金缺口。",
+          "function": "为提前到账的要求给出具体限制，避免“你先垫一下”成为默认义务。",
+          "conditions": "it的上下文是Eli应提前转来的那份钱；不是Mara连自己的£90都不能出，也不是物理上的桥。此时只提出到账要求，尚未收到款。",
+          "register": "本场合租费用协商中的口语；按关系和承诺范围调整。",
+          "frequency_status": "未核实语料频率或CEFR等级；这里只确认本册的实际用法。",
+          "event_id": "e-86159428862c4034",
+          "surface": "I can’t bridge it if it’s late.",
+          "start": 118,
+          "end": 149,
+          "source_sha256": "2dc3254a52938a81386e571e57d49b6a62a5e3369e5c1dc82878eb180fb576c8",
+          "variants": [
+            {
+              "text": "I can’t cover your share while I wait for it.",
+              "explanation": "双语回看编辑拟句，非角色原话。cover强调暂时拿出资金；最终谁该承担多少仍可另谈，不能从这句话推导现实合同责任。"
+            }
+          ],
+          "public_sources": []
+        }
+      ]
+    },
+    {
+      "id": "an-offer-is-not-a-measurement",
+      "cue": "想让缺席被考虑，怎样提出少承担的数额，又不把它说成测量结果",
+      "intent": "澄清没有要求对方承担全部缺席费用，提出可讨论的金额，并保留付款方式还未谈妥的条件。",
+      "why_hard": "缺席应有影响，不直接推出减多少。£50让步、季度总额和已付金额还要分别算；愿意考虑一个总额，也不表示能在指定月份付出它。",
+      "what_changed": "Eli把“缺席应算进去”收窄为£50的提议，明确说没有计算证明这个数；Mara说could accept，并算出双方尚应补£170和£70，但立刻要求商定月付款办法。£250/£350仍未最终约定。",
+      "event_ids": [
+        "e-86159428862c4034",
+        "e-a84617fb614f47db",
+        "e-28341b5753f14fb3"
+      ],
+      "public_fragment": [
+        {
+          "id": "e-86159428862c4034",
+          "kind": "speech",
+          "actor": "mara",
+          "text": "All right—ninety each for the fifteenth, with the quarter still open. Please get yours to me a couple of days before; I can’t bridge it if it’s late. Twenty-seven each for standing charges sounds fair to me. With the usage, I don’t want to charge you as if you’d been here all along, but I don’t think taking all six weeks onto myself would be fair either."
+        },
+        {
+          "id": "e-a84617fb614f47db",
+          "kind": "speech",
+          "actor": "eli",
+          "text": "I'll send the ninety by the thirteenth. And yes, twenty-seven each for the standing charges. I don't expect you to take on everything while I was away; I just want the absence to count for something. Would you consider fifty pounds off my half of the quarter—so two hundred and fifty for me, three hundred and fifty for you? I haven't got a calculation that proves fifty. It's an offer, and you can tell me if it feels too much."
+        },
+        {
+          "id": "e-28341b5753f14fb3",
+          "kind": "speech",
+          "actor": "mara",
+          "text": "Fifty feels like a compromise I could accept. That’s a hundred and seventy still to come from me and seventy from you, after what we’ve both already paid. I need us to agree how to do that through the monthly payments, though. I’ve only got ninety for April, and I don’t want to say yes now and leave you chasing me for the difference."
+        }
+      ],
+      "fragment_sha256": "2ef07e6cc685f1a8b6c83aec71e96ca58528b3fbcee4050434d0d13c2b9a1bef",
+      "usage": [
+        {
+          "meaning": "我只是希望这次缺席在费用分摊时有实际影响。count for something在这里是有分量、会被纳入考虑。",
+          "function": "回应“你是不是想让我全担”的担忧，收窄自己要求的范围。",
+          "conditions": "前面I don’t expect you to take on everything表明没有要求全免；这句话本身没有给出金额或比例，也不证明缺席使成本等比例下降。",
+          "register": "本场合租费用协商中的口语；按关系和承诺范围调整。",
+          "frequency_status": "未核实语料频率或CEFR等级；这里只确认本册的实际用法。",
+          "event_id": "e-a84617fb614f47db",
+          "surface": "I just want the absence to count for something.",
+          "start": 152,
+          "end": 199,
+          "source_sha256": "f02de43d83db13cbc0ea00d6c374c2d594e500793b4e5402e382ef5cef761338",
+          "variants": [
+            {
+              "text": "I’m not asking you to cover all of it. I’m asking us to take the absence into account.",
+              "explanation": "双语回看编辑拟句，非角色原话。先排除过大的要求，再提出应考虑的因素；into account也不保证某个固定折扣。"
+            }
+          ],
+          "public_sources": []
+        },
+        {
+          "meaning": "从原先设想的这个季度一半费用中减去五十英镑。",
+          "function": "把一个感受改成有明确单位、基数和对象的提议。",
+          "conditions": "本册季度总额£600，一半£300，减£50得到£250；不是减50%，也不是从£240旧欠额中给每个人各减£50。Eli紧接着承认这只是offer，不是个人用量测算。",
+          "register": "本场合租费用协商中的口语；按关系和承诺范围调整。",
+          "frequency_status": "未核实语料频率或CEFR等级；这里只确认本册的实际用法。",
+          "event_id": "e-a84617fb614f47db",
+          "surface": "fifty pounds off my half of the quarter",
+          "start": 219,
+          "end": 258,
+          "source_sha256": "f02de43d83db13cbc0ea00d6c374c2d594e500793b4e5402e382ef5cef761338",
+          "variants": [
+            {
+              "text": "Would you consider reducing my part of the total by fifty pounds?",
+              "explanation": "双语回看编辑拟句，非角色原话。明确减少的是total中的本人部分；实际使用仍需先说清total是哪笔费用。"
+            }
+          ],
+          "public_sources": []
+        },
+        {
+          "meaning": "Eli少承担五十英镑这个调整，对我来说像是一个可以考虑接受的折中。",
+          "function": "表示有接受的可能，同时让随后关于付款安排的条件继续成立。",
+          "conditions": "这里could是当前可能愿意接受，不是过去已经接受。后面的I need us to agree how说明月付款仍须商定；不能脱离这一回应把它记成已定分摊。",
+          "register": "本场合租费用协商中的口语；按关系和承诺范围调整。",
+          "frequency_status": "未核实语料频率或CEFR等级；这里只确认本册的实际用法。",
+          "event_id": "e-28341b5753f14fb3",
+          "surface": "Fifty feels like a compromise I could accept.",
+          "start": 0,
+          "end": 45,
+          "source_sha256": "f794e9ecdbd29c1ed15841ee5ba721b134d3c81900408aa0b2ae992eba88ce16",
+          "variants": [
+            {
+              "text": "I could agree to that amount if we can make the payments work.",
+              "explanation": "双语回看编辑拟句，非角色原话。把原场景后续才说明的付款条件直接接在if后；这是假设说法，不是Mara新增的承诺。"
+            }
+          ],
+          "public_sources": []
+        }
+      ]
+    },
+    {
+      "id": "the-sums-work-but-can-i-pay",
+      "cue": "分期算得通，怎样只确认眼下能做的事，并把后续方案留下记录",
+      "intent": "区分预测成本、分期提议和本人支付能力，保持四月安排明确，同时把五月之后的方案留待核预算。",
+      "why_hard": "Eli算出的£80/£100以持续费用预测为前提；Mara尚不知能否从五月起出£100。that payment需回指四月的£90；群聊写下方案也不等于后续方案获同意或钱已付出。",
+      "what_changed": "Mara说算式成立，却只承诺四月£90；她请求周日再议并共同留痕。Eli实际发出标明proposal和awaiting 周日的群聊摘要，Mara确认记录并停止当晚计算。未来付款能力、最终分摊和真实转账都没有因此完成。",
+      "event_ids": [
+        "e-451c76a4f22a4861",
+        "e-3b1b64296f2f493e",
+        "e-1fbee59c5f93441d",
+        "e-717ccd2c242443c0",
+        "e-d26f673a62454d56",
+        "e-7d350f790e9a46a1"
+      ],
+      "public_fragment": [
+        {
+          "id": "e-451c76a4f22a4861",
+          "kind": "speech",
+          "actor": "eli",
+          "text": "Could we keep April at ninety each, then do eighty from me and a hundred from you for the next five payments? Counting seventy each towards the ongoing estimate, April puts twenty each towards the old balance. That leaves fifty for me and a hundred and fifty for you, so ten and thirty a month would clear those. We'd still need to check the new bills against the estimate. Is a hundred from May manageable for you, though?"
+        },
+        {
+          "id": "e-3b1b64296f2f493e",
+          "kind": "speech",
+          "actor": "mara",
+          "text": "The figures make sense. I need to check whether I can manage the hundred, though; I know I’ve got ninety for April, and that’s all I can promise tonight. Can we keep that payment firm and come back to the May-to-September plan on Sunday? Could you put your proposal in the house chat before then? I’d like us both keeping track of this."
+        },
+        {
+          "id": "e-1fbee59c5f93441d",
+          "kind": "action",
+          "actor": "eli",
+          "text": "I type a summary in the house chat: April at £90 each, my transfer by 13 April; proposed quarter totals of £250 for me and £350 for Mara, with £180 each already paid; proposed May–September payments of £80 from me and £100 from Mara, allowing £70 each towards the ongoing forecast. I mark the later payments as awaiting Sunday's discussion and note that future bills still need checking against the forecast. I tap Send."
+        },
+        {
+          "id": "e-717ccd2c242443c0",
+          "kind": "observation",
+          "text": "Eli's house-chat summary is sent. It records April at £90 each and his promised transfer by 13 April, labels the quarter totals and May–September schedule as proposals, and leaves the later payments awaiting Sunday's discussion. It also records the need to check future bills against the forecast."
+        },
+        {
+          "id": "e-d26f673a62454d56",
+          "kind": "speech",
+          "actor": "mara",
+          "text": "Thanks for putting it in the chat. That takes one thing out of my head. I’ll check my budget before Sunday. I’m leaving the sums alone for tonight."
+        },
+        {
+          "id": "e-7d350f790e9a46a1",
+          "kind": "speech",
+          "actor": "eli",
+          "text": "Yeah, let's leave it there tonight. Sunday, then. Thanks for hearing me out about being away."
+        }
+      ],
+      "fragment_sha256": "7301cffc2991816f73977be10f57746e2009c8dac4668d1104a1a76cd4f1b12e",
+      "usage": [
+        {
+          "meaning": "预计接下来持续发生的能源费用；在这项提议里，每人按每月£70计。",
+          "function": "把未来费用预测与偿还旧余额的那部分钱分开。",
+          "conditions": "£70每人来自全屋每月£140预测，不是已测出的个人用量，也不是对未来费用的保证。Eli随后仍要求拿新账单核对。",
+          "register": "本场合租费用协商中的口语；按关系和承诺范围调整。",
+          "frequency_status": "未核实语料频率或CEFR等级；这里只确认本册的实际用法。",
+          "event_id": "e-451c76a4f22a4861",
+          "surface": "the ongoing estimate",
+          "start": 140,
+          "end": 160,
+          "source_sha256": "74b44e887156ef0d707ba071db5e65242ca6d6bd0a59c5e84ef899e715531e04",
+          "variants": [
+            {
+              "text": "The proposal allows seventy each a month for ongoing costs. We’d still need to check the actual bills.",
+              "explanation": "双语回看编辑拟句，非角色原话。明确说这项提议每人每月预留70英镑给持续费用，不把费用预测当实测用量，也不暗示已经同意。"
+            }
+          ],
+          "public_sources": [
+            {
+              "label": "账单制度背景：Citizens Advice月付款说明；不作本条英文的语料或词频证据",
+              "url": "https://www.citizensadvice.org.uk/consumer/energy/energy-supply/problems-with-your-energy-bill/energy-supplier-has-increased-your-direct-debit/"
+            }
+          ]
+        },
+        {
+          "meaning": "这些数额之间的计算关系讲得通。",
+          "function": "承认对方算式的一点，再说明本人支付能力尚待确认。",
+          "conditions": "下句I need to check whether I can manage the hundred保留了未知；本句既没有证明最终分摊公平，也没有答应从五月起付£100。",
+          "register": "本场合租费用协商中的口语；按关系和承诺范围调整。",
+          "frequency_status": "未核实语料频率或CEFR等级；这里只确认本册的实际用法。",
+          "event_id": "e-3b1b64296f2f493e",
+          "surface": "The figures make sense.",
+          "start": 0,
+          "end": 23,
+          "source_sha256": "4fa13cce3cabbadc4c3e0ec9e594e320f983c357d06f1c7ae43c5287e5a1c7aa",
+          "variants": [
+            {
+              "text": "The sums add up. I still need to check my budget.",
+              "explanation": "双语回看编辑拟句，非角色原话。短句分别承认算得通和保留预算检查；不是角色在原作中额外说过的话。"
+            }
+          ],
+          "public_sources": []
+        },
+        {
+          "meaning": "我得先核一下，自己能不能承担那每月一百英镑。manage在这里是支付上能应付，不是会不会算。",
+          "function": "把接受一个计算方案与能否实际承担付款分开。",
+          "conditions": "the hundred回指五月至九月拟议的每月£100；不是一次性£100，也不是已经知道付不起。afford未在这册公开原句出现，下面只将它用作编辑变式。",
+          "register": "本场合租费用协商中的口语；按关系和承诺范围调整。",
+          "frequency_status": "未核实语料频率或CEFR等级；这里只确认本册的实际用法。",
+          "event_id": "e-3b1b64296f2f493e",
+          "surface": "I need to check whether I can manage the hundred",
+          "start": 24,
+          "end": 72,
+          "source_sha256": "4fa13cce3cabbadc4c3e0ec9e594e320f983c357d06f1c7ae43c5287e5a1c7aa",
+          "variants": [
+            {
+              "text": "I need to check whether I can afford a hundred a month.",
+              "explanation": "双语回看编辑拟句，非角色原话。用afford把经济上能否承担说得直接，加入a month保留单位；不得把这个编辑句记成角色原话。"
+            }
+          ],
+          "public_sources": []
+        },
+        {
+          "meaning": "我们能不能先把那次付款安排保持明确、已确认的状态。firm在这里是确定的安排。",
+          "function": "从尚待检查的新计划中保住一项当前可以承诺的安排。",
+          "conditions": "that payment依据前句回指四月各£90，不是最近提到的五月每月£100。问句是在确认安排，不是银行已执行；firm也不是“公司”的名词义。",
+          "register": "本场合租费用协商中的口语；按关系和承诺范围调整。",
+          "frequency_status": "未核实语料频率或CEFR等级；这里只确认本册的实际用法。",
+          "event_id": "e-3b1b64296f2f493e",
+          "surface": "Can we keep that payment firm",
+          "start": 154,
+          "end": 183,
+          "source_sha256": "4fa13cce3cabbadc4c3e0ec9e594e320f983c357d06f1c7ae43c5287e5a1c7aa",
+          "variants": [
+            {
+              "text": "Can we confirm ninety each for April and leave May open?",
+              "explanation": "双语回看编辑拟句，非角色原话。直接说出月份和金额以减少指代负担；仍是双方需要确认的安排，不代表款项已到账。"
+            }
+          ],
+          "public_sources": []
+        }
+      ]
+    }
+  ],
+  "series_relations": [
+    {
+      "id": "sums-versus-a-result",
+      "kind": "handling-function",
+      "source": {
+        "book_id": "balance-on-screen-01",
+        "book_title": "The Balance on the Screen / 屏幕上的余额",
+        "case_id": "the-sums-work-but-can-i-pay",
+        "case_sha256": "bfef596b760bd19ebc2a7ceef63d977884b31912e7703e8882aecec311687811",
+        "fragment_sha256": "7301cffc2991816f73977be10f57746e2009c8dac4668d1104a1a76cd4f1b12e"
+      },
+      "target": {
+        "book_id": "forty-milliseconds-01",
+        "book_title": "What Did the Forty Milliseconds Measure? / 四十毫秒量了什么",
+        "case_id": "investigate-without-a-fix",
+        "case_sha256": "1f17cb4fc7879f0255fa994d5cdcad1b2d98bd166c6de7f648ba5895ee781b68",
+        "fragment_sha256": "a359b0812d9e79967bf7413d6bcdcce1e86406bda3b6687d4988b2cdb276799c"
+      },
+      "target_root": "../../forty-milliseconds-01/source",
+      "explanation": "算式讲得通，仍可能缺少现实能力或执行证据；先确认已知的一小步。",
+      "differences": "生活册未知是后续支付能力/同意；技术册未知是启动段细分与可验证修复。不是同一词义，不计词汇复现。",
+      "semantic_certification": false
+    }
+  ],
+  "learning_lessons": [
+    {
+      "id": "which-money-and-which-agreement",
+      "title": "先听清是哪一笔钱，再说我能承担什么",
+      "author": "双语回看编辑",
+      "purpose": "听懂旧欠额与新月付的关系，区别当前出资、临时份额和替人垫款。",
+      "sections": [
+        {
+          "id": "entry",
+          "kind": "explanation",
+          "purpose": "用数量、单位和时间先建立听觉直觉；说明混合动作中的原生引语",
+          "text": "这是英格兰两位合租者在四月处理能源费用的虚构场景，金额也全是虚构的。先把旧账放在一起：一月至三月总费用六百英镑，两人合计已经交了三百六十，还差二百四十。这二百四十是全屋账户的旧余额，不是每个人各欠二百四十。Mara先往下读邮件，Eli要看完整版本。接下来含有动作说明；其中引号内才是Mara当时说的话。",
+          "source_section_ids": []
+        },
+        {
+          "id": "read-the-email",
+          "kind": "source",
+          "purpose": "完整保留读取、请求、含原生引语的转发动作及Eli打开邮件",
+          "event_ids": [
+            "e-7f1c6098562d4d50",
+            "e-406b535b377a4ab9",
+            "e-415efbc15c11456e",
+            "e-7eb5c7dbbe08499b"
+          ],
+          "public_fragment": [
+            {
+              "id": "e-7f1c6098562d4d50",
+              "kind": "action",
+              "actor": "mara",
+              "text": "I scroll below the balance and new-payment figures to read the rest of the email."
+            },
+            {
+              "id": "e-406b535b377a4ab9",
+              "kind": "speech",
+              "actor": "eli",
+              "text": "Can you send me the whole email? I want to see what it's actually asking for. I was away for six weeks, so I'm uncomfortable just calling everything half each—but I don't want you stuck paying it either."
+            },
+            {
+              "id": "e-415efbc15c11456e",
+              "kind": "action",
+              "actor": "mara",
+              "text": "I address a forward of the complete email to Eli and tap Send. ‘Oh, hang on. They aren’t asking for the two hundred and forty on top—the new payment includes forty a month to clear it. I can put in ninety for this collection, but I can’t manage an extra lump sum. I thought we meant half each when we said split. I hear you about being away, though.’"
+            },
+            {
+              "id": "e-7eb5c7dbbe08499b",
+              "kind": "action",
+              "actor": "eli",
+              "text": "I open the forwarded email on my phone and read it from the beginning through the payment details."
+            }
+          ],
+          "fragment_sha256": "80a46b67b73517fb1a1a7cfb8df6a3fcd3e8895fd8cc0e56d5204030d1ef8c77"
+        },
+        {
+          "id": "on-top",
+          "kind": "explanation",
+          "purpose": "解释金额包含关系和修复的实际范围",
+          "text": "新月付款是一百八十英镑。按这册虚构邮件的安排，其中一百四十是今后的持续费用预测，四十是偿还旧余额；四十交六次，合计清掉二百四十。因此Mara说They aren’t asking for the two hundred and forty on top，是说没有要求在新月付款之外再另交一笔二百四十。on top在这里是额外加上去，不是位置在上面。她在读完后把理解修正出来；原作没有出现她此前公开向Eli索要两笔款的对话。这个账单说明只解释本册安排，别据此猜另一张真实账单也完全一样。",
+          "source_section_ids": [
+            "read-the-email"
+          ]
+        },
+        {
+          "id": "listen-for-the-limit",
+          "kind": "explanation",
+          "purpose": "在实际往返前区分当前付款与最终分摊",
+          "text": "现在听Eli愿意先出多少，再听Mara怎样回应。注意两个问题同时存在：这次扣款怎样凑齐，上一季最终怎样分。每人先出九十，合计一百八十，只能先回答第一个问题。",
+          "source_section_ids": []
+        },
+        {
+          "id": "pay-now-leave-open",
+          "kind": "source",
+          "purpose": "连续保留Eli临时出资请求及Mara接受的范围与垫款限制",
+          "event_ids": [
+            "e-c8e51fe97c724093",
+            "e-86159428862c4034"
+          ],
+          "public_fragment": [
+            {
+              "id": "e-c8e51fe97c724093",
+              "kind": "speech",
+              "actor": "eli",
+              "text": "I can put in ninety for the fifteenth too. That would cover the next payment between us, but I'd like my share to be provisional while we sort out the quarter. I don't mind splitting the standing charges. It's the usage while I was away that bothers me, and I don't know how to put a fair number on it."
+            },
+            {
+              "id": "e-86159428862c4034",
+              "kind": "speech",
+              "actor": "mara",
+              "text": "All right—ninety each for the fifteenth, with the quarter still open. Please get yours to me a couple of days before; I can’t bridge it if it’s late. Twenty-seven each for standing charges sounds fair to me. With the usage, I don’t want to charge you as if you’d been here all along, but I don’t think taking all six weeks onto myself would be fair either."
+            }
+          ],
+          "fragment_sha256": "e5e0171579bbf2648acae2832f9309d542b5ff7eb1218271c7db24ec790345b0"
+        },
+        {
+          "id": "put-in-and-provisional",
+          "kind": "explanation",
+          "purpose": "解释能出钱、提出安排和双方尚待议的份额",
+          "text": "I can put in ninety for the fifteenth too，是“我也能为十五日这次付款出九十英镑”。put in是共同费用中出钱。这里的can说明他眼下能承担，并提出这样做；没有说钱已经转出。接着的I’d like my share to be provisional，是希望自己的份额先暂定。while we sort out the quarter，是等他们把这一月至三月的分摊商量清楚。provisional不等于拒付全部费用，也不是他一个人写个备注就能决定规则。Mara实际接住了这个范围，说ninety each for the fifteenth, with the quarter still open。",
+          "source_section_ids": [
+            "pay-now-leave-open"
+          ]
+        },
+        {
+          "id": "bridge-the-gap",
+          "kind": "explanation",
+          "purpose": "把真实垫款限制与最终责任区分",
+          "text": "Mara随后要求提前几天拿到钱，说I can’t bridge it if it’s late。bridge在这里是临时垫上资金缺口：如果Eli的钱晚到，她没有余钱先代出。她不是说自己的九十也拿不出来。最终谁该付多少，和谁能先把钱垫上，是两种不同的压力。她把这个限制说给对方听，下一步才可能约定具体到账时间。",
+          "source_section_ids": [
+            "pay-now-leave-open"
+          ]
+        },
+        {
+          "id": "shorter-options",
+          "kind": "contrast",
+          "purpose": "给出比完整专家式解释更短的起步表达",
+          "text": "以下是编辑给的短变式，不是角色新增发言，也不预设听者有多少钱。如果还没算清，可以先说：I’m getting lost in the figures. Can we check what is included first? 我有点绕不过这些数，能先看清包含哪些钱吗？如果确实能先出一笔，可以说：I can put in ninety for this payment. Can we leave the final split open? 我能先为这次出九十，最终怎么分能不能留待确认？先说可做的一步，再提出尚未谈妥的范围，不需要一口气讲完全部算式。",
+          "source_section_ids": [
+            "read-the-email",
+            "pay-now-leave-open"
+          ]
+        },
+        {
+          "id": "rehear-the-agreement",
+          "kind": "source",
+          "purpose": "带着金额、暂定范围和垫款限制，再完整回听这一组回应",
+          "event_ids": [
+            "e-c8e51fe97c724093",
+            "e-86159428862c4034"
+          ],
+          "public_fragment": [
+            {
+              "id": "e-c8e51fe97c724093",
+              "kind": "speech",
+              "actor": "eli",
+              "text": "I can put in ninety for the fifteenth too. That would cover the next payment between us, but I'd like my share to be provisional while we sort out the quarter. I don't mind splitting the standing charges. It's the usage while I was away that bothers me, and I don't know how to put a fair number on it."
+            },
+            {
+              "id": "e-86159428862c4034",
+              "kind": "speech",
+              "actor": "mara",
+              "text": "All right—ninety each for the fifteenth, with the quarter still open. Please get yours to me a couple of days before; I can’t bridge it if it’s late. Twenty-seven each for standing charges sounds fair to me. With the usage, I don’t want to charge you as if you’d been here all along, but I don’t think taking all six weeks onto myself would be fair either."
+            }
+          ],
+          "fragment_sha256": "e5e0171579bbf2648acae2832f9309d542b5ff7eb1218271c7db24ec790345b0"
+        }
+      ],
+      "public_source_sha256": "5d528aef8ef57e45e9225ee73e0910d32489b6474e51fc909824642eb20f71d6"
+    },
+    {
+      "id": "the-figures-and-the-promise",
+      "title": "算得通，还不能替我答应",
+      "author": "双语回看编辑",
+      "purpose": "区别有根据的金额提议、愿意考虑、付款能力与明确承诺，并听到实际留下的记录。",
+      "sections": [
+        {
+          "id": "entry",
+          "kind": "explanation",
+          "purpose": "用具体总额和单位建立提议的基数，不预先批准方案",
+          "text": "这一段从两人暂定四月各出九十之后开始。过去一季费用合计六百，若各一半就是各三百。Eli提出从自己这一半里少五十，所以他承担二百五十，Mara承担三百五十。单位是五十英镑，不是百分之五十。两人过去各已交一百八十，接下来还要算的是剩余多少；这个提议是否合适，不能靠减法本身回答。这一遍先跟住每个数字属于哪一笔，再听Mara实际答应到哪一步。",
+          "source_section_ids": []
+        },
+        {
+          "id": "offer-and-possible-acceptance",
+          "kind": "source",
+          "purpose": "连续保留£50提议、没有测算证明的说明及could accept之后的付款条件",
+          "event_ids": [
+            "e-a84617fb614f47db",
+            "e-28341b5753f14fb3"
+          ],
+          "public_fragment": [
+            {
+              "id": "e-a84617fb614f47db",
+              "kind": "speech",
+              "actor": "eli",
+              "text": "I'll send the ninety by the thirteenth. And yes, twenty-seven each for the standing charges. I don't expect you to take on everything while I was away; I just want the absence to count for something. Would you consider fifty pounds off my half of the quarter—so two hundred and fifty for me, three hundred and fifty for you? I haven't got a calculation that proves fifty. It's an offer, and you can tell me if it feels too much."
+            },
+            {
+              "id": "e-28341b5753f14fb3",
+              "kind": "speech",
+              "actor": "mara",
+              "text": "Fifty feels like a compromise I could accept. That’s a hundred and seventy still to come from me and seventy from you, after what we’ve both already paid. I need us to agree how to do that through the monthly payments, though. I’ve only got ninety for April, and I don’t want to say yes now and leave you chasing me for the difference."
+            }
+          ],
+          "fragment_sha256": "192ad33326751459a6846c804928d6469788b1205e1c49d71b13b8c98dd486a0"
+        },
+        {
+          "id": "offer-not-proof",
+          "kind": "explanation",
+          "purpose": "区分希望被考虑、明确的金额、测量与谈判提议",
+          "text": "I just want the absence to count for something，是希望缺席在分摊时有实际影响。前一句I don’t expect you to take on everything已说明他没有要求Mara全担。fifty pounds off my half，是从他原先的一半中减五十英镑。他接着说I haven’t got a calculation that proves fifty：这个五十是拿来谈的offer，不是分表测出的个人用量。Mara算出她还应补一百七十、Eli还应补七十，是因为每人过去都已交了一百八十；这仍只是按该提议计算，不会把提议变成证明。",
+          "source_section_ids": [
+            "offer-and-possible-acceptance"
+          ]
+        },
+        {
+          "id": "could-accept",
+          "kind": "explanation",
+          "purpose": "结合实际下一句理解情态和同意范围",
+          "text": "Fifty feels like a compromise I could accept，表示这个折中是她可能愿意接受的。这里could不是过去已经接受；后面立刻跟着I need us to agree how to do that through the monthly payments。她仍要商定怎样按月付，手头只确定四月的九十。不能把could accept摘下来，写成整套方案已经通过。下面这个短句只是编辑把条件说在一起：I could agree to that amount if we can make the payments work. 如果付款安排能做得到，这个金额我可以考虑接受。它不是角色在原作中另说过的话。",
+          "source_section_ids": [
+            "offer-and-possible-acceptance"
+          ]
+        },
+        {
+          "id": "forecast-first",
+          "kind": "explanation",
+          "purpose": "在口算出现前分开每月预测和旧余额，降低听觉负担",
+          "text": "下一段的月付款仍合计一百八十。按本册预测，其中一百四十是持续费用，先按每人七十计；剩下四十偿还旧余额。四月各出九十，便各有二十算向旧余额。Eli随后把五月到九月的五次付款提成他八十、Mara一百。这里的七十是每人每月的预测份额，不是已经测出的未来个人用量。带着这个区别，听他的算式和Mara的回应。",
+          "source_section_ids": []
+        },
+        {
+          "id": "plan-and-limit",
+          "kind": "source",
+          "purpose": "连续保留分期提议和Mara对算式、支付能力、April承诺及记录的回应",
+          "event_ids": [
+            "e-451c76a4f22a4861",
+            "e-3b1b64296f2f493e"
+          ],
+          "public_fragment": [
+            {
+              "id": "e-451c76a4f22a4861",
+              "kind": "speech",
+              "actor": "eli",
+              "text": "Could we keep April at ninety each, then do eighty from me and a hundred from you for the next five payments? Counting seventy each towards the ongoing estimate, April puts twenty each towards the old balance. That leaves fifty for me and a hundred and fifty for you, so ten and thirty a month would clear those. We'd still need to check the new bills against the estimate. Is a hundred from May manageable for you, though?"
+            },
+            {
+              "id": "e-3b1b64296f2f493e",
+              "kind": "speech",
+              "actor": "mara",
+              "text": "The figures make sense. I need to check whether I can manage the hundred, though; I know I’ve got ninety for April, and that’s all I can promise tonight. Can we keep that payment firm and come back to the May-to-September plan on Sunday? Could you put your proposal in the house chat before then? I’d like us both keeping track of this."
+            }
+          ],
+          "fragment_sha256": "72d0b2b9b4e553c6324080fa881773141ed8f3a01b945b47343888a45bad3b81"
+        },
+        {
+          "id": "estimate-and-ability",
+          "kind": "explanation",
+          "purpose": "把计算、预测和本人支付能力分别理解",
+          "text": "Eli用the ongoing estimate指预计持续发生的费用，并说仍要拿新账单对照。若按他的提议算，四月这笔之后，旧余额中他还出五十，Mara还出一百五十；再分五次，每月就是他十、她三十，加上每人七十的持续费用预测，才得到八十和一百。算式成立依赖这些前提，未来费用并没有被保证。Mara先说The figures make sense，随后说I need to check whether I can manage the hundred。她接受的是数之间讲得通；能否每月拿出一百，仍不知道。这里manage是经济上能不能应付，不是会不会做这道减法。",
+          "source_section_ids": [
+            "plan-and-limit"
+          ]
+        },
+        {
+          "id": "firm-refers-to-april",
+          "kind": "explanation",
+          "purpose": "解决that payment指代及firm的实际含义",
+          "text": "Can we keep that payment firm里的that payment，依据她前面的I know I’ve got ninety for April，指四月各九十这项安排，不是五月的一百。firm在这里是把安排保持明确、确定。这个问句没有报告银行已经扣款，也没有确认五月到九月的计划。她能承诺的是今晚已知能承担的部分，后续要核预算再谈。",
+          "source_section_ids": [
+            "plan-and-limit"
+          ]
+        },
+        {
+          "id": "shorter-budget-words",
+          "kind": "contrast",
+          "purpose": "提供短说法；明确afford是编辑对照而非角色原句",
+          "text": "下面仍是编辑拟句。The sums add up. I still need to check my budget. 算式对得上，我还需要查预算。也可以把支付能力说得更直接：I need to check whether I can afford a hundred a month. 我得查能不能承担每月一百。afford没有出现在这册角色的公开原句中，这里只是manage在金钱语境下的一个对照说法。要缩短承诺，还可以说：I can confirm ninety for April. I’m not ready to agree to May yet. 四月九十我能确认，五月我还不能答应。只有本人确实有这个能力和安排时，才能这样承诺。",
+          "source_section_ids": [
+            "plan-and-limit"
+          ]
+        },
+        {
+          "id": "a-record-is-not-a-payment",
+          "kind": "explanation",
+          "purpose": "给动作与公开结果建立正确期待，不把写入当作获批",
+          "text": "接下来，Eli把金额写进合租群聊并发出，明确把后面的安排标为提议、等待周日讨论。动作和记录的说明都保留。它们确认的是记录已发，不是银行转账；最后再听两个人怎样停下当晚的计算。",
+          "source_section_ids": []
+        },
+        {
+          "id": "record-and-close",
+          "kind": "source",
+          "purpose": "完整保留群聊摘要动作、已发出的公开结果及双方的实际收束",
+          "event_ids": [
+            "e-1fbee59c5f93441d",
+            "e-717ccd2c242443c0",
+            "e-d26f673a62454d56",
+            "e-7d350f790e9a46a1"
+          ],
+          "public_fragment": [
+            {
+              "id": "e-1fbee59c5f93441d",
+              "kind": "action",
+              "actor": "eli",
+              "text": "I type a summary in the house chat: April at £90 each, my transfer by 13 April; proposed quarter totals of £250 for me and £350 for Mara, with £180 each already paid; proposed May–September payments of £80 from me and £100 from Mara, allowing £70 each towards the ongoing forecast. I mark the later payments as awaiting Sunday's discussion and note that future bills still need checking against the forecast. I tap Send."
+            },
+            {
+              "id": "e-717ccd2c242443c0",
+              "kind": "observation",
+              "text": "Eli's house-chat summary is sent. It records April at £90 each and his promised transfer by 13 April, labels the quarter totals and May–September schedule as proposals, and leaves the later payments awaiting Sunday's discussion. It also records the need to check future bills against the forecast."
+            },
+            {
+              "id": "e-d26f673a62454d56",
+              "kind": "speech",
+              "actor": "mara",
+              "text": "Thanks for putting it in the chat. That takes one thing out of my head. I’ll check my budget before Sunday. I’m leaving the sums alone for tonight."
+            },
+            {
+              "id": "e-7d350f790e9a46a1",
+              "kind": "speech",
+              "actor": "eli",
+              "text": "Yeah, let's leave it there tonight. Sunday, then. Thanks for hearing me out about being away."
+            }
+          ],
+          "fragment_sha256": "24a96072b0ffb471ba6cc62c9ebd410f7283809639afdb77676411e745638cd7"
+        },
+        {
+          "id": "argument-application",
+          "kind": "contrast",
+          "purpose": "清楚标记作者的日常到议论应用及类比边界",
+          "text": "最后是一小段作者应用示范，不是Mara或Eli的原话：A fixed cost can justify a shared contribution. It does not automatically justify an equal share of every cost. 固定成本可以成为共同出资的理由，但不能自动证明所有费用都应均摊。这个区别可以用于议论中提出一个理由，再限制它能推出多大的结论。若转向公共交通或图书馆收费，还要研究那个制度的成本、公共收益与支付能力；本册虚构家庭账单本身不是政策证据，也不证明任何考试表现。",
+          "source_section_ids": [
+            "offer-and-possible-acceptance",
+            "plan-and-limit"
+          ]
+        }
+      ],
+      "public_source_sha256": "5d528aef8ef57e45e9225ee73e0910d32489b6474e51fc909824642eb20f71d6"
+    }
+  ],
+  "editorial_scope": {
+    "role": "international-life-and-argument-case",
+    "limits": "A budget and consent boundary remains open; arithmetic/negotiation are relatively fluent, not a human difficulty measurement.",
+    "learner_outcome": "unobserved",
+    "real_user_biography": false,
+    "source_profile": "0.8.0@314e513d439829fa1159e6801d1421ed1e569e0a",
+    "source_schema_migration": "Explicit current source2; historical production snapshots not rewritten."
+  },
+  "learning_reviews": [
+    {
+      "decision": "useful",
+      "reviewer": "Main after actual public source/lesson reading and scoped V01/V02/V03/D01 returns",
+      "reason": "按当前editorial_scope与具体案例采用为可理解、可回查、可供取用的语言资料；不是完整真实窘境认证、词频认证、手机验证或学习收益。A budget and consent boundary remains open; arithmetic/negotiation are relatively fluent, not a human difficulty measurement.",
+      "case_findings": [
+        {
+          "case_id": "what-is-due-and-what-is-open",
+          "judgment": "useful",
+          "reason": "完整材料读取/分享与未付钱分开；混合action中的原生引语没有冒名speech，240/180/40未双算。"
+        },
+        {
+          "case_id": "an-offer-is-not-a-measurement",
+          "judgment": "useful",
+          "reason": "50英镑是提议而不是个人用量推算；could accept的后续月付条件保留。"
+        },
+        {
+          "case_id": "the-sums-work-but-can-i-pay",
+          "judgment": "useful",
+          "reason": "四月90承诺、80/100提议、预算未知与记录已发分别保留；新变式明说每月持续费用，不称实测usage。"
+        }
+      ],
+      "content_sha256": "934f148d944bb5fa67792cb740d4eb44234a739239ae1340c6e1b72f98463986",
+      "recorded_at": "2026-11-11T06:28:18.346+00:00",
+      "semantic_certification": false
+    }
+  ],
+  "integrity_sha256": "0467d3eb41e3889887e1fb042c8b6532ef07d520cd82c627203affa605178247"
+}
+```

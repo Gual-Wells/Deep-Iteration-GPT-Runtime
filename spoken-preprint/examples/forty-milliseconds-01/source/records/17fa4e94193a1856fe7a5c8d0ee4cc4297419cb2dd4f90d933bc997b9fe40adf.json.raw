@@ -1,0 +1,9 @@
+{
+  "kind": "action",
+  "text": "I open the timer wrapper and the saved demo trace side by side.",
+  "actual_native_return": "I open the timer wrapper and the saved demo trace side by side.",
+  "reads": [
+    "timer",
+    "trace"
+  ]
+}

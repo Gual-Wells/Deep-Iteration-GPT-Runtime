@@ -1,0 +1,15 @@
+{
+  "kind": "world",
+  "decision": "apply",
+  "proposal": "Open the reserved diagnostic console in standby so a requested replay can be run during the interview.",
+  "reason": "Making the console available gives the participants a present option without spending either diagnostic slot or supplying an unrequested test result.",
+  "changes": {
+    "console_status": "open in standby; awaiting a diagnostic request; no replay has run in this encounter"
+  },
+  "percepts": [
+    {
+      "to": ["public"],
+      "text": "The reserved console is open. Its status reads Ready, with two replay slots remaining. The result area is empty."
+    }
+  ]
+}

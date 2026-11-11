@@ -1,0 +1,39 @@
+{
+  "kind": "world",
+  "decision": "apply",
+  "proposal": "Complete the requested sequential A-then-B replay on the same live module and display the requested frame-labelled reads beside their saved native references.",
+  "reason": "The submitted replay is covered by the frozen fixture and uses one of the two available diagnostic slots.",
+  "changes": {
+    "diagnostic_slots": 1,
+    "console_status": "open; requested sequential replay complete; one diagnostic slot remains",
+    "latest_diagnostic": {
+      "sequence": "A then B, same live module",
+      "reads": [
+        {
+          "frame_id": "A",
+          "read": "immediate scores copied into an independent array before B",
+          "scores": [2, 0, -1],
+          "saved_native_reference": [2, 0, -1]
+        },
+        {
+          "frame_id": "B",
+          "read": "immediate scores copied into an independent array after B",
+          "scores": [-1, 2, 0],
+          "saved_native_reference": [-1, 2, 0]
+        },
+        {
+          "frame_id": "A",
+          "read": "retained A wrapper read and copied after B",
+          "scores": [-1, 2, 0],
+          "saved_native_reference": [2, 0, -1]
+        }
+      ]
+    }
+  },
+  "percepts": [
+    {
+      "to": ["public"],
+      "text": "The console completes one sequential replay on the same module. Its log shows: A | immediate independent snapshot before B | [2,0,-1] | saved A reference [2,0,-1]; B | immediate independent snapshot after B | [-1,2,0] | saved B reference [-1,2,0]; A | retained A wrapper read after B | [-1,2,0] | saved A reference [2,0,-1]. One replay slot remains."
+    }
+  ]
+}

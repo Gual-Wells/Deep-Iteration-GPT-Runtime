@@ -1,0 +1,1 @@
+{"kind":"speech","text":"Oh—that retained A has B's scores now. Keeping the Tensor hasn't preserved A's result in this run. I'd restore the independent copy immediately after each call and use the last replay to check both history entries after B."}

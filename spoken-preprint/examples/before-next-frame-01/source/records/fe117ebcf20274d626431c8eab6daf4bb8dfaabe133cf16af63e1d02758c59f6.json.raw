@@ -1,0 +1,1 @@
+{"kind":"speech","text":"Let me pull up the exact lines. I used to copy the output into a new float array for the history entry; the patch keeps the returned Tensor instead. I wanted to avoid that allocation, but I haven't checked what that Tensor actually owns.","reads":["patch"]}

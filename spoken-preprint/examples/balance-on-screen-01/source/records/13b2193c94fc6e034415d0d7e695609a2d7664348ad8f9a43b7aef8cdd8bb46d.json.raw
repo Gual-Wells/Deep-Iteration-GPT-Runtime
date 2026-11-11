@@ -1,0 +1,96 @@
+{
+  "packet_sha256": "2d83774744c1b2d0dc085d3fd27b0327b6b6c6605372bc627b57ba339e27d509",
+  "view": {
+    "director": {
+      "id": "billing",
+      "name": "Billing and materials world",
+      "territory": "The fictional account records, available documents, and whether an attempted sharing makes a copy available. Do not decide household fairness, write dialogue, supply personal-room measurements, change old commitments or reveal a private mind. You may refrain.",
+      "reads": [
+        "billing_facts",
+        "important_past",
+        "mara_email_access",
+        "eli_email_access",
+        "bill_copy_status"
+      ],
+      "writes": [
+        "mara_email_access",
+        "eli_email_access",
+        "bill_copy_status"
+      ]
+    },
+    "scene": "On Thursday 2 April 2026, Mara and Eli sit at the kitchen table of their shared rented flat in England. Mara has an energy-account email open on her phone. They need to work out what the figures require of them and how to deal with the household cost. Nobody else is in the conversation.",
+    "world": {
+      "billing_facts": {
+        "currency": "GBP, all figures fictional",
+        "charges": 600,
+        "payments": 360,
+        "balance_debit": 240,
+        "standing_charges": 54,
+        "usage_charges": 546,
+        "next_monthly_collection": 180,
+        "expected_ongoing": 140,
+        "balance_recovery_per_collection": 40,
+        "scheduled_recovery_collections": 6,
+        "collection_start": "15 April 2026",
+        "email_upper": "YOUR ACCOUNT\nPrevious balance: £0\nCharges, 1 January–31 March: £600\nPayments received, three × £120: -£360\nYour balance: £240 debit\nNew monthly payment from 15 April: £180",
+        "email_lower": "Your monthly payment includes:\nExpected ongoing energy costs: £140\nRecovery of existing debit balance: £40\nTotal monthly payment: £180\n\nAt £40 per month, the existing £240 balance is scheduled to be recovered over six payments. We are not requesting a separate £240 payment now. If an additional payment is made, contact us to review this arrangement.\n\nThe quarter's £600 charges include £54 standing charges and £546 usage charges. These figures include any tax for this invented account. The £140 ongoing amount is a forecast, not a guarantee of future cost. There is no individual-room breakdown in this bill.",
+        "payment_mode": "monthly budget Direct Debit",
+        "extra_lump_sum_requested": false
+      },
+      "important_past": {
+        "fiction": true,
+        "location": "England",
+        "old_chat": "We can split the bills. Sixty each for now, then check it against the actual bill.",
+        "contributions": "£60 each in January, February and March, all made",
+        "absence": "Eli away six weeks in that quarter",
+        "absence_policy": "not explicitly recorded",
+        "individual_measurements": "no room meter, no household departure/return readings",
+        "account_holder": "Mara",
+        "private_available_cash": {
+          "mara": 90,
+          "eli": 90
+        },
+        "no_invented_prior_agreement": true
+      },
+      "mara_email_access": "available",
+      "eli_email_access": "not_shared",
+      "bill_copy_status": "not_shared"
+    },
+    "public_events": [
+      {
+        "id": "e-7f1c6098562d4d50",
+        "kind": "action",
+        "actor": "mara",
+        "text": "I scroll below the balance and new-payment figures to read the rest of the email."
+      },
+      {
+        "id": "e-406b535b377a4ab9",
+        "kind": "speech",
+        "actor": "eli",
+        "text": "Can you send me the whole email? I want to see what it's actually asking for. I was away for six weeks, so I'm uncomfortable just calling everything half each—but I don't want you stuck paying it either."
+      },
+      {
+        "id": "e-415efbc15c11456e",
+        "kind": "action",
+        "actor": "mara",
+        "text": "I address a forward of the complete email to Eli and tap Send. ‘Oh, hang on. They aren’t asking for the two hundred and forty on top—the new payment includes forty a month to clear it. I can put in ninety for this collection, but I can’t manage an extra lump sum. I thought we meant half each when we said split. I hear you about being away, though.’"
+      }
+    ],
+    "instruction": "Propose or refrain. Affect situations and perceived events, not another participant private mind. Do not write other characters dialogue.",
+    "territory": {
+      "writes": [
+        "mara_email_access",
+        "eli_email_access",
+        "bill_copy_status"
+      ],
+      "frozen_keys": [
+        "important_past",
+        "billing_facts"
+      ],
+      "scope": "Domain-authorized present consequences; cannot rewrite important history or another private mind."
+    }
+  },
+  "task": "You now receive Mara actual public contribution including her attempt to forward the complete email by tapping Send. Independently decide warranted present document availability consequences within your billing/material territory, or refrain. Do not decide fairness or invent a supplier/bank action, old reading, extra charge or secret past. Preserve literal fictional billing data. Save a world JSON proposal with director billing, decision, proposal, reason, changes, percepts. An availability percept can point to a copy; material text is delivered only by its owner actual reads.",
+  "return_path": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\balance-on-screen-01\\native\\returns\\w-billing-02.json",
+  "input_ref": "D:\\CodexLab\\worktrees\\digr-knowledge-pool\\digr-runtime-source\\.cache\\esp-transfer-upgrade-20261111\\books\\balance-on-screen-01\\native\\inputs\\w-billing-02.json"
+}
