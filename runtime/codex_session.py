@@ -1,11 +1,12 @@
 """Resumable Codex work lines and explicitly bounded activity facts.
 
 This is a file utility, not an agent executor, scheduler, semantic approval gate
-or attestation service. Each line owns its work, candidate and activity file.
+or attestation service. Each line owns its work and candidate. New sessions
+only locate a shared, run-scoped Begin/End journal; no live timer is carried.
 The model initializes complete parameters and judges N/R/D/V responsibilities;
 the helper preserves those declarations and merges observed clock intervals.
 
-A Windows live-process anchor establishes a common monotonic clock domain. It
+A legacy Windows live-process anchor establishes a common monotonic clock domain. It
 does not establish continuous task activity. Only an explicit end/checkpoint
 with caller-declared continuity closes an activity interval. Recovery discards
 the open tail, preserving earlier closed intervals and the gap itself.
@@ -18,6 +19,7 @@ from ctypes import wintypes
 from hashlib import sha256
 import json
 import math
+import os
 from pathlib import Path
 import re
 import socket
@@ -32,6 +34,7 @@ from .validation import require_binary, require_nonempty_text, require_nonnegati
 
 FORMAT = 'digr-codex-session-1'
 MANAGED_FORMAT = 'digr-codex-session-2'
+VISIT_FORMAT = 'digr-codex-session-3'
 ACTIVITY_STATES = frozenset({'MAIN', 'SOURCE', 'D_EXCLUSIVE', 'V_EXCLUSIVE', 'META', 'IDLE'})
 _LINE_ID = re.compile(r'M[0-9]{2,}')
 _PROCESS_SESSION = uuid.uuid4().hex
@@ -62,10 +65,10 @@ def _write_json(path: Path, value: Mapping[str, Any], *, new: bool = False) -> N
 def _session(root: Path) -> tuple[Path, dict[str, Any]]:
     root = Path(root).resolve()
     metadata = _read_json(root / 'session.json')
-    if metadata.get('format') not in {FORMAT, MANAGED_FORMAT}:
+    if metadata.get('format') not in {FORMAT, MANAGED_FORMAT, VISIT_FORMAT}:
         raise ValueError('unsupported Codex session format')
     from .codex_lifecycle import requires_lifecycle
-    if requires_lifecycle(metadata) and metadata.get('format') != MANAGED_FORMAT:
+    if requires_lifecycle(metadata) and metadata.get('format') not in {MANAGED_FORMAT, VISIT_FORMAT}:
         raise ValueError('0.8+ managed session requires format-2; legacy writers cannot bypass lifecycle')
     raw = (root / 'REQUEST.txt').read_bytes()
     if sha256(raw).hexdigest() != metadata.get('request_sha256'):
@@ -197,7 +200,8 @@ def capture_clock(anchor: Mapping[str, Any] | None = None) -> dict[str, Any]:
 def create_session(root: Path, *, request: Path, p_run: str,
                    decisions: Path | None = None, explicit_parameters: Mapping[str, Any] | None = None,
                    anchor_pid: int | None = None, m_target: int | None = None,
-                   require_foundation: bool | None = None) -> dict[str, Any]:
+                   require_foundation: bool | None = None,
+                   visits_path: Path | None = None, run_id: str | None = None) -> dict[str, Any]:
     """Prepare storage from an already-acquired P_run; do not start execution."""
     if not isinstance(p_run, str) or not re.fullmatch(r'[^@\s]+@[0-9a-f]{40}', p_run):
         raise ValueError('P_run must be version@full-40-character-SHA')
@@ -209,6 +213,9 @@ def create_session(root: Path, *, request: Path, p_run: str,
     version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)', p_run.split('@', 1)[0])
     profile_requires_foundation = bool(version and tuple(map(int, version.groups())) >= (0, 7, 0))
     profile_requires_lifecycle = bool(version and tuple(map(int, version.groups())) >= (0, 8, 0))
+    profile_uses_visits = bool(version and tuple(map(int, version.groups())) >= (0, 8, 1))
+    if not profile_uses_visits and (visits_path is not None or run_id is not None):
+        raise ValueError('shared visit configuration belongs to 0.8.1+ new sessions; keep old pins unchanged')
     invocation = None
     if profile_requires_lifecycle:
         from .codex_profile import classify_invocation
@@ -245,6 +252,17 @@ def create_session(root: Path, *, request: Path, p_run: str,
         metadata['lifecycle_required'] = True
         metadata['initial_invocation'] = {key: invocation[key] for key in ('classification', 'route_key', 'reason')}
         metadata['invocation_basis'] = 'structure only; repository acquisition is an upstream obligation'
+    if profile_uses_visits:
+        if visits_path is None:
+            configured = os.environ.get('DIGR_VISITS_PATH')
+            codex_data = os.environ.get('CODEX_HOME')
+            if not configured and not codex_data:
+                raise ValueError('set --visits or DIGR_VISITS_PATH/CODEX_HOME for the shared file')
+            visits_path = Path(configured) if configured else Path(codex_data) / 'digr-codex' / 'visits.jsonl'
+        metadata['format'] = VISIT_FORMAT
+        metadata['visit_clock'] = {'path': str(Path(visits_path).absolute()),
+                                   'run_id': require_nonempty_text('visit run id', run_id or uuid.uuid4().hex)}
+        metadata['return_schema'] = 2
     root.mkdir(parents=True, exist_ok=False)
     (root / 'lines').mkdir()
     (root / 'common').mkdir()
@@ -441,6 +459,8 @@ def activity(root: Path, owner: str, action: str, *, state: str | None = None,
               scope: str | None = None) -> dict[str, Any]:
     """Append a genuine current boundary to this one owner's activity file."""
     root, metadata = _session(root)
+    if metadata.get('visit_clock'):
+        raise ValueError('this session uses a shared visit file; use visits begin/end, not the legacy owner clock')
     if owner == 'COMMON':
         folder = root / 'common'
     else:
@@ -532,6 +552,8 @@ def session_report(root: Path) -> dict[str, Any]:
     union and whole-task domain comparability stay unknown.
     """
     root, metadata = _session(root)
+    if metadata.get('visit_clock'):
+        return _visit_session_report(root, metadata)
     streams, packages, issues = {}, {}, []
     unavailable = {}
 
@@ -603,6 +625,32 @@ def session_report(root: Path) -> dict[str, Any]:
             'count_scope': 'registered packages do not prove effective independent main lines'}
 
 
+def _visit_session_report(root: Path, metadata: Mapping[str, Any]) -> dict[str, Any]:
+    """Read one run's journal. No running timer is stored on task/line objects."""
+    from .codex_visits import read_visits, summarize_visits
+    from .codex_lifecycle import load_lifecycle
+    clock = metadata['visit_clock']
+    read = read_visits(Path(clock['path']), run_id=clock['run_id'])
+    timing = summarize_visits(read, run_id=clock['run_id'])
+    foundation = summarize_visits(read, run_id=clock['run_id'], phase='FOUNDATION')
+    packages = {}
+    for folder in sorted((root / 'lines').iterdir()):
+        if not folder.is_dir():
+            continue
+        _line_dir(root, folder.name)
+        package = _read_json(folder / 'line.json')
+        if package.get('line_id') != folder.name:
+            raise ValueError(f'line package identity mismatch: {folder}')
+        packages[folder.name] = package
+    return {'session': dict(metadata), 'line_packages': packages, 'timing': timing,
+            'foundation_timing': foundation, 'lifecycle': load_lifecycle(root),
+            'registered_line_count': len(packages), 'effective_M_count': None,
+            'report_status': read['file_status'],
+            'issues': [*read.get('issues', []), *read.get('file_issues', [])],
+            'report_scope': 'selected-run paired journal intervals, with labeled repairs and unresolved gaps',
+            'count_scope': 'journal intervals and registered packages do not certify responsibility counts'}
+
+
 def line_packet(root: Path, line_id: str, *, topic: str | None = None,
                 max_chars: int = 24000, corrections_topics: Iterable[str] = (),
                 experiences: Iterable[str | Path] = ()) -> str:
@@ -645,10 +693,20 @@ def line_packet(root: Path, line_id: str, *, topic: str | None = None,
             parts.append('产物已不同于上次状态所指字节；旧状态与评审不能自动覆盖当前文件。')
     # Resuming one owner must not read or depend on another owner's private
     # work or even on the readability of that owner's activity file.
-    timing = summarize_activity({line_id: _read_activity(_line_dir(root, line_id) / 'activity.jsonl')})['lines'][line_id]
+    if metadata.get('visit_clock'):
+        from .codex_visits import read_visits, summarize_visits
+        clock = metadata['visit_clock']
+        facts = read_visits(Path(clock['path']), run_id=clock['run_id'])
+        # Shared public boundaries only; never retrieve other agents' private work.
+        timing = summarize_visits(facts, run_id=clock['run_id'])['by_line'].get(line_id, {})
+    else:
+        timing = summarize_activity({line_id: _read_activity(_line_dir(root, line_id) / 'activity.jsonl')})['lines'][line_id]
+    recovery = ('旧开放段保留缺口；有可见依据时用visits repair追加近似边界，'
+                '否则不补。继续工作以真实Begin登记，不把旧尾段延到现在。'
+                if metadata.get('visit_clock') else
+                '对旧开放段使用recover，再以真实边界开启新活动。')
     parts += ['## 本线已记录的活动事实', json.dumps(timing, ensure_ascii=False, indent=2),
-              '开放尾段不计有效时间。中断恢复先核对产物、在途工具与未处理返回；'
-              '对旧开放段使用recover，再以真实边界开启新活动。']
+              '开放尾段不计有效时间。中断恢复先核对产物、在途工具与未处理返回；' + recovery]
     # Keep the current shared material after old work/candidate/state so its
     # actual contents, rather than an obsolete NEXT section, frame re-entry.
     # Include the source once: duplicating a long decision file wastes context

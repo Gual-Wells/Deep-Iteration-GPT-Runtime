@@ -1,4 +1,4 @@
-# DIGR Codex 0.8.0 使用说明
+# DIGR Codex 0.8.1 使用说明
 
 普通任务采用轻量交付偏好；显式 DIGR 启动高投入的问题研究、方案探索与实际制作。默认 N12/R4/D3/V3/L3/M1，只自主上调和改变方法；时间按任务补齐为软目标，来源默认 REQUIRED。
 
@@ -24,7 +24,7 @@
 - **M** 各自完整推进。文件目录和脚本不会自动替代真正独立的Main。
 - **授权** 延续已有任务与资源决定；能力、预算、执行效果分别看，不为常规任务内操作反复申请。
 
-[PROTOCOL](PROTOCOL.md)、[FOUNDATION](FOUNDATION.md)、[CHARACTER](CHARACTER.md)、[PARAMETERS](PARAMETERS.md)、[COLLABORATION](COLLABORATION.md)、[PERMISSIONS](PERMISSIONS.md)、[RETURN](RETURN.md) 为执行正文，可从同pin聚合包一次读取。默认返回包含结果、关键后果及时间—工作标识图；缺失记录明确说明。结束后普通纠错不再启动 DIGR，真正未完成的补充沿用原任务。[WORKBENCH](WORKBENCH.md) 是按需工具手册。
+[PROTOCOL](PROTOCOL.md)、[FOUNDATION](FOUNDATION.md)、[CHARACTER](CHARACTER.md)、[PARAMETERS](PARAMETERS.md)、[COLLABORATION](COLLABORATION.md)、[PERMISSIONS](PERMISSIONS.md)、[RETURN](RETURN.md)为执行正文，可从同pin聚合包一次读取。默认返回在response正文固定五段，以正文时间／工作表显示过程，禁用内嵌页或附件替代；T计所有参与者工作并集、t计来源并集，近似补点与缺口明确说明。结束后普通纠错不再启动DIGR，真正未完成的补充沿用原任务。[WORKBENCH](WORKBENCH.md)是按需工具手册。
 
 ## 实际使用工具
 

@@ -45,11 +45,14 @@ def read_message(path: Path) -> str:
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else list(argv)
     # Pass through argument parsing rather than duplicate mature CLI surfaces.
-    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint'):
+    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'visits'):
         from tools import codex_experience, codex_profile, codex_workbench, codex_knowledge, codex_timeline, codex_voice
         if argv[0] == 'return':
             from tools.codex_return import main as return_main
             return return_main(argv[1:])
+        if argv[0] == 'visits':
+            from tools.codex_visits import main as visits_main
+            return visits_main(argv[1:])
         if argv[0] == 'preprint':
             from tools.codex_preprint import main as preprint_main
             return preprint_main(argv[1:])
@@ -60,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
                 'voice': codex_voice.main}[argv[0]](argv[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
-    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint'):
+    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'visits'):
         sub.add_parser(name, help=f'{name} commands; append --help for details')
     acquire = sub.add_parser('acquire', help='actually acquire a live, immutable Codex profile')
     acquire.add_argument('--stage', choices=('startup', 'help', 'execution'), default='startup')
@@ -77,6 +80,8 @@ def main(argv: list[str] | None = None) -> int:
     create.add_argument('--explicit', type=Path, help='original explicit parameter declarations, if any')
     create.add_argument('--anchor-pid', type=int)
     create.add_argument('--m', type=int)
+    create.add_argument('--visits', type=Path, help='shared Begin/End file for 0.8.1+ sessions')
+    create.add_argument('--run-id', help='stable task group in that file; generated once if omitted')
     create.add_argument('--require-foundation', action='store_true', default=None,
                         help='prepare research first; managed execution waits for the current user decision')
     report = ts.add_parser('report')
@@ -189,7 +194,8 @@ def main(argv: list[str] | None = None) -> int:
                 result = create_session(args.out, request=args.request, p_run=args.p_run,
                     decisions=args.decisions,
                     explicit_parameters=read_object(args.explicit) if args.explicit else None,
-                    anchor_pid=args.anchor_pid, m_target=args.m, require_foundation=args.require_foundation)
+                    anchor_pid=args.anchor_pid, m_target=args.m, require_foundation=args.require_foundation,
+                    visits_path=args.visits, run_id=args.run_id)
             elif args.action == 'message':
                 result = ingest_message(args.root, source=args.source_file,
                     source_ref=args.source_ref, route_pin=args.route_pin)
