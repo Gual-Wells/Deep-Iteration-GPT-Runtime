@@ -10,10 +10,12 @@ python -B tools/codex.py preprint lesson --root <book> --input <lesson.json> --e
 python -B tools/codex.py preprint review --root <book> --input <review.json> --expected-revision <R> --operation-id review-v1
 python -B tools/codex.py preprint learning-status --root <book>
 python -B tools/codex.py preprint study-status --root <book>
-python -B tools/codex.py preprint find --root <book-A> --root <book-B> --query "还没想清楚怎样先澄清"
+python -B tools/codex.py preprint find --root <book-A> --root <book-B> --query "垫付"
 ```
 
 使用实际 revision；同 operation ID 只可重试相同输入。源变后重新阅读，不给旧判断换新哈希继续用。
+
+`find` 是显式书目中的字面子串搜索，返回完整来源片段；它不理解一整句自然提问。面向用户的接续由原生 Codex 完成：保留用户处境，先理解要处理的动作，选择少量中文/英语短词检索，再核读完整往返及使用条件。零命中时换较短词、查当前案例目录，或明确没有适合材料；不能由一次零命中断言知识池没有知识，也不能把短词命中当成语义匹配证明。例如“账单还没算清，怎么先出钱又保留最终分摊？”可先查“垫付”，再判断付款义务、暂定方案和支付能力是否匹配。这个判断由 Codex 负责，不新增搜索模型 API。
 
 cases 输入含 cases 列表，可附 series_relations。每个 case 有 id/cue（中文处境）/intent/why_hard/what_changed/event_ids/usage。event_ids 要保留一段连续公开投影，至少两轮 speech，不省略中间回应或动作。usage 逐项给 event_id/surface/meaning/function/conditions/register/frequency_status，可附作者 variants{text,explanation} 与 public_sources。解释实际指代、义项和语气；没有语料证据就标未核实，不给伪造词频排名。
 
