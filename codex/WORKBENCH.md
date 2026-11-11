@@ -4,7 +4,7 @@
 
 论文辅学另有可选的[知识池技能](../.agents/skills/digr-paper-knowledge/SKILL.md)与 `python -B tools/codex.py knowledge --help`。原生 Codex 读论文、分层批量问询和教学，工具保存冻结问项、论文局部用法、真实选择、有范围证据及接续位置。个人数据与原件放在独立私有项目，不进入本公共库；可从私有项目的相对路径入口接续，本机定位缓存仅用于发现。它不替代本轮在线 DIGR 协议获取，也不需要阅读器或付费模型接口。普通读取只用标准库，摄入 PDF 另需所选 Python 环境中的 `pypdf`。具体数据与命令见技能的按需引用。
 
-必读[RETURN](RETURN.md)规定默认返回；[时间—工作标识图](RETURN_VISUAL.md)与 `python -B tools/codex.py timeline --help`提供实现。先给结果、静态总图及关键后果，再提供任选的互动细读；图保持时间横轴与X_i纵轴，并区分U0、议会、自举、发出/收到、决定和落实。它只渲染明确提供的工作摘要，不从参数计数自动编造历史或有效时长，也不替代原有事实报告。return seal/status/close 将所选返回绑定到当前实际文件并收口任务，不认证语义质量。
+必读[RETURN](RETURN.md)要求最终response正文固定五段：结果、关键变化、工作过程、核验与限制、参数。过程用正文时间／工作表，不能由文件、内嵌页或截图替代；真实任务产物仍可链接。`return seal/status/body/close`保存选定正文并收口；body输出待发送Markdown，不证明宿主已发送。历史timeline是按需工具，不再是默认报告。
 
 ## 0. 在其它项目找到工具，及时开始记录
 
@@ -20,7 +20,7 @@ python -B $toolLocation.cli workbench --help
 
 保持当前项目工作目录，request、work和out传该任务的真实绝对路径；运行源码仍在独立工具根，不往当前项目复制协议或改变它的Git状态。工具版本与本轮协议不一致时按实际可用接口处理，不假称本地已经取得最新pin。
 
-把计时准备放进初始化：取实际墙钟起点，核对可用单调钟/锚，准备task与已初始化的line；在首项实质MAIN/SOURCE开始前记begin，INIT说明真实能力。没能力时立即说明未知并继续可做的工作，不延迟任务去造计时平台；不得在几十分钟之后用新起点回填早段。时钟相关命令见第6节。
+把访时准备放进初始化：task只关联共同文件与run_id，准备已初始化的line；各实际参与者在实质WORK/SOURCE开始前记Begin，INIT说明实际口径。没能力时立即说明未知并继续可做的工作，不延迟任务去造计时平台；不得在几十分钟之后用新起点回填早段。时钟相关命令见第6节。
 
 ## 1. 取得协议：在线获取与同 pin 续读
 
@@ -44,8 +44,8 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 0.7起的新会话默认要求前置任务说明；0.8起另有当前任务生命周期与消息来源闸门。旧pin仍保留其真实状态，不静默升级。模型先研究实际材料与原话，再提供proposal；脚本不自动识别意图。
 
 ```text
-python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run 0.8.0@<实际SHA> --require-foundation
-python -B tools/codex.py clock begin --root D:/task/session --owner COMMON --scope FOUNDATION --state SOURCE
+python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run 0.8.1@<实际SHA> --visits D:/shared/digr-visits.jsonl --run-id <本任务唯一分组> --require-foundation
+python -B tools/codex.py visits begin --root D:/task/session --actor Main --line COMMON --phase FOUNDATION --category SOURCE
 python -B tools/codex.py foundation propose --root D:/task/session --input D:/task/proposal.json --reason "原件调查后的完整候选"
 python -B tools/codex.py foundation show --root D:/task/session
 ```
@@ -55,7 +55,7 @@ proposal示例见codex/examples/foundation/proposal.json：内容涵盖目标、
 ```text
 python -B tools/codex.py foundation answer --root D:/task/session --id Q1 --revision <实际所答版本> --reply-file D:/task/actual-reply.txt --source <真实消息引用> --effect "说明与下一行动的实际变化"
 python -B tools/codex.py foundation confirm --root D:/task/session --revision <已展示当前版本> --reply-file D:/task/actual-go-ahead.txt --source <真实明确决定>
-python -B tools/codex.py clock end --root D:/task/session --owner COMMON --continued
+python -B tools/codex.py visits end --root D:/task/session --actor Main --line COMMON --phase FOUNDATION
 ```
 
 answer不自动确认整体。模型理解真实答复：用户已看完整说明并明确要求改后执行，可按该决定记录，无需固定口令；提出新重要取舍则先讨论。material修订默认使旧确认不再覆盖当前稿；non_material只允许不改变决策的基础观察维护，并保留原接受内容。目标/成品/范围/粒度/依赖/路线/资源/完成字段改变会拒绝这条快捷路径。改问题或选项后不沿用旧答案；revoke立即失效旧确认，不因仍有accepted历史而可继续。
@@ -72,27 +72,28 @@ python -B tools/codex.py task lifecycle --root D:/task/session
 
 明确实质变更使用action revise，它先使旧决定失效；pause保留任务但禁止继续，resume须真实恢复指示。stop/cancel先终结，再收尾，旧确认不能复活。真实停止消息可优先越过较早pending：task terminate --status STOPPED（或CANCELLED）--source-file <真实停止原文> --source-ref <唯一消息引用> --reason <实际后果>；保留旧pending摘要，这条优先路径只能终结。无source pair时明确为操作者清理记录，不能伪引旧答复为停止来源。
 
-source-ref是本地不可变消息身份，同引用不重新编号；编辑后的真实新消息使用新的引用。它不是用户认证，模型仍须核对实际对话。结束后普通纠错可action ordinary记录并保持结束；真的新显式调用须新建任务，不能重用已终结session。handle是模型记录实际含义，不是工具判断用户同意。中断后task recover只丢弃未知活动尾段，不重新激活。0.8新会话写session-2，旧writer会拒绝；旧pin仍session-1且不静默迁移。
+source-ref是本地不可变消息身份，同引用不重新编号；编辑后的真实新消息使用新的引用。它不是用户认证，模型仍须核对实际对话。结束后普通纠错可action ordinary记录并保持结束；真的新显式调用须新建任务，不能重用已终结session。handle是模型记录实际含义，不是工具判断用户同意。0.8.0新会话写session-2，早期pin保留session-1；0.8.1新会话写session-3，共用访时缺口保留，可有据近似修复，不通过recover自动补点或重新激活。
 
 ### 返回快照与收口
 
 先结束真实活动，编写一个明确选定的返回输入，例如：
 
 ```json
-{"schema_version":1,"result":"实际结果","scope":"实际范围","evidence":"依据及验证","limits":"使用限制或明确无已知限制","time_and_responsibilities":"真实责任与时间事实及缺口","artifacts":[],"decisions":[],"unhandled":[],"sources":[]}
+{"schema_version":2,"result":"完整答案或成品入口","key_changes":"形成的认识与实际后果","work_process":"| 时间／记录范围 | 工作与后果 |\n| --- | --- |\n| 未单列 | 真实工作与所得 |","verification_limits":"实际验证与限制","parameters":"真实参数及T/t、补点、缺口、P_run","artifacts":[],"sources":[]}
 ```
 
-文字研究可直接以result交付；文件成品使用artifacts中的label/path。sources明确选择文件，路径相对输入文件；不扫描整份聊天。可选timeline为实录对象或JSON路径，需protocol_pin与P_run一致，并有notice说明采集范围，不能用illustration替代。
+文字研究以完整正文交付；文件成品用artifacts的label/path补充链接。sources只选必要文件，路径相对输入；不扫描聊天。schema2不接受timeline替代过程表，schema1仅供旧pin路径。
 
 ```text
 python -B tools/codex.py return seal --root D:/task/session --input D:/task/return-input.json
 python -B tools/codex.py return status --root D:/task/session
+python -B tools/codex.py return body --root D:/task/session
 python -B tools/codex.py return close --root D:/task/session --reason "约定结果已完成并交付"
 ```
 
-CURRENT_RETURN.md是该任务的一个当前入口；RETURN.md、details.html与可选静态图来自同一快照。相关事实或产物改变即STALE，重核后重新seal；READY_UNCLOSED不是语义批准，close才真正收口。澄清/等待用户不close。后续新版本不改写当前任务原P_run。
+CURRENT_RETURN.md仅是保存入口；schema2只保存RETURN.md正文副本和机器记录，不生成HTML/互动图报告。把body直接贴回最终response，链接副本不能代交付。相关任务事实或产物变动使其STALE，其他run追加及相同事件重放不会；READY不是语义批准或UI发送认证。close才终结生命周期，澄清/等待不close，P_run不随当前工具升级而重写。
 
-确认后才补齐正式参数，line create仍只是准备文件。正式clock begin默认EXECUTION；未确认时MAIN/SOURCE及独占D/V均拒绝，失效后的checkpoint也拒绝，end/recover始终可用。task report的foundation_timing单列前置，timing只算正式，不把前置分钟冲抵T/t。恢复包自动带当前任务说明与决定；无重要变化不重新盘问。
+确认后补齐正式参数，line create只是准备文件。`visits --root ... begin`核对本任务生命周期及正式前置；直接`--file/--run-id`是低层事实登记，不做任务许可判定或拦截外部代理。task report分开foundation_timing和timing。正常结束前End；缺End可据可见记录近似修复，未补缺口不使其它配对失效或强制阻止报告收口。
 
 这些命令只检查被管理的入口和记录一致性，不拦截宿主所有工具，也不认证用户真实同意或解释质量。真语义及新纠正仍由模型依据会话处理。短任务可直接对话完成前置，不强制落这些文件。
 
@@ -172,24 +173,21 @@ status示例：
 
 自主调参用 `line parameters --parameters ... --reasons ...`；N/R/D/V不自动降值。真实用户修订可加 `--user-revision "原话或明确引用"`，保留到变更记录，不由脚本认证。所有状态为作者声明；registered_line_count不是effective_M_count。实际作者、原生分工、议会和最终内容综合仍由模型做，不由文件目录代替。
 
-## 6. 真计时：显式边界、已知小计与缺口
+## 6. 共用Begin/End访时
 
 ```text
-python -B tools/codex.py clock begin --root D:/task/session --owner M01 --state SOURCE
-python -B tools/codex.py clock checkpoint --root D:/task/session --owner M01 --continued
-python -B tools/codex.py clock end --root D:/task/session --owner M01 --continued
-python -B tools/codex.py clock recover --root D:/task/session --owner M01 --reason "中断后核对真实文件再继续"
-python -B tools/codex.py clock report --root D:/task/session
+python -B tools/codex.py visits begin --root D:/task/session --actor Main --category WORK --work N01-topic
+python -B tools/codex.py visits end --root D:/task/session --actor Main
+python -B tools/codex.py visits begin --file D:/shared/digr-visits.jsonl --run-id <本任务唯一分组> --actor D01 --line M01 --category SOURCE --work competing-route
+python -B tools/codex.py visits end --file D:/shared/digr-visits.jsonl --run-id <本任务唯一分组> --actor D01 --line M01
+python -B tools/codex.py visits report --root D:/task/session
+python -B tools/codex.py visits repair --root D:/task/session --actor D01 --begin-id <需修复Begin的event_id> --at <有依据的ISO8601结束时刻及UTC偏移> --basis <可见依据>
 ```
 
-这些是可选动作示例：recover用于确有开放尾段的恢复，不需在正常end后机械执行。begin只开段；checkpoint闭合前段并继续相同状态；end闭合。continued是操作者对真正连续活动的明确声明，不是脚本自动探测。恢复丢弃开放尾段并保存缺口，再begin开新段。状态MAIN/SOURCE可进T，只有SOURCE进t；D_EXCLUSIVE/V_EXCLUSIVE/META/IDLE排除。
+所有参与者共用同一文件；未指定--visits时用DIGR_VISITS_PATH，或CODEX_HOME/digr-codex/visits.jsonl。本机CODEX_HOME与实际任务数据在D盘。无这两个环境变量则明确指定路径，不暗放系统盘。分组ID初始化一次，子代理不携带运行timer状态。
 
-Windows跨短命CLI可在task create给 `--anchor-pid <明确核对的存活宿主PID>`，每次读PID+创建时间与单调钟。未提供时只有同进程域，不虚报跨进程连续；Linux取boot_id。可用 `clock anchor --root ... --pid ... --reason ...`明确更换未来时钟域，不修补旧段。主机存活不证明模型在工作。
+正常Begin/End直接实采，category只按实际工作分WORK/SOURCE/META/IDLE，角色不决定是否计时。换类别先End再Begin，等待前End。T为所有WORK/SOURCE并集，t为SOURCE并集；U0用FOUNDATION，其余默认EXECUTION。每M单算本线，全局去重，COMMON不回填。
 
-共同实质综合用owner COMMON，只进全局一次，不反填M。全局取同域并集，多个域分列，未知总数不强加。某线活动日志不可读时，report_status为PARTIAL_READ，可读子集另列available_global_known_union_ns；整项global_known_union_ns与全局可比性保持未知，坏线不当0，也不自动抢救或改写；代理空闲或running不证明有效时间。状态/参数/文件准备均不证明完整M或L3已经执行。
+缺End不延到现在，新Begin不替旧尾补点。repair必须指向旧Begin并提供有效边界和依据，实际补录时刻另记；保留未补缺口。reader和writer共用短锁，坏行、重复事件和倒退时刻局部报告；按run筛选不混入其它任务。统计是登记覆盖，不认证每秒持续活动，T/t详见PARAMETERS与RETURN。
 
-## 7. 任务授权上下文
-
-必要时使用 `permissions --input operation.json`，输入context（scope、authorized、可选既有grants/budget/stopped）、operation、within_task、capability及可选estimated_cost。它分开持续授权、真实能力与费用，不执行操作或改变宿主权限。不是每次行动前的必填审批表；正常任务沿用实际会话决定。完整原则见PERMISSIONS。
-
-所有新增任务材料、缓存、临时解包与发布包遵守本机真实存储分工；本机使用D盘。没有工具需求的短任务直接完成，不先搭工作站。
+0.8.0及更早session保持旧pin与逐owner activity路径；新任务用session-3/schema2，旧writer不能误读。旧clock/anchor命令仍供原会话使用，不能成为新任务默认入口。产物路径、缓存和日志遵守实际存储分工；无工具需求的短任务直接完成，不先搭工作站。

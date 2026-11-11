@@ -8,21 +8,24 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from runtime.codex_return import close_return, return_status, seal_return
+from runtime.codex_return import close_return, return_status, seal_return, response_body
 
 
 def main(argv=None):
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, 'reconfigure'):
-            stream.reconfigure(encoding='utf-8')
+            stream.reconfigure(encoding='utf-8', newline='\n')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('seal', 'status', 'close'))
+    parser.add_argument('action', choices=('seal', 'status', 'close', 'body'))
     parser.add_argument('--root', required=True, type=Path)
     parser.add_argument('--input', type=Path)
     parser.add_argument('--outcome', choices=('CLOSED', 'STOPPED', 'CANCELLED'), default='CLOSED')
     parser.add_argument('--reason')
     args = parser.parse_args(argv)
     try:
+        if args.action == 'body':
+            print(response_body(args.root), end='')
+            return 0
         if args.action == 'seal':
             if args.input is None:
                 raise ValueError('--input is required for seal')

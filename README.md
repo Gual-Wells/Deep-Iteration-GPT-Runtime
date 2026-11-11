@@ -1,8 +1,8 @@
-# DIGR for Codex · 0.8.0
+# DIGR for Codex · 0.8.1
 
 **让深入研究、竞争方案和实际制作共同推动任务结果。**
 
-0.8 将[默认返回](codex/RETURN.md)纳入必读执行包，并接通实际任务生命周期：显式只读调用仍执行 DIGR；新纠错先改变下一步；已结束任务不能被旧确认或普通讨论复活。返回先交付结果与关键后果，再给[时间—工作标识图](codex/RETURN_VISUAL.md)及点按细读。消息、决定、产物和当前返回有可核对入口，记录缺口仍如实保留。[升级说明与验证范围](docs/CODEX_0_8_UPGRADE.md)。
+0.8 将[默认返回](codex/RETURN.md)纳入必读执行包，并接通实际任务生命周期：显式只读调用仍执行 DIGR；新纠错先改变下一步；已结束任务不能被旧确认或普通讨论复活。0.8.1固定response正文五段与工作表，禁用内嵌页或附件替代；各参与者共用Begin/End文件，收尾按run并集统计T/t，允许有依据的近似补点。消息、决定、产物和当前返回有可核对入口，记录缺口仍如实保留。[本次接口与兼容说明](docs/CODEX_RESPONSE_CLOCK_UPGRADE.md)；[0.8生命周期说明](docs/CODEX_0_8_UPGRADE.md)。
 
 0.7新增[U0前置任务工程](codex/FOUNDATION.md)：先调查已有材料，把完整结果、处理粒度、依赖、竞争路线和资源去向说清，经问答纠偏与明确决定后再全面执行。前置与正式任务独立预算、独立计时；已确认续做只问重要变化。[本轮研究与实际工作](docs/research/codex-task-foundation-20261109/WORK.md)记录了取舍和验证范围。
 
@@ -10,9 +10,9 @@
 
 DIGR 是一套由模型承担研究、判断与制作的工作协议。它鼓励深入真实材料，发展有内容的候选，认真重开整条路线，并让独立研究产生实际后果。目标是用户能拿来使用的结果：一份有依据的研究、一件完整作品，或经过真实路径验证的修复。
 
-本分支提供 **Codex 0.8.0 实验通道**与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
+本分支提供 **Codex 0.8.1 实验通道**与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
 
-[附属项目入口](addons/README.md)列出 Voice Companion、Paper Knowledge、[English-Spoken-Preprint](spoken-preprint/README.md) 与 [Personal Context](personal-context/README.md)。ESP 0.2 以目标领域中的困难处理为选材中心，提供原场景与独立双语学习听稿；个人资料附属可提供有来源的最小人物视图，保持可选关系。项目回原数据接续，不互相强绑；独立的[真人参与实训](research/codex-participation/README.md)目前只作设计探索。核心仍为 Codex 0.8.0，附属各自版本化。
+[附属项目入口](addons/README.md)列出 Voice Companion、Paper Knowledge、[English-Spoken-Preprint](spoken-preprint/README.md) 与 [Personal Context](personal-context/README.md)。ESP 0.2 以目标领域中的困难处理为选材中心，提供原场景与独立双语学习听稿；个人资料附属可提供有来源的最小人物视图，保持可选关系。项目回原数据接续，不互相强绑；独立的[真人参与实训](research/codex-participation/README.md)目前只作设计探索。附属各自版本化，不改根 stable 语义。
 
 ## 从你的用途进入
 
@@ -112,7 +112,7 @@ python -B tools/codex.py acquire --stage execution --continue-from D:/task/acqui
 
 ### 接续长任务与计时
 
-需要接续时，`task/line`保留原委托、每线完整配置、笔记、产物与未处理事项；`clock`保存明确的真实活动边界，恢复丢弃开放尾段并保留已闭合小计。Windows跨短命CLI需明确核对存活进程锚，时钟可比性与持续工作声明分别处理。
+需要接续时，`task/line`保留原委托、每线完整配置、笔记、产物与未处理事项；0.8.1的`visits`让所有参与者在共同文件记Begin/End，收尾取本run的T/t并集。缺口局部保留，可依据可见记录追加近似补点，不要求进程锚；旧pin仍用自己的`clock`口径。
 
 完整JSON、同pin续读、独立输入、参数修订和恢复操作见[工作工具手册](codex/WORKBENCH.md)。第一次使用只需上面的普通笔记路径，按任务需要再采用这些能力。已有独立工具安装时，可从 CODEX_HOME/digr-codex/toolchain.json 找到绝对CLI入口，从其它项目直接调用，不需把协议复制进项目。
 

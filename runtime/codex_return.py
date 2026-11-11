@@ -19,12 +19,13 @@ from .codex_session import (
     _read_activity, _read_json, _session, _write_json, derive_activity, session_report,
 )
 from .codex_timeline import fragment, render_svg, validate as validate_timeline
+from .codex_response import render_response, validate_response
 
 FORMAT = 'digr-codex-return-1'
 _TEXT_FIELDS = ('result', 'scope', 'evidence', 'limits', 'time_and_responsibilities')
 _TASK_FIELDS = ('format', 'P_run', 'request_sha256', 'M_target',
                 'request_origin', 'created_wall_ns', 'explicit_parameters', 'clock_anchor',
-                'foundation_required', 'lifecycle_required', 'decisions')
+                'foundation_required', 'lifecycle_required', 'decisions', 'visit_clock', 'return_schema')
 
 
 def _path(base: Path, supplied: str | Path) -> Path:
@@ -50,7 +51,8 @@ def _fingerprints(paths: set[Path]) -> dict[str, dict[str, Any]]:
 def _tool_paths() -> set[Path]:
     runtime = Path(__file__).resolve().parent
     files = {runtime / (name + '.py') for name in
-             ('codex_return', 'codex_timeline', 'codex_session', 'codex_foundation', 'codex_lifecycle')}
+             ('codex_return', 'codex_response', 'codex_visits', 'codex_timeline',
+              'codex_session', 'codex_foundation', 'codex_lifecycle')}
     files.update({runtime.parent / 'tools' / name for name in ('codex.py', 'codex_return.py')})
     files.update(path for path in (runtime / 'assets').glob('codex_timeline*') if path.is_file())
     return files
@@ -106,10 +108,18 @@ def _native_state(root: Path) -> dict[str, Any]:
         except (OSError, ValueError, TypeError, KeyError) as exc:
             unknown.append({'path': str(path), 'reason': str(exc)})
     lifecycle = _lifecycle(root)
-    return {'task': {key: metadata.get(key) for key in _TASK_FIELDS},
+    state = {'task': {key: metadata.get(key) for key in _TASK_FIELDS},
             'task_input_ref': lifecycle.get('task_input_ref'),
             'files': _fingerprints(files), 'directory_candidates': candidates,
             'open_activity': active, 'unreadable_activity': unknown}
+    if metadata.get('visit_clock'):
+        from .codex_visits import run_projection
+        clock = metadata['visit_clock']
+        path = Path(clock['path'])
+        state['visit_projection'] = {'selected_path': str(path),
+                                    'resolved_path': str(path.resolve()),
+                                    'facts': run_projection(path, clock['run_id'])}
+    return state
 
 
 def _lifecycle(root: Path) -> dict[str, Any]:
@@ -127,9 +137,13 @@ def _strings(data: Mapping[str, Any], field: str) -> list[str]:
 def _input(root: Path, path: Path) -> tuple[dict[str, Any], set[Path], bytes]:
     raw = path.read_bytes()
     data = json.loads(raw.decode('utf-8-sig'))
-    if not isinstance(data, dict) or data.get('schema_version') != 1:
+    if not isinstance(data, dict) or data.get('schema_version') not in {1, 2}:
         raise ValueError('unsupported return-input schema')
-    for field in _TEXT_FIELDS:
+    new_body = data['schema_version'] == 2
+    if _session(root)[1].get('return_schema') == 2 and not new_body:
+        raise ValueError('this task requires schema 2: five-part response Markdown body')
+    fields = ('result', 'key_changes', 'work_process', 'verification_limits', 'parameters') if new_body else _TEXT_FIELDS
+    for field in fields:
         if not isinstance(data.get(field), str) or not data[field].strip():
             raise ValueError(f'explicit text required for {field}')
     if data.get('mode', 'recorded') != 'recorded':
@@ -150,6 +164,11 @@ def _input(root: Path, path: Path) -> tuple[dict[str, Any], set[Path], bytes]:
         normal.append({'label': item['label'], 'path': str(selected)})
     data['artifacts'] = normal
     timeline = data.get('timeline')
+    if new_body:
+        if timeline is not None:
+            raise ValueError('schema 2 uses the response work table; a timeline cannot replace the report body')
+        render_response(data)
+        return data, paths, raw
     if isinstance(timeline, str):
         timeline_path = _path(path.parent, timeline)
         timeline = _read_json(timeline_path)
@@ -176,6 +195,14 @@ def _relative(path: str | Path, folder: Path) -> str:
 
 def _write_views(folder: Path, data: Mapping[str, Any], report: Mapping[str, Any]) -> None:
     _write_json(folder / 'native-report.json', report)
+    if data['schema_version'] == 2:
+        selected = dict(data)
+        if data['artifacts']:
+            links = ['[' + item['label'] + '](<' + Path(item['path']).as_posix() + '>)'
+                     for item in data['artifacts']]
+            selected['result'] = data['result'].rstrip() + '\n\n' + ' · '.join(links)
+        (folder / 'RETURN.md').write_text(render_response(selected), encoding='utf-8', newline='\n')
+        return
     artifacts = [(item['label'], _relative(item['path'], folder)) for item in data['artifacts']]
     bullets = lambda items: '\n'.join('- ' + item for item in items) or '- 无；这是操作者的明确声明。'
     body = ['# 返回结果', '', data['result'], '']
@@ -228,8 +255,10 @@ def _entry(root: Path, result: Mapping[str, Any]) -> None:
              '此状态只表示本次核验；后续改动须再次运行return status。']
     if result.get('receipt'):
         folder = Path(result['receipt']).parent
-        lines += ['', '[结果、依据与限制](' + _relative(folder / 'RETURN.md', root) + ') · '
-                  '[可点按细读](' + _relative(folder / 'details.html', root) + ')']
+        lines += ['', '[选定正文的保存副本](' + _relative(folder / 'RETURN.md', root) + ')',
+                  '报告须直接发在最终response正文；此索引不替代对话交付。']
+        if (folder / 'details.html').exists():
+            lines[-2] += ' · [历史格式细读](' + _relative(folder / 'details.html', root) + ')'
         if (folder / 'pipeline.svg').exists():
             lines[-1] += ' · [静态图](' + _relative(folder / 'pipeline.svg', root) + ')'
     if result['issues']:
@@ -267,6 +296,8 @@ def return_status(root: Path, *, refresh_entry: bool = False) -> dict[str, Any]:
             if receipt.get('format') != FORMAT or receipt.get('task_root') != str(root):
                 raise ValueError('return receipt does not belong to this task')
             result['receipt'] = str(receipt_path)
+            result['response_body'] = str(receipt_path.parent / 'RETURN.md')
+            result['return_schema'] = receipt.get('return_schema', 1)
             result['coverage'] = receipt['coverage']
             for name, ref in receipt['inputs'].items():
                 if _file_ref(Path(name)) != ref:
@@ -331,7 +362,8 @@ def seal_return(root: Path, input_path: Path) -> dict[str, Any]:
         raise ValueError('return dependencies changed during rendering; no current pointer was published')
     outputs = {file.name: _file_ref(file) for file in sorted(folder.iterdir()) if file.is_file()}
     receipt = {'format': FORMAT, 'task_root': str(root), 'P_run': metadata['P_run'],
-               'coverage': data['scope'], 'inputs': inputs, 'native_state': native,
+               'coverage': data.get('scope', 'selected five-part response body'),
+               'return_schema': data['schema_version'], 'inputs': inputs, 'native_state': native,
                'tool_state': tool_state,
                'outputs': outputs, 'semantic_certification': False,
                'collection_scope': 'explicit selected public facts; no automatic chat collection'}
@@ -342,6 +374,18 @@ def seal_return(root: Path, input_path: Path) -> dict[str, Any]:
                 'receipt_sha256': _file_ref(receipt_path)['sha256'],
                 'receipt_resolved_path': str(receipt_path.resolve())})
     return return_status(root, refresh_entry=True)
+
+
+def response_body(root: Path) -> str:
+    """Emit the selected current body. The model still has to send it in chat."""
+    status = return_status(root)
+    if status['current_receipt'] not in {'READY_UNCLOSED', 'CLOSED'}:
+        raise ValueError('a current sealed return is required before emitting the response body')
+    if status.get('return_schema') != 2:
+        raise ValueError('legacy return is a saved view, not a five-part response body')
+    text = Path(status['response_body']).read_text(encoding='utf-8')
+    validate_response(text)
+    return text
 
 
 def close_return(root: Path, *, reason: str, outcome: str = 'CLOSED') -> dict[str, Any]:
