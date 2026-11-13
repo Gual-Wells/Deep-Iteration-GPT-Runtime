@@ -44,7 +44,7 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 0.7起的新会话默认要求前置任务说明；0.8起另有当前任务生命周期与消息来源闸门。旧pin仍保留其真实状态，不静默升级。模型先研究实际材料与原话，再提供proposal；脚本不自动识别意图。
 
 ```text
-python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run 0.8.1@<实际SHA> --visits D:/shared/digr-visits.jsonl --run-id <本任务唯一分组> --require-foundation
+python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run 0.8.2@<实际SHA> --visits D:/shared/digr-visits.jsonl --run-id <本任务唯一分组> --require-foundation
 python -B tools/codex.py visits begin --root D:/task/session --actor Main --line COMMON --phase FOUNDATION --category SOURCE
 python -B tools/codex.py foundation propose --root D:/task/session --input D:/task/proposal.json --reason "原件调查后的完整候选"
 python -B tools/codex.py foundation show --root D:/task/session
@@ -72,7 +72,7 @@ python -B tools/codex.py task lifecycle --root D:/task/session
 
 明确实质变更使用action revise，它先使旧决定失效；pause保留任务但禁止继续，resume须真实恢复指示。stop/cancel先终结，再收尾，旧确认不能复活。真实停止消息可优先越过较早pending：task terminate --status STOPPED（或CANCELLED）--source-file <真实停止原文> --source-ref <唯一消息引用> --reason <实际后果>；保留旧pending摘要，这条优先路径只能终结。无source pair时明确为操作者清理记录，不能伪引旧答复为停止来源。
 
-source-ref是本地不可变消息身份，同引用不重新编号；编辑后的真实新消息使用新的引用。它不是用户认证，模型仍须核对实际对话。结束后普通纠错可action ordinary记录并保持结束；真的新显式调用须新建任务，不能重用已终结session。handle是模型记录实际含义，不是工具判断用户同意。0.8.0新会话写session-2，早期pin保留session-1；0.8.1新会话写session-3，共用访时缺口保留，可有据近似修复，不通过recover自动补点或重新激活。
+source-ref是本地不可变消息身份，同引用不重新编号；编辑后的真实新消息使用新的引用。它不是用户认证，模型仍须核对实际对话。0.8.2中ordinary只处置消息：ACTIVE保留活动、决定与原P_run，并更新输入锚点使旧返回失效；PAUSED保持暂停，已终结保持终结。普通补充不重开前置或要求再次开工。真的新显式调用须在旧任务明确结束后建新任务，不能复活已终结session。handle是模型记录实际含义，不是工具判断用户同意。边界预览ActiveContext须显式提供从实际lifecycle读取的状态；NEW_TURN本身不结束DIGR。正常关闭使用return close，裸CLOSED或任意草稿不能代替当前RETURN。0.8.0新会话写session-2，早期pin保留session-1；0.8.1起新会话写session-3，共用访时缺口保留，可有据近似修复，不通过recover自动补点或重新激活。详见[兼容说明](../docs/CODEX_REAL_WORLD_CONTINUITY_UPGRADE.md)。
 
 ### 返回快照与收口
 

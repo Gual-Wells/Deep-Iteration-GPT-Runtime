@@ -18,6 +18,7 @@ from runtime.codex_lifecycle import (
     load_lifecycle, recover_session, require_active, require_open_decision, terminate_message,
 )
 from runtime.codex_session import activity, create_line, create_session, session_report
+from runtime.codex_return import close_return, return_status, seal_return
 
 ROOT = Path(__file__).resolve().parents[1]
 PIN = '0.8.0@' + '1' * 40
@@ -77,6 +78,17 @@ class LifecycleTests(unittest.TestCase):
     def ready(self):
         return self.confirm(self.propose()['revision'])
 
+    def sealed_result(self):
+        source = self.file('constructed-result.txt', 'The selected bounded result.\n')
+        data = {'schema_version': 2, 'result': 'The selected bounded result.',
+                'key_changes': 'The constructed result was revised.',
+                'work_process': '| Time | Work |\n| --- | --- |\n| Unknown | Constructed fixture |',
+                'verification_limits': 'No semantic certification.',
+                'parameters': 'No real task contribution or timing is claimed.',
+                'artifacts': [], 'sources': [source.name]}
+        selected = self.file('constructed-return.json', json.dumps(data))
+        return seal_return(self.root, selected)
+
     def test_original_readonly_DIGR_stays_explicit_and_ordinary_cannot_create_new_session(self):
         value = load_lifecycle(self.root)
         self.assertEqual(value['current_message']['surface'], 'EXECUTING')
@@ -101,8 +113,9 @@ class LifecycleTests(unittest.TestCase):
     def test_completed_return_consumes_continuation_for_representative_ordinary_corrections(self):
         self.ready()
         metadata = (self.root / 'session.json').read_bytes()
-        result = self.file('result.md', 'The contracted research result was returned.\n')
-        closed = close_session(self.root, result=result, reason='Result was actually returned')
+        selected = self.sealed_result()
+        result = Path(selected['receipt'])
+        closed = close_session(self.root, result=result, reason='Selected protocol return was completed')
         self.assertEqual(closed['status'], 'CLOSED')
         self.assertEqual(closed['closure']['result_ref']['path'], result.as_posix())
         self.assertEqual((self.root / 'session.json').read_bytes(), metadata)
@@ -142,6 +155,58 @@ class LifecycleTests(unittest.TestCase):
         self.assertEqual(load_foundation(self.root)['confirmation'], accepted['confirmation'])
         self.assertEqual((self.root / 'foundation.json').read_bytes(), foundation_bytes)
         self.assertEqual(load_lifecycle(self.root)['P_run'], PIN)
+
+    def test_ordinary_supplement_keeps_open_work_decision_and_frozen_pin(self):
+        self.ready()
+        foundation = (self.root / 'foundation.json').read_bytes()
+        metadata = (self.root / 'session.json').read_bytes()
+        activity(self.root, 'M01', 'begin', state='MAIN')
+        message_id, _, _ = self.message('补充一点说明；没有要求中止。\n')
+        value = handle_message(self.root, message_id=message_id, action='ordinary',
+                               reason='An ordinary message is a supplement to the unfinished task')
+        self.assertEqual(require_active(self.root)['status'], 'ACTIVE')
+        self.assertEqual(value['task_input_ref']['message_id'], message_id)
+        self.assertEqual(value['P_run'], PIN)
+        self.assertIsNotNone(session_report(self.root)['timing']['lines']['M01']['active'])
+        self.assertEqual((self.root / 'foundation.json').read_bytes(), foundation)
+        self.assertEqual((self.root / 'session.json').read_bytes(), metadata)
+        activity(self.root, 'M01', 'checkpoint', continued=True)
+        activity(self.root, 'M01', 'end', continued=True)
+
+    def test_help_discussion_and_invalid_surface_do_not_consume_unfinished_task(self):
+        accepted = self.ready()['confirmation']
+        for text in ('DIGR/help', 'DIGR是什么？', 'DIGR： ', 'DIGR：再补充一项'):
+            with self.subTest(text=text):
+                message_id, _, _ = self.message(text, route_pin=NEW_ROUTE_PIN)
+                value = handle_message(self.root, message_id=message_id, action='continue',
+                                       reason='Acquired message surface is not a lifecycle end')
+                self.assertEqual(value['status'], 'ACTIVE')
+                self.assertEqual(value['P_run'], PIN)
+                self.assertEqual(load_foundation(self.root)['confirmation'], accepted)
+
+    def test_ordinary_supplement_stales_old_return_without_ending_the_task(self):
+        self.ready()
+        self.sealed_result()
+        self.assertEqual(return_status(self.root)['current_receipt'], 'READY_UNCLOSED')
+        message_id, _, _ = self.message('返回前请把已约定的说明补充进去。\n')
+        handle_message(self.root, message_id=message_id, action='ordinary', reason='Same-task supplement')
+        self.assertEqual(load_lifecycle(self.root)['status'], 'ACTIVE')
+        self.assertEqual(return_status(self.root)['current_receipt'], 'STALE')
+        with self.assertRaisesRegex(ValueError, 'current sealed return'):
+            close_return(self.root, reason='A stale return must not close past the new input')
+
+    def test_direct_close_cannot_bypass_the_protocol_return(self):
+        self.ready()
+        arbitrary = self.file('draft.txt', 'This is only a draft.\n')
+        for result in (None, arbitrary):
+            with self.subTest(result=result), self.assertRaisesRegex(ValueError, 'current sealed return'):
+                close_session(self.root, result=result, reason='Attempted premature normal closure')
+            self.assertEqual(require_active(self.root)['status'], 'ACTIVE')
+        selected = self.sealed_result()
+        with self.assertRaisesRegex(ValueError, 'current sealed return'):
+            close_session(self.root, result=arbitrary, reason='Wrong receipt cannot consume the task')
+        close_session(self.root, result=Path(selected['receipt']), reason='Current protocol return selected')
+        self.assertEqual(load_lifecycle(self.root)['status'], 'CLOSED')
 
     def test_material_correction_revokes_before_next_work_and_keeps_foundation_research_possible(self):
         self.ready()
@@ -307,7 +372,7 @@ class LifecycleTests(unittest.TestCase):
             handle_message(self.root, message_id=message_id, action='ordinary', reason='An ordinary discussion, no work continuation')
         value = load_lifecycle(self.root)
         self.assertEqual(len(value['recent_messages']), 8)
-        self.assertEqual(value['status'], 'ORDINARY')
+        self.assertEqual(value['status'], 'ACTIVE')
         self.assertTrue(all('text' not in item['source'] for item in value['recent_messages']))
         before = (self.root / 'lifecycle.json').read_bytes()
         with self.assertRaisesRegex(ValueError, 'stale/replayed'):

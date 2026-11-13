@@ -18,12 +18,48 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class CodexBoundaryTests(unittest.TestCase):
     def setUp(self):
-        self.active = ActiveContext('turn-1', 'DEEP')
+        self.active = ActiveContext('turn-1', 'DEEP', 'ACTIVE')
 
-    def test_new_ordinary_turn_does_not_inherit_deep(self):
+    def test_host_new_turn_preserves_unfinished_deep_task(self):
         result = decide_boundary('NEW_TURN', '继续整理文件', active=self.active)
-        self.assertEqual((result.mode, result.action), ('LIGHT', 'HANDLE_ORDINARY_TASK'))
+        self.assertEqual((result.mode, result.action), ('DEEP', 'CONTINUE'))
+        self.assertTrue(result.preserve_task)
+        self.assertEqual(result.continuation_of, 'turn-1')
+
+    def test_closed_context_does_not_revive_and_light_is_not_sticky(self):
+        for status in ('CLOSED', 'STOPPED', 'CANCELLED'):
+            context = ActiveContext('finished', 'DEEP', status)
+            result = decide_boundary('NEW_TURN', '补充一个说明', active=context)
+            self.assertEqual((result.mode, result.action), ('LIGHT', 'HANDLE_ORDINARY_TASK'))
+            self.assertFalse(result.preserve_task)
+            with self.assertRaisesRegex(ValueError, 'unfinished task'):
+                decide_boundary('STEER', '补充', active=context, expected_turn_id='finished')
+            for event in ('COMPACTION', 'INTERRUPT'):
+                control = decide_boundary(event, active=context)
+                self.assertEqual(control.action, 'PRESERVE_TERMINAL_STATE')
+                self.assertEqual(control.mode, 'LIGHT')
+        result = decide_boundary('NEW_TURN', '普通任务', active=ActiveContext('light', 'LIGHT', 'ACTIVE'))
+        self.assertEqual(result.mode, 'LIGHT')
         self.assertFalse(result.preserve_task)
+
+    def test_lifecycle_status_cannot_be_inferred_from_a_legacy_turn_id(self):
+        with self.assertRaises(TypeError):
+            ActiveContext('old-turn', 'DEEP')
+        with self.assertRaisesRegex(ValueError, 'actual task lifecycle'):
+            ActiveContext('old-turn', 'DEEP', 'UNKNOWN')
+
+    def test_paused_supplement_preserves_task_without_resuming(self):
+        context = ActiveContext('paused', 'DEEP', 'PAUSED')
+        result = decide_boundary('NEW_TURN', '把说明补全', active=context)
+        self.assertEqual(result.action, 'HANDLE_SUPPLEMENT_KEEP_PAUSED')
+        self.assertTrue(result.preserve_task)
+        routed = decide_boundary('NEW_TURN', 'DIGR/help', active=context)
+        self.assertEqual(routed.after_route, 'HANDLE_SUPPLEMENT_KEEP_PAUSED')
+        self.assertTrue(routed.route_required)
+        for event in ('COMPACTION', 'INTERRUPT'):
+            control = decide_boundary(event, active=context)
+            self.assertEqual(control.action, 'PRESERVE_PAUSED_STATE')
+            self.assertTrue(control.preserve_task)
 
     def test_read_only_question_is_still_an_explicit_invocation(self):
         text = '  DIGR：研究表现，别急着推，我就问一下。\n'
@@ -66,7 +102,7 @@ class CodexBoundaryTests(unittest.TestCase):
             expected_turn_id='turn-1', goal_changed=True,
         )
         self.assertEqual(result.action, 'REALIGN_GOAL')
-        self.assertFalse(result.preserve_task)
+        self.assertTrue(result.preserve_task)
 
     def test_steer_rejects_stale_or_missing_turn(self):
         for active, expected in ((None, 'turn-1'), (self.active, None), (self.active, 'old')):
@@ -92,12 +128,21 @@ class CodexBoundaryTests(unittest.TestCase):
         self.assertTrue(result.preserve_task)
         self.assertEqual(result.after_route, 'CONTINUE')
 
+    def test_every_prefixed_host_new_turn_routes_without_ending_the_task(self):
+        for text in ('DIGR：补充要求', 'DIGR/help', 'DIGR是什么？', 'DIGR： '):
+            with self.subTest(text=text):
+                result = decide_boundary('NEW_TURN', text, active=self.active)
+                self.assertTrue(result.route_required)
+                self.assertTrue(result.preserve_task)
+                self.assertEqual(result.continuation_of, 'turn-1')
+                self.assertEqual(result.after_route, 'CONTINUE')
+
     def test_control_events_do_not_start_new_runs(self):
         restored = decide_boundary('COMPACTION', active=self.active)
         self.assertEqual(restored.action, 'RESTORE_REAL_STATE')
         self.assertEqual(restored.continuation_of, 'turn-1')
         stopped = decide_boundary('INTERRUPT', active=self.active)
-        self.assertEqual(stopped.action, 'STOP')
+        self.assertEqual(stopped.action, 'SUSPEND_ACTIVITY_PRESERVE_TASK')
         self.assertTrue(stopped.preserve_task)
         for event in ('COMPACTION', 'INTERRUPT'):
             with self.assertRaises(ValueError):

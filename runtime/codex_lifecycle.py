@@ -324,9 +324,10 @@ def _revoke_if_present(root: Path, message: Mapping[str, Any], reason: str) -> N
 def handle_message(root: Path, *, message_id: int, action: str, reason: str) -> dict[str, Any]:
     """Apply a model-owned interpretation; this does not judge free-text intent.
 
-    Harmless same-task continuation carries the existing foundation decision.
-    A semantic correction needs `revise`, which revokes before more execution.
-    Ordinary messages after termination may be recorded without reopening it.
+    Message disposition is not task termination. Ordinary input to ACTIVE is
+    a supplement and carries its foundation/activity; PAUSED stays paused.
+    Only a material replacement of the accepted object needs `revise`.
+    Terminal tasks never reopen through ordinary discussion.
     """
     root, value = _managed(root)
     reason = require_nonempty_text('actual message consequence', reason)
@@ -340,19 +341,17 @@ def handle_message(root: Path, *, message_id: int, action: str, reason: str) -> 
         raise ValueError('candidate message still lacks its upstream route pin reference; actual acquisition remains required')
     if action in {'continue', 'revise', 'resume'} and value['status'] in TERMINAL:
         raise ValueError('ordinary messages cannot reopen a terminated managed task; a new invocation needs a new session')
-    if action in {'continue', 'resume', 'revise'} and message['surface'] in {'HELP', 'INVALID', 'ROUTE_PENDING'}:
-        raise ValueError('HELP/INVALID/unresolved route does not continue deep execution')
+    if action in {'continue', 'resume', 'revise'} and message['surface'] == 'ROUTE_PENDING':
+        raise ValueError('unresolved route does not continue deep execution')
     if action == 'continue' and value['status'] == 'PAUSED':
         raise ValueError('paused task needs an actual resume decision, not implicit continuation')
     if action == 'revise':
         # The input fence is still pending if this fails. Do not consume it
         # before the actual current foundation decision has been invalidated.
         _revoke_if_present(root, message, reason)
-    cleanup = action in {'ordinary', 'revise', 'pause', 'stop', 'cancel'}
+    cleanup = action in {'revise', 'pause', 'stop', 'cancel'}
     if action in {'continue', 'resume'}:
         value['status'] = 'ACTIVE'
-    elif action == 'ordinary' and value['status'] not in {*TERMINAL, 'PAUSED'}:
-        value['status'] = 'ORDINARY'
     elif action == 'pause' and value['status'] not in TERMINAL:
         value['status'] = 'PAUSED'
     elif action in {'stop', 'cancel'} and value['status'] not in TERMINAL:
@@ -361,7 +360,8 @@ def handle_message(root: Path, *, message_id: int, action: str, reason: str) -> 
                             'message_id': message_id, 'result_ref': None,
                             'task_input_ref': dict(value['task_input_ref']),
                             'wall_ns': time.time_ns(), 'scope': 'lifecycle termination; no quality claim'}
-    if action in {'continue', 'resume', 'revise'}:
+    if (action in {'continue', 'resume', 'revise'}
+            or action == 'ordinary' and value['status'] not in TERMINAL):
         value['task_input_ref'] = _input_ref(message)
     message['handling'] = {'action': action, 'reason': reason, 'wall_ns': time.time_ns()}
     value['handled_message_id'] = message_id
@@ -389,6 +389,11 @@ def close_session(root: Path, *, reason: str, result: Path | None = None,
         return value
     if status == 'CLOSED':
         require_active(root)  # Do not return past a pending correction or pause.
+        from .codex_return import return_status
+        current = return_status(root)
+        if (not current['can_close'] or result is None
+                or Path(result).resolve() != Path(current['receipt']).resolve()):
+            raise ValueError('normal closure requires the current sealed return; use return close')
     result_ref = _artifact_ref(Path(result)) if result is not None else None
     value['status'] = status
     value['closure'] = {'status': status, 'reason': reason, 'message_id': value['message_id'],

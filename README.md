@@ -1,4 +1,6 @@
-# DIGR for Codex · 0.8.1
+# DIGR for Codex · 0.8.2
+
+0.8.2修正现实信息不完备下的决策与未完成任务接续：有据中心判断不被最坏情况替换，普通补充/NEW_TURN不终结DIGR，暂停与终结按真实状态保留，正常结束复用当前RETURN。规则进入所有本通道任务的必读正文与运行工具。[行为、API兼容与验证范围](docs/CODEX_REAL_WORLD_CONTINUITY_UPGRADE.md)。
 
 **让深入研究、竞争方案和实际制作共同推动任务结果。**
 
@@ -10,7 +12,7 @@
 
 DIGR 是一套由模型承担研究、判断与制作的工作协议。它鼓励深入真实材料，发展有内容的候选，认真重开整条路线，并让独立研究产生实际后果。目标是用户能拿来使用的结果：一份有依据的研究、一件完整作品，或经过真实路径验证的修复。
 
-本分支提供 **Codex 0.8.1 实验通道**与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
+本分支提供 **Codex 0.8.2 实验通道**与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
 
 [附属项目入口](addons/README.md)列出 Voice Companion、Paper Knowledge、[English-Spoken-Preprint](spoken-preprint/README.md) 与 [Personal Context](personal-context/README.md)。ESP 0.2 以目标领域中的困难处理为选材中心，提供原场景与独立双语学习听稿；个人资料附属可提供有来源的最小人物视图，保持可选关系。项目回原数据接续，不互相强绑；独立的[真人参与实训](research/codex-participation/README.md)目前只作设计探索。附属各自版本化，不改根 stable 语义。
 

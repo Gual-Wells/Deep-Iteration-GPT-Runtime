@@ -57,12 +57,15 @@ class EventKind(str, Enum):
 class ActiveContext:
     turn_id: str
     mode: str
+    lifecycle_status: str
 
     def __post_init__(self) -> None:
         if not isinstance(self.turn_id, str) or not self.turn_id.strip():
             raise ValueError('active turn_id must be nonempty')
         if self.mode not in ('LIGHT', 'DEEP'):
             raise ValueError('active mode must be LIGHT or DEEP')
+        if self.lifecycle_status not in ('ACTIVE', 'PAUSED', 'CLOSED', 'STOPPED', 'CANCELLED'):
+            raise ValueError('supply the actual task lifecycle status')
 
 
 @dataclass(frozen=True)
@@ -135,11 +138,10 @@ def decide_boundary(
 ) -> BoundaryDecision:
     """Preview a supplied host event without inferring intent or executing it.
 
-    STEER needs an active turn and its expected id, like App Server. The caller
-    supplies goal_changed after semantic interpretation; this helper cannot
-    decide whether a user's correction replaces the goal. Every candidate user
-    message, including a steer, still requires real routing before interpretation.
-    A route requirement is never an EXECUTING decision.
+    Host turn names do not end an unfinished DEEP task. The caller supplies its
+    actual lifecycle status and goal_changed after interpretation; neither a
+    turn id nor this preview certifies those facts. Every candidate message
+    still requires real acquisition, without replacing the frozen run pin.
     """
     event = EventKind(event)
     if not isinstance(message, str):
@@ -152,6 +154,8 @@ def decide_boundary(
     if event is EventKind.STEER:
         if active is None or expected_turn_id != active.turn_id:
             raise ValueError('STEER requires the matching active expected_turn_id')
+        if active.lifecycle_status in ('CLOSED', 'STOPPED', 'CANCELLED'):
+            raise ValueError('STEER requires an unfinished task; a closed task cannot be revived')
     elif expected_turn_id is not None:
         raise ValueError('expected_turn_id applies only to STEER')
 
@@ -160,15 +164,24 @@ def decide_boundary(
             raise ValueError('control events do not contain a new user message/goal')
         if active is None:
             raise ValueError('control event requires active context')
-        action = 'RESTORE_REAL_STATE' if event is EventKind.COMPACTION else 'STOP'
+        if active.lifecycle_status in ('CLOSED', 'STOPPED', 'CANCELLED'):
+            return BoundaryDecision('LIGHT', 'PRESERVE_TERMINAL_STATE', False, True, active.turn_id)
+        if active.lifecycle_status == 'PAUSED':
+            return BoundaryDecision(active.mode, 'PRESERVE_PAUSED_STATE', False, True, active.turn_id)
+        action = ('RESTORE_REAL_STATE' if event is EventKind.COMPACTION
+                  else 'SUSPEND_ACTIVITY_PRESERVE_TASK')
         return BoundaryDecision(active.mode, action, False, True, active.turn_id)
 
-    continuing = event is EventKind.STEER
-    preserve = continuing and not goal_changed
+    unfinished_deep = (active is not None and active.mode == 'DEEP'
+                       and active.lifecycle_status in ('ACTIVE', 'PAUSED'))
+    continuing = event is EventKind.STEER or unfinished_deep
+    preserve = continuing
     continuation = active.turn_id if continuing and active is not None else None
     after_route = 'REALIGN_GOAL' if continuing and goal_changed else (
         'CONTINUE' if continuing else 'CLASSIFY_NEW_INVOCATION'
     )
+    if continuing and active is not None and active.lifecycle_status == 'PAUSED':
+        after_route = 'HANDLE_SUPPLEMENT_KEEP_PAUSED'
     key = candidate_route_key(message)
     if key is not None:
         return BoundaryDecision(
@@ -178,10 +191,10 @@ def decide_boundary(
     if continuing:
         assert active is not None
         return BoundaryDecision(
-            active.mode, 'REALIGN_GOAL' if goal_changed else 'CONTINUE',
+            active.mode, after_route,
             False, preserve, continuation,
         )
-    # A previous DEEP context does not make an ordinary new turn sticky.
+    # Completed/cancelled tasks and LIGHT mode do not activate a fresh DIGR task.
     return BoundaryDecision('LIGHT', 'HANDLE_ORDINARY_TASK', False, False, None)
 
 
