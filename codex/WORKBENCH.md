@@ -44,7 +44,7 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 0.7起的新会话默认要求前置任务说明；0.8起另有当前任务生命周期与消息来源闸门。旧pin仍保留其真实状态，不静默升级。模型先研究实际材料与原话，再提供proposal；脚本不自动识别意图。
 
 ```text
-python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run 0.8.2@<实际SHA> --visits D:/shared/digr-visits.jsonl --run-id <本任务唯一分组> --require-foundation
+python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run 0.8.3@<实际SHA> --visits D:/shared/digr-visits.jsonl --run-id <本任务唯一分组> --require-foundation
 python -B tools/codex.py visits begin --root D:/task/session --actor Main --line COMMON --phase FOUNDATION --category SOURCE
 python -B tools/codex.py foundation propose --root D:/task/session --input D:/task/proposal.json --reason "原件调查后的完整候选"
 python -B tools/codex.py foundation show --root D:/task/session

@@ -1,6 +1,6 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "protocol": "digr-codex-native-v8",
   "status": "experimental",
   "language": "zh-CN",
@@ -57,20 +57,20 @@
     "real_world_incomplete_information_policy": "EVIDENCE_BASED_CENTRAL_JUDGMENT_AND_PROPORTIONATE_ACTION"
   },
   "file_sha256": {
-    "codex/VERSION": "ceb9b2c03afb769df3b1e518520c4e1798e9a3313a1c5ffffcb054fef5d6d6fb",
-    "codex/AGENTS.light.md": "f2965cf01525c675ead3fefcaecdf9d447b0e0665b127650b00900e9c3c4153c",
+    "codex/VERSION": "780363b8ef02ff7e83eb72709f6396b09dec21a26403bb44f58ea8d6757fe33d",
+    "codex/AGENTS.light.md": "d21ad2ff0d26bd2ec6d576877713b7998c7d0cdc4972d6030c52b7ff23c8e1ab",
     "codex/ROUTER.experimental.txt": "6aa91d9aea27e029155349bbc9abed5cf5b216a65ad74a45788a8cf16a845347",
-    "codex/STARTUP.md": "5b3b8f8ff78eaa877cdfb1a1ad5cf105a0095253386d4adfbdc98ee0663b794c",
-    "codex/PROTOCOL.md": "897ffc3a14a7162645a937dda631bafb206bd9d4a6bccefe3052a1c95e6f1622",
+    "codex/STARTUP.md": "3a6d7ea3a3e91de7bdc61a84e1cfb1491a0a93dd43a1ed111d0b3c08edd662b6",
+    "codex/PROTOCOL.md": "2b5e2d8be71868385838ae5f9e9c11ac622f5f5ccea2c9a2da14c6a7e1d4732d",
     "codex/FOUNDATION.md": "b943b9160f5f9ad2b2f80e444c80b416aaa472847fffda73a62ddf6d7a6d374b",
-    "codex/HELP.md": "aa3f41cb7f2ef3c84a52a403794cd609300917c60000c2f553308c79c6796bfa",
+    "codex/HELP.md": "5576fdaa1abc936f2b11c6037cb79c21292cb66d5a8f62ae3e268ecc67c9e2ef",
     "codex/PARAMETERS.md": "d4b3b95a8c63f18b566f15f459e4d91386efeed5ebcd31b9491fb9106cc12cf9",
-    "codex/WORKBENCH.md": "288e80e361130812b443041d687d1809d04a52fdee541c399ec66059d96b6930",
+    "codex/WORKBENCH.md": "93e1aa3c25c24824ce402e62667bcc2df57938fe735199e30956d89bb744345d",
     "codex/CHARACTER.md": "c0565f52bdf585d8ba24da51e6354493d9d7acdb5938ab9848f12eed736eb932",
     "codex/COLLABORATION.md": "40bac20c5efad996ed453cfca495aff1130a8534d965c8de6282868352ce1b55",
     "codex/PERMISSIONS.md": "3c59a22111c9ae058342d48cf091216cc661c0ff28206700a1d94b25ffecd58b",
-    "codex/RETURN.md": "349e98b874a66dbfaead31345532855eafdc24937b914f898ac317296561303a",
-    "codex/EXECUTION_PROTOCOL.json": "66722f37dabb257bf7551bdbbe118519723c34c6a4c067a2e6bdf3f5861e50cb"
+    "codex/RETURN.md": "4f9efd48c26f712516c601a7c46818f6f5394759cea7ae6e5677b2791561cda8",
+    "codex/EXECUTION_PROTOCOL.json": "c0ea1b45041b42551f7f111ff050ff4dac326d4b9c5440d53a45ff0b0d81d235"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {

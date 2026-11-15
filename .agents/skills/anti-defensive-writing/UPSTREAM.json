@@ -1,0 +1,11 @@
+{
+  "repository": "Kiterlin/anti-defensive-writing",
+  "commit": "f516147d017a3fe43ae99192cb89d8261b0c8679",
+  "source_path": "skill/anti-defensive-writing/SKILL.md",
+  "source_url": "https://raw.githubusercontent.com/Kiterlin/anti-defensive-writing/f516147d017a3fe43ae99192cb89d8261b0c8679/skill/anti-defensive-writing/SKILL.md",
+  "skill_sha256": "287e3d05aeabf6409fa53b74a124ee0d897338009be2c04d3e38c352ca74a3c1",
+  "skill_git_blob": "c756be063b4cdc344394a5e7d4e9ae95d839e5f8",
+  "license": "MIT",
+  "license_source_path": "LICENSE",
+  "local_modifications": false
+}
