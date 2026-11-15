@@ -1,5 +1,10 @@
 [
   {
+    "id": "digrp",
+    "name": "DIGRP Paper Reading",
+    "path": "paper/PROTOCOL.md"
+  },
+  {
     "id": "voice-companion",
     "name": "DIGR Voice Companion",
     "path": "voice/README.md"

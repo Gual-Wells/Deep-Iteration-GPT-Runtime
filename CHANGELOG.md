@@ -1,5 +1,14 @@
 # Changelog
 
+## Codex 0.8.4 — optional DIGRP 0.1.0 paper reading increment
+
+- An explicitly selected, same-pin addon gives each paper a complete M and integrates global design, original notation, explained reasoning, experiments and full-paper return reading in the order m1 → m4 → m2 → m3 → m5.
+- The native host remains responsible for research, mathematical explanation and Gmail actions. Thin versioned file tools preserve source identities, actual guide locations, revisions, candidate files and per-volume read-back delivery facts. A paper can return independently; the parent closes only through the core RETURN.
+- Local Markdown rendering and RGB screenshot-PDF assembly retain equations, original plots and semantic page order. Source line breaks take precedence over unreadably small formulas; final written PDFs are reopened for review.
+- Resume prioritizes the current saved step and unresolved send attempts. Another volume's receipt does not clear an uncertain send, and a pending correction to a returned paper prevents a false all-complete summary. Synthetic forward runs exercise these cases without claiming real mail or learning outcomes.
+
+The compatible call is `DIGR：按 DIGRP 完整处理……`; a separate `DIGRP：` prefix is not enabled. Root stable and existing execution pins keep their semantics.
+
 ## Codex 0.7.0 — researched task foundation before full execution
 
 - A mandatory FOUNDATION core separates immutable original words from a research-authored, revisable task explanation. It covers usable outcomes, scope, granularity, actual assets and dependencies, competing delivery routes, resources and completion.

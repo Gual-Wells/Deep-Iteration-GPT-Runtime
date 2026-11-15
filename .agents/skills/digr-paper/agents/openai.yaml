@@ -1,0 +1,4 @@
+interface:
+  display_name: "DIGRP Paper Reading"
+  short_description: "Read whole papers through models, derivations and evidence"
+  default_prompt: "Use $digr-paper to guide me through this complete paper and its original reasoning."

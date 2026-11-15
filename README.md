@@ -1,4 +1,6 @@
-# DIGR for Codex · 0.8.3
+# DIGR for Codex · 0.8.4
+
+0.8.4新增可选的[DIGRP论文解构增量](paper/PROTOCOL.md)：每篇完整M，先看整体与有限世界，再准备原文语言、逐步推理、实验和全篇回读。Markdown实际渲染成保留原图颜色的截图PDF，每篇经授权Gmail发送并读回核验后独立返回；所有篇与公共工作完成后才结束父任务。[技能与文件工具](paper/DATA.md)随同一不可变pin提供，兼容调用为`DIGR：按 DIGRP 完整处理这篇论文……`。
 
 0.8.3接入社区 Anti-Defensive Writing：有据主张先行，删除重复辩护、叠加保留和自我贬低，必要限定准确落在相关主张。核心规则进入必读PROTOCOL、RETURN及普通任务轻量约定；中英双语完整技能连同不可变来源和MIT许可随分发提供。[来源与接入说明](docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md)。
 
@@ -14,7 +16,7 @@
 
 DIGR 是一套由模型承担研究、判断与制作的工作协议。它鼓励深入真实材料，发展有内容的候选，认真重开整条路线，并让独立研究产生实际后果。目标是用户能拿来使用的结果：一份有依据的研究、一件完整作品，或经过真实路径验证的修复。
 
-本分支提供 **Codex 0.8.3 实验通道**与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
+本分支提供 **Codex 0.8.4 实验通道**与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
 
 [附属项目入口](addons/README.md)列出 Voice Companion、Paper Knowledge、[English-Spoken-Preprint](spoken-preprint/README.md) 与 [Personal Context](personal-context/README.md)。ESP 0.2 以目标领域中的困难处理为选材中心，提供原场景与独立双语学习听稿；个人资料附属可提供有来源的最小人物视图，保持可选关系。项目回原数据接续，不互相强绑；独立的[真人参与实训](research/codex-participation/README.md)目前只作设计探索。附属各自版本化，不改根 stable 语义。
 

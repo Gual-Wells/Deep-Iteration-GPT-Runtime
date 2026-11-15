@@ -1,11 +1,12 @@
 # DIGR Codex 附属项目入口
 
-这里登记与 DIGR Codex 共存、各有用途的四个附属项目。按要做的动作进入，接续时回到该项目的原数据；目录不保存个人进度，不判断宿主是否已经具备某种能力，也不负责安装或依赖解析。
+这里登记与 DIGR Codex 共存、各有用途的附属项目。按要做的动作进入，接续时回到该项目的原数据；目录不保存个人进度，不判断宿主是否已经具备某种能力，也不负责安装或依赖解析。
 
 [index.json](index.json) 仅提供项目 ID、名称和仓库相对入口。发行版本以项目已有的发行材料为准；数据格式、历史协议 pin、产物身份与私人数据 revision 各自表达。登记为附属不意味着彼此成为运行依赖。
 
 | 项目 | 立项目的与责任 | 实际入口 |
 |---|---|---|
+| DIGRP Paper Reading | 每篇完整主进度，连接全景、基础、推理、实验与原文；经授权Gmail独立返回每篇，全部完成后统筹结束。 | [版本化协议](../paper/PROTOCOL.md)、[文件/命令契约](../paper/DATA.md)、[技能](../.agents/skills/digr-paper/SKILL.md) |
 | DIGR Voice Companion | 在英语语音陪练中帮助构思、接话、创作与继续交流；提供本机短核、完整技能及手机自足材料。 | [使用说明](../voice/README.md)、[手机短核](../voice/MOBILE.txt)、[完整手机材料](../voice/ChatGPT-Voice-Companion.md)、[开始一句话](../voice/START.txt) |
 | DIGR Paper Knowledge | 在 Codex 读论文时保留来源、论文局部用法、真实选择、已讲内容和有范围的学习证据，并按实际位置接续。当前数据格式为 schema 2；这不是独立产品 2.0。 | [技能与接续流程](../.agents/skills/digr-paper-knowledge/SKILL.md)、[数据/命令契约](../.agents/skills/digr-paper-knowledge/references/data-contract.md)、[CLI](../tools/codex_knowledge.py) |
 | English-Spoken-Preprint | 在 Codex 中由真实独立人物及伴生内心生成场景日志，制作供手机顺畅多角色场景演绎、用户跟听的预印本；台前与幕后分别交付。 | [项目与工作流](../spoken-preprint/README.md)、[统一 CLI 的 preprint 入口](../tools/codex.py)、[具体命令](../tools/codex_preprint.py) |
