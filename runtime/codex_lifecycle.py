@@ -91,6 +91,10 @@ def initialize_lifecycle(root: Path, metadata: Mapping[str, Any]) -> dict[str, A
     value['current_message'].update({key: surface[key] for key in
         ('invocation_key', 'addon_hint', 'addon_selection') if key in surface})
     value['task_input_ref'] = _input_ref(value['current_message'])
+    if metadata.get('delivery_contract') == 'x-files-v1':
+        value['delivery_selection'] = metadata['delivery_selection']
+        value['delivery_policy'] = metadata['initial_delivery_policy']
+        value['delivery_history'] = []
     _write_json(root / 'lifecycle.json', value, new=True)
     return value
 
@@ -323,7 +327,24 @@ def _revoke_if_present(root: Path, message: Mapping[str, Any], reason: str) -> N
                           source=message['source']['source_ref'], reason=reason)
 
 
-def handle_message(root: Path, *, message_id: int, action: str, reason: str) -> dict[str, Any]:
+def handle_message(root: Path, *, message_id: int, action: str, reason: str,
+                   delivery_selection: dict | None = None, destinations: Path | None = None) -> dict[str, Any]:
+    """Serialize a real policy change with pre-send reservation, not STOP.
+
+    The message itself is already pending before this call; an external host
+    must also honor later user input after it receives a one-time send grant.
+    """
+    if delivery_selection is not None and action not in {'stop','cancel','pause'}:
+        from .codex_delivery import policy_lock
+        with policy_lock(Path(root).resolve()):
+            return _handle_message(root,message_id=message_id,action=action,reason=reason,
+                delivery_selection=delivery_selection,destinations=destinations)
+    return _handle_message(root,message_id=message_id,action=action,reason=reason,
+        delivery_selection=delivery_selection,destinations=destinations)
+
+
+def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
+                    delivery_selection: dict | None = None, destinations: Path | None = None) -> dict[str, Any]:
     """Apply a model-owned interpretation; this does not judge free-text intent.
 
     Message disposition is not task termination. Ordinary input to ACTIVE is
@@ -347,6 +368,44 @@ def handle_message(root: Path, *, message_id: int, action: str, reason: str) -> 
         raise ValueError('unresolved route does not continue deep execution')
     if action == 'continue' and value['status'] == 'PAUSED':
         raise ValueError('paused task needs an actual resume decision, not implicit continuation')
+    from .codex_session import _session, read_delivery_registry
+    metadata = _session(root)[1]
+    if metadata.get('delivery_contract') == 'x-files-v1' and action not in {'stop','cancel','pause'}:
+        from .codex_profile import classify_invocation
+        surface = classify_invocation(message['source']['text'])
+        incoming = surface.get('delivery_selection', {})
+        current = value.get('delivery_selection', metadata['delivery_selection'])
+        if delivery_selection is not None and surface['classification'] in {'HELP','INVALID','ROUTE_PENDING'}:
+            raise ValueError('malformed/help/unresolved source cannot authorize an X delivery change')
+        if delivery_selection is None and incoming.get('explicit') and incoming != current:
+            from .codex_delivery import resolve_policy
+            registry, _ = read_delivery_registry(destinations)
+            resolved = resolve_policy(incoming, registry)
+            endpoint = ('channel','account','recipient','transport','target_kind','evidence_adapter','account_kind')
+            if any(resolved.get(field) != value['delivery_policy'].get(field) for field in endpoint):
+                raise ValueError('this source changes X; handle its actual choice with --delivery-selection before continuing')
+            # An equivalent alias does not rebind the saved endpoint or adopt
+            # newly edited registry capability/identity observations.
+            value['delivery_selection'] = incoming
+        if delivery_selection is not None and delivery_selection != current:
+            if surface['classification'] == 'EXECUTING' and incoming.get('explicit') and incoming != delivery_selection:
+                raise ValueError('delivery change differs from the current source X header')
+            from .codex_delivery import inspect as inspect_delivery, resolve_policy
+            deliveries = inspect_delivery(root)['deliveries']
+            if delivery_selection.get('mode') != 'local' and any(
+                    item['unresolved'] or item['recorded_status'] == 'SENT_VERIFIED' for item in deliveries):
+                raise ValueError('external retarget after a send is not automatic; reconcile uncertain sends and use a new explicitly scoped task')
+            registry, origin = (read_delivery_registry(destinations)
+                                if delivery_selection.get('mode') == 'external' else (None,None))
+            policy = resolve_policy(delivery_selection, registry)
+            value.setdefault('delivery_history', []).append({
+                'selection':current,'policy':value['delivery_policy'],
+                'changed_by_message_id':message_id,'source_ref':message['source']['source_ref'],
+                'reason':reason,'recorded_wall_ns':time.time_ns()})
+            value.update(delivery_selection=delivery_selection,delivery_policy=policy,
+                         delivery_registry_origin=origin)
+    elif delivery_selection is not None or destinations is not None:
+        raise ValueError('delivery changes require an active 0.9+ task source and an applicable message action')
     if action == 'revise':
         # The input fence is still pending if this fails. Do not consume it
         # before the actual current foundation decision has been invalidated.

@@ -1,6 +1,8 @@
-# DIGR for Codex · 0.8.5
+# DIGR for Codex · 0.9.0
 
-0.8.5接通[DIGRP 0.2.0](paper/PROTOCOL.md)直接调用：`DIGRP：完整处理这篇论文……`。每篇完整M，内部职责综合为面向读者的自然章节；[桌面PDF规范](paper/PDF_DESIGN.md)以固定标准单页、双页阅读及每篇一份完整文件为目标，优先保留可搜索文字、矢量公式与原色图表。每篇完成后一次Gmail发送并读回核验，所有篇与公共工作完成后才结束父任务。[技能与文件工具](paper/DATA.md)随同一不可变pin提供，仍兼容`DIGR：按 DIGRP……`。旧0.1手机分卷记录保留为历史，不作为新交付标准。
+0.9.0把[X文件交付](codex/DELIVERY.md)接入DIGR、DIGRP：无`X`在当前聊天返回文件；`DIGR(X):…`、`DIGRP(X):…`和`(X=Gmail)`均发送到本机配置的本人Gmail。常规投入参数后可另接一个X栏，例如`DIGRP(N=16,R=4)(X=Gmail):…`。X只控制任务约定的最终文件；没有文件时保留文字答复，不额外造文件。本版仅实现Gmail，个人目标在私有本机配置中，任务建立时解析并保存。
+
+[DIGRP 0.3.0](paper/PROTOCOL.md)继续每篇完整M、每篇一份[标准页桌面PDF](paper/PDF_DESIGN.md)，内部职责综合为自然章节。无X的完整论文可直接本地返回；有X时逐篇发送Gmail并读回，所有论文及公共工作完成后才结束父任务。交付工具在外发前保存发送状态，响应不明先对账；真实发送使用已有Gmail原生连接器。[操作技能](.agents/skills/digr-delivery/SKILL.md)随同一不可变pin提供。旧pin和既有Gmail/分卷历史保持原身份。
 
 0.8.3接入社区 Anti-Defensive Writing：有据主张先行，删除重复辩护、叠加保留和自我贬低，必要限定准确落在相关主张。核心规则进入必读PROTOCOL、RETURN及普通任务轻量约定；中英双语完整技能连同不可变来源和MIT许可随分发提供。[来源与接入说明](docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md)。
 
@@ -16,7 +18,7 @@
 
 DIGR 是一套由模型承担研究、判断与制作的工作协议。它鼓励深入真实材料，发展有内容的候选，认真重开整条路线，并让独立研究产生实际后果。目标是用户能拿来使用的结果：一份有依据的研究、一件完整作品，或经过真实路径验证的修复。
 
-本分支提供 **Codex 0.8.5 实验通道**与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
+本分支提供 **Codex 0.9.0 实验通道**与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
 
 [附属项目入口](addons/README.md)列出 Voice Companion、Paper Knowledge、[English-Spoken-Preprint](spoken-preprint/README.md) 与 [Personal Context](personal-context/README.md)。ESP 0.2 以目标领域中的困难处理为选材中心，提供原场景与独立双语学习听稿；个人资料附属可提供有来源的最小人物视图，保持可选关系。项目回原数据接续，不互相强绑；独立的[真人参与实训](research/codex-participation/README.md)目前只作设计探索。附属各自版本化，不改根 stable 语义。
 

@@ -11,6 +11,7 @@ from enum import Enum
 from hashlib import sha256
 import json
 from pathlib import Path
+import re
 from typing import Any, Mapping
 
 from .routing import candidate_route_key
@@ -22,6 +23,7 @@ PROFILE_CORE = (
     'codex/FOUNDATION.md',
     'codex/CHARACTER.md', 'codex/PARAMETERS.md',
     'codex/COLLABORATION.md', 'codex/PERMISSIONS.md',
+    'codex/DELIVERY.md',
     'codex/RETURN.md',
 )
 PROFILE_FILES = (
@@ -37,6 +39,7 @@ PROFILE_FILES = (
     'codex/CHARACTER.md',
     'codex/COLLABORATION.md',
     'codex/PERMISSIONS.md',
+    'codex/DELIVERY.md',
     'codex/RETURN.md',
     'codex/EXECUTION_PROTOCOL.json',
 )
@@ -44,6 +47,8 @@ CAPABILITY_NAMES = (
     'files', 'shell', 'persistent_workspace', 'repository_transport',
     'source_tools', 'monotonic_clock', 'isolated_agents', 'final_output_gate',
 )
+_DELIVERY_TOKEN = re.compile(r'(?<![A-Za-z0-9_])X(?![A-Za-z0-9_])')
+_DELIVERY_TARGET = re.compile(r'[A-Za-z][A-Za-z0-9_-]{0,63}')
 
 
 class EventKind(str, Enum):
@@ -82,12 +87,81 @@ class BoundaryDecision:
         return asdict(self)
 
 
+def _parameter_group_spans(prelude: str) -> list[tuple[int, int]]:
+    """Read complete, adjacent header groups without rewriting their bytes."""
+    spans = []
+    stack = []
+    pairs = {')': '(', '）': '（'}
+    start = None
+    for index, char in enumerate(prelude):
+        if char in '(（':
+            if not stack:
+                start = index
+            stack.append(char)
+        elif char in ')）':
+            if not stack or stack.pop() != pairs[char]:
+                raise ValueError('unbalanced parameter parentheses')
+            if not stack:
+                spans.append((start, index + 1))
+        elif not stack and not char.isspace():
+            raise ValueError('unexpected text between parameter groups')
+    if stack:
+        raise ValueError('unclosed parameter parentheses')
+    return spans
+
+
+def _delivery_group(content: str) -> dict[str, Any] | None:
+    """Recognize selection syntax, never resolve an account or authorize a send.
+
+    Custom target names are lexical candidates. The task's target registry must
+    resolve them before delivery is armed; spelling a slug cannot create a
+    destination. Only header punctuation, not task text, is interpreted here.
+    """
+    content = content.strip()
+    if content == 'X':
+        return {'mode': 'external', 'target': 'gmail', 'explicit': True}
+    selected = re.fullmatch(r'X\s*[=＝]\s*(.*?)\s*', content, flags=re.DOTALL)
+    if selected:
+        target = selected.group(1)
+        if not target:
+            raise ValueError('X= requires a nonempty delivery target')
+        if not _DELIVERY_TARGET.fullmatch(target):
+            raise ValueError('X target must be an ASCII slug of 1 to 64 characters')
+        return {'mode': 'external', 'target': target.casefold(), 'explicit': True}
+    if _DELIVERY_TOKEN.search(content):
+        raise ValueError('X must occupy its own final delivery parameter group')
+    return None
+
+
+def _invocation_parameters(prelude: str) -> tuple[str, dict[str, Any]]:
+    """Separate one execution group from an optional final X delivery group."""
+    groups = _parameter_group_spans(prelude)
+    selection = {'mode': 'local', 'target': None, 'explicit': False}
+    delivery_index = None
+    for index, (start, end) in enumerate(groups):
+        candidate = _delivery_group(prelude[start + 1:end - 1])
+        if candidate is not None:
+            if delivery_index is not None:
+                raise ValueError('duplicate X delivery parameter groups')
+            delivery_index, selection = index, candidate
+    if delivery_index is not None and delivery_index != len(groups) - 1:
+        raise ValueError('X delivery parameter group must be last')
+    if len(groups) - (delivery_index is not None) > 1:
+        raise ValueError('only one execution parameter group is allowed before X')
+    # Keep the exact normal header prefix (including whitespace); parameter_text
+    # separately retains the entire original prelude, including X and suffix.
+    execution = prelude if delivery_index is None else prelude[:groups[delivery_index][0]]
+    return execution, selection
+
+
 def classify_invocation(message: str) -> dict[str, Any]:
     """Classify the versioned call surface AFTER live pinned startup acquisition.
 
     This is deliberately separate from the thin candidate router. It neither
     fetches a repository nor infers write/publication authority from task words.
     Parameter text and the task are preserved for semantic interpretation.
+    X controls file delivery only. This preview parses a selection; it does not
+    validate a destination registry, transmit files or create extra artifacts.
     """
     if not isinstance(message, str):
         raise TypeError('message must be str')
@@ -100,7 +174,9 @@ def classify_invocation(message: str) -> dict[str, Any]:
     base = {'classification': 'NATIVE', 'route_key': key, 'task': None,
             'invocation_key': invocation_key, 'addon_hint': addon_hint,
             'addon_selection': None,
-            'parameter_text': None, 'action_scope': 'INTERPRET_SEPARATELY',
+            'parameter_text': None, 'execution_parameter_text': None,
+            'delivery_selection': {'mode': 'local', 'target': None, 'explicit': False},
+            'action_scope': 'INTERPRET_SEPARATELY',
             'live_acquisition_performed': False, 'run_started': False}
     if key is None:
         return {**base, 'reason': 'no exact leading candidate prefix'}
@@ -130,8 +206,13 @@ def classify_invocation(message: str) -> dict[str, Any]:
         return {**base, 'reason': 'discussion text before the task separator'}
     if not task.strip():
         return {**base, 'classification': 'INVALID', 'reason': 'empty task'}
+    try:
+        execution_parameters, delivery = _invocation_parameters(prelude)
+    except ValueError as exc:
+        return {**base, 'classification': 'INVALID', 'reason': str(exc)}
     return {**base, 'classification': 'EXECUTING', 'task': task,
-            'parameter_text': prelude, 'addon_selection': addon_hint,
+            'parameter_text': prelude, 'execution_parameter_text': execution_parameters,
+            'delivery_selection': delivery, 'addon_selection': addon_hint,
             'reason': 'explicit complete ' + invocation_key + ' invocation; question/read-only scope does not change mode'}
 
 

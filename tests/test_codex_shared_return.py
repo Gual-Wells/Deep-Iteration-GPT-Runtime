@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from runtime.codex_return import close_return, response_body, return_status, seal_return
 from runtime.codex_session import activity, create_session, session_report
@@ -74,11 +75,13 @@ class SharedReturnTests(unittest.TestCase):
         self.assertEqual(return_status(self.session)['current_receipt'], 'STALE')
 
     def test_missing_end_preserves_gap_without_invalidating_other_pairs_or_return(self):
-        self.visit('BEGIN', category='SOURCE')
-        self.visit('END')
-        self.visit('BEGIN', actor_id='interrupted')
+        # Fixed fixture boundaries avoid depending on Windows wall-clock ticks.
+        with patch('runtime.codex_visits.time.time_ns', side_effect=[1_000_000_000, 2_000_000_000, 3_000_000_000]):
+            self.visit('BEGIN', category='SOURCE')
+            self.visit('END')
+            self.visit('BEGIN', actor_id='interrupted')
         report = session_report(self.session)
-        self.assertGreater(report['timing']['t_ns'], 0)
+        self.assertEqual(report['timing']['t_ns'], 1_000_000_000)
         self.assertEqual(len(report['timing']['gaps']), 1)
         self.assertEqual(seal_return(self.session, self.input)['current_receipt'], 'READY_UNCLOSED')
         self.assertEqual(close_return(self.session, reason='unresolved gap explicitly retained')['current_receipt'], 'CLOSED')

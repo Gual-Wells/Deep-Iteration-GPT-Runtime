@@ -1,6 +1,6 @@
 ---
 name: digr-paper
-description: "Use DIGRP for a complete source-bound paper guide with explained reasoning, experiments and return reading. Produce one standard-page desktop PDF per paper and an authorized per-paper Gmail return. Use for paper deconstruction, not translation alone or to replace DIGR routing."
+description: "Use DIGRP for a complete source-bound paper guide with explained reasoning, experiments and return reading. Produce one standard-page desktop PDF per paper and task-selected X file delivery. Use for paper deconstruction, not translation alone or to replace DIGR routing."
 ---
 
 # DIGRP paper deconstruction
@@ -33,8 +33,10 @@ Maintain Markdown with embedded original images and correctly rendered math. Pre
 
 ## Persist and deliver without closing other papers
 
-Use `python -B <exact-distribution>/tools/codex.py paper --help` for deterministic operations. The addon records sources, guide mappings, candidate artifacts, read-back mail facts and per-paper return; native Codex still reviews meaning and uses connected Gmail.
+Use `python -B <exact-distribution>/tools/codex.py paper --help` for deterministic operations. The addon records sources, guide mappings, candidate artifacts, read-back delivery facts and per-paper return; native Codex still reviews meaning and uses the existing Gmail connector for X delivery.
 
-Respect expected revisions and stable operation IDs. A returned paper is independent of other papers and of the parent task. Send the complete paper once with its single final PDF; do not serialize m duties, chapters or volumes by email. If the file exceeds attachment limits, optimize the same complete file or resolve an actually authorized single-file alternative. Changed artifacts invalidate the old candidate/receipt. Reconcile an uncertain send before retrying; verify the authorized recipient, SENT and exact PDF attachment before recording the paper return. After all papers and common work finish, use the actual core RETURN for final chat closure. Old 0.1 multi-volume records remain historical.
+Respect expected revisions and stable operation IDs. A returned paper is independent of other papers and of the parent task. Inherit the parent's frozen X selection: `(X)` and `(X=Gmail)` both choose the configured self Gmail mailbox. Without X, complete the reviewed PDF and return it locally (`READY_LOCAL`); do not auto-email. With X, prepare and reserve this paper's single complete PDF in the **parent task** delivery ledger, then send through the existing Gmail connector and read it back. Use the paper candidate ID, not a chapter or role ID. Record the verified delivery ID with `paper delivery`, then `paper return`; do not send again during that recording or parent closure. Read the same-pin [file-delivery contract](../../../codex/DELIVERY.md) for actual Gmail operation and evidence shapes.
 
-Personal PDFs, feedback and mail evidence stay private. Link an existing Paper Knowledge pool through its own rules; do not fabricate questionnaire choices, explanations received, understanding or cross-paper transfer. Resume from the original source/version, current example and next step.
+Keep unresolved send outcomes durable and reconcile before retry. UI observations do not invent exact remote bytes, IDs or hashes. Changed final files invalidate the old candidate/receipt. After all papers and common work finish, use the actual core RETURN for chat closure. Old pinned Gmail and multi-volume records remain historical under their own contracts.
+
+Personal PDFs, feedback and delivery evidence stay private. Link an existing Paper Knowledge pool through its own rules; do not fabricate questionnaire choices, explanations received, understanding or cross-paper transfer. Resume from the original source/version, current example and next step.

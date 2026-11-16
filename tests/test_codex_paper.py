@@ -22,6 +22,10 @@ PARAMETERS = {'N': 2, 'T': '0min', 'R': 1, 'B': 0,
 class PaperFixture:
     legacy = False
     pdf_count = 1
+    pin = '0.8.4@' + 'a' * 40
+
+    def initialize_options(self):
+        return {'recipient':'reader@example.test'}
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -29,8 +33,8 @@ class PaperFixture:
         self.base = Path(self.temp.name)
         self.auth = self.base / 'actual-test-user.txt'; self.auth.write_text('Synthetic authorization fixture')
         self.batch = self.base / 'batch'
-        p.initialize(self.batch, p_run='0.8.4@' + 'a' * 40, authorization=self.auth,
-                     source_ref='fixture-user-1', recipient='reader@example.test')
+        p.initialize(self.batch, p_run=self.pin, authorization=self.auth,
+                     source_ref='fixture-user-1', **self.initialize_options())
         self.root = Path(p.add_paper(self.batch, paper_id='first', title='Synthetic Paper',
             line='M01', owner='fixture-native-host', parameters=PARAMETERS)['paper_root'])
         self.source = self.base / 'source.pdf'; self.pdf(self.source)

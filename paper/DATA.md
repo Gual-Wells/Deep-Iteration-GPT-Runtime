@@ -1,4 +1,4 @@
-# DIGRP 文件与命令契约 0.2.0
+# DIGRP 文件与命令契约 0.3.0
 
 语义来自同 pin 的 [PROTOCOL.md](PROTOCOL.md)。工具不用模型、不派代理、不发邮件，不验证数学证明、真实意图或学习效果。`check` 是所选文件与记录的检查；原生宿主仍须对照论文与成品。
 
@@ -8,13 +8,13 @@
 
 ```text
 python -B tools/codex.py paper acquire --continue-from <本轮execution获取目录> --out <新目录>
-python -B tools/codex.py paper init --out <私人批次> --p-run <核心version@完整SHA> --authorization <实际授权原文文件> --source-ref <真实用户消息引用> --recipient <已解析且获授权的邮箱>
+python -B tools/codex.py paper init --out <私人批次> --p-run <核心version@完整SHA> --authorization <实际授权原文文件> --source-ref <真实用户消息引用> --task-root <父DIGR会话目录>
 python -B tools/codex.py paper add --batch <私人批次> --id <论文ID> --title <论文题名> --line M01 --owner <真实主进度作者> --parameters <本篇完整参数JSON>
 ```
 
 第一条不重新取 HEAD，也不为下一条原始调用取得路由资格。工具核对核心声明、增量 manifest/VERSION 和全部成员散列。无法在线取得当前必需协议时遵守所属路由失败规则，不能把源码开发目录作为新调用的在线凭据。
 
-批次 `batch.json` 只保存 P_run、实际授权引用、收件地址与各篇索引。每篇 `papers/<id>/paper.json` 有独立 revision、完整参数、来源、映射、候选、交付、单篇返回和接续游标。每个 M line 与论文 ID 在批次内唯一，不能复用同一条完整主进度的身份掩盖其它篇未承担的责任。
+批次 `batch.json` 只保存 P_run、实际授权引用、冻结X目标、父任务入口与各篇索引。每篇 `papers/<id>/paper.json` 有独立 revision、完整参数、来源、映射、候选、交付、单篇返回和接续游标。每个 M line 与论文 ID 在批次内唯一，不能复用同一条完整主进度的身份掩盖其它篇未承担的责任。
 
 ## 逐篇写入
 
@@ -52,13 +52,7 @@ python -B tools/codex.py paper resume --root <本篇目录>
 
 `resume/check`以最新未完成的保存步骤为当前动作；后续实际变更保留旧游标的阅读上下文而不继续执行旧指令。它显示当前完整PDF及其已核验消息。已返回篇收到尚待处理的改稿保存步骤时，批次不会误报全部完成。旧0.1候选可按原事实回读，但不自动升级其交付契约。
 
-发送响应不明时用同一checkpoint记录实际事实，例如：
-
-```json
-{"position":"本篇完整PDF的发送响应不明","next_action":"先在Gmail核对本次SENT与附件，再决定是否需要重试","basis":"实际工具响应/消息引用","pending_delivery":{"attempt_id":"本次稳定尝试引用","outcome":"uncertain","pdf_names":["完整论文导读.pdf"]}}
-```
-
-工具把它绑定到当时的候选与文件身份；别篇/旧版回执或新的阅读游标不自动消除它。对应完整PDF的真实读回核验可解决这项未知；若实际核对得出其它结果，保存`outcome=resolved`和对应事实依据，再由原生宿主处理。它不自动检索Gmail、不认证依据，也不自动重发。
+0.3的新X批次将发送事务放在父任务的共同delivery ledger。发送前保留本篇候选ID、完整PDF及真实目标，只有首次mark-sending授权一项发送；响应不明保持SENDING/UNCERTAIN并先核对，不用事后checkpoint抹去未知。旧0.2游标和Gmail事实仍按原契约读取。
 
 ## 本地排成一份标准页PDF
 
@@ -125,36 +119,25 @@ python -B tools/codex.py paper candidate --root <本篇目录> --input <candidat
 
 候选绑定当前映射、Markdown、唯一完整PDF、实际嵌入本地图片、所选核验与复核文件。改了任一绑定内容，旧候选变为STALE，旧邮件不能代表新候选已交付。外链图片须先按来源边界取得实际文件并嵌入，不能靠联网成功的偶然状态制作缺图PDF。
 
-## Gmail发送、读回和单篇返回
+## 按X记录送达和单篇返回
 
-原生宿主使用已授权的连接器发送本篇完整PDF，一篇一次最终返回；工具不新增API凭据，不替用户授权发消息。一次发送结果不明先核对Gmail，不能靠重复调用刷到成功。m职责、章节或证明链不是发送单位，文件过大也不自动拆分；按PROTOCOL处理同一完整文件。
+无X候选在内容、覆盖和最终PDF复核完成后显示`READY_LOCAL`，直接`paper return`，不发送邮件。
+
+有X时，按核心[DELIVERY](../codex/DELIVERY.md)在**父DIGR会话目录**操作`delivery prepare / mark-sending / reconcile`，`candidate_id`用该篇`paper check`返回的候选ID，files只选本篇完整PDF。真实发送由Gmail原生连接器执行；CLI不运行发件程序、不复制凭据。每个读回记录绑定账号、收件人、文件和实际尝试，实际附件元数据与取回内容按各自证据范围说明。
+
+父ledger已验证后，本篇只登记它的引用，不再发送：
 
 ```text
-python -B tools/codex.py paper delivery --root <本篇目录> --input <selected-gmail-facts.json> --expected-revision <当前值> --operation-id sent-message-<实际ID>
-python -B tools/codex.py paper return --root <本篇目录> --input <paper-return.json> --expected-revision <当前值> --operation-id paper-return-edition-1
+python -B tools/codex.py paper delivery --root <本篇目录> --input <verified-entry.json> --expected-revision <当前值> --operation-id record-edition-1
+python -B tools/codex.py paper return --root <本篇目录> --input <paper-return.json> --expected-revision <当前值> --operation-id return-edition-1
 python -B tools/codex.py paper summary --batch <私人批次>
 ```
 
-交付记录来自实际工具输出中选定的事实：
+`verified-entry.json`为`{"candidate_id":"<本篇已审候选ID>","delivery_id":"<父ledger已验证条目ID>"}`。条目必须恰含本篇唯一完整PDF、相同候选与冻结X目标、相同批次授权引用；本篇绑定稳定交付身份和回执摘要，由父ledger核对当前证据。别篇新增条目不使本篇失效；同一消息的真实新读回可以补证，历史缺失记录保留，不重新发送。
 
-```json
-{
-  "candidate_id":"<本篇check返回的候选ID>",
-  "message_id":"<实际Gmail消息ID>",
-  "recipient":"<读回的已授权地址>",
-  "label_ids":["SENT"],
-  "attachments":[{"filename":"<最终PDF文件名>","bytes":12345}],
-  "authorization_source_ref":"<实际批次用户授权引用>",
-  "send_evidence":"<保留的实际发送响应.json>",
-  "readback_evidence":"<保留的实际读回响应.json>"
-}
-```
+`paper-return.json`为`{"body":"<本篇实际完成说明.md>"}`。状态包括DRAFT、READY、READY_LOCAL、SENT_VERIFIED、RETURNED；文件、来源或当前证据失效为STALE_OR_UNAVAILABLE。单篇RETURNED不表示用户打开或理解，也不关闭父任务。父RETURN列实际最终PDF，复用共同ledger，不重复发件。
 
-消息ID、收件人、SENT与附件事实必须由真实Gmail发送/读回取得，不可手填合成冒充实际交付。工具保存的是作者选定证据，非Gmail服务器认证或宿主拦截器。命名/字节数核对只证明相应范围，发送选用的本地PDF散列与候选一起保留。
-
-`paper-return.json`为`{"body":"<本篇实际完成说明.md>"}`。状态依次可为DRAFT、READY、SENT_VERIFIED、RETURNED，变化/缺件表现为STALE_OR_UNAVAILABLE。只有当前完整PDF有相应读回证据，才能记录本篇返回。返回文件或凭据本身之后改变也需复核。0.1多卷历史仍显示其原事实，不改写成新0.2合格状态；0.2工具不向旧候选追加交付/返回，继续制作时先显式建立新的单文件候选。
-
-`summary` 的 `all_papers_returned=true` 仍不关闭父任务。根协调者完成公共工程并按核心RETURN发出统筹正文、收口原生命周期。准备、发送、读回、单篇返回和全局关闭各自有事实，不互相代替。
+旧pin的0.2单PDF/Gmail和0.1分卷历史保持原语义；不对旧包倒套无X规则。新0.9核心/0.3论文批次使用`--task-root`，旧式`--recipient`不改选新任务出口。
 
 ## 维护发行
 

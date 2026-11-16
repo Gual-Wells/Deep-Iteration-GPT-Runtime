@@ -25,7 +25,8 @@ FORMAT = 'digr-codex-return-1'
 _TEXT_FIELDS = ('result', 'scope', 'evidence', 'limits', 'time_and_responsibilities')
 _TASK_FIELDS = ('format', 'P_run', 'request_sha256', 'M_target',
                 'request_origin', 'created_wall_ns', 'explicit_parameters', 'clock_anchor',
-                'foundation_required', 'lifecycle_required', 'decisions', 'visit_clock', 'return_schema')
+                'foundation_required', 'lifecycle_required', 'decisions', 'visit_clock', 'return_schema',
+                'delivery_contract', 'delivery_selection', 'initial_delivery_policy')
 
 
 def _path(base: Path, supplied: str | Path) -> Path:
@@ -52,7 +53,7 @@ def _tool_paths() -> set[Path]:
     runtime = Path(__file__).resolve().parent
     files = {runtime / (name + '.py') for name in
              ('codex_return', 'codex_response', 'codex_visits', 'codex_timeline',
-              'codex_session', 'codex_foundation', 'codex_lifecycle')}
+              'codex_session', 'codex_foundation', 'codex_lifecycle', 'codex_delivery')}
     files.update({runtime.parent / 'tools' / name for name in ('codex.py', 'codex_return.py')})
     files.update(path for path in (runtime / 'assets').glob('codex_timeline*') if path.is_file())
     return files
@@ -112,6 +113,13 @@ def _native_state(root: Path) -> dict[str, Any]:
             'task_input_ref': lifecycle.get('task_input_ref'),
             'files': _fingerprints(files), 'directory_candidates': candidates,
             'open_activity': active, 'unreadable_activity': unknown}
+    if metadata.get('delivery_contract') == 'x-files-v1':
+        state['delivery_selection'] = lifecycle.get('delivery_selection', metadata['delivery_selection'])
+        state['delivery_policy'] = lifecycle.get('delivery_policy', metadata['initial_delivery_policy'])
+        state['delivery_history'] = lifecycle.get('delivery_history', [])
+        ledger = root / 'delivery.json'
+        if ledger.is_file():
+            state['delivery_ledger'] = _file_ref(ledger)
     if metadata.get('visit_clock'):
         from .codex_visits import run_projection
         clock = metadata['visit_clock']
@@ -167,6 +175,22 @@ def _input(root: Path, path: Path) -> tuple[dict[str, Any], set[Path], bytes]:
     if new_body:
         if timeline is not None:
             raise ValueError('schema 2 uses the response work table; a timeline cannot replace the report body')
+        from .codex_session import task_delivery_policy
+        policy = task_delivery_policy(root)
+        if policy is not None:
+            from .codex_delivery import completion_status
+            selected = data.get('delivery_files', [item['path'] for item in normal])
+            if not isinstance(selected, list) or any(not isinstance(item, str) for item in selected):
+                raise ValueError('delivery_files must explicitly list the actual final file artifacts')
+            final_paths = [_path(path.parent, item) for item in selected]
+            if not {Path(item['path']) for item in normal}.issubset(set(final_paths)):
+                raise ValueError('X completion cannot omit declared final artifacts from delivery_files')
+            paths.update(final_paths)
+            completion = completion_status(root, [item.as_posix() for item in final_paths], policy)
+            if not completion['ready']:
+                raise ValueError('selected X file delivery is incomplete: ' + json.dumps(completion, ensure_ascii=False))
+            data['delivery_files'] = [item.as_posix() for item in final_paths]
+            data['delivery_completion'] = completion
         render_response(data)
         return data, paths, raw
     if isinstance(timeline, str):

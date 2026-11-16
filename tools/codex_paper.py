@@ -18,7 +18,8 @@ def main(argv=None):
     init = sub.add_parser('init'); init.add_argument('--out', type=Path, required=True)
     init.add_argument('--p-run', required=True); init.add_argument('--authorization', type=Path, required=True)
     init.add_argument('--source-ref', required=True)
-    init.add_argument('--recipient', required=True)
+    init.add_argument('--recipient', help='legacy pre-X batches only')
+    init.add_argument('--task-root', type=Path, help='parent 0.9+ DIGR session with frozen X policy')
     acquire = sub.add_parser('acquire')
     acquire.add_argument('--continue-from', type=Path, required=True)
     acquire.add_argument('--out', type=Path, required=True)
@@ -43,7 +44,8 @@ def main(argv=None):
     try:
         if args.command == 'init':
             result = paper.initialize(args.out, p_run=args.p_run,
-                authorization=args.authorization, source_ref=args.source_ref, recipient=args.recipient)
+                authorization=args.authorization, source_ref=args.source_ref, recipient=args.recipient,
+                task_root=args.task_root)
         elif args.command == 'acquire':
             from runtime.codex_transport import load_acquisition
             result = paper.acquire_addon(load_acquisition(args.continue_from), output=args.out)

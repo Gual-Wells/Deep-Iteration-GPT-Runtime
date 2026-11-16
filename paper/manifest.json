@@ -1,6 +1,6 @@
 {
   "name": "DIGRP Paper Reading",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "protocol": "digrp-codex-1",
   "version_path": "paper/VERSION",
   "entrypoint": "paper/PROTOCOL.md",
@@ -14,11 +14,11 @@
     "m5"
   ],
   "file_sha256": {
-    "paper/VERSION": "1f930dd1f133c1f97a94fe3acb8db34372cf4c01ffdb2b3ff4ca72f9494121e9",
-    "paper/PROTOCOL.md": "c962434729644a7f31729ec58a481d803d29c7a07dcced4861a7ae942f841c57",
-    "paper/DATA.md": "42fea0dec29936e057b8c64dd19a408f95f5e5d3ddf2e06b88b8d3d9b30852ae",
+    "paper/VERSION": "d915cc95d6ca8f47ae297713ed46d4e5c5d99ddd29fc3c61e263bdf305f2b5b0",
+    "paper/PROTOCOL.md": "35519fa462a8cdda21d80428685ed24597335c5cec63b23f1bc2e1256e34ad62",
+    "paper/DATA.md": "c181a36de3164528538d659ad5526627ee69586a6875b0baa9c04e4bf94a7911",
     "paper/PDF_DESIGN.md": "ce4257d95692a0fa8f6e6c41d7da6e8be89dc63a70ab16590a28b34d7c26a238",
-    ".agents/skills/digr-paper/SKILL.md": "aac38e9c29e3652dfdd0164893ace0179cbf918e33b2af2413f21de082d994e0",
+    ".agents/skills/digr-paper/SKILL.md": "08dddb8f2e3da7534fd94eaaadce650fea6ec9eee09dcbdedfc8aa49d281df2c",
     ".agents/skills/digr-paper/agents/openai.yaml": "2ae96ded2eb72268159026033f6c97858817b982ab03d7b477644f9e24fe781e"
   }
 }
