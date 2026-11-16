@@ -17,12 +17,14 @@ from typing import Any, Mapping
 from .routing import candidate_route_key
 from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
+from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v8'
+PROFILE_PROTOCOL = 'digr-codex-native-v9'
 PROFILE_CORE = (
     'codex/FOUNDATION.md',
     'codex/CHARACTER.md', 'codex/PARAMETERS.md',
     'codex/COLLABORATION.md', 'codex/PERMISSIONS.md',
+    'codex/CONSULT.md',
     'codex/DELIVERY.md',
     'codex/RETURN.md',
 )
@@ -38,6 +40,7 @@ PROFILE_FILES = (
     'codex/WORKBENCH.md',
     'codex/CHARACTER.md',
     'codex/COLLABORATION.md',
+    'codex/CONSULT.md',
     'codex/PERMISSIONS.md',
     'codex/DELIVERY.md',
     'codex/RETURN.md',
@@ -167,14 +170,15 @@ def classify_invocation(message: str) -> dict[str, Any]:
         raise TypeError('message must be str')
     text = message.lstrip()
     key = candidate_route_key(message)
-    # The thin router deliberately returns DIGR for every leading DIGRP too.
-    # Only this acquired Codex surface interprets the longer paper alias.
-    invocation_key = 'DIGRP' if text.startswith('DIGRP') else key
+    # The thin router stays broad. Only the acquired profile interprets aliases.
+    invocation_key = next((alias for alias in ('DIGRC', 'DIGRP')
+                           if text.startswith(alias)), key)
     addon_hint = 'paper' if invocation_key == 'DIGRP' else None
     base = {'classification': 'NATIVE', 'route_key': key, 'task': None,
             'invocation_key': invocation_key, 'addon_hint': addon_hint,
             'addon_selection': None,
             'parameter_text': None, 'execution_parameter_text': None,
+            'consult_selection': False, 'depth_defaults': None,
             'delivery_selection': {'mode': 'local', 'target': None, 'explicit': False},
             'action_scope': 'INTERPRET_SEPARATELY',
             'live_acquisition_performed': False, 'run_started': False}
@@ -208,11 +212,14 @@ def classify_invocation(message: str) -> dict[str, Any]:
         return {**base, 'classification': 'INVALID', 'reason': 'empty task'}
     try:
         execution_parameters, delivery = _invocation_parameters(prelude)
+        defaults = resolve_defaults(execution_parameters)
     except ValueError as exc:
         return {**base, 'classification': 'INVALID', 'reason': str(exc)}
     return {**base, 'classification': 'EXECUTING', 'task': task,
             'parameter_text': prelude, 'execution_parameter_text': execution_parameters,
             'delivery_selection': delivery, 'addon_selection': addon_hint,
+            'consult_selection': invocation_key in ('DIGRC', 'DIGRP'),
+            'depth_defaults': defaults,
             'reason': 'explicit complete ' + invocation_key + ' invocation; question/read-only scope does not change mode'}
 
 
@@ -359,6 +366,9 @@ def refresh_distribution(root: Path) -> dict[str, Any]:
     version = (root / 'codex/VERSION').read_text(encoding='utf-8').strip()
     if manifest.get('protocol') != PROFILE_PROTOCOL or manifest.get('version') != version:
         raise ValueError('Codex manifest/VERSION identity mismatch')
+    manifest['depth_preferences']['presets'] = preset_catalog()['presets']
+    manifest['depth_preferences']['preset_aliases'] = {'standard': 'Light'}
+    manifest['depth_preferences']['default_preset'] = 'Default'
     expected = ['codex/PROTOCOL.md', *PROFILE_CORE]
     if manifest.get('core') != list(PROFILE_CORE) or manifest.get('execution_bundle') != {
         'path': 'codex/EXECUTION_PROTOCOL.json', 'schema': 1, 'members': expected,

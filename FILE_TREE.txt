@@ -30,6 +30,7 @@ bundle/EXECUTION_PROTOCOL.json
 codex/AGENTS.light.md
 codex/CHARACTER.md
 codex/COLLABORATION.md
+codex/CONSULT.md
 codex/DELIVERY.md
 codex/EXECUTION_PROTOCOL.json
 codex/FOUNDATION.md
@@ -435,6 +436,7 @@ runtime/assets/codex_timeline_view.js
 runtime/candidate_store.py
 runtime/clock_journal.py
 runtime/clock_probe.py
+runtime/codex_consult.py
 runtime/codex_delivery.py
 runtime/codex_experience.py
 runtime/codex_foundation.py
@@ -450,6 +452,7 @@ runtime/codex_preprint_export.py
 runtime/codex_preprint_learning.py
 runtime/codex_preprint_sources.py
 runtime/codex_preprint_study.py
+runtime/codex_presets.py
 runtime/codex_profile.py
 runtime/codex_response.py
 runtime/codex_return.py
@@ -865,7 +868,10 @@ tests/test_clock_cross_process.py
 tests/test_clock_genesis_stress.py
 tests/test_clock_journal.py
 tests/test_clock_probe.py
+tests/test_codex_carrier.py
 tests/test_codex_cli.py
+tests/test_codex_consult.py
+tests/test_codex_consult_paper.py
 tests/test_codex_delivery.py
 tests/test_codex_experience.py
 tests/test_codex_foundation.py
@@ -880,6 +886,7 @@ tests/test_codex_preprint_export.py
 tests/test_codex_preprint_learning.py
 tests/test_codex_preprint_sources.py
 tests/test_codex_preprint_study.py
+tests/test_codex_presets.py
 tests/test_codex_profile.py
 tests/test_codex_response.py
 tests/test_codex_return.py
@@ -926,6 +933,7 @@ tests/validate_repo.py
 tools/assemble_paper.py
 tools/build_release.py
 tools/codex.py
+tools/codex_consult.py
 tools/codex_delivery.py
 tools/codex_experience.py
 tools/codex_knowledge.py

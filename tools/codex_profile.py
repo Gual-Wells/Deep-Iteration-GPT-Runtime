@@ -15,6 +15,7 @@ from runtime.codex_profile import (
     ActiveContext, capability_report, decide_boundary,
     instruction_text, verify_distribution, depth_preferences, refresh_distribution, classify_invocation,
 )
+from runtime.codex_presets import preset_catalog, resolve_defaults
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -23,6 +24,10 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser('check', help='verify local instruction identity and bytes')
     sub.add_parser('refresh', help='explicitly regenerate local bundle and profile hashes')
     sub.add_parser('depth', help='show user-selected depth and unit-responsibility references')
+    sub.add_parser('presets', help='list five named depth defaults; no execution or budget')
+    parameters = sub.add_parser('parameters', help='preview named defaults and overrides; native interpretation remains required')
+    parameters.add_argument('--text', default='', help='execution parameter group, without X')
+    parameters.add_argument('--overrides', type=Path, help='explicit structured overrides JSON')
     ins = sub.add_parser('instructions', help='print a layer; never install it')
     ins.add_argument('layer', choices=('light', 'experimental-router', 'codex-agents'))
     export = sub.add_parser('export', help='create a new instruction file; never overwrite or install global AGENTS')
@@ -42,6 +47,11 @@ def main(argv: list[str] | None = None) -> int:
             result = refresh_distribution(ROOT)
         elif args.command == 'depth':
             result = depth_preferences(ROOT)
+        elif args.command == 'presets':
+            result = preset_catalog()
+        elif args.command == 'parameters':
+            result = resolve_defaults(args.text,
+                json.loads(args.overrides.read_text(encoding='utf-8-sig')) if args.overrides else None)
         elif args.command == 'classify':
             result = classify_invocation(args.message_file.read_bytes().decode('utf-8-sig'))
         elif args.command == 'instructions':

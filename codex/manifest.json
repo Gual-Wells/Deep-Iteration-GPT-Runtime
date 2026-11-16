@@ -1,7 +1,7 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "0.9.0",
-  "protocol": "digr-codex-native-v8",
+  "version": "0.10.0",
+  "protocol": "digr-codex-native-v9",
   "status": "experimental",
   "language": "zh-CN",
   "version_path": "codex/VERSION",
@@ -15,6 +15,7 @@
     "codex/PARAMETERS.md",
     "codex/COLLABORATION.md",
     "codex/PERMISSIONS.md",
+    "codex/CONSULT.md",
     "codex/DELIVERY.md",
     "codex/RETURN.md"
   ],
@@ -64,24 +65,32 @@
     "external_x_default": "GMAIL_SELF",
     "supported_file_channels": [
       "gmail"
-    ]
+    ],
+    "consult_modes": [
+      "DIGRC",
+      "DIGRP"
+    ],
+    "native_default_preserved": true,
+    "consult_is_native_l3": false,
+    "consult_guidance": "SUBJECTIVE_PRIORITY_UNDER_EQUAL_ACTUAL_CONDITIONS"
   },
   "file_sha256": {
-    "codex/VERSION": "9d8c94f1ad3ea96b1e2ac4914fda4cb93c76b4a3e0d8cc6dd8976d6c0b227d15",
+    "codex/VERSION": "dc24feb5bd35084d8ae32a4eafbec12352707d4662401fcbcc9bbd696cde77a9",
     "codex/AGENTS.light.md": "d21ad2ff0d26bd2ec6d576877713b7998c7d0cdc4972d6030c52b7ff23c8e1ab",
     "codex/ROUTER.experimental.txt": "6aa91d9aea27e029155349bbc9abed5cf5b216a65ad74a45788a8cf16a845347",
-    "codex/STARTUP.md": "d744b46f9719e88863389a25479f08656e26af0a0819ed31dbfcaad9d67a292f",
-    "codex/PROTOCOL.md": "0dc67a5f08f7bc5c85fca7abb304c581a215aab85d2d974303023ad36d8de8a3",
+    "codex/STARTUP.md": "b34fe9ad07590cd1ea2060ed424ae1a48bfb42705151c93f7545b195abedaa48",
+    "codex/PROTOCOL.md": "b398adad3aad8343c74577d48bf9e36a3ee4c0b61cdc0f6f279cf44eccf169a5",
     "codex/FOUNDATION.md": "b943b9160f5f9ad2b2f80e444c80b416aaa472847fffda73a62ddf6d7a6d374b",
-    "codex/HELP.md": "69a510fca2017ca0a3db610224e77d6632aae852fab23b1c7f861fd5a7b2083b",
-    "codex/PARAMETERS.md": "e5eb10a69a1fb6e77f7fab337a45c66ba8e3bf4de2273e613a4c35b84687861f",
+    "codex/HELP.md": "d262e47a532f37598517e430fe2172aaf2495ee2551bd742ceb4fbb297804934",
+    "codex/PARAMETERS.md": "119deec1fa090ff6a450591f34b952655804b67efeae750f4691ca6aeb4ef245",
     "codex/WORKBENCH.md": "7b021a4a4d67d1c874c59579958a4a9ab521044f0503df8d29b1f37ce67f5fde",
-    "codex/CHARACTER.md": "c0565f52bdf585d8ba24da51e6354493d9d7acdb5938ab9848f12eed736eb932",
-    "codex/COLLABORATION.md": "40bac20c5efad996ed453cfca495aff1130a8534d965c8de6282868352ce1b55",
+    "codex/CHARACTER.md": "608bed7c9105ed2570fd633fd3b9a28ffb4378185b6cfdd8599a6581e7455a4b",
+    "codex/COLLABORATION.md": "5b4439d98b84ddcfded3bf640b4110915ab6d2d6ff6682b91a02b16d53efaea7",
+    "codex/CONSULT.md": "ccdf3109fc37c278d8a61d9aa8ed748887243258982bb1a45a591dc5a5df734b",
     "codex/PERMISSIONS.md": "3c59a22111c9ae058342d48cf091216cc661c0ff28206700a1d94b25ffecd58b",
-    "codex/DELIVERY.md": "005e0a0056192da114054354882836a0f6be51eebd0f4301f7b70675e2a522ca",
+    "codex/DELIVERY.md": "e7915c14e9ccd71dae5e2c4b86af9d45cf392b7ea69e51870a4f6d10dd986b00",
     "codex/RETURN.md": "27d6a0b9b8058be4c6ffce77d646a245c923babb164136a6d1469a6478e12f29",
-    "codex/EXECUTION_PROTOCOL.json": "2fb06da18627fdb213edbc9bbbc24c9d99bd495c690a1f52526f2a313deb9c79"
+    "codex/EXECUTION_PROTOCOL.json": "e8bd4460f73ecad330f042320ef4c63916934118de92461d3a7f0d1b69d67dd7"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {
@@ -104,7 +113,53 @@
     "autonomous_downshift": false,
     "isolation_mode": "L3_ONLY",
     "low_isolation_fallback": false,
-    "progress_stream": "USER_COMMENTARY_PER_UNIT"
+    "progress_stream": "USER_COMMENTARY_PER_UNIT",
+    "presets": {
+      "Light": {
+        "N": 2,
+        "R": 1,
+        "D": 0,
+        "V": 0,
+        "L": 3,
+        "M": 1
+      },
+      "Less": {
+        "N": 6,
+        "R": 2,
+        "D": 1,
+        "V": 1,
+        "L": 3,
+        "M": 1
+      },
+      "Default": {
+        "N": 12,
+        "R": 4,
+        "D": 3,
+        "V": 3,
+        "L": 3,
+        "M": 1
+      },
+      "More": {
+        "N": 18,
+        "R": 6,
+        "D": 4,
+        "V": 4,
+        "L": 3,
+        "M": 1
+      },
+      "Max": {
+        "N": 24,
+        "R": 8,
+        "D": 6,
+        "V": 6,
+        "L": 3,
+        "M": 1
+      }
+    },
+    "preset_aliases": {
+      "standard": "Light"
+    },
+    "default_preset": "Default"
   },
   "execution_bundle": {
     "path": "codex/EXECUTION_PROTOCOL.json",
@@ -116,13 +171,14 @@
       "codex/PARAMETERS.md",
       "codex/COLLABORATION.md",
       "codex/PERMISSIONS.md",
+      "codex/CONSULT.md",
       "codex/DELIVERY.md",
       "codex/RETURN.md"
     ]
   },
   "paper_addon": {
     "manifest": "paper/manifest.json",
-    "version": "0.3.0",
-    "sha256": "778f5cbb1ae57fbbaff6f2109a14de36e2f9bc79e6b7e0b8bf0e9c22648cf862"
+    "version": "0.4.0",
+    "sha256": "faa129327997cb816317c9b1fadd496cd9713c7a271457fc31696950b062e6a4"
   }
 }
