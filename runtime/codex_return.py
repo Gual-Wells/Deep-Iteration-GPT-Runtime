@@ -27,6 +27,7 @@ _TASK_FIELDS = ('format', 'P_run', 'request_sha256', 'M_target',
                 'request_origin', 'created_wall_ns', 'explicit_parameters', 'clock_anchor',
                 'foundation_required', 'lifecycle_required', 'decisions', 'visit_clock', 'return_schema',
                 'delivery_contract', 'delivery_selection', 'initial_delivery_policy')
+_TASK_FIELDS += ('execution_profile', 'parameter_selection', 'consult_addons')
 
 
 def _path(base: Path, supplied: str | Path) -> Path:
@@ -75,6 +76,12 @@ def _native_state(root: Path) -> dict[str, Any]:
         files.add(root / 'foundation.json')
     if metadata.get('decisions'):
         files.add(_path(root, metadata['decisions']))
+    exchanges = root / 'consult' / 'exchanges'
+    if exchanges.is_dir():
+        for exchange in exchanges.iterdir():
+            if exchange.is_dir():
+                files.update(path for name in ('request.json', 'attempt.json', 'public.md')
+                             if (path := exchange / name).is_file())
     candidates, activity_paths = {}, []
     common = root / 'common' / 'activity.jsonl'
     if common.exists():

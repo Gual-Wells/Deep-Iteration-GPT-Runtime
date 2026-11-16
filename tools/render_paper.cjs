@@ -55,10 +55,11 @@ function protectMath(source){
  }
  return {markdown:result,maths,issues};
 }
-function displayLayout(tex){
+function displayLayout(tex,{splitAtQquad=true}={}){
  const labels=[];let body='',cursor=0;const tag=/\\tag\*?\s*\{/g;let match;
  while((match=tag.exec(tex))){let depth=1,j=tag.lastIndex;for(;j<tex.length&&depth;j++){if(tex[j]==='{'&&!escaped(tex,j))depth++;else if(tex[j]==='}'&&!escaped(tex,j))depth--;}if(depth)break;body+=tex.slice(cursor,match.index);labels.push(tex.slice(tag.lastIndex,j-1));cursor=j;tag.lastIndex=j;}
  body+=tex.slice(cursor);
+ if(!splitAtQquad)return {tex:body,labels,splitAtQquad:false};
  let depth=0,environment=0,start=0;const pieces=[];
  for(let i=0;i<body.length;i++){
   if(body.startsWith('\\begin{',i))environment++;

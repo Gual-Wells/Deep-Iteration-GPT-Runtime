@@ -38,7 +38,7 @@ The selection operation persists only the exact offered-but-unselected items int
 
 ## Teach a connected explanation
 
-Use learner guidance and the current question, not a dictionary list. Build one concrete system event with quantities and units, walk the timeline and each arithmetic step, then map those same objects to the paper's notation. A diagram and a formula also require an explicit mapping between them. Identify where the paper's assumptions change the example. Label normalized teaching units and invented examples.
+Use learner guidance and the current question, not a dictionary list. When it serves the actual difficulty, build a concrete system event with quantities and units, walk its timeline and necessary arithmetic, then map the objects to the paper's notation. Choose the teaching form from the user's purpose and applicable Consult guidance; this example pattern is not mandatory and does not justify unrelated arithmetic or a fixed curriculum. A diagram and a formula also require an explicit mapping between them. Identify where the paper's assumptions change the example. Label normalized teaching units and invented examples.
 
 Necessary background can be offered briefly or checked with a small optional question; it is not a compulsory entrance test. Respect skipping and refusal. Difficulty with a representation or subscript does not establish a global lack of knowledge. Preserve useful actual statements, examples, stumbling points, and what remains unresolved at that specific scope.
 

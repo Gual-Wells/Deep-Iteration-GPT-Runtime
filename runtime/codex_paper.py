@@ -18,7 +18,7 @@ import re
 import time
 from typing import Any
 
-VERSION = '0.3.0'
+VERSION = '0.4.0'
 SINGLE_PDF_CONTRACT = 'single-pdf-one-message'
 X_PDF_CONTRACT = 'single-pdf-x-files'
 LEGACY_CONTRACT = 'legacy-multiple-volumes'
@@ -111,6 +111,7 @@ def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_r
         raise ValueError('p_run needs a version and full immutable SHA')
     version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@.+', p_run)
     uses_x = bool(version and tuple(map(int, version.groups())) >= (0, 9, 0))
+    uses_consult = bool(version and tuple(map(int, version.groups())) >= (0, 10, 0))
     policy = None
     if uses_x:
         from .codex_session import _session, task_delivery_policy
@@ -130,14 +131,28 @@ def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_r
     with _lock(root):
         if (root / 'batch.json').exists():
             raise ValueError('batch already exists')
-        value = {'format': 'digrp-batch-1', 'addon_version': VERSION if uses_x else '0.2.0', 'P_run': p_run,
+        value = {'format': 'digrp-batch-1',
+                 'addon_version': VERSION if uses_consult else '0.3.0' if uses_x else '0.2.0', 'P_run': p_run,
                  'authorization': _file(root, authorization),
                  'authorization_source_ref': _text(source_ref, 'actual user source_ref'),
                  'recipient': recipient,
                  'papers': {}, 'parent_lifecycle_unchanged': True}
         if uses_x:
             value.update(task_root=task_root.as_posix(), delivery_policy=policy)
+        if uses_consult:
+            value.update(consult_enabled=True, mapping_contract='integrated-functions-v1')
         _write(root / 'batch.json', value)
+    if uses_consult:
+        # A user-selected paper addon can be entered inside a native DIGR task.
+        # Preserve its initial mode and record the actual addon scope instead
+        # of pretending the task originally used the DIGRP prefix.
+        from .codex_session import _write_json
+        task_root, parent = _session(task_root)
+        scopes = list(parent.get('consult_addons', []))
+        scopes.append({'addon': 'paper', 'version': VERSION, 'batch': root.as_posix(),
+                       'authorization_source_ref': source_ref})
+        parent['consult_addons'] = scopes
+        _write_json(task_root / 'session.json', parent)
     return value
 
 
@@ -176,6 +191,8 @@ def add_paper(batch, *, paper_id, title, line, owner, parameters):
             from .codex_session import task_delivery_policy
             value.update(task_root=index['task_root'],
                          delivery_policy=task_delivery_policy(Path(index['task_root'])))
+        if index.get('consult_enabled'):
+            value.update(consult_enabled=True, mapping_contract='integrated-functions-v1')
         _write(root / 'paper.json', value)
         index['papers'][paper_id] = {'path': 'papers/' + paper_id, 'line': line}
         _write(batch / 'batch.json', index)
@@ -232,12 +249,27 @@ def _anchor(value, anchor):
     _text(anchor.get('label'), 'anchor label')
 
 
+def _part_locations(mapping, integrated=False):
+    locations = []
+    for part in PARTS:
+        supplied = mapping['parts'][part]
+        if isinstance(supplied, str):
+            supplied = [supplied]
+        elif not integrated or not isinstance(supplied, list) or not supplied:
+            raise ValueError('each function needs an actual nonempty manuscript location')
+        locations.extend(_text(location, 'reader part heading') for location in supplied)
+    return locations
+
+
 def map_paper(root, payload, **revision):
     def update(value):
         if set(payload.get('parts', {})) != set(PARTS):
             raise ValueError('reader order must be m1, m4, m2, m3, m5')
-        for heading in payload['parts'].values():
-            _text(heading, 'reader part heading')
+        integrated = bool(value.get('consult_enabled'))
+        declared = payload.get('mapping_contract')
+        if declared is not None and (not integrated or declared != 'integrated-functions-v1'):
+            raise ValueError('integrated function locations require the new paper 0.4 contract')
+        _part_locations(payload, integrated)
         ids = {}
         for group in ('assumptions', 'claims', 'chains', 'experiments', 'coverage'):
             rows = payload.get(group)
@@ -372,19 +404,32 @@ def prepare_candidate(root, payload, **revision):
             if line.startswith('#'):
                 heading_order.setdefault(re.sub(r'^#+\s*', '', line).strip(), position)
         headings = set(heading_order)
-        locations = list(value['mapping']['parts'].values())
+        integrated = bool(value.get('consult_enabled'))
+        locations = _part_locations(value['mapping'], integrated)
         for group in ('assumptions', 'claims', 'chains', 'experiments', 'coverage'):
             locations.extend(row['location'] for row in value['mapping'][group])
         if any(location not in headings for location in locations):
             raise ValueError('mapping location is absent from Markdown headings')
-        positions = [heading_order[value['mapping']['parts'][part]] for part in PARTS]
-        if positions != sorted(positions) or len(set(positions)) != len(PARTS):
-            raise ValueError('guide parts must actually appear in reader order m1, m4, m2, m3, m5')
+        if not integrated:
+            positions = [heading_order[value['mapping']['parts'][part]] for part in PARTS]
+            if positions != sorted(positions) or len(set(positions)) != len(PARTS):
+                raise ValueError('guide parts must actually appear in reader order m1, m4, m2, m3, m5')
         if not isinstance(payload.get('pdfs'), list) or len(payload['pdfs']) != 1:
             raise ValueError('one complete PDF per paper is required; compress it or arrange alternative delivery, do not split volumes')
         pdfs = [_file(root, payload['pdfs'][0], 'pdf')]
         geometry = _pdf_geometry(root, pdfs[0], payload.get('page_profile', 'A4'))
         files = [markdown, *pdfs, _file(root, payload['qa'], 'qa'), _file(root, payload['review'], 'review')]
+        consultation = None
+        if integrated:
+            supplied = payload.get('consultation')
+            if not isinstance(supplied, dict):
+                raise ValueError('new paper candidate needs actual Consult public guidance and applicable scope')
+            guidance = _file(root, supplied['guidance'], 'consult_guidance')
+            _text((Path(root) / guidance['path']).read_text(encoding='utf-8-sig'), 'actual Consult public guidance')
+            consultation = {'guidance': guidance,
+                'source_ref': _text(supplied.get('source_ref'), 'actual Consult exchange/source reference'),
+                'scope': _text(supplied.get('scope'), 'actual applicable guidance scope')}
+            files.append(guidance)
         for match in re.finditer(r'!\[[^\]]*\]\(([^)]+)\)', text):
             target = match.group(1).strip().strip('<>')
             if re.match(r'https?://', target):
@@ -407,13 +452,15 @@ def prepare_candidate(root, payload, **revision):
             raise ValueError('QA page count must match the actual complete PDF page count')
         review = (Path(root) / payload['review']).read_text(encoding='utf-8-sig')
         _text(review, 'native content and final-page review')
-        candidate = {'addon_version': VERSION if 'delivery_policy' in value else '0.2.0', 'delivery_contract':
+        candidate = {'addon_version': value.get('addon_version', '0.2.0'), 'delivery_contract':
                      X_PDF_CONTRACT if 'delivery_policy' in value else SINGLE_PDF_CONTRACT,
                      'pdf_geometry': geometry,
                      'mapping_digest': _digest(value['mapping']), 'files': files,
                      'responsibility_report': deepcopy(payload.get('responsibility_report', {}))}
         if 'delivery_policy' in value:
             candidate['delivery_policy_id'] = value['delivery_policy']['policy_id']
+        if consultation is not None:
+            candidate['consultation'] = consultation
         for key in ('N', 'R', 'D', 'V'):
             actual = candidate['responsibility_report'].get(key)
             if type(actual) is not int or actual < value['parameters'][key]:
@@ -742,6 +789,8 @@ def refresh_addon(root):
         'version_path': 'paper/VERSION', 'entrypoint': 'paper/PROTOCOL.md',
         'pdf_design': 'paper/PDF_DESIGN.md',
         'skill': '.agents/skills/digr-paper/SKILL.md', 'reader_order': list(PARTS),
+        'reader_order_policy': 'CONSULT_GUIDED_NATURAL_CHAPTERS_WITH_COMPLETE_FUNCTION_COVERAGE',
+        'consult_enabled': True, 'mapping_contract': 'integrated-functions-v1',
         'file_sha256': {path: sha256((root / path).read_bytes()).hexdigest() for path in paths}}
     _write(root / 'paper/manifest.json', manifest)
     core = _read(root / 'codex/manifest.json')

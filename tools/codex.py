@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """One source-checkout CLI for the experimental Codex profile and work tools.
 
-No model calls, agent scheduler or permission escalation. Existing standalone
-profile/workbench/experience commands remain supported.
+Only the explicit consult call command invokes an externally configured model.
+There is no agent scheduler or permission escalation.
 """
 from __future__ import annotations
 
@@ -45,8 +45,11 @@ def read_message(path: Path) -> str:
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else list(argv)
     # Pass through argument parsing rather than duplicate mature CLI surfaces.
-    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery'):
+    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery', 'consult'):
         from tools import codex_experience, codex_profile, codex_workbench, codex_knowledge, codex_timeline, codex_voice
+        if argv[0] == 'consult':
+            from tools.codex_consult import main as consult_main
+            return consult_main(argv[1:])
         if argv[0] == 'return':
             from tools.codex_return import main as return_main
             return return_main(argv[1:])

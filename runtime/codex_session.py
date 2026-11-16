@@ -216,6 +216,7 @@ def create_session(root: Path, *, request: Path, p_run: str,
     profile_requires_lifecycle = bool(version and tuple(map(int, version.groups())) >= (0, 8, 0))
     profile_uses_visits = bool(version and tuple(map(int, version.groups())) >= (0, 8, 1))
     profile_uses_delivery = bool(version and tuple(map(int, version.groups())) >= (0, 9, 0))
+    profile_uses_consult = bool(version and tuple(map(int, version.groups())) >= (0, 10, 0))
     if destinations is not None and not profile_uses_delivery:
         raise ValueError('X target configuration belongs to 0.9+ new sessions; keep old pins unchanged')
     if not profile_uses_visits and (visits_path is not None or run_id is not None):
@@ -226,6 +227,24 @@ def create_session(root: Path, *, request: Path, p_run: str,
         invocation = classify_invocation(raw.decode('utf-8-sig'))
         if invocation['classification'] != 'EXECUTING':
             raise ValueError('new managed session requires an EXECUTING original request; ordinary correction/help cannot create it')
+        if invocation['invocation_key'] == 'DIGRC' and not profile_uses_consult:
+            raise ValueError('DIGRC requires an acquired 0.10+ pin; old task semantics are unchanged')
+    selection = invocation.get('depth_defaults') if invocation and profile_uses_consult else None
+    if selection:
+        # Named defaults fill missing declarations; actual named user overrides
+        # take priority. The caller still chooses T/t and source work per task.
+        chosen = dict(selection['parameters']) if selection['preset_explicit'] else {}
+        parsed = selection['parsed_overrides']
+        for key, value in parsed.items():
+            if key in explicit and explicit[key] != value:
+                raise ValueError('explicit parameter record conflicts with original header: ' + key)
+        for values in (parsed, explicit):
+            for key, value in values.items():
+                if key == 'S' and isinstance(value, Mapping):
+                    chosen.setdefault('S', {}).update(value)
+                else:
+                    chosen[key] = value
+        explicit = chosen
     if require_foundation is None:
         require_foundation = profile_requires_foundation
     if type(require_foundation) is not bool:
@@ -258,6 +277,14 @@ def create_session(root: Path, *, request: Path, p_run: str,
         metadata['initial_invocation'].update({key: invocation[key] for key in
             ('invocation_key', 'addon_hint', 'addon_selection') if key in invocation})
         metadata['invocation_basis'] = 'structure only; repository acquisition is an upstream obligation'
+    if profile_uses_consult and invocation:
+        metadata['execution_profile'] = {
+            'mode': 'CONSULT' if invocation['consult_selection'] else 'NATIVE',
+            'native_responsibilities': 'N/R/D/V/L/M remain Codex-owned',
+            'consult_role': 'higher-priority subjective guidance under equal actual conditions'
+                            if invocation['consult_selection'] else None,
+        }
+        metadata['parameter_selection'] = selection
     if profile_uses_delivery:
         from .codex_delivery import resolve_policy
         selection = invocation['delivery_selection']
@@ -591,6 +618,18 @@ def summarize_activity(streams: Mapping[str, list[dict[str, Any]]], *, scope: st
             'scope': 'recorded activity only; not whole-task completeness or semantic attestation'}
 
 
+def _consult_snapshot(root: Path, metadata: Mapping[str, Any]) -> dict | None:
+    if metadata.get('execution_profile', {}).get('mode') != 'CONSULT' and not metadata.get('consult_addons'):
+        return None
+    try:
+        from .codex_consult import inspect_exchange
+        return inspect_exchange(root)
+    except (ValueError, TypeError, KeyError, OSError) as error:
+        return {'status': 'UNAVAILABLE', 'error_type': type(error).__name__,
+                'local_path': (root / 'consult').as_posix(),
+                'scope': 'Consult files unavailable; no guidance or fee outcome inferred'}
+
+
 def session_report(root: Path) -> dict[str, Any]:
     """Read packages and available activity without hiding an unreadable owner.
 
@@ -666,6 +705,7 @@ def session_report(root: Path) -> dict[str, Any]:
         issues.append(issue)
         lifecycle = {'managed': True, 'status': 'UNREADABLE', 'issue': issue}
     return {'session': metadata, 'line_packages': packages, 'timing': timing, 'lifecycle': lifecycle,
+            'consult': _consult_snapshot(root, metadata),
             'foundation_timing': foundation_timing,
             'registered_line_count': len(packages), 'effective_M_count': None,
             'report_status': 'PARTIAL_READ' if issues else 'READABLE', 'issues': issues,
@@ -691,6 +731,7 @@ def _visit_session_report(root: Path, metadata: Mapping[str, Any]) -> dict[str, 
             raise ValueError(f'line package identity mismatch: {folder}')
         packages[folder.name] = package
     return {'session': dict(metadata), 'line_packages': packages, 'timing': timing,
+            'consult': _consult_snapshot(root, metadata),
             'foundation_timing': foundation, 'lifecycle': load_lifecycle(root),
             'registered_line_count': len(packages), 'effective_M_count': None,
             'report_status': read['file_status'],
@@ -709,6 +750,12 @@ def line_packet(root: Path, line_id: str, *, topic: str | None = None,
              '本线完整参数与作者记录如下。旧计划、下一步和状态可因新要求失效；'
              '文件准备与状态声明不证明原生代理已启动或责任完成。',
              json.dumps(package, ensure_ascii=False, indent=2, allow_nan=False)]
+    consultation = _consult_snapshot(root, metadata)
+    if consultation is not None:
+        parts += ['## 当前Consult公开交换与费用事实',
+                  json.dumps(consultation, ensure_ascii=False, indent=2, allow_nan=False),
+                  '按当前用户与原件条件使用实际公开稿；可用、已采纳、已落实与审阅范围不同。'
+                  '本机路径不是顾问已取得材料，API状态不证明原生责任或指导质量。']
     from .codex_lifecycle import load_lifecycle
     lifecycle = load_lifecycle(root)
     if lifecycle.get('managed'):

@@ -1,4 +1,4 @@
-# DIGRP 文件与命令契约 0.3.0
+# DIGRP 文件与命令契约 0.4.0
 
 语义来自同 pin 的 [PROTOCOL.md](PROTOCOL.md)。工具不用模型、不派代理、不发邮件，不验证数学证明、真实意图或学习效果。`check` 是所选文件与记录的检查；原生宿主仍须对照论文与成品。
 
@@ -39,7 +39,7 @@ python -B tools/codex.py paper resume --root <本篇目录>
 
 | 字段 | 内容 |
 | --- | --- |
-| `parts` | m1、m4、m2、m3、m5 到实际导读标题的映射；正文中须按阅读顺序出现 |
+| `parts` | m1、m4、m2、m3、m5 到真实内容位置的完整映射；0.4允许共用标题或非空标题列表，按实际阅读路线组织；旧pin保留原顺序契约 |
 | `assumptions` | 模型假设与范围，各条有id、anchor、location |
 | `claims` | 全局主张、真实依据性质basis、依赖的assumptions/chains/experiments ID |
 | `chains` | 每条purpose、prerequisites、source_vs_supplement、result、unresolved，与原页及导读章节相连 |
@@ -142,3 +142,13 @@ python -B tools/codex.py paper summary --batch <私人批次>
 ## 维护发行
 
 源码作者修改协议/技能后运行 `paper refresh --root <源码>`，再运行 `profile refresh` 和必要检查。前者更新增量清单及核心指针，后者更新核心聚合包与散列。它们是显式源码维护，不是在线获取、安装、执行授权或质量认证。发布后须读取新SHA的实际文件再验证安装/调用。
+
+## 0.4的Consult与自然职责定位
+
+新核心0.10的批次记录`consult_enabled=true`与`mapping_contract=integrated-functions-v1`；旧核心0.9仍创建0.3契约，旧候选/发送按原事实回读。新批次在父任务保存实际论文addon选择，即使父原话使用DIGR前缀也不伪改其initial mode。
+
+新mapping.parts仍完整包含m1/m4/m2/m3/m5，每值可为一个真实标题或非空标题列表；职责可共用或跨章节，所有位置必须实际存在。其余原页锚、主张依据、推理链、实验和覆盖责任保持；位置可解析不认证讲透。内部角色不进入正文。
+
+新候选增加`consultation={guidance:<实际公开稿路径>,source_ref:<实际exchange/来源引用>,scope:<当前适用指导范围>}`；实际非空公开稿与已有native review一起绑定。review说明Main怎样处理中心指导、确定事实及真实页面；不是要求Consult填表或每版重审。指导文件变化会使绑定候选过时，但候选版本变化本身不要求另开Consult终审。原生responsibility_report不减少、不由外部稿件代填。
+
+`consult prepare/call/inspect/reconcile-cost`提供公开上下文和费用事实；CLI只在显式call按配置调用模型，见核心CONSULT和实际--help。原稿/图像必须实际传入，不能只交Windows路径。完整指导和费用对账状态分开；未知预留不记零、无自动推理重试。
