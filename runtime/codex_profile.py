@@ -93,12 +93,18 @@ def classify_invocation(message: str) -> dict[str, Any]:
         raise TypeError('message must be str')
     text = message.lstrip()
     key = candidate_route_key(message)
+    # The thin router deliberately returns DIGR for every leading DIGRP too.
+    # Only this acquired Codex surface interprets the longer paper alias.
+    invocation_key = 'DIGRP' if text.startswith('DIGRP') else key
+    addon_hint = 'paper' if invocation_key == 'DIGRP' else None
     base = {'classification': 'NATIVE', 'route_key': key, 'task': None,
+            'invocation_key': invocation_key, 'addon_hint': addon_hint,
+            'addon_selection': None,
             'parameter_text': None, 'action_scope': 'INTERPRET_SEPARATELY',
             'live_acquisition_performed': False, 'run_started': False}
     if key is None:
         return {**base, 'reason': 'no exact leading candidate prefix'}
-    tail = text[len(key):]
+    tail = text[len(invocation_key):]
     if tail.strip() == '/help':
         return {**base, 'classification': 'HELP', 'reason': 'exact help request'}
     if not tail.strip():
@@ -125,7 +131,8 @@ def classify_invocation(message: str) -> dict[str, Any]:
     if not task.strip():
         return {**base, 'classification': 'INVALID', 'reason': 'empty task'}
     return {**base, 'classification': 'EXECUTING', 'task': task,
-            'parameter_text': prelude, 'reason': 'explicit complete DIGR invocation; question/read-only scope does not change mode'}
+            'parameter_text': prelude, 'addon_selection': addon_hint,
+            'reason': 'explicit complete ' + invocation_key + ' invocation; question/read-only scope does not change mode'}
 
 
 def decide_boundary(

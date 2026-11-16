@@ -1,7 +1,7 @@
 """DIGRP paper work packages and independent, evidence-bound mail returns.
 
-The native host reads, teaches, reviews and sends mail. These standard-library
-operations preserve its source/mapping/artifact/receipt facts, not their truth.
+The native host reads, teaches, reviews and sends mail. These file operations
+preserve its source/mapping/artifact/receipt facts, not their truth.
 Each paper has its own revision. Returning it never closes the parent DIGR run.
 """
 from __future__ import annotations
@@ -9,14 +9,24 @@ from __future__ import annotations
 from contextlib import contextmanager
 from copy import deepcopy
 from hashlib import sha256
+from io import BytesIO
 import json
+import math
 import os
 from pathlib import Path
 import re
 import time
 from typing import Any
 
-VERSION = '0.1.0'
+VERSION = '0.2.0'
+SINGLE_PDF_CONTRACT = 'single-pdf-one-message'
+LEGACY_CONTRACT = 'legacy-multiple-volumes'
+# Named physical sheets, measured after /UserUnit and /Rotate. The tolerance
+# only accommodates rounding of PDF point values, not arbitrary page shapes.
+PAGE_PROFILES = {'A4': (210 * 72 / 25.4, 297 * 72 / 25.4),
+                 'A5': (148 * 72 / 25.4, 210 * 72 / 25.4),
+                 'Letter': (612.0, 792.0)}
+PAGE_TOLERANCE_PT = 1.0
 PARTS = ('m1', 'm4', 'm2', 'm3', 'm5')
 DISPOSITIONS = {'explained', 'context', 'non_content', 'unavailable'}
 
@@ -251,6 +261,58 @@ def _candidate_issues(root, value):
     return issues
 
 
+def _candidate_contract(candidate):
+    # 0.1 candidates did not declare a contract. Reading them never upgrades
+    # their artifact count or rewrites their already selected mail facts.
+    return candidate.get('delivery_contract', LEGACY_CONTRACT) if candidate else SINGLE_PDF_CONTRACT
+
+
+def _pdf_geometry(root, file, profile_name):
+    if not isinstance(profile_name, str) or profile_name not in PAGE_PROFILES:
+        raise ValueError('page_profile must be a supported named portrait sheet: ' + ', '.join(PAGE_PROFILES))
+    try:
+        from pypdf import PdfReader
+        from pypdf.errors import PyPdfError
+    except ImportError as error:
+        raise ValueError('actual PDF geometry verification needs the configured Python with pypdf') from error
+    raw = (Path(root) / file['path']).read_bytes()
+    if sha256(raw).hexdigest() != file['sha256']:
+        raise ValueError('PDF changed while preparing the candidate')
+    try:
+        reader = PdfReader(BytesIO(raw))
+        sizes = []
+        for page in reader.pages:
+            unit = float(page.get('/UserUnit', 1))
+            rotation = int(page.rotation or 0) % 360
+            if not math.isfinite(unit) or unit <= 0 or rotation not in (0, 90, 180, 270):
+                raise ValueError('invalid PDF page unit or rotation')
+            boxes = []
+            for box in (page.mediabox, page.cropbox):
+                width, height = float(box.width) * unit, float(box.height) * unit
+                if rotation in (90, 270):
+                    width, height = height, width
+                boxes.append((width, height))
+            sizes.append(boxes)
+    except (PyPdfError, ValueError, TypeError, KeyError, AttributeError) as error:
+        raise ValueError('cannot verify actual PDF pages: ' + str(error)) from error
+    if not sizes:
+        raise ValueError('the complete PDF must contain at least one page')
+    target = PAGE_PROFILES[profile_name]
+    for number, boxes in enumerate(sizes, 1):
+        for box_name, size in zip(('MediaBox', 'CropBox'), boxes):
+            if any(not math.isfinite(x) or abs(x - wanted) > PAGE_TOLERANCE_PT
+                   for x, wanted in zip(size, target)):
+                raise ValueError(f'PDF page {number} {box_name} must be the standard portrait {profile_name} sheet')
+    for box_index in (0, 1):
+        for dimension in (0, 1):
+            values = [boxes[box_index][dimension] for boxes in sizes]
+            if max(values) - min(values) > PAGE_TOLERANCE_PT:
+                raise ValueError('all complete-PDF pages must have uniform physical geometry')
+    return {'profile': profile_name, 'pages': len(sizes), 'orientation': 'portrait',
+            'width_pt': target[0], 'height_pt': target[1],
+            'tolerance_pt': PAGE_TOLERANCE_PT, 'media_and_crop_boxes_checked': True}
+
+
 def prepare_candidate(root, payload, **revision):
     def update(value):
         if not value['mapping'] or not value['mapping']['coverage']:
@@ -273,9 +335,10 @@ def prepare_candidate(root, payload, **revision):
         positions = [heading_order[value['mapping']['parts'][part]] for part in PARTS]
         if positions != sorted(positions) or len(set(positions)) != len(PARTS):
             raise ValueError('guide parts must actually appear in reader order m1, m4, m2, m3, m5')
-        pdfs = [_file(root, name, 'pdf') for name in payload['pdfs']]
-        if not pdfs or len({p['filename'] for p in pdfs}) != len(pdfs):
-            raise ValueError('one or more uniquely named PDF volumes required')
+        if not isinstance(payload.get('pdfs'), list) or len(payload['pdfs']) != 1:
+            raise ValueError('one complete PDF per paper is required; compress it or arrange alternative delivery, do not split volumes')
+        pdfs = [_file(root, payload['pdfs'][0], 'pdf')]
+        geometry = _pdf_geometry(root, pdfs[0], payload.get('page_profile', 'A4'))
         files = [markdown, *pdfs, _file(root, payload['qa'], 'qa'), _file(root, payload['review'], 'review')]
         for match in re.finditer(r'!\[[^\]]*\]\(([^)]+)\)', text):
             target = match.group(1).strip().strip('<>')
@@ -284,12 +347,24 @@ def prepare_candidate(root, payload, **revision):
             asset = (Path(root) / markdown['path']).parent / target
             files.append(_file(root, asset, 'image'))
         qa = _read(Path(root) / payload['qa'])
+        if qa.get('sha256') is not None:
+            observed_hash = qa['sha256']
+            if (not isinstance(observed_hash, str) or not re.fullmatch(r'[0-9a-fA-F]{64}', observed_hash)
+                    or observed_hash.lower() != pdfs[0]['sha256']):
+                raise ValueError('QA PDF hash differs from the selected final complete PDF')
+        if qa.get('status') == 'NEEDS_REVIEW':
+            raise ValueError('selected final-PDF inspection still needs review; resolve it in documented final QA')
         if (qa.get('pages', 0) < 1 or qa.get('rendered_pages') != qa.get('pages') or
                 any(qa.get(k) != [] for k in ('formula_errors', 'overflow', 'missing_images'))):
             raise ValueError('actual rendered PDF QA must include page coverage and resolved layout/image errors')
+        if (type(qa.get('pages')) is not int or type(qa.get('rendered_pages')) is not int or
+                qa['pages'] != geometry['pages']):
+            raise ValueError('QA page count must match the actual complete PDF page count')
         review = (Path(root) / payload['review']).read_text(encoding='utf-8-sig')
         _text(review, 'native content and final-page review')
-        candidate = {'mapping_digest': _digest(value['mapping']), 'files': files,
+        candidate = {'addon_version': VERSION, 'delivery_contract': SINGLE_PDF_CONTRACT,
+                     'pdf_geometry': geometry,
+                     'mapping_digest': _digest(value['mapping']), 'files': files,
                      'responsibility_report': deepcopy(payload.get('responsibility_report', {}))}
         for key in ('N', 'R', 'D', 'V'):
             actual = candidate['responsibility_report'].get(key)
@@ -305,6 +380,8 @@ def record_delivery(root, payload, **revision):
         candidate = value['candidate']
         if not candidate or _candidate_issues(root, value):
             raise ValueError('mail receipt cannot refer to a missing or stale candidate')
+        if _candidate_contract(candidate) != SINGLE_PDF_CONTRACT:
+            raise ValueError('legacy candidate delivery history is read-only; review one current complete PDF before a new delivery')
         if payload.get('candidate_id') != candidate['id']:
             raise ValueError('receipt must identify the exact reviewed candidate')
         message_id = _text(payload.get('message_id'), 'actual Gmail message_id')
@@ -319,6 +396,12 @@ def record_delivery(root, payload, **revision):
         attachments = payload.get('attachments')
         if not isinstance(attachments, list) or not attachments:
             raise ValueError('read-back attachment facts required')
+        if _candidate_contract(candidate) == SINGLE_PDF_CONTRACT:
+            if len(attachments) != 1:
+                raise ValueError('one complete PDF attachment in one Gmail message is required')
+            messages = {r['message_id'] for r in value['deliveries'] if r['candidate_id'] == candidate['id']}
+            if messages - {message_id}:
+                raise ValueError('this complete PDF already has a Gmail message; reconcile it instead of recording another send')
         for attachment in attachments:
             expected = pdfs.get(attachment.get('filename'))
             if not expected or attachment.get('bytes') != expected['bytes']:
@@ -353,6 +436,7 @@ def inspect(root):
     root = Path(root).resolve(); value = _load(root)
     issues = _candidate_issues(root, value)
     candidate = value['candidate']; status = 'DRAFT'
+    contract = _candidate_contract(candidate)
     receipts = [r for r in value['deliveries']
                 if candidate and r['candidate_id'] == candidate['id']]
     volumes = []
@@ -386,11 +470,15 @@ def inspect(root):
     pending_saved_step = (cursor_current or bool(unresolved_delivery)) and not issues
     next_action = {
         'DRAFT': 'complete source-bound guide and native review',
-        'READY': 'send only remaining PDF volumes through authorized Gmail, then read back: ' + ', '.join(remaining),
+        'READY': ('send the one complete PDF through authorized Gmail, then read back: '
+                  if contract == SINGLE_PDF_CONTRACT else
+                  'send only remaining PDF volumes through authorized Gmail, then read back: ') + ', '.join(remaining),
         'SENT_VERIFIED': 'record this paper return; parent DIGR task stays open',
         'RETURNED': 'this paper returned; continue other papers/common work',
         'STALE_OR_UNAVAILABLE': 'inspect changed source/artifact; do not reuse an old mail receipt'
     }[status]
+    if contract == LEGACY_CONTRACT and status in ('READY', 'SENT_VERIFIED'):
+        next_action = 'read legacy delivery facts only; prepare one current complete PDF candidate before a new delivery or return'
     if unresolved_delivery and not issues:
         next_action = ('reconcile uncertain Gmail send ' + unresolved_delivery['attempt_id'] +
             ' for ' + ', '.join(unresolved_delivery['remaining']) +
@@ -399,6 +487,8 @@ def inspect(root):
         next_action = value['cursor']['next_action']
     return {'paper_id': value['paper_id'], 'line': value['line'], 'revision': value['revision'],
         'status': status, 'issues': issues, 'candidate_id': candidate['id'] if candidate else None,
+        'candidate_addon_version': candidate.get('addon_version', '0.1.0') if candidate else None,
+        'delivery_contract': contract,
         'cursor': value['cursor'], 'cursor_current': cursor_current,
         'pending_saved_step': pending_saved_step, 'mapping': value['mapping'],
         'unresolved_delivery_attempt': unresolved_delivery,
@@ -411,6 +501,8 @@ def inspect(root):
 def return_paper(root, payload, **revision):
     body = _file(root, payload['body'], 'paper_return')
     def update(value):
+        if _candidate_contract(value['candidate']) != SINGLE_PDF_CONTRACT:
+            raise ValueError('legacy candidate return history is read-only; review one current complete PDF before a new return')
         status = inspect(root)
         if status['status'] != 'SENT_VERIFIED' or status.get('unresolved_delivery_attempt'):
             raise ValueError('paper return requires complete current Gmail attachment verification')
@@ -497,8 +589,13 @@ def acquire_addon(base, *, fetch=None, output=None):
     if not isinstance(members, dict) or manifest.get('protocol') != 'digrp-codex-1':
         raise ValueError('unsupported DIGRP protocol manifest')
     required = {manifest.get('version_path'), manifest.get('entrypoint'), manifest.get('skill')}
+    version_parts = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)', manifest['version'])
+    if not version_parts:
+        raise ValueError('unsupported DIGRP protocol version')
+    if tuple(map(int, version_parts.groups())) >= (0, 2, 0):
+        required.add(manifest.get('pdf_design'))
     if not required.issubset(members) or None in required:
-        raise ValueError('DIGRP manifest misses its version, entrypoint or skill')
+        raise ValueError('DIGRP manifest misses a required protocol member, including PDF design in 0.2+')
     for path, digest in members.items():
         get(path, digest)
     if files[manifest['version_path']].decode('utf-8').strip() != manifest['version']:
@@ -522,10 +619,11 @@ def refresh_addon(root):
     version = (root / 'paper/VERSION').read_text(encoding='utf-8').strip()
     if version != VERSION:
         raise ValueError('paper source/tool version mismatch')
-    paths = ('paper/VERSION', 'paper/PROTOCOL.md', 'paper/DATA.md',
+    paths = ('paper/VERSION', 'paper/PROTOCOL.md', 'paper/DATA.md', 'paper/PDF_DESIGN.md',
              '.agents/skills/digr-paper/SKILL.md', '.agents/skills/digr-paper/agents/openai.yaml')
     manifest = {'name': 'DIGRP Paper Reading', 'version': version, 'protocol': 'digrp-codex-1',
         'version_path': 'paper/VERSION', 'entrypoint': 'paper/PROTOCOL.md',
+        'pdf_design': 'paper/PDF_DESIGN.md',
         'skill': '.agents/skills/digr-paper/SKILL.md', 'reader_order': list(PARTS),
         'file_sha256': {path: sha256((root / path).read_bytes()).hexdigest() for path in paths}}
     _write(root / 'paper/manifest.json', manifest)

@@ -251,6 +251,8 @@ def create_session(root: Path, *, request: Path, p_run: str,
     if profile_requires_lifecycle:
         metadata['lifecycle_required'] = True
         metadata['initial_invocation'] = {key: invocation[key] for key in ('classification', 'route_key', 'reason')}
+        metadata['initial_invocation'].update({key: invocation[key] for key in
+            ('invocation_key', 'addon_hint', 'addon_selection') if key in invocation})
         metadata['invocation_basis'] = 'structure only; repository acquisition is an upstream obligation'
     if profile_uses_visits:
         if visits_path is None:

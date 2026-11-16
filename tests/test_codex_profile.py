@@ -87,6 +87,72 @@ class CodexBoundaryTests(unittest.TestCase):
         self.assertEqual(result['classification'], 'EXECUTING')
         self.assertEqual(result['parameter_text'], '（N（12），S（n（3）））')
 
+    def test_digrp_longest_alias_selects_paper_without_changing_the_thin_route(self):
+        from runtime.routing import candidate_route_key
+        raw = '\u3000 DIGRP（N（12），S（n（3）））：完整论文：保留原任务\n'
+        result = classify_invocation(raw)
+        self.assertEqual(candidate_route_key(raw), 'DIGR')
+        self.assertEqual(result['route_key'], 'DIGR')
+        self.assertEqual(result['invocation_key'], 'DIGRP')
+        self.assertEqual(result['classification'], 'EXECUTING')
+        self.assertEqual(result['parameter_text'], '（N（12），S（n（3）））')
+        self.assertEqual(result['task'], '完整论文：保留原任务\n')
+        self.assertEqual((result['addon_hint'], result['addon_selection']), ('paper', 'paper'))
+        self.assertFalse(result['live_acquisition_performed'])
+        self.assertFalse(result['run_started'])
+        boundary = decide_boundary('NEW_TURN', raw, active=self.active)
+        self.assertEqual((boundary.mode, boundary.route_key), ('ROUTE_PENDING', 'DIGR'))
+        self.assertTrue(boundary.preserve_task)
+        self.assertEqual(boundary.after_route, 'CONTINUE')
+
+    def test_paper_alias_help_invalid_and_discussion_are_hints_not_task_selection(self):
+        cases = [('DIGRP/help', 'HELP'), ('DIGRP', 'INVALID'), ('DIGRP： ', 'INVALID'),
+                 ('DIGRP（N（12）：任务', 'INVALID'), ('DIGRP是什么？', 'NATIVE'),
+                 ('DIGRProblem：这里只是单词讨论', 'NATIVE')]
+        for text, expected in cases:
+            with self.subTest(text=text):
+                result = classify_invocation(text)
+                self.assertEqual(result['classification'], expected)
+                self.assertEqual(result['addon_hint'], 'paper')
+                self.assertIsNone(result['addon_selection'])
+        for text in ('digrp：任务', 'Digrp：任务', '“DIGRP：任务”是引文', '请用DIGRP：任务'):
+            with self.subTest(text=text):
+                result = classify_invocation(text)
+                self.assertEqual(result['classification'], 'NATIVE')
+                self.assertIsNone(result['addon_hint'])
+                self.assertIsNone(result['addon_selection'])
+        ordinary = classify_invocation('DIGR：研究题名包含DIGRP的工具')
+        self.assertEqual(ordinary['classification'], 'EXECUTING')
+        self.assertIsNone(ordinary['addon_selection'])
+
+    def test_paper_selection_survives_session_creation_and_an_ordinary_followup(self):
+        from runtime.codex_session import create_session
+        from runtime.codex_lifecycle import ingest_message, load_lifecycle
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            request = base / 'request.txt'
+            request.write_text('DIGRP（N（12））：完整处理合成论文\n', encoding='utf-8')
+            session = base / 'session'
+            metadata = create_session(session, request=request, p_run='0.8.5@' + 'a' * 40,
+                visits_path=base / 'visits.jsonl', run_id='synthetic-paper-alias')
+            selected = metadata['initial_invocation']
+            self.assertEqual((selected['invocation_key'], selected['addon_selection']), ('DIGRP', 'paper'))
+            self.assertEqual(load_lifecycle(session)['current_message']['addon_selection'], 'paper')
+            followup = base / 'followup.txt'
+            followup.write_text('把解释接着写完，仍沿用原来的论文范围。', encoding='utf-8')
+            result = ingest_message(session, source=followup, source_ref='synthetic-followup')
+            self.assertEqual((result['status'], result['current_message']['surface']), ('ACTIVE', 'NATIVE'))
+            saved = json.loads((session / 'session.json').read_text(encoding='utf-8'))
+            self.assertEqual(saved['initial_invocation'], selected)
+            self.assertEqual(saved['request_sha256'], metadata['request_sha256'])
+            help_request = base / 'help.txt'
+            help_request.write_text('DIGRP/help', encoding='utf-8')
+            help_session = base / 'help-session'
+            with self.assertRaisesRegex(ValueError, 'EXECUTING original request'):
+                create_session(help_session, request=help_request, p_run='0.8.5@' + 'a' * 40,
+                    visits_path=base / 'visits.jsonl', run_id='synthetic-help')
+            self.assertFalse(help_session.exists())
+
     def test_steer_preserves_task_and_mode(self):
         result = decide_boundary(
             'STEER', '不用适配手机，保留原样式', active=self.active,

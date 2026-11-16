@@ -1,6 +1,6 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "protocol": "digr-codex-native-v8",
   "status": "experimental",
   "language": "zh-CN",
@@ -57,20 +57,20 @@
     "real_world_incomplete_information_policy": "EVIDENCE_BASED_CENTRAL_JUDGMENT_AND_PROPORTIONATE_ACTION"
   },
   "file_sha256": {
-    "codex/VERSION": "cf6a05db55c83ecdf0b3323be40d441e20f4bbd3860a3f4104a9dab70fbae161",
+    "codex/VERSION": "a92b0248b8baacfaf54e8d59caaca7d5e6b9a0a25ee140c81ea973b4ae25142f",
     "codex/AGENTS.light.md": "d21ad2ff0d26bd2ec6d576877713b7998c7d0cdc4972d6030c52b7ff23c8e1ab",
     "codex/ROUTER.experimental.txt": "6aa91d9aea27e029155349bbc9abed5cf5b216a65ad74a45788a8cf16a845347",
-    "codex/STARTUP.md": "9e15eca0e3bf0511da1b2727057404cc65830ee6d6a5a485d3a523f4049dc5f6",
-    "codex/PROTOCOL.md": "0771b1d39d6040c4a07da25967d313cfdfaf67fe7a55dcbb7453f42ee1bf4897",
+    "codex/STARTUP.md": "86b82c7e810d02c58d10d2efdebe2c9d9fa02dbbdbf175de0267201e9cdea65a",
+    "codex/PROTOCOL.md": "1966eecd7f2f864df30db42696f0173d11f8e99ac37a0e371b5192d1b80f306c",
     "codex/FOUNDATION.md": "b943b9160f5f9ad2b2f80e444c80b416aaa472847fffda73a62ddf6d7a6d374b",
-    "codex/HELP.md": "07b0efc220f37c47c0321a0f5fbd5a4311c7df22b79df52bc5c2127b38f828f6",
+    "codex/HELP.md": "93a136f0a9f508d4e6125081593420e739c797fffd74f2072fc5e2087a2dd216",
     "codex/PARAMETERS.md": "d4b3b95a8c63f18b566f15f459e4d91386efeed5ebcd31b9491fb9106cc12cf9",
     "codex/WORKBENCH.md": "7b021a4a4d67d1c874c59579958a4a9ab521044f0503df8d29b1f37ce67f5fde",
     "codex/CHARACTER.md": "c0565f52bdf585d8ba24da51e6354493d9d7acdb5938ab9848f12eed736eb932",
     "codex/COLLABORATION.md": "40bac20c5efad996ed453cfca495aff1130a8534d965c8de6282868352ce1b55",
     "codex/PERMISSIONS.md": "3c59a22111c9ae058342d48cf091216cc661c0ff28206700a1d94b25ffecd58b",
     "codex/RETURN.md": "4f9efd48c26f712516c601a7c46818f6f5394759cea7ae6e5677b2791561cda8",
-    "codex/EXECUTION_PROTOCOL.json": "9f8163c1f5fcb09c3398b608371c2b6d67017e81e9a83102ac68aa97274000d4"
+    "codex/EXECUTION_PROTOCOL.json": "8d45f86eb14277e0036afa5b68b65fc7af51d8cab4ab3f613f87124d8516c7cf"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {
@@ -110,7 +110,7 @@
   },
   "paper_addon": {
     "manifest": "paper/manifest.json",
-    "version": "0.1.0",
-    "sha256": "b3448d78c1018011dfb96b1d19dfd903bd3190d08576cb43d68ddfeb3ef29a12"
+    "version": "0.2.0",
+    "sha256": "2cd3d71a66a0ab9395dbcc131e66d687057b5826a963992a0b045ceacb6ed128"
   }
 }

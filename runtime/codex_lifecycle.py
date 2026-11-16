@@ -88,6 +88,8 @@ def initialize_lifecycle(root: Path, metadata: Mapping[str, Any]) -> dict[str, A
              'closure': None, 'cleanup_issues': [],
              'updated_wall_ns': time.time_ns(),
              'scope': 'managed continuation only; not host interception or authenticated consent'}
+    value['current_message'].update({key: surface[key] for key in
+        ('invocation_key', 'addon_hint', 'addon_selection') if key in surface})
     value['task_input_ref'] = _input_ref(value['current_message'])
     _write_json(root / 'lifecycle.json', value, new=True)
     return value

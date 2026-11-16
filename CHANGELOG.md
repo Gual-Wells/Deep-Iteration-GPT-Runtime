@@ -1,5 +1,12 @@
 # Changelog
 
+## Codex 0.8.5 / DIGRP 0.2.0 — whole-paper desktop books
+
+- The pinned Codex classifier recognizes the complete `DIGRP：` alias before `DIGR`, while the thin broad router and root stable stay unchanged. A complete call selects the paper addon; help/discussion only carries a hint.
+- New paper candidates contain one complete standard portrait PDF and one corresponding Gmail return. Historical 0.1 multi-volume receipts remain historical; an old receipt cannot deliver a revised candidate.
+- PDF production targets fixed pages for desktop two-page reading, with reader-facing chapters, deliberate typography, original-color figures, searchable text and vector mathematics where appropriate. Internal M/m responsibilities do not become the book's labels or layout.
+- Design changes are compared using real content and actual written-PDF spreads at fit-width and fit-height. The product contract distinguishes offline previews from real viewer observations.
+
 ## Codex 0.8.4 — optional DIGRP 0.1.0 paper reading increment
 
 - An explicitly selected, same-pin addon gives each paper a complete M and integrates global design, original notation, explained reasoning, experiments and full-paper return reading in the order m1 → m4 → m2 → m3 → m5.
