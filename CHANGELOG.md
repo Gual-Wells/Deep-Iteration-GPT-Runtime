@@ -6,6 +6,7 @@
 - New paper candidates contain one complete standard portrait PDF and one corresponding Gmail return. Historical 0.1 multi-volume receipts remain historical; an old receipt cannot deliver a revised candidate.
 - PDF production targets fixed pages for desktop two-page reading, with reader-facing chapters, deliberate typography, original-color figures, searchable text and vector mathematics where appropriate. Internal M/m responsibilities do not become the book's labels or layout.
 - Design changes are compared using real content and actual written-PDF spreads at fit-width and fit-height. The product contract distinguishes offline previews from real viewer observations.
+- Return validation accepts angle-wrapped Markdown artifact destinations, including Windows drive paths and filenames with spaces; HTML containers in labels or prose remain rejected.
 
 ## Codex 0.8.4 — optional DIGRP 0.1.0 paper reading increment
 

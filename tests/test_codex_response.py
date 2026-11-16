@@ -30,6 +30,20 @@ class ResponseTests(unittest.TestCase):
     def test_markdown_autolink_and_angle_brackets_are_prose(self):
         validate_response(render_response(self.report(result='正文来源 <https://example.org/report>，联系 <user@example.org>，当 a < b 时保留条件。')))
 
+    def test_angle_wrapped_local_artifact_destinations_are_markdown(self):
+        for target in ('D:/papers/完整导读.pdf', 'D:/My Papers/a (draft).pdf',
+                       '/tmp/My Paper.pdf', 'assets/My Paper.pdf'):
+            with self.subTest(target=target):
+                link = '[完整PDF](<' + target + '>)'
+                self.assertIn(link, render_response(self.report(result=link)))
+
+    def test_artifact_destination_does_not_hide_html_labels_or_following_html(self):
+        for text in ('[<div>正文</div>](<D:/papers/a.pdf>)',
+                     '[完整PDF](<D:/papers/a.pdf>)\n<iframe>正文</iframe>'):
+            with self.subTest(text=text):
+                with self.assertRaisesRegex(ValueError, 'raw HTML'):
+                    render_response(self.report(result=text))
+
     def test_multiline_inline_html_sample_is_literal_code(self):
         validate_response(render_response(self.report(result='例子 `<div>\n这里是字面量\n</div>` 不携带正文。')))
 

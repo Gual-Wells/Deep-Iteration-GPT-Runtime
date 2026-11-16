@@ -69,6 +69,16 @@ def _without_inline_code(line: str) -> str:
     return ''.join(pieces)
 
 
+def _without_angle_link_destinations(text: str) -> str:
+    """Angle-wrapped Markdown destinations are link syntax, not raw HTML.
+
+    The return writer emits this form for local artifacts, including Windows
+    drive paths and filenames with spaces. Keep labels and surrounding prose
+    visible to the HTML check; only remove a complete destination token.
+    """
+    return re.sub(r'(?<!\\)(\]\([ \t]*)<[^<>\r\n]*>([ \t]*\))', r'\1\2', text)
+
+
 class _RawHTML(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=False)
@@ -125,7 +135,7 @@ def validate_response(text: str) -> None:
             elif stripped.startswith('# '):
                 raise ValueError('use the five level-two report sections; subheadings start at level three')
             prose.append(line)
-    parser.feed(_without_inline_code('\n'.join(prose)))
+    parser.feed(_without_angle_link_destinations(_without_inline_code('\n'.join(prose))))
     parser.close()
     if parser.found:
         raise ValueError('raw HTML cannot carry the response report; quote code samples as Markdown code')
