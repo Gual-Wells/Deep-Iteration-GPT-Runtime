@@ -45,7 +45,7 @@ def read_message(path: Path) -> str:
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else list(argv)
     # Pass through argument parsing rather than duplicate mature CLI surfaces.
-    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper'):
+    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery'):
         from tools import codex_experience, codex_profile, codex_workbench, codex_knowledge, codex_timeline, codex_voice
         if argv[0] == 'return':
             from tools.codex_return import main as return_main
@@ -62,6 +62,9 @@ def main(argv: list[str] | None = None) -> int:
         if argv[0] == 'paper':
             from tools.codex_paper import main as paper_main
             return paper_main(argv[1:])
+        if argv[0] == 'delivery':
+            from tools.codex_delivery import main as delivery_main
+            return delivery_main(argv[1:])
         return {'profile': codex_profile.main, 'workbench': codex_workbench.main,
                 'experience': codex_experience.main,
                 'knowledge': codex_knowledge.main,
@@ -69,7 +72,7 @@ def main(argv: list[str] | None = None) -> int:
                 'voice': codex_voice.main}[argv[0]](argv[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
-    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper'):
+    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery'):
         sub.add_parser(name, help=f'{name} commands; append --help for details')
     acquire = sub.add_parser('acquire', help='actually acquire a live, immutable Codex profile')
     acquire.add_argument('--stage', choices=('startup', 'help', 'execution'), default='startup')
@@ -88,6 +91,7 @@ def main(argv: list[str] | None = None) -> int:
     create.add_argument('--m', type=int)
     create.add_argument('--visits', type=Path, help='shared Begin/End file for 0.8.1+ sessions')
     create.add_argument('--run-id', help='stable task group in that file; generated once if omitted')
+    create.add_argument('--destinations', type=Path, help='private X target registry, resolved once for this new task')
     create.add_argument('--require-foundation', action='store_true', default=None,
                         help='prepare research first; managed execution waits for the current user decision')
     report = ts.add_parser('report')
@@ -102,6 +106,9 @@ def main(argv: list[str] | None = None) -> int:
     handle.add_argument('--message-id', required=True, type=int)
     handle.add_argument('--action', dest='message_action', required=True, choices=sorted(MESSAGE_ACTIONS))
     handle.add_argument('--reason', required=True)
+    handle.add_argument('--delivery-selection', type=Path,
+                        help='actual current user choice JSON; ordinary followups otherwise inherit X')
+    handle.add_argument('--destinations', type=Path, help='resolve a genuinely changed X target once')
     lifecycle = ts.add_parser('lifecycle', help='read managed continuation state or explicit legacy status')
     lifecycle.add_argument('--root', required=True, type=Path)
     stop = ts.add_parser('terminate', help='stop/cancel a task; completed delivery uses return close')
@@ -201,13 +208,15 @@ def main(argv: list[str] | None = None) -> int:
                     decisions=args.decisions,
                     explicit_parameters=read_object(args.explicit) if args.explicit else None,
                     anchor_pid=args.anchor_pid, m_target=args.m, require_foundation=args.require_foundation,
-                    visits_path=args.visits, run_id=args.run_id)
+                    visits_path=args.visits, run_id=args.run_id, destinations=args.destinations)
             elif args.action == 'message':
                 result = ingest_message(args.root, source=args.source_file,
                     source_ref=args.source_ref, route_pin=args.route_pin)
             elif args.action == 'handle':
                 result = handle_message(args.root, message_id=args.message_id,
-                    action=args.message_action, reason=args.reason)
+                    action=args.message_action, reason=args.reason,
+                    delivery_selection=read_object(args.delivery_selection) if args.delivery_selection else None,
+                    destinations=args.destinations)
             elif args.action == 'lifecycle':
                 result = load_lifecycle(args.root)
             elif args.action == 'terminate':

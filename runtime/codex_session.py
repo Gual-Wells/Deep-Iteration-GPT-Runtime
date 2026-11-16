@@ -201,7 +201,8 @@ def create_session(root: Path, *, request: Path, p_run: str,
                    decisions: Path | None = None, explicit_parameters: Mapping[str, Any] | None = None,
                    anchor_pid: int | None = None, m_target: int | None = None,
                    require_foundation: bool | None = None,
-                   visits_path: Path | None = None, run_id: str | None = None) -> dict[str, Any]:
+                   visits_path: Path | None = None, run_id: str | None = None,
+                   destinations: Path | None = None) -> dict[str, Any]:
     """Prepare storage from an already-acquired P_run; do not start execution."""
     if not isinstance(p_run, str) or not re.fullmatch(r'[^@\s]+@[0-9a-f]{40}', p_run):
         raise ValueError('P_run must be version@full-40-character-SHA')
@@ -214,6 +215,9 @@ def create_session(root: Path, *, request: Path, p_run: str,
     profile_requires_foundation = bool(version and tuple(map(int, version.groups())) >= (0, 7, 0))
     profile_requires_lifecycle = bool(version and tuple(map(int, version.groups())) >= (0, 8, 0))
     profile_uses_visits = bool(version and tuple(map(int, version.groups())) >= (0, 8, 1))
+    profile_uses_delivery = bool(version and tuple(map(int, version.groups())) >= (0, 9, 0))
+    if destinations is not None and not profile_uses_delivery:
+        raise ValueError('X target configuration belongs to 0.9+ new sessions; keep old pins unchanged')
     if not profile_uses_visits and (visits_path is not None or run_id is not None):
         raise ValueError('shared visit configuration belongs to 0.8.1+ new sessions; keep old pins unchanged')
     invocation = None
@@ -254,6 +258,16 @@ def create_session(root: Path, *, request: Path, p_run: str,
         metadata['initial_invocation'].update({key: invocation[key] for key in
             ('invocation_key', 'addon_hint', 'addon_selection') if key in invocation})
         metadata['invocation_basis'] = 'structure only; repository acquisition is an upstream obligation'
+    if profile_uses_delivery:
+        from .codex_delivery import resolve_policy
+        selection = invocation['delivery_selection']
+        registry, registry_ref = (read_delivery_registry(destinations)
+                                  if selection['mode'] == 'external' else (None, None))
+        policy = resolve_policy(selection, registry)
+        metadata.update(delivery_contract='x-files-v1', delivery_selection=selection,
+                        initial_delivery_policy=policy, delivery_registry_origin=registry_ref)
+        metadata['initial_invocation'].update({key: invocation[key] for key in
+            ('parameter_text', 'execution_parameter_text', 'delivery_selection')})
     if profile_uses_visits:
         if visits_path is None:
             configured = os.environ.get('DIGR_VISITS_PATH')
@@ -274,6 +288,38 @@ def create_session(root: Path, *, request: Path, p_run: str,
         from .codex_lifecycle import initialize_lifecycle
         initialize_lifecycle(root, metadata)
     return metadata
+
+
+def read_delivery_registry(path: Path | None = None, *, required: bool = True) -> tuple[dict | None, dict | None]:
+    """Resolve only a local nonsecret target map; callers freeze the result.
+
+    Registry edits are not task edits. An existing task must use its saved
+    policy rather than reopening this file during each send.
+    """
+    if path is None:
+        data_home = os.environ.get('CODEX_HOME')
+        path = Path(data_home) / 'digr-codex/destinations.json' if data_home else None
+    if path is None or not Path(path).is_file():
+        if required:
+            raise ValueError('X target registry is unavailable; configure --destinations or CODEX_HOME/digr-codex/destinations.json')
+        return None, None
+    path = Path(path).resolve()
+    raw = path.read_bytes()
+    value = json.loads(raw.decode('utf-8-sig'))
+    if not isinstance(value, dict):
+        raise ValueError('X target registry must be a JSON object')
+    return value, {'path': path.as_posix(), 'sha256': sha256(raw).hexdigest(),
+                   'scope': 'origin only; resolved policy is frozen in the task'}
+
+
+def task_delivery_policy(root: Path) -> dict | None:
+    """Return the task's selected policy, never the latest global default."""
+    root, metadata = _session(root)
+    if metadata.get('delivery_contract') != 'x-files-v1':
+        return None
+    from .codex_lifecycle import load_lifecycle
+    lifecycle = load_lifecycle(root)
+    return json.loads(json.dumps(lifecycle.get('delivery_policy', metadata['initial_delivery_policy'])))
 
 
 def create_line(root: Path, line_id: str, *, parameters: Mapping[str, Any], owner: str | None = None,

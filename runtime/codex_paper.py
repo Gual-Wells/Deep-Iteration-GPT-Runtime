@@ -18,8 +18,9 @@ import re
 import time
 from typing import Any
 
-VERSION = '0.2.0'
+VERSION = '0.3.0'
 SINGLE_PDF_CONTRACT = 'single-pdf-one-message'
+X_PDF_CONTRACT = 'single-pdf-x-files'
 LEGACY_CONTRACT = 'legacy-multiple-volumes'
 # Named physical sheets, measured after /UserUnit and /Rotate. The tolerance
 # only accommodates rounding of PDF point values, not arbitrary page shapes.
@@ -104,18 +105,38 @@ def _load(root):
     return value
 
 
-def initialize(root, *, p_run, authorization, source_ref, recipient):
+def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_root=None):
     root = Path(root).resolve(); root.mkdir(parents=True, exist_ok=True)
     if not re.fullmatch(r'[^@\s]+@[0-9a-f]{40}', p_run):
         raise ValueError('p_run needs a version and full immutable SHA')
+    version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@.+', p_run)
+    uses_x = bool(version and tuple(map(int, version.groups())) >= (0, 9, 0))
+    policy = None
+    if uses_x:
+        from .codex_session import _session, task_delivery_policy
+        if task_root is None or recipient is not None:
+            raise ValueError('new DIGRP uses --task-root X policy, not the legacy --recipient option')
+        task_root, parent = _session(Path(task_root))
+        if parent['P_run'] != p_run:
+            raise ValueError('paper batch and parent task must use the same immutable P_run')
+        policy = task_delivery_policy(task_root)
+        if policy is None:
+            raise ValueError('parent task has no X file-delivery contract')
+        recipient = policy.get('recipient')
+    elif task_root is not None:
+        raise ValueError('legacy paper batches keep their original delivery semantics')
+    else:
+        recipient = _text(recipient, 'authorized resolved recipient')
     with _lock(root):
         if (root / 'batch.json').exists():
             raise ValueError('batch already exists')
-        value = {'format': 'digrp-batch-1', 'addon_version': VERSION, 'P_run': p_run,
+        value = {'format': 'digrp-batch-1', 'addon_version': VERSION if uses_x else '0.2.0', 'P_run': p_run,
                  'authorization': _file(root, authorization),
                  'authorization_source_ref': _text(source_ref, 'actual user source_ref'),
-                 'recipient': _text(recipient, 'authorized resolved recipient'),
+                 'recipient': recipient,
                  'papers': {}, 'parent_lifecycle_unchanged': True}
+        if uses_x:
+            value.update(task_root=task_root.as_posix(), delivery_policy=policy)
         _write(root / 'batch.json', value)
     return value
 
@@ -144,13 +165,17 @@ def add_paper(batch, *, paper_id, title, line, owner, parameters):
             raise ValueError('paper ID and M line must be unique within the batch')
         root = batch / 'papers' / paper_id
         root.mkdir(parents=True, exist_ok=False)
-        value = {'format': 'digrp-paper-1', 'addon_version': VERSION, 'revision': 0,
+        value = {'format': 'digrp-paper-1', 'addon_version': index['addon_version'], 'revision': 0,
                  'paper_id': paper_id, 'title': _text(title, 'title'), 'line': line,
                  'owner': _text(owner, 'actual owner'), 'parameters': deepcopy(parameters),
                  'P_run': index['P_run'], 'recipient': index['recipient'],
                  'authorization_source_ref': index['authorization_source_ref'],
                  'sources': {}, 'mapping': None,
                  'candidate': None, 'deliveries': [], 'returns': [], 'cursor': None, 'operations': {}}
+        if 'delivery_policy' in index:
+            from .codex_session import task_delivery_policy
+            value.update(task_root=index['task_root'],
+                         delivery_policy=task_delivery_policy(Path(index['task_root'])))
         _write(root / 'paper.json', value)
         index['papers'][paper_id] = {'path': 'papers/' + paper_id, 'line': line}
         _write(batch / 'batch.json', index)
@@ -247,14 +272,27 @@ def _candidate_issues(root, value):
         issues.extend(_file_issues(root, source))
     candidate = value['candidate']
     if candidate:
+        if 'delivery_policy' in value and not any(r['candidate_id'] == candidate['id'] for r in value['returns']):
+            from .codex_session import task_delivery_policy
+            if task_delivery_policy(Path(value['task_root'])) != value['delivery_policy']:
+                issues.append('task X choice changed; review a candidate under the current task policy')
         if candidate['mapping_digest'] != _digest(value['mapping']):
             issues.append('mapping changed after candidate review')
         for file in candidate['files']:
             issues.extend(_file_issues(root, file))
         for delivery in value['deliveries']:
             if delivery['candidate_id'] == candidate['id']:
-                for evidence in delivery['evidence']:
-                    issues.extend(_file_issues(root, evidence))
+                if 'delivery_policy' in value:
+                    try:
+                        entry = _paper_delivery_entry(value, delivery['delivery_id'])
+                        if (entry['identity_digest'] != delivery['ledger_identity_digest'] or
+                                entry['receipt_digest'] != delivery['ledger_receipt_digest']):
+                            issues.append('selected per-paper delivery identity or receipt changed')
+                    except (OSError, ValueError, KeyError) as error:
+                        issues.append('selected per-paper delivery unavailable: ' + str(error))
+                else:
+                    for evidence in delivery['evidence']:
+                        issues.extend(_file_issues(root, evidence))
         for returned in value['returns']:
             if returned['candidate_id'] == candidate['id']:
                 issues.extend(_file_issues(root, returned['body']))
@@ -315,6 +353,13 @@ def _pdf_geometry(root, file, profile_name):
 
 def prepare_candidate(root, payload, **revision):
     def update(value):
+        if 'delivery_policy' in value:
+            from .codex_session import task_delivery_policy
+            current_policy = task_delivery_policy(Path(value['task_root']))
+            if current_policy is None:
+                raise ValueError('parent X task contract is unavailable')
+            value['delivery_policy'] = current_policy
+            value['recipient'] = current_policy.get('recipient')
         if not value['mapping'] or not value['mapping']['coverage']:
             raise ValueError('source-to-guide mapping with original coverage required')
         issues = _candidate_issues(root, {**value, 'candidate': None})
@@ -362,10 +407,13 @@ def prepare_candidate(root, payload, **revision):
             raise ValueError('QA page count must match the actual complete PDF page count')
         review = (Path(root) / payload['review']).read_text(encoding='utf-8-sig')
         _text(review, 'native content and final-page review')
-        candidate = {'addon_version': VERSION, 'delivery_contract': SINGLE_PDF_CONTRACT,
+        candidate = {'addon_version': VERSION if 'delivery_policy' in value else '0.2.0', 'delivery_contract':
+                     X_PDF_CONTRACT if 'delivery_policy' in value else SINGLE_PDF_CONTRACT,
                      'pdf_geometry': geometry,
                      'mapping_digest': _digest(value['mapping']), 'files': files,
                      'responsibility_report': deepcopy(payload.get('responsibility_report', {}))}
+        if 'delivery_policy' in value:
+            candidate['delivery_policy_id'] = value['delivery_policy']['policy_id']
         for key in ('N', 'R', 'D', 'V'):
             actual = candidate['responsibility_report'].get(key)
             if type(actual) is not int or actual < value['parameters'][key]:
@@ -375,11 +423,53 @@ def prepare_candidate(root, payload, **revision):
     return _mutate(root, action='candidate', payload=payload, update=update, **revision)
 
 
+def _paper_delivery_entry(value, delivery_id):
+    from .codex_delivery import inspect as inspect_delivery
+    entries = inspect_delivery(value['task_root'])['deliveries']
+    selected = next((entry for entry in entries if entry['id'] == delivery_id), None)
+    if selected is None:
+        raise ValueError('unknown parent-task delivery entry')
+    if selected['status'] != 'SENT_VERIFIED' or selected['issues']:
+        raise ValueError('parent-task delivery is not verified and current')
+    return selected
+
+
 def record_delivery(root, payload, **revision):
     def update(value):
         candidate = value['candidate']
         if not candidate or _candidate_issues(root, value):
             raise ValueError('mail receipt cannot refer to a missing or stale candidate')
+        if 'delivery_policy' in value:
+            if value['delivery_policy']['mode'] != 'external':
+                raise ValueError('no-X paper has local file delivery; do not send or record external receipts')
+            if payload.get('candidate_id') != candidate['id']:
+                raise ValueError('receipt must identify the exact reviewed candidate')
+            entry = _paper_delivery_entry(value, payload.get('delivery_id'))
+            if entry['candidate_id'] != candidate['id'] or entry['policy'] != value['delivery_policy']:
+                raise ValueError('verified delivery differs from this paper candidate or frozen X target')
+            pdfs = [file for file in candidate['files'] if file['kind'] == 'pdf']
+            expected = {(f['filename'], f['bytes'], f['sha256']) for f in pdfs}
+            observed = {(f['filename'], f['bytes'], f['sha256']) for f in entry['files']}
+            if len(entry['files']) != 1 or observed != expected:
+                raise ValueError('this paper needs its one complete PDF in one delivery entry')
+            if any(old['candidate_id'] == candidate['id'] and old.get('delivery_id') != entry['id']
+                   for old in value['deliveries']):
+                raise ValueError('this paper already has a different delivery; reconcile instead of duplicating')
+            if any(old.get('delivery_id') == entry['id'] for old in value['deliveries']):
+                return
+            if entry['authorization_source_ref'] != value['authorization_source_ref']:
+                raise ValueError('delivery authorization reference differs from the actual paper batch source')
+            receipt = entry['attempts'][-1]['receipt']
+            value['deliveries'].append({'candidate_id':candidate['id'], 'delivery_id':entry['id'],
+                'ledger_identity_digest':entry['identity_digest'],
+                'ledger_receipt_digest':entry['receipt_digest'], 'message_id':receipt.get('message_id'),
+                'recipient':value['delivery_policy']['recipient'],
+                'attachments':[{'filename':f['filename'],'bytes':f['bytes']} for f in pdfs],
+                'evidence':[], 'proof_scope':'current proof in the parent-task ledger; older evidence remains history',
+                'authorization_source_ref':entry['authorization_source_ref'],
+                'evidence_strength':receipt['evidence_strength'],
+                'observation_scope':receipt['scope']})
+            return
         if _candidate_contract(candidate) != SINGLE_PDF_CONTRACT:
             raise ValueError('legacy candidate delivery history is read-only; review one current complete PDF before a new delivery')
         if payload.get('candidate_id') != candidate['id']:
@@ -444,12 +534,19 @@ def inspect(root):
         for file in candidate['files']:
             if file['kind'] != 'pdf':
                 continue
-            messages = [r['message_id'] for r in receipts
-                        if any(a['filename'] == file['filename'] and
-                               a['bytes'] == file['bytes'] for a in r['attachments'])]
+            matches = [r for r in receipts if any(a['filename'] == file['filename'] and
+                       a['bytes'] == file['bytes'] for a in r['attachments'])]
+            messages = [r['message_id'] for r in matches if r.get('message_id') is not None]
             volumes.append({**file, 'message_ids': messages,
-                            'sent_verified': bool(messages) and not issues})
+                            'delivery_ids':[r['delivery_id'] for r in matches if r.get('delivery_id')],
+                            'sent_verified': bool(matches) and not issues})
     remaining = [v['filename'] for v in volumes if not v['sent_verified']]
+    completion = None
+    if candidate and 'delivery_policy' in value:
+        from .codex_delivery import completion_status
+        files = [(root / f['path']).as_posix() for f in candidate['files'] if f['kind'] == 'pdf']
+        completion = completion_status(value['task_root'], files, value['delivery_policy'],
+                                       candidate_id=candidate['id'])
     if issues:
         status = 'STALE_OR_UNAVAILABLE'
     elif candidate:
@@ -458,6 +555,11 @@ def inspect(root):
             status = 'SENT_VERIFIED'
             if any(r['candidate_id'] == candidate['id'] for r in value['returns']):
                 status = 'RETURNED'
+        if completion is not None and value['delivery_policy']['mode'] == 'local':
+            status = 'RETURNED' if any(r['candidate_id'] == candidate['id'] for r in value['returns']) else 'READY_LOCAL'
+            remaining = []
+        elif completion is not None and not completion['ready']:
+            status = 'READY'
 
     # A checkpoint is an explicit saved next step. Later mutations preserve
     # its reading context but supersede its action, so an old cursor cannot
@@ -467,9 +569,13 @@ def inspect(root):
         if o['result']['action'] == 'checkpoint'), default=-1)
     cursor_current = bool(value['cursor']) and checkpoint_revision == value['revision']
     unresolved_delivery = _unresolved_delivery(value)
+    if completion is not None and completion.get('unresolved_delivery_ids'):
+        unresolved_delivery = {'delivery_ids':completion['unresolved_delivery_ids'],
+                              'basis':'parent-task durable pre-send records'}
     pending_saved_step = (cursor_current or bool(unresolved_delivery)) and not issues
     next_action = {
         'DRAFT': 'complete source-bound guide and native review',
+        'READY_LOCAL': 'return the complete PDF locally; X is absent, no external send is required or allowed',
         'READY': ('send the one complete PDF through authorized Gmail, then read back: '
                   if contract == SINGLE_PDF_CONTRACT else
                   'send only remaining PDF volumes through authorized Gmail, then read back: ') + ', '.join(remaining),
@@ -477,9 +583,15 @@ def inspect(root):
         'RETURNED': 'this paper returned; continue other papers/common work',
         'STALE_OR_UNAVAILABLE': 'inspect changed source/artifact; do not reuse an old mail receipt'
     }[status]
+    if completion is not None and status == 'READY':
+        next_action = ('record the already verified parent-task delivery entry; do not resend'
+                       if completion['ready'] else
+                       'prepare/resume this exact complete PDF in the parent task delivery ledger, then use only the frozen X channel')
     if contract == LEGACY_CONTRACT and status in ('READY', 'SENT_VERIFIED'):
         next_action = 'read legacy delivery facts only; prepare one current complete PDF candidate before a new delivery or return'
-    if unresolved_delivery and not issues:
+    if unresolved_delivery and not issues and completion is not None:
+        next_action = 'reconcile the parent-task uncertain delivery before retry or paper return; do not switch channels'
+    elif unresolved_delivery and not issues:
         next_action = ('reconcile uncertain Gmail send ' + unresolved_delivery['attempt_id'] +
             ' for ' + ', '.join(unresolved_delivery['remaining']) +
             '; do not resend before checking SENT')
@@ -489,6 +601,7 @@ def inspect(root):
         'status': status, 'issues': issues, 'candidate_id': candidate['id'] if candidate else None,
         'candidate_addon_version': candidate.get('addon_version', '0.1.0') if candidate else None,
         'delivery_contract': contract,
+        'delivery_policy':value.get('delivery_policy'), 'delivery_completion':completion,
         'cursor': value['cursor'], 'cursor_current': cursor_current,
         'pending_saved_step': pending_saved_step, 'mapping': value['mapping'],
         'unresolved_delivery_attempt': unresolved_delivery,
@@ -501,11 +614,13 @@ def inspect(root):
 def return_paper(root, payload, **revision):
     body = _file(root, payload['body'], 'paper_return')
     def update(value):
-        if _candidate_contract(value['candidate']) != SINGLE_PDF_CONTRACT:
+        if _candidate_contract(value['candidate']) not in (SINGLE_PDF_CONTRACT, X_PDF_CONTRACT):
             raise ValueError('legacy candidate return history is read-only; review one current complete PDF before a new return')
         status = inspect(root)
-        if status['status'] != 'SENT_VERIFIED' or status.get('unresolved_delivery_attempt'):
-            raise ValueError('paper return requires complete current Gmail attachment verification')
+        if status['status'] not in ('SENT_VERIFIED','READY_LOCAL') or status.get('unresolved_delivery_attempt'):
+            raise ValueError('paper return requires the complete local PDF or current selected-channel verification'
+                             if 'delivery_policy' in value else
+                             'paper return requires complete current Gmail attachment verification')
         value['returns'].append({'candidate_id': value['candidate']['id'], 'body': body,
                                 'parent_lifecycle_unchanged': True, 'at_ns': time.time_ns()})
     return _mutate(root, action='paper_return', payload={**payload, 'body_file': body}, update=update, **revision)
@@ -513,6 +628,8 @@ def return_paper(root, payload, **revision):
 
 def checkpoint(root, payload, **revision):
     def update(value):
+        if 'delivery_policy' in value and payload.get('pending_delivery') is not None:
+            raise ValueError('new X papers use the parent durable pre-send ledger, not a post-timeout Gmail checkpoint')
         if payload.get('anchor'):
             _anchor(value, payload['anchor'])
         for field in ('position', 'next_action', 'basis'):

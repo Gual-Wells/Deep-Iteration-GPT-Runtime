@@ -51,3 +51,13 @@ python -B tools/codex.py clock --help
 `acquire`进行真正联网获取；profile check只检查本地分发。其它工具协助保留原目标、取回材料、接续本线产物、按真实活动边界算时长；不调用模型、不启动代理或扩大权限。原有 `tools/codex_profile.py`、`tools/codex_workbench.py` 与 `tools/codex_experience.py` 仍可用。
 
 本分支不自动改宿主采样参数或模型权重；新语义和工具能否在后续任务持续改善结果，仍需实际使用观察。
+
+## 文件交付X（0.9起）
+
+| 写法 | 最终文件出口 |
+| --- | --- |
+| `DIGR：…` / `DIGRP：…` | 当前聊天文件入口 |
+| `DIGR（X）：…` / `DIGRP（）（X）：…` | 本机所配置的本人Gmail |
+| `DIGRP（N=16,R=4）（X=Gmail）：…` | 本机所配置的本人Gmail |
+
+没有文件时X不触发外发，也不为此创建文件。文字答复仍在聊天。本版仅实现Gmail，使用已有原生连接；未注册或不支持的目标会明确报错。[完整操作](DELIVERY.md)。

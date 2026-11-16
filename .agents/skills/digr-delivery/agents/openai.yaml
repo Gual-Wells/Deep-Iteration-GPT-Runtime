@@ -1,0 +1,4 @@
+interface:
+  display_name: "DIGR Gmail Delivery"
+  short_description: "Deliver selected X files to your own Gmail inbox"
+  default_prompt: "Use $digr-delivery to send this task's selected final files to Gmail self and verify the sent attachments."
