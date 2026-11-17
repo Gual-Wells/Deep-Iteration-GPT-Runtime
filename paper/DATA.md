@@ -1,6 +1,6 @@
-# DIGRP 文件与命令契约 0.4.0
+# DIGRP 文件与命令契约 0.5.0
 
-语义来自同 pin 的 [PROTOCOL.md](PROTOCOL.md)。工具不用模型、不派代理、不发邮件，不验证数学证明、真实意图或学习效果。`check` 是所选文件与记录的检查；原生宿主仍须对照论文与成品。
+语义来自同 pin 的 [PROTOCOL.md](PROTOCOL.md)。论文文件工具本身不调用模型、不派代理、不发邮件，不验证数学证明、真实意图或学习效果。`check` 是所选文件与记录的检查；原生宿主仍须对照论文与成品。
 
 ## 取得增量与私人批次
 
@@ -14,11 +14,17 @@ python -B tools/codex.py paper add --batch <私人批次> --id <论文ID> --titl
 
 第一条不重新取 HEAD，也不为下一条原始调用取得路由资格。工具核对核心声明、增量 manifest/VERSION 和全部成员散列。无法在线取得当前必需协议时遵守所属路由失败规则，不能把源码开发目录作为新调用的在线凭据。
 
-批次 `batch.json` 只保存 P_run、实际授权引用、冻结X目标、父任务入口与各篇索引。每篇 `papers/<id>/paper.json` 有独立 revision、完整参数、来源、映射、候选、交付、单篇返回和接续游标。每个 M line 与论文 ID 在批次内唯一，不能复用同一条完整主进度的身份掩盖其它篇未承担的责任。
+批次 `batch.json` 保存 P_run、实际授权引用、冻结X目标、父任务入口、各篇索引和所选契约。新核心0.11对应论文0.5，批次与单篇记录 `authoring_contract=sonnet-native-v1`、`mapping_contract=source-bound-native-v1`。每篇 `papers/<id>/paper.json` 有独立 revision、完整参数、来源、映射、候选、交付、单篇返回和接续游标。每个 M line 与论文 ID 在批次内唯一，不能复用同一条完整主进度的身份掩盖其它篇未承担的责任。
+
+`--parameters` 是本篇已冻结的完整配置，由 Codex 维护，不交给 Sonnet 填。时间保留单位，例如 `T="90min"`、`S.t="25min"`；下例说明形状，各值须换成本篇实际承诺，并非新的默认档位：
+
+```json
+{"N":12,"R":4,"D":3,"V":3,"L":3,"T":"90min","B":0,"S":{"n":4,"t":"25min","r":2,"b":0}}
+```
 
 ## 逐篇写入
 
-写命令使用 `--expected-revision <当前篇revision> --operation-id <稳定ID>`；重试同一操作和内容用同一ID，不会重复写入。改变内容须新ID。revision冲突先重读本篇并处理事实差异，不能强行覆盖。单篇短锁只协调该工作目录；锁残留须先查是否仍有写者，不自动删除活动锁。多篇主进度可以并行，多个m通过实际产物与消息返回，由该篇作者串行维护映射。
+写命令使用 `--expected-revision <当前篇revision> --operation-id <稳定ID>`；重试同一操作和内容用同一ID，不会重复写入。改变内容须新ID。revision冲突先重读本篇并处理事实差异，不能强行覆盖。单篇短锁只协调该工作目录；锁残留须先查是否仍有写者，不自动删除活动锁。多篇主进度可以并行，该篇作者处理实际研究与公开创作返回，并串行维护来源去处。
 
 ```text
 python -B tools/codex.py paper source --root <本篇目录> --input <source.json> --expected-revision 0 --operation-id source-journal
@@ -35,24 +41,42 @@ python -B tools/codex.py paper resume --root <本篇目录>
 
 源ID不可覆盖，改版用新ID并明确受影响的解释。工具保存真实字节身份，PDF物理页数用当前 Python 中的 `pypdf`核验；普通JSON操作只用标准库。外部未取得的证明依赖，定位在本篇引用它的原页并说明缺失，不能冒充已摄入全文。
 
-`mapping.json` 由原生宿主依据实际原文编写，包含：
+`mapping.json` 由 Codex 依据实际原文和真实作品编写。新契约只要求来源去处，不预设论文应有的论证类别：
 
-| 字段 | 内容 |
-| --- | --- |
-| `parts` | m1、m4、m2、m3、m5 到真实内容位置的完整映射；0.4允许共用标题或非空标题列表，按实际阅读路线组织；旧pin保留原顺序契约 |
-| `assumptions` | 模型假设与范围，各条有id、anchor、location |
-| `claims` | 全局主张、真实依据性质basis、依赖的assumptions/chains/experiments ID |
-| `chains` | 每条purpose、prerequisites、source_vs_supplement、result、unresolved，与原页及导读章节相连 |
-| `experiments` | 图表/设置/指标/结果的解释及原页、导读去处 |
-| `coverage` | 实际原文内容块的去处，disposition为explained、context、non_content或unavailable；原生复核确保粒度足以发现真实遗漏 |
+```json
+{
+  "mapping_contract":"source-bound-native-v1",
+  "coverage":[
+    {
+      "id":"source-block-03",
+      "anchor":{"source":"journal-v1","page":3,"label":"实际原节、段落或图的标识"},
+      "location":"Sonnet实际形成并已写入作品的章节标题",
+      "disposition":"explained",
+      "note":"这一原文内容在此处得到的实际处理"
+    }
+  ]
+}
+```
 
-各条统一 `anchor={"source":"已注册ID","page":物理页码,"label":"原节/式/图/脚注标签"}`、`location="实际导读标题"`。工具拒绝越界页码、悬空依赖和不存在的标题；字段存在或覆盖表全绿不证明内容真正解释充分。
+`coverage` 为非空列表，各条必须有唯一 `id`、有效 `anchor`、真实作品标题 `location` 及 `disposition`。后者可为 `explained`、`context`、`non_content` 或 `unavailable`；`note` 等原生来源事实可按需要保留。原文内容可汇入同章，也可依实际需要分开，章节数量和顺序自由。新映射不接受旧 `parts`；没有必须填写的 assumptions/claims/chains/experiments 数组，也不把它们改名为另一组必填栏目。需要核对的假设、推导或观察由当前原文和用户目的决定，Codex实际完成这些工作。
+
+上例只说明一条记录形状，不是一篇的完整覆盖。原生作者实际读完整约定原件，按足以发现实质遗漏的粒度记录去处；不能用一条“全文”记录、页数配额或占位条目冒充这项工作。工具核对来源身份、物理页码和位置标题，不能判定解释是否忠实、粒度是否足够或整篇是否真的处理。
 
 `cursor.json` 保存 position、next_action、basis 与可选 anchor，保留当前原式、例子和待接的步骤。暂停不是学习缺陷证据，游标不写入另一套能力状态。
 
 `resume/check`以最新未完成的保存步骤为当前动作；后续实际变更保留旧游标的阅读上下文而不继续执行旧指令。它显示当前完整PDF及其已核验消息。已返回篇收到尚待处理的改稿保存步骤时，批次不会误报全部完成。旧0.1候选可按原事实回读，但不自动升级其交付契约。
 
 0.3的新X批次将发送事务放在父任务的共同delivery ledger。发送前保留本篇候选ID、完整PDF及真实目标，只有首次mark-sending授权一项发送；响应不明保持SENDING/UNCERTAIN并先核对，不用事后checkpoint抹去未知。旧0.2游标和Gmail事实仍按原契约读取。
+
+## 本篇的真实 Sonnet 公开创作
+
+首次 `consult prepare` 用 `--paper-root <本篇目录>` 绑定实际0.5论文。后续用 `--continue-from <本篇exchange ID>` 继承这篇及其公开上下文，不从普通DIGRC历史中途切入论文，也不把另一篇续接成当前篇。任务原话、实际论文选择与当前用户要求保留各自来源身份；Sonnet收到的是自然的论文委托，不接收内部line、计数或映射schema作为创作指令。
+
+来源目录中的路径、页数、文件名和散列只说明本机已取得材料，不表示正文已传入。按当前 `consult --help` 用 `--material <实际UTF-8正文>`、`--image <实际图像>` 提供所需真实内容，保留版本、范围和提取缺损。Sonnet可自然要求更多原件、核对和试作，不必填输出模板或运行命令。`prepare` 不发出；`call` 才在实际费用授权内调用。公开内容与费用对账分别记录，未知费用不记零，失败推理不自动重试。
+
+候选通过父任务consult ledger中的实际 `COMPLETE` exchange绑定本篇公开稿。工具检查该交换对应同一完整论文与当前父任务，并读取、绑定实际公开文件及其散列；不得用任意本地文本冒称真实参与。工具有这项来源绑定，仍不能认证Sonnet的内容质量或指导是否实际进入作品。具体调用、能力、费用和恢复依同pin核心CONSULT，普通DIGRC及旧0.4交换沿原契约。
+
+论文请求只接受规范 Sonnet 型号标识。`consult inspect` 的 `paper_model_identity` 只有实际请求与服务响应所报型号精确一致时为 `CONFIRMED`；候选自动绑定稳定的 `model_identity={status,requested_model,response_model}`，操作者不在候选输入中自填身份。型号缺失、不符或只返回别名时，公开稿和费用记录保留，但不能登记为 Sonnet 原生候选；不据此丢稿、推断别名相同或自动重试。
 
 ## 本地排成一份标准页PDF
 
@@ -82,7 +106,7 @@ SVG数学字符是轮廓；正文可搜索不代表公式可复制，改变正�
 
 ### 制作与复看
 
-正文保留完整推理与来源身份，内部角色只留在私有映射。自然章节进入目录/书签，图表和数学实际嵌入。统一标准纸型和方向，固定页高内处理段落、公式、图题、表头和算法；不裁成长短不一的图片页。
+正文保留本篇所需的完整解释与来源身份，内部运行记录留在私有区。Sonnet形成的自然章节进入目录/书签，实际需要的图表和数学嵌入。统一标准纸型和方向，固定页高内处理段落、公式、图题、表头和算法；不裁成长短不一的图片页。
 
 优先保留可搜索文字及矢量公式。公式按有意义的关系分行，必要说明紧随；图像保留原色，密集图例不足以细读时用原件子图展开。正常表保持可比较的列行，跨页重复表头，不默认改成长字段卡片。
 
@@ -105,6 +129,7 @@ python -B tools/codex.py paper candidate --root <本篇目录> --input <candidat
   "page_profile":"A4",
   "qa":"<实际PDF渲染核验.json>",
   "review":"<原生作者对照原件与最终页面的复核记录.md>",
+  "consultation":{"exchange_id":"<本篇实际COMPLETE公开交换ID>","scope":"<本候选采用该公开创作的实际范围>"},
   "responsibility_report":{"N":16,"R":4,"D":3,"V":3}
 }
 ```
@@ -143,12 +168,8 @@ python -B tools/codex.py paper summary --batch <私人批次>
 
 源码作者修改协议/技能后运行 `paper refresh --root <源码>`，再运行 `profile refresh` 和必要检查。前者更新增量清单及核心指针，后者更新核心聚合包与散列。它们是显式源码维护，不是在线获取、安装、执行授权或质量认证。发布后须读取新SHA的实际文件再验证安装/调用。
 
-## 0.4的Consult与自然职责定位
+## 0.5的候选绑定与历史兼容
 
-新核心0.10的批次记录`consult_enabled=true`与`mapping_contract=integrated-functions-v1`；旧核心0.9仍创建0.3契约，旧候选/发送按原事实回读。新批次在父任务保存实际论文addon选择，即使父原话使用DIGR前缀也不伪改其initial mode。
+新候选的 `consultation={exchange_id,scope}` 从父ledger取得真实公开稿；`scope`说明其在当前整篇候选中的实际适用范围。native review对照当前原件和最终页面，说明公开创作及独立发现怎样落实，真实差异和未解决处如何影响使用。它不是要Sonnet填表，也不因工程字节变化要求新一轮终审。已绑定公开稿、映射或成品改变时，旧候选过时；仍适用的公开创作可以继续形成新的候选。原生responsibility_report不减少、不由外部稿件代填。
 
-新mapping.parts仍完整包含m1/m4/m2/m3/m5，每值可为一个真实标题或非空标题列表；职责可共用或跨章节，所有位置必须实际存在。其余原页锚、主张依据、推理链、实验和覆盖责任保持；位置可解析不认证讲透。内部角色不进入正文。
-
-新候选增加`consultation={guidance:<实际公开稿路径>,source_ref:<实际exchange/来源引用>,scope:<当前适用指导范围>}`；实际非空公开稿与已有native review一起绑定。review说明Main怎样处理中心指导、确定事实及真实页面；不是要求Consult填表或每版重审。指导文件变化会使绑定候选过时，但候选版本变化本身不要求另开Consult终审。原生responsibility_report不减少、不由外部稿件代填。
-
-`consult prepare/call/inspect/reconcile-cost`提供公开上下文和费用事实；CLI只在显式call按配置调用模型，见核心CONSULT和实际--help。原稿/图像必须实际传入，不能只交Windows路径。完整指导和费用对账状态分开；未知预留不记零、无自动推理重试。
+新核心0.11创建0.5，核心0.10仍创建0.4并保留 `integrated-functions-v1`，核心0.9仍创建0.3。0.4的真实指导文件绑定、五职责位置映射及更早的读序/交付继续按原事实回读，不被0.5自动重写。新批次在父任务保存实际论文addon选择，即使父原话使用DIGR前缀也不伪改其initial mode。新契约不以兼容旧数据为由继续要求小m结构。

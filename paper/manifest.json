@@ -1,27 +1,20 @@
 {
   "name": "DIGRP Paper Reading",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "protocol": "digrp-codex-1",
   "version_path": "paper/VERSION",
   "entrypoint": "paper/PROTOCOL.md",
   "pdf_design": "paper/PDF_DESIGN.md",
   "skill": ".agents/skills/digr-paper/SKILL.md",
-  "reader_order": [
-    "m1",
-    "m4",
-    "m2",
-    "m3",
-    "m5"
-  ],
-  "reader_order_policy": "CONSULT_GUIDED_NATURAL_CHAPTERS_WITH_COMPLETE_FUNCTION_COVERAGE",
   "consult_enabled": true,
-  "mapping_contract": "integrated-functions-v1",
+  "authoring_contract": "sonnet-native-v1",
+  "mapping_contract": "source-bound-native-v1",
   "file_sha256": {
-    "paper/VERSION": "40b8eb4000a913a7791090535f291d3d369874162a89ef3c9e3d4e887a1b9e79",
-    "paper/PROTOCOL.md": "f57e96450d5da68642da2f1081b80d2baaefd485c1493708a579beb32067e53b",
-    "paper/DATA.md": "292bf19729af8eba87112c2ad50750611179660d651d8299e0970f665162ff91",
-    "paper/PDF_DESIGN.md": "f82c19df937f202788b054e8e913ddc8755cae3c231e32a7879843ab879e3c24",
-    ".agents/skills/digr-paper/SKILL.md": "5d08b15447ced3c181f0565dd43e9667e4be88c1ef256a721ab59fa193dba774",
-    ".agents/skills/digr-paper/agents/openai.yaml": "2ae96ded2eb72268159026033f6c97858817b982ab03d7b477644f9e24fe781e"
+    "paper/VERSION": "a0ad50640139a524f86591157145bf1d4674ea9c065bfea21558f0f7b04430c8",
+    "paper/PROTOCOL.md": "0067f07f83e425d5896301ea00b3347748977a7ddc2dc2c00a4441c6fc20fe0e",
+    "paper/DATA.md": "8538724deb158f4d429f8c8ebc117098db42843c68144ba6a946be1714f05420",
+    "paper/PDF_DESIGN.md": "6cec39146852bbb366c32a1fb041e4743bfe827305336981a08fec0eab965781",
+    ".agents/skills/digr-paper/SKILL.md": "547d401baa507eafbd0c7abf5339d928d75286749556ad55c8ae86ec8d25a7eb",
+    ".agents/skills/digr-paper/agents/openai.yaml": "36e345f1b6460dffd2ff81a264e6ccca869840517bf56fdc5db8f19648a1aa4e"
   }
 }

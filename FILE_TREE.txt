@@ -877,7 +877,9 @@ tests/test_codex_experience.py
 tests/test_codex_foundation.py
 tests/test_codex_knowledge.py
 tests/test_codex_lifecycle.py
+tests/test_codex_native_paper_return.py
 tests/test_codex_paper.py
+tests/test_codex_paper_native.py
 tests/test_codex_permissions.py
 tests/test_codex_personal.py
 tests/test_codex_preprint.py

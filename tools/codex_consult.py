@@ -28,6 +28,8 @@ def main(argv=None):
     prepare.add_argument('--material', type=Path, action='append', default=[], help='actual UTF-8 source to include; repeatable')
     prepare.add_argument('--image', type=Path, action='append', default=[], help='actual PNG/JPEG/WebP bytes to include; repeatable')
     prepare.add_argument('--continue-from', help='same-task exchange whose exact public messages and reply are replayed')
+    prepare.add_argument('--paper-root', type=Path,
+                         help='select one registered paper 0.5 for native Sonnet authoring; inherited on continuation')
     prepare.add_argument('--exchange-id', help='optional simple local identifier')
     prepare.add_argument('--model', default=consult.DEFAULT_MODEL)
     prepare.add_argument('--effort', default=consult.DEFAULT_EFFORT)
@@ -55,7 +57,8 @@ def main(argv=None):
         if args.command == 'prepare':
             result = consult.prepare_request(args.root, input_path=args.input, materials=args.material,
                 images=args.image, continue_from=args.continue_from, exchange_id=args.exchange_id,
-                model=args.model, effort=args.effort, max_tokens=args.max_tokens, input_revision=args.input_revision)
+                model=args.model, effort=args.effort, max_tokens=args.max_tokens, input_revision=args.input_revision,
+                paper_root=args.paper_root)
         elif args.command == 'call':
             result = consult.call_once(args.root, args.exchange_id, facts=read(args.facts),
                                        ceiling_usd=args.ceiling_usd, config_path=args.config)
