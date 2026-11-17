@@ -60,8 +60,15 @@ def main(argv=None):
                 model=args.model, effort=args.effort, max_tokens=args.max_tokens, input_revision=args.input_revision,
                 paper_root=args.paper_root)
         elif args.command == 'call':
+            session = read(args.root / 'session.json')
+            live = consult.streams_public(session['P_run'])
+            emit = (lambda event: print(json.dumps(event, ensure_ascii=False, allow_nan=False), flush=True)) if live else None
             result = consult.call_once(args.root, args.exchange_id, facts=read(args.facts),
-                                       ceiling_usd=args.ceiling_usd, config_path=args.config)
+                                       ceiling_usd=args.ceiling_usd, config_path=args.config,
+                                       on_public_event=emit)
+            if live:
+                print(json.dumps({'event': 'result', 'result': result}, ensure_ascii=False, allow_nan=False), flush=True)
+                return 0
         elif args.command == 'inspect':
             result = consult.inspect_exchange(args.root, args.exchange_id)
         else:

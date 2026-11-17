@@ -1,5 +1,11 @@
 # Changelog
 
+## Codex 0.12.1 / DIGRP 0.5.3 — live public relay and prepared source input
+
+- New requests stream public text into an incremental original and flushed events. Hosts forward it in commentary during the call; logs or delayed replay are insufficient.
+- Preserve partial output and generation/cost state on interruption; no automatic paid replay. Retain legacy pin transport and native authoring freedom.
+- Codex prepares text/Markdown, reliable formulas and necessary figure/table crops before inference; whole-page batches are not the default for text-extractable papers. The host and stable common core carry the same actual duty split.
+
 ## Codex 0.12.0 / DIGRP 0.5.2 — logical argument as the analytical basis
 
 - Qualitative judgments can be settled by sufficient premises, mechanisms, inference and meaningful counterarguments. Missing trials or later feedback are no longer default objections, completion gaps or closing disclaimers.

@@ -52,6 +52,25 @@ class ConsultFaultHandler(BaseHTTPRequestHandler):
             self.send_header('Location', '/redirect-target')
             self.end_headers()
             return
+        if label in {'streaming', 'stream-truncated'}:
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/event-stream')
+            self.send_header('X-Generation-Id', 'gen-local-' + label)
+            self.end_headers()
+            frame = lambda value: ('data: ' + json.dumps(value, ensure_ascii=False) + '\n\n').encode('utf-8')
+            self.wfile.write(frame({'id': 'gen-local-' + label, 'model': consult.DEFAULT_MODEL,
+                'choices': [{'index': 0, 'delta': {'content': '第一段。\n\n', 'reasoning': HIDDEN}}]}))
+            self.wfile.flush()
+            if hasattr(self.server, 'public_forwarded'):
+                self.server.forwarded_before_finish = self.server.public_forwarded.wait(1)
+            if label == 'stream-truncated':
+                return
+            self.wfile.write(frame({'choices': [{'index': 0, 'delta': {'content': '第二段。'}, 'finish_reason': 'stop'}]}))
+            self.wfile.write(frame({'choices': [{'index': 0, 'delta': {}, 'finish_reason': 'stop'}],
+                'usage': {'cost': .03, 'completion_tokens': 10, 'private': HIDDEN}}))
+            self.wfile.write(b'data: [DONE]\n\n')
+            self.wfile.flush()
+            return
         self.send_response(400 if label == 'rejected' else 200)
         self.send_header('Content-Type', 'application/json')
         self.send_header('X-Generation-Id', 'gen-local-' + label)
@@ -488,7 +507,7 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
     def test_paper_patch_selection_preserves_old_core_and_rejects_incompatible_scopes(self):
         for version, expected in (('0.10.0', '0.4.0'), ('0.10.1', '0.4.0'),
                                   ('0.11.0', '0.5.0'), ('0.11.1', '0.5.1'),
-                                  ('0.12.0', '0.5.2')):
+                                  ('0.12.0', '0.5.2'), ('0.12.1', '0.5.3')):
             with self.subTest(core=version):
                 request = self.file('request-' + version + '.txt', 'DIGR：选择论文增量。\n')
                 parent_root = self.folder / ('parent-' + version)
@@ -517,6 +536,8 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
                 invalid_versions = ['0.5.99', '0.4.1'] + (['0.5.1'] if version == '0.11.0' else [])
                 if version in {'0.11.0', '0.11.1'}:
                     invalid_versions.append('0.5.2')
+                if version in {'0.10.0', '0.10.1', '0.11.0', '0.11.1', '0.12.0'}:
+                    invalid_versions.append('0.5.3')
                 for invalid in invalid_versions:
                     parent['consult_addons'][0]['version'] = invalid
                     (parent_root / 'session.json').write_text(json.dumps(parent), encoding='utf-8')
@@ -525,6 +546,45 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
                         consult.prepare_request(parent_root, input_path=self.input,
                                                 exchange_id='invalid-' + invalid, max_tokens=16000, **kwargs)
         self.assertEqual(len(self.server.post_calls), 0)
+
+    def test_new_streaming_call_relays_and_saves_partial_before_terminal_frame(self):
+        task = self.folder / 'live-public'
+        create_session(task, request=self.original, p_run='0.12.1@' + 'f' * 40)
+        prepared = consult.prepare_request(task, input_path=self.input, exchange_id='streaming', max_tokens=16000)
+        request = json.loads(Path(prepared['request_path']).read_text('utf-8'))
+        self.assertTrue(request['stream'])
+        self.server.public_forwarded = threading.Event()
+        observations = []
+        def relay(event):
+            if event['event'] == 'public_delta':
+                folder = task / 'consult/exchanges/streaming'
+                observations.append((folder / 'public.md').read_text('utf-8'))
+                self.server.public_forwarded.set()
+        with patch.dict(os.environ, {'DIGR_TEST_CONSULT_KEY': SECRET}):
+            result = consult.call_once(task, 'streaming', facts=self.facts(), ceiling_usd=.20,
+                                       config_path=self.config('streaming'), on_public_event=relay)
+        self.assertTrue(self.server.forwarded_before_finish)
+        self.assertEqual(observations[0], '第一段。\n\n')
+        self.assertEqual(result['exchange']['public_status'], 'COMPLETE')
+        self.assertEqual(result['exchange']['known_cost_usd'], .03)
+        journal = task / 'consult/exchanges/streaming/public.events.jsonl'
+        events = [json.loads(line) for line in journal.read_text('utf-8').splitlines()]
+        self.assertEqual([e['event'] for e in events], ['connected', 'public_delta', 'public_delta', 'finished'])
+        self.assertNotIn(HIDDEN, journal.read_text('utf-8'))
+
+    def test_truncated_stream_retains_public_text_and_unknown_cost_reservation(self):
+        task = self.folder / 'truncated-public'
+        create_session(task, request=self.original, p_run='0.12.1@' + 'f' * 40)
+        consult.prepare_request(task, input_path=self.input, exchange_id='stream-truncated', max_tokens=16000)
+        with patch.dict(os.environ, {'DIGR_TEST_CONSULT_KEY': SECRET}):
+            result = consult.call_once(task, 'stream-truncated', facts=self.facts(), ceiling_usd=.20,
+                                       config_path=self.config('stream-truncated'))
+        self.assertEqual(result['exchange']['public_status'], 'PARTIAL')
+        self.assertEqual(result['exchange']['transport_status'], 'OUTCOME_UNKNOWN')
+        self.assertEqual(result['exchange']['billing_status'], 'UNKNOWN')
+        self.assertEqual(result['exchange']['reserved_usd'], .2)
+        self.assertEqual(Path(result['public_path']).read_text('utf-8'), '第一段。\n\n')
+        self.assertEqual(len(self.server.post_calls), 1)
 
     def test_new_generic_request_carries_logic_basis_without_changing_legacy_prompt(self):
         request = self.file('logic-request.txt', 'DIGRC：分析这个设计。\n')
