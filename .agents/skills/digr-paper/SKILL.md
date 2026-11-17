@@ -27,6 +27,8 @@ Read the complete agreed original and connect its actual content to the work, in
 
 Use the actual task's learner guidance. At a difficulty, identify the current source-bound relation the reader is missing or conflating; change the example, ordering or omitted step and reconnect it to the paper. “I don't understand” does not automatically call for trivial examples, a new artifact or a rebuilt curriculum. Technical knowledge needed by the reader remains content while Codex performs the implementation work. Check numbers and premises independently under applicable Consult guidance. Apply corrections to the actual current draft; sibling-branch repairs count only when carried into it. Ask only useful, optional feedback questions during teaching. A prepared guide or mail delivery is not a mastery diagnosis.
 
+Qualitative judgments about explanations, organization and design rest on reasoned argument from the actual purpose, premises and mechanisms. Give a clear conclusion when those reasons suffice; missing experiments or later user trials are not default objections or a closing disclaimer. Claims about actual events, measurements and learning records retain their factual scope.
+
 ## Make the actual artifact work
 
 Retrieve relevant recent successes/failures and inspect their artifacts when they change the current decision. Apply the lesson in the current source and final pages. A note saying “fixed” is not the fix.

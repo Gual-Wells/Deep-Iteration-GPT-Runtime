@@ -45,7 +45,7 @@ Use `preprint publish` to create a new edition. `phone/PHONE.txt` is the primary
 
 The phone performs the preprint's roles in natural sequence for listening. It is a single host interpreting a source produced by independent native contexts. It must not require the listener to answer or stand in for somebody. Different voices and timing need verification on the real device; text probes are only text probes.
 
-Read the actual output, compare representative dialogue to the original native returns, check private canaries are absent, and run `verify` against the current source. Source identity and clean exports do not prove dramatic quality, listening improvement or successful phone Voice playback.
+Read the actual output, compare representative dialogue to the original native returns, check private canaries are absent, and run `verify` against the current source. Judge dramatic quality and the fit of a scene through its actual dialogue, activity, relationships and reasons; a future listening experiment is not a prerequisite to that judgment. Export checks establish file/source facts. Report actual phone playback or learning outcomes only when they have occurred.
 
 Annotate language after the real dialogue exists. Bind exact surface spans, meanings, communicative functions and register to public source events; verify frequency claims with actual corpus evidence or say unverified. Do not infer mastery from fictional actor success or a finished book. Deliver one current entry, the phone package, optional creator edition, sources and real limits.
 

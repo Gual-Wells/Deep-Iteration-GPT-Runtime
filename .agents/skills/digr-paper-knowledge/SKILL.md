@@ -48,6 +48,8 @@ One question can group multiple source uses. When only part was explained or obs
 
 When earlier uses are retrieved, compare their source context before shaping the next question: what can carry over, what changed in this paper, and what remains unresolved. Let this comparison change the wording and teaching starting point; returning related IDs alone is not reuse. Continue the same concrete example into its notation when that resolves the actual difficulty.
 
+Qualitative judgments about explanations, organization and design rest on reasoned argument from the actual purpose, premises and mechanisms. Give a clear conclusion when those reasons suffice; missing experiments or later user trials are not default objections or a closing disclaimer. Claims about actual events, measurements and learning records retain their factual scope.
+
 ## Save, resume and reuse
 
 Use the mutation commands with the current expected revision and a stable operation ID. A lost response can be retried with the same ID and content; a changed operation needs a different ID. On conflict, reread current data and reconcile the actual user response. Never overwrite the pool to silence a conflict. A lock left after a crash needs inspection of its process and file before recovery; do not delete an active writer's lock.

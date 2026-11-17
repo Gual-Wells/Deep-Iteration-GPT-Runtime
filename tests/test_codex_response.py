@@ -23,6 +23,19 @@ class ResponseTests(unittest.TestCase):
         self.assertIn(argument, text)
         validate_response(text)
 
+    def test_argument_scope_is_preserved_and_legacy_reports_keep_their_title(self):
+        old = self.report()
+        self.assertIn('## 核验与限制', render_response(old))
+        new = dict(old)
+        new['argument_scope'] = '该结构结论由前提和机制推出；只在所述条件下采用。'
+        new.pop('verification_limits')
+        body = render_response(new)
+        self.assertIn('## 论证与适用范围', body)
+        self.assertIn(new['argument_scope'], body)
+        validate_response(body)
+        with self.assertRaisesRegex(ValueError, 'not both'):
+            render_response(dict(new, verification_limits='Ambiguous second field'))
+
     def test_html_and_fake_section_titles_inside_code_do_not_change_structure(self):
         code = '修复例子：\n\n````html\n<div>样本</div>\n## 第六段是假标题\n```\n````\n\n`<details>只是代码</details>` 与 ``a ` <b>`` 都是字面量。'
         validate_response(render_response(self.report(result=code)))
