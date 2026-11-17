@@ -16,7 +16,7 @@ import math
 import os
 from pathlib import Path
 import re
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 from urllib.error import HTTPError
 from urllib.parse import urlencode, urlsplit, urlunsplit
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
@@ -91,7 +91,12 @@ def _generic_system(p_run: str) -> str:
 
 
 def _paper_system(addon_version: str) -> str:
-    return _LOGICAL_PAPER_SYSTEM if addon_version == '0.5.2' else _PAPER_SYSTEM
+    return _LOGICAL_PAPER_SYSTEM if addon_version in {'0.5.2', '0.5.3'} else _PAPER_SYSTEM
+
+
+def streams_public(p_run: str) -> bool:
+    version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', p_run)
+    return bool(version and tuple(map(int, version.groups())) >= (0, 12, 1))
 
 
 def _now() -> str:
@@ -183,7 +188,7 @@ def _paper_scopes(root: Path, session: Mapping[str, Any]) -> list[dict]:
     core = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', session['P_run'])
     core_version = tuple(map(int, core.groups())) if core else ()
     compatible = {'0.4.0': (0, 10, 0), '0.5.0': (0, 11, 0),
-                  '0.5.1': (0, 11, 1), '0.5.2': (0, 12, 0)}
+                  '0.5.1': (0, 11, 1), '0.5.2': (0, 12, 0), '0.5.3': (0, 12, 1)}
     for scope in scopes:
         if not isinstance(scope, Mapping) or scope.get('addon') != 'paper':
             continue
@@ -204,7 +209,7 @@ def _paper_scopes(root: Path, session: Mapping[str, Any]) -> list[dict]:
                 continue
             verified = {'addon': 'paper', 'version': scope['version'], 'batch': batch_root.as_posix(),
                         'authorization_source_ref': source_ref}
-            if scope['version'] in {'0.5.0', '0.5.1', '0.5.2'}:
+            if scope['version'] in {'0.5.0', '0.5.1', '0.5.2', '0.5.3'}:
                 version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', session['P_run'])
                 if (not version or tuple(map(int, version.groups())) < (0, 11, 0)
                         or scope.get('authoring_contract') != _PAPER_AUTHORING_CONTRACT
@@ -221,7 +226,7 @@ def _selected_paper(root: Path, session: Mapping[str, Any], paper_root: Path) ->
     """Resolve one registered 0.5 paper; no other paper's state becomes context."""
     paper_root = Path(paper_root).resolve()
     for registered in _paper_scopes(root, session):
-        if registered['version'] not in {'0.5.0', '0.5.1', '0.5.2'}:
+        if registered['version'] not in {'0.5.0', '0.5.1', '0.5.2', '0.5.3'}:
             continue
         batch_root = Path(registered['batch'])
         batch = _read(batch_root / 'batch.json')
@@ -260,7 +265,7 @@ def _verify_authoring_record(attempt: Mapping[str, Any], request: Mapping[str, A
                 'authoring_contract', 'P_run', 'authorization_source_ref'}
     if (not isinstance(scope, Mapping) or set(scope) != required
             or any(not isinstance(scope[key], str) or not scope[key].strip() for key in required)
-            or scope['addon_version'] not in {'0.5.0', '0.5.1', '0.5.2'}
+            or scope['addon_version'] not in {'0.5.0', '0.5.1', '0.5.2', '0.5.3'}
             or scope['authoring_contract'] != _PAPER_AUTHORING_CONTRACT
             or scope['P_run'] != attempt.get('P_run')
             or attempt.get('authoring_scope_sha256') != _hash(_json_bytes(scope))
@@ -488,7 +493,7 @@ def prepare_request(
         new_paper_invocation = (pin and tuple(map(int, pin.groups())) >= (0, 11, 0)
                                 and initial.get('addon_hint') == 'paper')
         new_native_addon = (session.get('execution_profile', {}).get('mode') != 'CONSULT'
-                            and any(scope['version'] in {'0.5.0', '0.5.1', '0.5.2'} for scope in _paper_scopes(root, session)))
+                            and any(scope['version'] in {'0.5.0', '0.5.1', '0.5.2', '0.5.3'} for scope in _paper_scopes(root, session)))
         if new_paper_invocation or new_native_addon:
             raise ValueError('Paper authoring requires an explicit --paper-root for its first exchange')
     info, raw = _source(input_path, 'CURRENT_INPUT')
@@ -522,8 +527,10 @@ def prepare_request(
                 'url': 'data:' + media_type + ';base64,' + base64.b64encode(raw).decode('ascii')}})
     messages.append({'role': 'user', 'content': content})
     request = {'model': model, 'messages': messages, 'reasoning': {'effort': effort, 'exclude': True},
-               'max_tokens': max_tokens, 'stream': False, 'usage': {'include': True},
+               'max_tokens': max_tokens, 'stream': streams_public(session['P_run']), 'usage': {'include': True},
                'provider': {'require_parameters': True}}
+    if request['stream']:
+        request['stream_options'] = {'include_usage': True}
     if authoring_scope is not None:
         # OpenRouter's documented request-level user identifier binds private
         # scope identity into the hashed request without putting record fields
@@ -756,7 +763,8 @@ def _usage(data: Mapping[str, Any]) -> dict:
 
 
 def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling_usd: float,
-              config_path: Path | None = None) -> dict:
+              config_path: Path | None = None,
+              on_public_event: Callable[[dict], None] | None = None) -> dict:
     """Perform at most one generation POST; never automatically retry any outcome."""
     root, session, lifecycle = _task(root, active=True)
     with _writer(root):
@@ -788,6 +796,34 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
             source['transmission'] = 'ATTEMPTED_RECEIPT_UNCONFIRMED'
         _write(directory / 'attempt.json', attempt)
         opener = _opener(config)
+        sequence = 0
+        public_hash = sha256()
+        public_bytes = 0
+
+        def relay(kind: str, **values):
+            nonlocal sequence, public_bytes
+            sequence += 1
+            event = {'event': kind, 'exchange_id': exchange_id, 'sequence': sequence, 'at': _now(), **values}
+            if kind == 'public_delta':
+                raw = values['text'].encode('utf-8')
+                with (directory / 'public.md').open('ab') as stream:
+                    stream.write(raw)
+                    stream.flush()
+                public_hash.update(raw)
+                public_bytes += len(raw)
+                attempt.update(public_sha256=public_hash.hexdigest(), public_byte_length=public_bytes,
+                               public_status='PARTIAL')
+                _write(directory / 'attempt.json', attempt)
+            with (directory / 'public.events.jsonl').open('ab') as stream:
+                stream.write((json.dumps(event, ensure_ascii=False, separators=(',', ':'), allow_nan=False) + '\n').encode('utf-8'))
+                stream.flush()
+            if on_public_event is not None:
+                try:
+                    on_public_event(dict(event))
+                except Exception as error:
+                    # An observer fault must not discard or repeat a paid answer.
+                    attempt['observer_error_class'] = type(error).__name__
+
         req = Request(config['endpoint'], data=request_raw, method='POST',
                       headers={'Authorization': 'Bearer ' + secret, 'Content-Type': 'application/json',
                                'X-Title': 'DIGR private Consult'})
@@ -802,7 +838,14 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
                 attempt['generation_id'] = header_id
                 # Header identity survives a body read failure.
                 _write(directory / 'attempt.json', attempt)
-                data = json.loads(response.read())
+                if request.get('stream'):
+                    from .codex_public_stream import read_public_response
+                    relay('connected', http_status=response.status)
+                    data = read_public_response(response, secret=secret,
+                        on_delta=lambda text: relay('public_delta', text=text))
+                    attempt.update(actual_streamed=data['actual_streamed'], stream_ended=data['stream_ended'])
+                else:
+                    data = json.loads(response.read())
             if not isinstance(data, Mapping):
                 raise ValueError('nonobject response')
             body_id = _safe_text(data.get('id'), secret)
@@ -822,10 +865,14 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
             if isinstance(text, str) and text.strip():
                 public = text.replace(secret, '[REDACTED]')
                 raw = public.encode('utf-8')
-                _write_bytes(directory / 'public.md', raw, new=True)
+                if not request.get('stream'):
+                    _write_bytes(directory / 'public.md', raw, new=True)
+                elif (directory / 'public.md').read_bytes() != raw:
+                    raise ValueError('Incremental public content does not match the completed public answer')
                 attempt.update(public_sha256=_hash(raw), public_byte_length=len(raw),
-                               public_redacted=public != text,
-                               public_status='COMPLETE' if finish == 'stop' and not data.get('error') else 'PARTIAL')
+                               public_redacted=public != text or bool(data.get('public_redacted')),
+                               public_status='COMPLETE' if (finish == 'stop' and not data.get('error')
+                                   and 200 <= response.status < 300 and data.get('stream_ended', True)) else 'PARTIAL')
             usage = _usage(data)
             attempt['usage'] = usage
             if 'cost' in usage and not mismatch:
@@ -836,15 +883,18 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
             if isinstance(error, Mapping):
                 code = error.get('code')
                 attempt['provider_error_code'] = code if type(code) is int else _safe_text(code, secret)
-            attempt['transport_status'] = 'RESPONDED'
+            attempt['transport_status'] = ('OUTCOME_UNKNOWN' if data.get('actual_streamed') and not data.get('stream_ended') else 'RESPONDED')
             for source in attempt['sources']:
                 source['transmission'] = 'RESPONSE_OBSERVED'
-        except Exception as error:
+        except (Exception, KeyboardInterrupt) as error:
             attempt.update(transport_status='OUTCOME_UNKNOWN', error_class=type(error).__name__)
             # Do not persist exception text, request objects, raw headers/body,
             # arbitrary provider errors or hidden reasoning fields.
         attempt['finished_at'] = _now()
         _write(directory / 'attempt.json', attempt)
+        if request.get('stream'):
+            relay('finished', transport_status=attempt['transport_status'], public_status=attempt['public_status'],
+                  billing_status=attempt['billing_status'], known_cost_usd=attempt.get('known_cost_usd'))
     return inspect_exchange(root, exchange_id)
 
 

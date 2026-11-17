@@ -456,6 +456,7 @@ runtime/codex_preprint_sources.py
 runtime/codex_preprint_study.py
 runtime/codex_presets.py
 runtime/codex_profile.py
+runtime/codex_public_stream.py
 runtime/codex_response.py
 runtime/codex_return.py
 runtime/codex_session.py
@@ -892,6 +893,7 @@ tests/test_codex_preprint_sources.py
 tests/test_codex_preprint_study.py
 tests/test_codex_presets.py
 tests/test_codex_profile.py
+tests/test_codex_public_stream.py
 tests/test_codex_response.py
 tests/test_codex_return.py
 tests/test_codex_session.py

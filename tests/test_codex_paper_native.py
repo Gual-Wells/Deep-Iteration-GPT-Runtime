@@ -245,5 +245,10 @@ class LogicalNativePaperTests(NativePaperPatchTests):
     addon_version = '0.5.2'
 
 
+class LiveRelayNativePaperTests(NativePaperPatchTests):
+    core_version = '0.12.1'
+    addon_version = '0.5.3'
+
+
 if __name__ == '__main__':
     unittest.main()
