@@ -255,5 +255,10 @@ class LiveRelayNativePaperTests(NativePaperPatchTests):
     addon_version = '0.5.3'
 
 
+class UnifiedNativePaperTests(NativePaperPatchTests):
+    core_version = '0.14.0'
+    addon_version = '0.6.0'
+
+
 if __name__ == '__main__':
     unittest.main()

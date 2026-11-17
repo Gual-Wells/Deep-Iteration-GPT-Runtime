@@ -1,16 +1,16 @@
-# DIGR for Codex · 0.13.0
+# DIGR for Codex · 0.14.0
 
-0.13起，DIGRC、DIGRP及复用Consult的Claude通路在每次提交前采用[本机原生Split](codex/SPLIT.md)：Codex研究任务分工、完成必要本机工作，给Claude最小充分的原件和内容问题；工具逐次绑定请求与实际成果，缺少或过期计划不能发送。`consult split --input … --out …`机械附加当前绑定，`call --split-plan …`提交前本机检查。保留Claude内容判断、0.12.1公开增量转播及文本优先取材，旧pin按原版本接续；[完整合成示例](codex/examples/split/README.md)。
+0.13起的逐提交Split现统一进入DIGR，所有实际Claude通路在每次提交前采用[本机原生Split](codex/SPLIT.md)：Codex研究任务分工、完成必要本机工作，给Claude最小充分的原件和内容问题；工具逐次绑定请求与实际成果，缺少或过期计划不能发送。`consult split --input … --out …`机械附加当前绑定，`call --split-plan …`提交前本机检查。保留Claude内容判断、0.12.1公开增量转播及文本优先取材，旧pin按原版本接续；[完整合成示例](codex/examples/split/README.md)。
 
 0.12起，概念、机制、协议和方案分析以逻辑论证为默认判断基础，论证充分即可直接给结论与完成任务；不把效果实验或后续试用设成默认资格。新版返回第四段采用“论证与适用范围”，保留旧输入兼容。[共同方法](docs/LOGIC_FIRST_ANALYSIS.md)同步进入stable、Codex及本机日常约定。
 
-0.10起的`DIGRC`在完整原生Main上加入Consult，`DIGRP`采用论文侧协作；裸`DIGR`保留原生关系。Light／Less／Default／More／Max控制原生投入，沿实际授权调用外部模型。[协作约定](codex/CONSULT.md)。
+0.14统一使用`DIGR`：实际采用Sonnet即触发内容协作与相应工程要求，真实整篇论文对象自然接入论文内容驱动。旧C/P拼写兼容，旧pin保留原语义。Light／Less／Default／More／Max控制原生投入，沿实际授权调用外部模型。[协作约定](codex/CONSULT.md)。
 
 本次把当前理解关系、现稿纠正与历史案例证据的方法放进共同核心，并按用途更新论文、知识接续、个人材料、ESP和Voice技能。[全族适用范围](docs/CODEX_FAMILY_UPGRADE_0_11_1.md)区分共同方法与Consult专属权限。五档投入不暗降模型能力或扩张费用授权；裸调用仍为Default=N12/R4/D3/V3/L3/M1。
 
 0.9.0把[X文件交付](codex/DELIVERY.md)接入DIGR、DIGRP：无`X`在当前聊天返回文件；`DIGR(X):…`、`DIGRP(X):…`和`(X=Gmail)`均发送到本机配置的本人Gmail。常规投入参数后可另接一个X栏，例如`DIGRP(N=16,R=4)(X=Gmail):…`。X只控制任务约定的最终文件；没有文件时保留文字答复，不额外造文件。本版仅实现Gmail，个人目标在私有本机配置中，任务建立时解析并保存。
 
-[DIGRP 0.5.4](paper/PROTOCOL.md)由Sonnet根据原论文和用户用途原生驱动内容与阅读路线，取消预设小m职责及其映射门槛。Codex自主取材、复算、制作和核验，每篇仍有完整M及一份[标准页桌面PDF](paper/PDF_DESIGN.md)。无X的完整论文可直接本地返回；有X时逐篇发送Gmail并读回，所有论文及公共工作完成后才结束父任务。交付工具在外发前保存发送状态，响应不明先对账；真实发送使用已有Gmail原生连接器。[操作技能](.agents/skills/digr-delivery/SKILL.md)随同一不可变pin提供。旧pin和既有Gmail/分卷历史保持原身份。
+[DIGR 论文0.6.0](paper/PROTOCOL.md)由Sonnet根据原论文和用户用途原生驱动内容与阅读路线，取消预设小m职责及其映射门槛。Codex自主取材、复算、制作和核验，每篇仍有完整M及一份[标准页桌面PDF](paper/PDF_DESIGN.md)。无X的完整论文可直接本地返回；有X时逐篇发送Gmail并读回，所有论文及公共工作完成后才结束父任务。交付工具在外发前保存发送状态，响应不明先对账；真实发送使用已有Gmail原生连接器。[操作技能](.agents/skills/digr-delivery/SKILL.md)随同一不可变pin提供。旧pin和既有Gmail/分卷历史保持原身份。
 
 0.8.3接入社区 Anti-Defensive Writing：有据主张先行，删除重复辩护、叠加保留和自我贬低，必要限定准确落在相关主张。核心规则进入必读PROTOCOL、RETURN及普通任务轻量约定；中英双语完整技能连同不可变来源和MIT许可随分发提供。[来源与接入说明](docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md)。
 
@@ -59,7 +59,7 @@ DIGR：比较这个项目的两种发布方案，实际验证关键路径，给�
 | 调用 | 含义 |
 | --- | --- |
 | `DIGR：任务` | 无参数深执行，从 N12/R4/D3/V3/L3/M1 补齐。 |
-| `DIGRP：完整处理论文` | 沿同一宽路由取得当前pin后，明确选择论文增量；每篇一份完整标准页PDF。 |
+| `DIGR：用Sonnet完整处理论文` | 按实际整篇对象自然接入论文内容驱动；一篇一份完整标准页PDF。 |
 | `DIGR(M(2))：任务` | 两条完整独立 Main，各自初始化、研究制作、承担本线责任并收敛，然后比较。 |
 | `DIGR(target=60min)：任务` | 软时间目标，模型仍按结果决定是否继续。 |
 | `DIGR(min=60min)：任务` | 有效工作硬下限，需要真实时间证据。 |

@@ -18,7 +18,7 @@ import re
 import time
 from typing import Any
 
-VERSION = '0.5.4'
+VERSION = '0.6.0'
 SINGLE_PDF_CONTRACT = 'single-pdf-one-message'
 X_PDF_CONTRACT = 'single-pdf-x-files'
 LEGACY_CONTRACT = 'legacy-multiple-volumes'
@@ -115,7 +115,8 @@ def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_r
     uses_x = bool(version and tuple(map(int, version.groups())) >= (0, 9, 0))
     uses_consult = bool(version and tuple(map(int, version.groups())) >= (0, 10, 0))
     uses_native = bool(version and tuple(map(int, version.groups())) >= (0, 11, 0))
-    addon_version = (VERSION if version and tuple(map(int, version.groups())) >= (0, 13, 0)
+    addon_version = (VERSION if version and tuple(map(int, version.groups())) >= (0, 14, 0)
+                     else '0.5.4' if version and tuple(map(int, version.groups())) >= (0, 13, 0)
                      else '0.5.3' if version and tuple(map(int, version.groups())) >= (0, 12, 1)
                      else '0.5.2' if version and tuple(map(int, version.groups())) >= (0, 12, 0)
                      else '0.5.1' if version and tuple(map(int, version.groups())) >= (0, 11, 1)
@@ -877,7 +878,7 @@ def refresh_addon(root):
         raise ValueError('paper source/tool version mismatch')
     paths = ('paper/VERSION', 'paper/PROTOCOL.md', 'paper/DATA.md', 'paper/PDF_DESIGN.md',
              '.agents/skills/digr-paper/SKILL.md', '.agents/skills/digr-paper/agents/openai.yaml')
-    manifest = {'name': 'DIGRP Paper Reading', 'version': version, 'protocol': 'digrp-codex-1',
+    manifest = {'name': 'DIGR Paper Reading', 'version': version, 'protocol': 'digrp-codex-1',
         'version_path': 'paper/VERSION', 'entrypoint': 'paper/PROTOCOL.md',
         'pdf_design': 'paper/PDF_DESIGN.md',
         'skill': '.agents/skills/digr-paper/SKILL.md',

@@ -4,7 +4,7 @@
 
 论文辅学另有可选的[知识池技能](../.agents/skills/digr-paper-knowledge/SKILL.md)与 `python -B tools/codex.py knowledge --help`。原生 Codex 读论文、分层批量问询和教学，工具保存冻结问项、论文局部用法、真实选择、有范围证据及接续位置。个人数据与原件放在独立私有项目，不进入本公共库；可从私有项目的相对路径入口接续，本机定位缓存仅用于发现。它不替代本轮在线 DIGR 协议获取，也不需要阅读器或付费模型接口。普通读取只用标准库，摄入 PDF 另需所选 Python 环境中的 `pypdf`。具体数据与命令见技能的按需引用。
 
-用户明确选择整篇解构工作流时，用同SHA声明的[ DIGRP协议](../paper/PROTOCOL.md)、[技能](../.agents/skills/digr-paper/SKILL.md)与 `python -B tools/codex.py paper --help`。它保存每篇的来源/导读映射、候选和Gmail读回事实；不替知识池写学习证据，单篇返回也不关闭当前DIGR任务。
+统一DIGR实际采用Sonnet处理整篇解构/导读对象时，自然应用同SHA声明的[论文协议](../paper/PROTOCOL.md)、[技能](../.agents/skills/digr-paper/SKILL.md)与 `python -B tools/codex.py paper --help`。它保存每篇的来源/导读映射、候选和Gmail读回事实；不替知识池写学习证据，单篇返回也不关闭当前DIGR任务。
 
 必读[RETURN](RETURN.md)要求最终response正文固定五段：结果、关键变化、工作过程、核验与限制、参数。过程用正文时间／工作表，不能由文件、内嵌页或截图替代；真实任务产物仍可链接。`return seal/status/body/close`保存选定正文并收口；body输出待发送Markdown，不证明宿主已发送。历史timeline是按需工具，不再是默认报告。
 

@@ -1,71 +1,31 @@
-# DIGR Codex 0.8.5 使用说明
+# DIGR Codex 0.14 使用说明
 
-普通任务采用轻量交付偏好；显式 DIGR 启动高投入的问题研究、方案探索与实际制作。默认 N12/R4/D3/V3/L3/M1，只自主上调和改变方法；时间按任务补齐为软目标，来源默认 REQUIRED。
+统一入口是 `DIGR：任务` 或 `深度迭代：任务`。真实获取候选分支、固定同SHA协议后，按任务研究、制作与交付。完整只读/询问调用仍是深执行，但操作授权按实际委托；精确`/help`只看帮助，讨论不新建执行。DIGRC、DIGRP仅保留兼容拼写，用户不再需要用它们解锁Sonnet协作。
 
-0.8.3接入社区[反防御性写作规则](../docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md)：先陈述有依据的主张，删除重复辩护和叠加保留，保留实际影响结论与使用的限定。核心规则已进入必读执行正文，完整技能随分发提供，可按写作用途调用。
+## 按实际参与触发内容与工程
 
-本版接通[ DIGRP 0.5.0 论文解构增量](../paper/PROTOCOL.md)的直接调用：`DIGRP：完整处理这篇论文……`，兼容`DIGR：按 DIGRP 完整处理……`。每篇完整M，由Sonnet根据原论文和用户用途形成内容与读序，取消预设小m拆分；桌面标准单页、每篇一份完整PDF，按任务X选择本地或经授权Gmail返回。完整调用才选择增量执行，`DIGRP/help`只看说明。全部论文和公共工作完成后再统筹结束。`python -B tools/codex.py paper --help`提供文件工具，原生宿主承担阅读、证明、教学、代理与发送。
+- 普通DIGR由Codex承担完整原生责任。当前任务实际准备采用Sonnet时，即应用[CONSULT](CONSULT.md)的内容关系和全部发送前工程要求；首次和中途采用相同，不重开任务、不改写冻结原话。
+- 通用Sonnet可发展方向、论证、强替代、设计与稿件，同条件有效主观指导优先。真实对象为整篇论文导读/解构时，自然应用[论文协议](../paper/PROTOCOL.md)，Sonnet发展本篇问题、读序、章节和讲法，Codex完成独立研究与制作。普通翻译、局部问答和其它产品保持原委托。
+- 每次Sonnet提交前都按[SPLIT](SPLIT.md)完成本机原生分工与必要工作。Codex准备正文/Markdown、可靠文字公式及必要局部图像；公开消息与正文增量到达时按原文及时转播，完整稿/部分稿/连接状态分清。
+- 工具在当前实际模型与内容作用域上派生要求，保留当前用户纠正、来源、预算、未知费用和不重试边界。配置存在、历史提及或准备记录不代表发生了外部调用，也不新增费用授权。其它明确选择模型的普通建议不继承Sonnet身份或专属优先级。
 
-任务未按RETURN明确结束或被明令停止/取消前，后续消息沿当前DIGR作为补充处理；NEW_TURN、纠正、追问或技术中断不使它降级、重开前置或丢失投入。暂停保留任务，普通补充不自动恢复。再次命中前缀仍先获取仓库，当前P_run不变。已结束后的普通讨论也不复活DIGR。
-
-现实中数据不齐时，用已有来源和有据中心估计推进，保留相关不确定性；只问会改变当前决定且不能合理替代的少量信息。不要把未知一律判成坏情况、把可逆试用挂在理想数据之后，或擅自换成更慢目标。[0.8.2行为与兼容说明](../docs/CODEX_REAL_WORLD_CONTINUITY_UPGRADE.md)。
-
-新任务先按[FOUNDATION](FOUNDATION.md)独立研究用途、成品、处理粒度、已有基础、依赖与投入，展示可纠偏说明并问答；用户明确决定后才正式初始化并全面执行。前置独立预算/计时，调用参数留给正式任务，前置没有固定高投入下限。已确认续做只讨论重要变化，常规操作不重新审批。
-
-| 调用 | 行为 |
+| 调用 | 实际用途 |
 | --- | --- |
-| `DIGR：任务` / `深度迭代：任务` | 先取得真实仓库 pin，读启动切片及完整执行协议，再动态初始化。 |
-| `DIGR：只问原因，别推送` | 完整显式调用，仍为深执行；动作限于询问/研究，不获得推送授权。 |
-| `DIGR(N=18,R=5,D(4),V(4))：任务` | 显式配置；数值是实质责任，不是工具调用数。 |
-| `DIGR(M(2))：任务` | 两条完整独立 Main，各自初始化参数、推进、使用自己的D/V、收敛并比较，不能平分同一份总量。 |
-| `DIGR(target=60min)：任务` | 软时间目标，不改变其它责任，也不表示到点就结束。 |
-| `DIGR(min=60min)：任务` | 有效工作硬下限；无真实计时证据时未验证，不靠等待凑。 |
-| `DIGR(standard)：任务` | 用户主动选择 N2/R1/D0/V0/L3/M1、时间0、来源AUTO的低档；模型不会自主切入。 |
-| `DIGR/help` | 帮助，不建立执行契约。 |
-| `DIGR是什么？` | 精确前缀仍先获取，再按启动协议进入普通讨论。 |
-| `digr：任务` / `Digr：任务` | 不命中精确前缀。 |
+| `DIGR：研究这个问题并完成方案` | 完整原生主线，按任务选择方法与已有授权内资源 |
+| `DIGR：让Sonnet参与这份方案的内容与设计` | 统一任务内采用Sonnet，对应内容与工程要求自动适用 |
+| `DIGR：用Sonnet完整讲通这篇论文` | 按真实整篇对象自然接入论文内容驱动和交付约定 |
+| `DIGR：请Sonnet忠实翻译这段，不加导读` | 按翻译产品完成，保留共用工程，不擅自扩成整篇导读 |
+| `DIGR(Less)(X)：任务` | Less原生投入，最终文件按已配置本人Gmail交付 |
+| `DIGR/help` | 只读帮助，不建立深执行 |
 
-初始化显示 `N（12）` 这样的生效值，结尾显示 `N（12/实际）`，B/b始终单值。中途使用色块、粗体身份和独立阶段行，显示真正的研究、返回与主线处理；不预编全部名册，不输出隐藏思维链。多个M分别展示，详细责任与格式见 [PARAMETERS](PARAMETERS.md)。
+Light/Less/Default/More/Max共用投入预设；默认N12/R4/D3/V3/L3/M1。时间与来源按实际问题补齐，参数为实质责任，不是角色名、命令数或费用额度。Sonnet不抵扣原生N/R/D/V/L/M。详见[PARAMETERS](PARAMETERS.md)。
 
-- **D** 先自主找到攻击口，成熟后以真实研究/作品挑战整条路线，Main处理其中心主张。
-- **V** 先研究形成分域，在有距离的材料世界持续工作；默认由Main忠实转交必要质疑与新事实，同线可因候选进展或自己新发现再入。
-- **M** 各自完整推进。文件目录和脚本不会自动替代真正独立的Main。
-- **授权** 延续已有任务与资源决定；能力、预算、执行效果分别看，不为常规任务内操作反复申请。
+任务以[FOUNDATION](FOUNDATION.md)对齐真实对象与已有决定；明确更改直接落实，常规任务内操作沿既有授权。未按RETURN结束或被明令停止前，后续消息沿当前任务，P_run不随HEAD升级；暂停/停止按实际范围生效。旧任务保持原pin，不因新入口规则迁移。
 
-[PROTOCOL](PROTOCOL.md)、[FOUNDATION](FOUNDATION.md)、[CHARACTER](CHARACTER.md)、[PARAMETERS](PARAMETERS.md)、[COLLABORATION](COLLABORATION.md)、[PERMISSIONS](PERMISSIONS.md)、[RETURN](RETURN.md)为执行正文，可从同pin聚合包一次读取。默认返回在response正文固定五段，以正文时间／工作表显示过程，禁用内嵌页或附件替代；T计所有参与者工作并集、t计来源并集，近似补点与缺口明确说明。结束后普通纠错不再启动DIGR，真正未完成的补充沿用原任务。[WORKBENCH](WORKBENCH.md)是按需工具手册。
+`X`只控制实际最终文件出口，无X在当前聊天交付；`(X)`／`(X=Gmail)`选择本机配置的本人Gmail，仍用原生连接器发送和读回。没有文件不另造附件，详见[DELIVERY](DELIVERY.md)。
 
-## 实际使用工具
+## 本机工具
 
-从仓库根目录运行，无需安装第三方依赖：
+`python -B tools/codex.py consult prepare`组装实际任务包，不发送。`consult split --input native-decision.json --out split-plan.json`机械附加当前绑定；`consult call --split-plan …`本机Split核对后才在真实预算内作一次提交；`consult inspect`读公开事实，`reconcile-cost`只对账。内部论文请求用`--paper-root`绑定具体对象，已有批次不把通用请求强制变成论文创作。
 
-```text
-python -B tools/codex.py --help
-python -B tools/codex.py profile check
-python -B tools/codex.py acquire --stage startup --out D:/task/acquired
-python -B tools/codex.py workbench --help
-python -B tools/codex.py task --help
-python -B tools/codex.py line --help
-python -B tools/codex.py clock --help
-```
-
-`acquire`进行真正联网获取；profile check只检查本地分发。其它工具协助保留原目标、取回材料、接续本线产物、按真实活动边界算时长；不调用模型、不启动代理或扩大权限。原有 `tools/codex_profile.py`、`tools/codex_workbench.py` 与 `tools/codex_experience.py` 仍可用。
-
-本分支不自动改宿主采样参数或模型权重；新语义和工具能否在后续任务持续改善结果，仍需实际使用观察。
-
-## 文件交付X（0.9起）
-
-| 写法 | 最终文件出口 |
-| --- | --- |
-| `DIGR：…` / `DIGRP：…` | 当前聊天文件入口 |
-| `DIGR（X）：…` / `DIGRP（）（X）：…` | 本机所配置的本人Gmail |
-| `DIGRP（N=16,R=4）（X=Gmail）：…` | 本机所配置的本人Gmail |
-
-没有文件时X不触发外发，也不为此创建文件。文字答复仍在聊天。本版仅实现Gmail，使用已有原生连接；未注册或不支持的目标会明确报错。[完整操作](DELIVERY.md)。
-
-## 五档与Consult
-
-`DIGR(Light)：任务`、`DIGRC(Less)：任务`、`DIGRP(More)(X)：论文任务`均可用。五档依次为Light N2/R1/D0/V0、Less N6/R2/D1/V1、Default N12/R4/D3/V3、More N18/R6/D4/V4、Max N24/R8/D6/V6；每档L3/M1，显式参数优先，裸调用Default。时间、来源工作和预算依真实任务；standard兼容Light。
-
-DIGR继续原生Main，DIGRC增加Consult，DIGRP0.5采用论文侧Sonnet原生内容驱动。Consult对同条件主观方向、风格、规格和内容/设计的指导优先，Main仍完整思考、生产和承担原生责任。参见[CONSULT](CONSULT.md)。普通话题和翻译不自动启用付费Consult。
-
-`python -B tools/codex.py profile presets`列出预设；`profile parameters --text '(Less,N=8)'`预览覆盖；`consult --help`查看实际公开对话、费用和恢复工具；0.13起每次Claude提交前按[SPLIT](SPLIT.md)完成本机原生分工，`consult split`取绑定，`call --split-plan`核对后提交。角色、计数、hash和API200都不是品质证明。
+`profile check`只检本地完整性，`acquire`真实联网取pin；`paper`、`visits`和`return`等工具保存作用域、事实与接续。它们不代替模型的研究、内容判断或有效指导的落实。完整执行按[PROTOCOL](PROTOCOL.md)及manifest全部核心，操作细节见[WORKBENCH](WORKBENCH.md)。

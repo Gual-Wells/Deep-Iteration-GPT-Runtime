@@ -1,5 +1,13 @@
 # Changelog
 
+## Codex 0.14.0 / paper 0.6.0 — one DIGR entry and actual Sonnet participation
+
+- Unify new tasks under DIGR. Actual selected Sonnet requests activate content guidance and all existing preparation, Split, public relay, budget and recovery duties; C/P spellings remain compatibility inputs rather than access gates.
+- Derive and verify each request's collaboration contract from its current model and content scope. Keep exact original invocation and current requirements; distinguish prepared work, submitted exchanges, public returns and observed identity.
+- Apply whole-paper authoring naturally to the actual guide product, while literal translation and local questions retain their requested product. A paper registry no longer forces later generic work into authoring scope.
+- Include actual generic collaboration in native-origin reports. On a generic model-family change, preserve public user/assistant history and record the updated system relationship; other models do not inherit Sonnet priority.
+- Preserve old pins, paper version mappings, exact scope isolation, stopped-task fences and non-retrying transport. New entry selection adds no paid-call authorization.
+
 ## Codex 0.13.0 / DIGRP 0.5.4 — native Split before every Claude submission
 
 - Codex researches the current allocation and performs useful local work; Claude receives sufficient originals and a substantive assignment with its existing content judgment intact. Every new-version Consult generation requires a request/input/paper/evidence-bound local Split; native DIGR does not gain an external call.

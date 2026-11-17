@@ -507,7 +507,8 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
     def test_paper_patch_selection_preserves_old_core_and_rejects_incompatible_scopes(self):
         for version, expected in (('0.10.0', '0.4.0'), ('0.10.1', '0.4.0'),
                                   ('0.11.0', '0.5.0'), ('0.11.1', '0.5.1'),
-                                  ('0.12.0', '0.5.2'), ('0.12.1', '0.5.3'), ('0.13.0', '0.5.4')):
+                                  ('0.12.0', '0.5.2'), ('0.12.1', '0.5.3'), ('0.13.0', '0.5.4'),
+                                  ('0.14.0', '0.6.0')):
             with self.subTest(core=version):
                 request = self.file('request-' + version + '.txt', 'DIGR：选择论文增量。\n')
                 parent_root = self.folder / ('parent-' + version)
@@ -518,10 +519,10 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
                                          source_ref='selected-paper', task_root=parent_root)
                 self.assertEqual(value['addon_version'], expected)
                 parent = json.loads((parent_root / 'session.json').read_text(encoding='utf-8'))
-                self.assertEqual(parent['execution_profile']['mode'], 'NATIVE')
+                self.assertEqual(parent['execution_profile']['mode'], 'DIGR' if version == '0.14.0' else 'NATIVE')
                 self.assertEqual(parent['consult_addons'][0]['version'], expected)
                 kwargs = {}
-                if expected.startswith('0.5.'):
+                if expected.startswith(('0.5.', '0.6.')):
                     selected = paper.add_paper(batch, paper_id='patch', title='Synthetic patch scope',
                                                line='M01', owner='native-fixture',
                                                parameters={'N': 2, 'R': 1, 'D': 0, 'V': 0,
@@ -538,15 +539,18 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
                     invalid_versions.append('0.5.2')
                 if version in {'0.10.0', '0.10.1', '0.11.0', '0.11.1', '0.12.0'}:
                     invalid_versions.append('0.5.3')
-                if version != '0.13.0':
+                if version not in {'0.13.0', '0.14.0'}:
                     invalid_versions.append('0.5.4')
+                if version != '0.14.0':
+                    invalid_versions.append('0.6.0')
                 for invalid in invalid_versions:
                     parent['consult_addons'][0]['version'] = invalid
                     (parent_root / 'session.json').write_text(json.dumps(parent), encoding='utf-8')
                     (batch / 'batch.json').write_text(json.dumps(dict(value, addon_version=invalid)), encoding='utf-8')
-                    with self.subTest(forged=invalid), self.assertRaisesRegex(ValueError, 'verified selected paper'):
+                    with self.subTest(forged=invalid), self.assertRaises(ValueError):
                         consult.prepare_request(parent_root, input_path=self.input,
                                                 exchange_id='invalid-' + invalid, max_tokens=16000, **kwargs)
+                    self.assertFalse((parent_root / 'consult' / 'exchanges' / ('invalid-' + invalid)).exists())
         self.assertEqual(len(self.server.post_calls), 0)
 
     def test_new_streaming_call_relays_and_saves_partial_before_terminal_frame(self):
