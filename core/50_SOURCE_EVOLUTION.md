@@ -2,6 +2,10 @@
 
 Normal executing DIGR work has `SourceDisposition=REQUIRED` and a real source strategy. `SourceDisposition=WAIVED` is allowed only for a concrete U0/host reason (for example a closed transformation where external material is prohibited or genuinely irrelevant). Omitted S, `S()`, or zero numeric S minima are not waivers. External source is broad: web, official docs, repositories/code, user files, datasets, papers, community material, tool/test outputs or any information not solely from model prior.
 
+## Analysis does not require new experiments
+
+Source responsibility establishes the object and necessary premises. Conceptual, mechanism and design analysis may use the supplied problem, source text, definitions, derivations and thought counterexamples; it does not require new efficacy data or experiments. A closed logical problem can justify a concrete WAIVED disposition under the existing rule when external material is genuinely irrelevant. N/R/S/D responsibility does not make experimental confirmation an admission condition for a reasoned conclusion.
+
 ## What counts as an actual S
 
 Opening a SourceWorkspace is only state preparation. For Source Presumption/completion, an actual S must be supported by **both**:

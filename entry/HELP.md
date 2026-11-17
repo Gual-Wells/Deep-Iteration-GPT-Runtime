@@ -154,3 +154,8 @@ DIGR(N_target/N_actual, T_target/T_actual, R_target/R_actual, B,
 ## 9. 版本与权威
 
 本帮助属于当前 pinned `P_run` 的用户级参考。具体仓库提交 SHA、manifest/VERSION 一致性与启动路径由本轮 repository authority 负责验证；帮助文本本身不替代版本化执行协议。
+
+
+## 分析判断的方法
+
+概念、机制、协议和方案分析默认依据逻辑论证，理由充分就直接给判断并可完成任务。S用于讨论对象与必要前提，不要求新做实验；运行proof记录执行事实，不替代论证，也不以缺少效果实测否定分析。
