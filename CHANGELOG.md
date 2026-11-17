@@ -1,5 +1,13 @@
 # Changelog
 
+## Codex 0.13.0 / DIGRP 0.5.4 — native Split before every Claude submission
+
+- Codex researches the current allocation and performs useful local work; Claude receives sufficient originals and a substantive assignment with its existing content judgment intact. Every new-version Consult generation requires a request/input/paper/evidence-bound local Split; native DIGR does not gain an external call.
+- Add `consult split --input --out` to bind an actual native decision without copying opaque fields. Preserve source-relative evidence identity, reject stale bound inputs and existing outputs, and keep the private plan outside Claude's messages.
+- Preserve exact current generic user requirements and deduplicate already-replayed exact requirement bodies; keep historical pins and addon0.5.3/core0.12.1 behavior distinct. Retain public streaming, model effort, budget reservations and non-retrying transport.
+- Move the last managed task check after transport construction and staged request writes, before committing a send. A preflight correction or stop blocks the demonstrated interleavings without reserving a generation fee.
+- See [Split contract](codex/SPLIT.md) and [synthetic use path](codex/examples/split/README.md). Request bytes and bound public records do not certify semantic quality or measured token savings.
+
 ## Codex 0.12.1 / DIGRP 0.5.3 — live public relay and prepared source input
 
 - New requests stream public text into an incremental original and flushed events. Hosts forward it in commentary during the call; logs or delayed replay are insufficient.

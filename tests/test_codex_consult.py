@@ -507,7 +507,7 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
     def test_paper_patch_selection_preserves_old_core_and_rejects_incompatible_scopes(self):
         for version, expected in (('0.10.0', '0.4.0'), ('0.10.1', '0.4.0'),
                                   ('0.11.0', '0.5.0'), ('0.11.1', '0.5.1'),
-                                  ('0.12.0', '0.5.2'), ('0.12.1', '0.5.3')):
+                                  ('0.12.0', '0.5.2'), ('0.12.1', '0.5.3'), ('0.13.0', '0.5.4')):
             with self.subTest(core=version):
                 request = self.file('request-' + version + '.txt', 'DIGR：选择论文增量。\n')
                 parent_root = self.folder / ('parent-' + version)
@@ -538,6 +538,8 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
                     invalid_versions.append('0.5.2')
                 if version in {'0.10.0', '0.10.1', '0.11.0', '0.11.1', '0.12.0'}:
                     invalid_versions.append('0.5.3')
+                if version != '0.13.0':
+                    invalid_versions.append('0.5.4')
                 for invalid in invalid_versions:
                     parent['consult_addons'][0]['version'] = invalid
                     (parent_root / 'session.json').write_text(json.dumps(parent), encoding='utf-8')

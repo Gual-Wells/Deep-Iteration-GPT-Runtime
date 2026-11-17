@@ -1,4 +1,6 @@
-# DIGR for Codex · 0.12.1
+# DIGR for Codex · 0.13.0
+
+0.13起，DIGRC、DIGRP及复用Consult的Claude通路在每次提交前采用[本机原生Split](codex/SPLIT.md)：Codex研究任务分工、完成必要本机工作，给Claude最小充分的原件和内容问题；工具逐次绑定请求与实际成果，缺少或过期计划不能发送。`consult split --input … --out …`机械附加当前绑定，`call --split-plan …`提交前本机检查。保留Claude内容判断、0.12.1公开增量转播及文本优先取材，旧pin按原版本接续；[完整合成示例](codex/examples/split/README.md)。
 
 0.12起，概念、机制、协议和方案分析以逻辑论证为默认判断基础，论证充分即可直接给结论与完成任务；不把效果实验或后续试用设成默认资格。新版返回第四段采用“论证与适用范围”，保留旧输入兼容。[共同方法](docs/LOGIC_FIRST_ANALYSIS.md)同步进入stable、Codex及本机日常约定。
 
@@ -8,7 +10,7 @@
 
 0.9.0把[X文件交付](codex/DELIVERY.md)接入DIGR、DIGRP：无`X`在当前聊天返回文件；`DIGR(X):…`、`DIGRP(X):…`和`(X=Gmail)`均发送到本机配置的本人Gmail。常规投入参数后可另接一个X栏，例如`DIGRP(N=16,R=4)(X=Gmail):…`。X只控制任务约定的最终文件；没有文件时保留文字答复，不额外造文件。本版仅实现Gmail，个人目标在私有本机配置中，任务建立时解析并保存。
 
-[DIGRP 0.5.3](paper/PROTOCOL.md)由Sonnet根据原论文和用户用途原生驱动内容与阅读路线，取消预设小m职责及其映射门槛。Codex自主取材、复算、制作和核验，每篇仍有完整M及一份[标准页桌面PDF](paper/PDF_DESIGN.md)。无X的完整论文可直接本地返回；有X时逐篇发送Gmail并读回，所有论文及公共工作完成后才结束父任务。交付工具在外发前保存发送状态，响应不明先对账；真实发送使用已有Gmail原生连接器。[操作技能](.agents/skills/digr-delivery/SKILL.md)随同一不可变pin提供。旧pin和既有Gmail/分卷历史保持原身份。
+[DIGRP 0.5.4](paper/PROTOCOL.md)由Sonnet根据原论文和用户用途原生驱动内容与阅读路线，取消预设小m职责及其映射门槛。Codex自主取材、复算、制作和核验，每篇仍有完整M及一份[标准页桌面PDF](paper/PDF_DESIGN.md)。无X的完整论文可直接本地返回；有X时逐篇发送Gmail并读回，所有论文及公共工作完成后才结束父任务。交付工具在外发前保存发送状态，响应不明先对账；真实发送使用已有Gmail原生连接器。[操作技能](.agents/skills/digr-delivery/SKILL.md)随同一不可变pin提供。旧pin和既有Gmail/分卷历史保持原身份。
 
 0.8.3接入社区 Anti-Defensive Writing：有据主张先行，删除重复辩护、叠加保留和自我贬低，必要限定准确落在相关主张。核心规则进入必读PROTOCOL、RETURN及普通任务轻量约定；中英双语完整技能连同不可变来源和MIT许可随分发提供。[来源与接入说明](docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md)。
 

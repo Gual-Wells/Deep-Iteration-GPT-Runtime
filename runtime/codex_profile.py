@@ -19,12 +19,13 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v9'
+PROFILE_PROTOCOL = 'digr-codex-native-v10'
 PROFILE_CORE = (
     'codex/FOUNDATION.md',
     'codex/CHARACTER.md', 'codex/PARAMETERS.md',
     'codex/COLLABORATION.md', 'codex/PERMISSIONS.md',
     'codex/CONSULT.md',
+    'codex/SPLIT.md',
     'codex/DELIVERY.md',
     'codex/RETURN.md',
 )
@@ -41,6 +42,7 @@ PROFILE_FILES = (
     'codex/CHARACTER.md',
     'codex/COLLABORATION.md',
     'codex/CONSULT.md',
+    'codex/SPLIT.md',
     'codex/PERMISSIONS.md',
     'codex/DELIVERY.md',
     'codex/RETURN.md',

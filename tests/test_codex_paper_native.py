@@ -245,6 +245,11 @@ class LogicalNativePaperTests(NativePaperPatchTests):
     addon_version = '0.5.2'
 
 
+class SplitNativePaperTests(NativePaperPatchTests):
+    core_version = '0.13.0'
+    addon_version = '0.5.4'
+
+
 class LiveRelayNativePaperTests(NativePaperPatchTests):
     core_version = '0.12.1'
     addon_version = '0.5.3'
