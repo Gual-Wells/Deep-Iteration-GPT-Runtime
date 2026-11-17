@@ -13,6 +13,8 @@ Keep profile and originals private on the permitted data volume. EPUB/PDF intake
 
 Admit bounded statements as goal, claim, self_report, observation, resource, inference or unknown, preserving the original quote and scope. A CV claim is not independently observed; a project paper may have several authors. Reference/simulation cannot become personal experience or mastery. Missing evidence is not inability.
 
+For selected conversation exports, follow actual parent/context links when relating a delegation, revision and feedback. A sibling correction is not inherited automatically. Separate a historical upload reference, an available source body, an authored artifact and observed use; keep a local success or difficulty at its actual scope instead of creating a global ability or model-ranking claim.
+
 Select the minimum explicit entry IDs for the present purpose. Keep self/author/actor/public sharing distinct. For an actor, bind exact book and role and keep source kinds intact; a personal project claim does not grant flawless technical reasoning. Never pretend the fictional D is the real user's inner thought. General reasoning remains available.
 
 Before new use, check selected entries and original source currency. A stale primary file cannot be repaired by finding an old identical backup; explicitly select a current version or relocate the same version. Withdrawal excludes new use while old books/history remain historical. Do not claim remote uploaded copies disappeared.

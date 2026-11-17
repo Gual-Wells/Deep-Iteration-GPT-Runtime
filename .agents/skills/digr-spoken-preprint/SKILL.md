@@ -11,6 +11,8 @@ The purpose is understanding and later reusing language in personally relevant d
 
 Current scope: the user listens. Do not add role takeover, user insertion, mobile handoff, tests for the listener or a new reader. Human-involved Codex training is a separate design exploration, not an ESP dependency. Constructing ESP does not activate English rehearsal in this chat.
 
+When a source exchange or the user's feedback changes the current edition, repair the affected scene or explanation itself. Follow its actual context rather than splicing sibling alternatives into one history. Preserve a useful new relationship or way of explaining without copying a source work's entire structure into every scene; production success and a listener's local feedback remain distinct evidence.
+
 ## Find the book and tools
 
 Use the supplied book path and its `preprint.json`; read any current navigation only as a pointer. A source checkout exposes `python -B tools/codex.py preprint --help`; an installed toolchain can be located through `$CODEX_HOME/digr-codex/toolchain.json`. A tool locator is not live protocol acquisition. Do not discover private books by scanning unrelated chats or infer personal learning state.

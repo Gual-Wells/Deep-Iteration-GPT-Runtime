@@ -1,5 +1,14 @@
 # Changelog
 
+## Codex 0.11.1 / DIGRP 0.5.1 — connected explanations across the family
+
+- Shared CHARACTER guidance applies to native DIGR, DIGRC and DIGRP: repair the current missing relationship, put corrections into the actual version, and learn mechanisms from historical cases without imposing one format or model ranking.
+- Consult can develop requested technical designs, code reasoning and implementation guides. Codex performs tools, routine execution and run bookkeeping; knowledge needed for the user's understanding stays in the content.
+- Paper and knowledge skills carry source-bound help into the actual work. Personal Context, ESP and Voice skills apply their relevant source/feedback or conversational parts without changing activation or data contracts.
+- Preserve the published 0.11.0 Sonnet-native paper design and removal of the m framework. Core 0.11.1 selects paper 0.5.1; frozen 0.11.0 retains 0.5.0 and 0.10.x retains 0.4.0. Verified scopes reject unknown or too-new versions.
+
+Five investment presets, full native responsibilities and explicit Consult selection remain. Root stable and existing task pins are unchanged. See [family applicability](docs/CODEX_FAMILY_UPGRADE_0_11_1.md).
+
 ## Codex 0.8.5 / DIGRP 0.2.0 — whole-paper desktop books
 
 - The pinned Codex classifier recognizes the complete `DIGRP：` alias before `DIGR`, while the thin broad router and root stable stay unchanged. A complete call selects the paper addon; help/discussion only carries a hint.

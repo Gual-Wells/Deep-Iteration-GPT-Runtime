@@ -22,7 +22,7 @@ class NativePaperFixture:
         self.temp = tempfile.TemporaryDirectory(prefix='paper-native-test-', dir=cache)
         self.addCleanup(self.temp.cleanup)
         self.base = Path(self.temp.name).resolve()
-        self.task, self.batch, self.root = self.fixture('0.11.0')
+        self.task, self.batch, self.root = self.fixture(getattr(self, 'core_version', '0.11.0'))
         self.source = self.base / 'original.pdf'
         writer = PdfWriter()
         writer.add_blank_page(width=210 * 72 / 25.4, height=297 * 72 / 25.4)
@@ -216,6 +216,28 @@ class NativePaperTests(NativePaperFixture, unittest.TestCase):
                     self.assertEqual(value['mapping_contract'], 'integrated-functions-v1')
                     session = paper._read(task / 'session.json')
                     self.assertEqual(session['consult_addons'][0]['version'], '0.4.0')
+
+
+@unittest.skipUnless(PdfWriter, 'configured Python with pypdf required')
+class NativePaperPatchTests(NativePaperFixture, unittest.TestCase):
+    core_version = '0.11.1'
+
+    def test_patch_public_work_binds_candidate_and_continues_the_same_scope(self):
+        self.mapped()
+        self.public_exchange()
+        self.candidate()
+        self.assertEqual(paper.inspect(self.root)['status'], 'READY_LOCAL')
+        scope = paper._load(self.root)['candidate']['consultation']['authoring_scope']
+        self.assertEqual(scope['addon_version'], '0.5.1')
+        followup = self.base / 'followup.txt'
+        followup.write_text('Synthetic next source request in this same paper.', encoding='utf-8')
+        result = consult.prepare_request(self.task, input_path=followup,
+                                         exchange_id='patch-followup', continue_from='paper-public',
+                                         paper_root=self.root, max_tokens=256)
+        self.assertEqual(result['exchange']['authoring_scope'], scope)
+        request = json.loads(Path(result['request_path']).read_text(encoding='utf-8'))
+        self.assertTrue(any(message['role'] == 'assistant' and 'SYNTHETIC PUBLIC FIXTURE' in message['content']
+                            for message in request['messages']))
 
 
 if __name__ == '__main__':
