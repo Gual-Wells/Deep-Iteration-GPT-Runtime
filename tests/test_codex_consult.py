@@ -487,7 +487,8 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
 
     def test_paper_patch_selection_preserves_old_core_and_rejects_incompatible_scopes(self):
         for version, expected in (('0.10.0', '0.4.0'), ('0.10.1', '0.4.0'),
-                                  ('0.11.0', '0.5.0'), ('0.11.1', '0.5.1')):
+                                  ('0.11.0', '0.5.0'), ('0.11.1', '0.5.1'),
+                                  ('0.12.0', '0.5.2')):
             with self.subTest(core=version):
                 request = self.file('request-' + version + '.txt', 'DIGR：选择论文增量。\n')
                 parent_root = self.folder / ('parent-' + version)
@@ -514,6 +515,8 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
                 # Matching forged records still cannot authorize a future addon,
                 # nor a newer known addon on a frozen older core.
                 invalid_versions = ['0.5.99', '0.4.1'] + (['0.5.1'] if version == '0.11.0' else [])
+                if version in {'0.11.0', '0.11.1'}:
+                    invalid_versions.append('0.5.2')
                 for invalid in invalid_versions:
                     parent['consult_addons'][0]['version'] = invalid
                     (parent_root / 'session.json').write_text(json.dumps(parent), encoding='utf-8')
@@ -521,6 +524,17 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
                     with self.subTest(forged=invalid), self.assertRaisesRegex(ValueError, 'verified selected paper'):
                         consult.prepare_request(parent_root, input_path=self.input,
                                                 exchange_id='invalid-' + invalid, max_tokens=16000, **kwargs)
+        self.assertEqual(len(self.server.post_calls), 0)
+
+    def test_new_generic_request_carries_logic_basis_without_changing_legacy_prompt(self):
+        request = self.file('logic-request.txt', 'DIGRC：分析这个设计。\n')
+        task = self.folder / 'logical-generic'
+        create_session(task, request=request, p_run='0.12.0@' + 'f' * 40)
+        prepared = consult.prepare_request(task, input_path=self.input,
+                                           exchange_id='logical', max_tokens=16000)
+        body = json.loads(Path(prepared['request_path']).read_text(encoding='utf-8'))
+        self.assertEqual(body['messages'][0], {'role': 'system', 'content': consult._LOGICAL_SYSTEM})
+        self.assertEqual(consult._generic_system(PIN), consult._SYSTEM)
         self.assertEqual(len(self.server.post_calls), 0)
 
     def test_native_parent_real_selected_paper_addon_enables_only_verified_new_pin_scope(self):

@@ -74,6 +74,24 @@ _PAPER_SYSTEM = (
     'user instructions. Return public work and useful reasons naturally; do not '
     'expose hidden reasoning.'
 )
+_LOGICAL_JUDGMENT = (
+    ' For qualitative analysis and design judgments, a sufficient reasoned '
+    'argument can settle the question. Missing experiments, benchmarks or later '
+    'reader trials are not default objections or closing disclaimers. State '
+    'actual actions and measurements truthfully within their relevant scope.'
+)
+_LOGICAL_SYSTEM = _SYSTEM + _LOGICAL_JUDGMENT
+_LOGICAL_PAPER_SYSTEM = _PAPER_SYSTEM + _LOGICAL_JUDGMENT
+
+
+def _generic_system(p_run: str) -> str:
+    version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', p_run)
+    current = bool(version and tuple(map(int, version.groups())) >= (0, 12, 0))
+    return _LOGICAL_SYSTEM if current else _SYSTEM
+
+
+def _paper_system(addon_version: str) -> str:
+    return _LOGICAL_PAPER_SYSTEM if addon_version == '0.5.2' else _PAPER_SYSTEM
 
 
 def _now() -> str:
@@ -164,7 +182,8 @@ def _paper_scopes(root: Path, session: Mapping[str, Any]) -> list[dict]:
     valid = []
     core = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', session['P_run'])
     core_version = tuple(map(int, core.groups())) if core else ()
-    compatible = {'0.4.0': (0, 10, 0), '0.5.0': (0, 11, 0), '0.5.1': (0, 11, 1)}
+    compatible = {'0.4.0': (0, 10, 0), '0.5.0': (0, 11, 0),
+                  '0.5.1': (0, 11, 1), '0.5.2': (0, 12, 0)}
     for scope in scopes:
         if not isinstance(scope, Mapping) or scope.get('addon') != 'paper':
             continue
@@ -185,7 +204,7 @@ def _paper_scopes(root: Path, session: Mapping[str, Any]) -> list[dict]:
                 continue
             verified = {'addon': 'paper', 'version': scope['version'], 'batch': batch_root.as_posix(),
                         'authorization_source_ref': source_ref}
-            if scope['version'] in {'0.5.0', '0.5.1'}:
+            if scope['version'] in {'0.5.0', '0.5.1', '0.5.2'}:
                 version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', session['P_run'])
                 if (not version or tuple(map(int, version.groups())) < (0, 11, 0)
                         or scope.get('authoring_contract') != _PAPER_AUTHORING_CONTRACT
@@ -202,7 +221,7 @@ def _selected_paper(root: Path, session: Mapping[str, Any], paper_root: Path) ->
     """Resolve one registered 0.5 paper; no other paper's state becomes context."""
     paper_root = Path(paper_root).resolve()
     for registered in _paper_scopes(root, session):
-        if registered['version'] not in {'0.5.0', '0.5.1'}:
+        if registered['version'] not in {'0.5.0', '0.5.1', '0.5.2'}:
             continue
         batch_root = Path(registered['batch'])
         batch = _read(batch_root / 'batch.json')
@@ -232,19 +251,22 @@ def _selected_paper(root: Path, session: Mapping[str, Any], paper_root: Path) ->
 def _verify_authoring_record(attempt: Mapping[str, Any], request: Mapping[str, Any]) -> None:
     scope = attempt.get('authoring_scope')
     if scope is None:
-        if request['messages'] and request['messages'][0] == {'role': 'system', 'content': _PAPER_SYSTEM}:
+        if request['messages'] and request['messages'][0] in (
+                {'role': 'system', 'content': _PAPER_SYSTEM},
+                {'role': 'system', 'content': _LOGICAL_PAPER_SYSTEM}):
             raise ValueError('Consult paper authoring scope is missing')
         return  # Historical and generic Consult records retain their original contract.
     required = {'paper_root', 'batch_root', 'paper_id', 'line', 'addon_version',
                 'authoring_contract', 'P_run', 'authorization_source_ref'}
     if (not isinstance(scope, Mapping) or set(scope) != required
             or any(not isinstance(scope[key], str) or not scope[key].strip() for key in required)
-            or scope['addon_version'] not in {'0.5.0', '0.5.1'}
+            or scope['addon_version'] not in {'0.5.0', '0.5.1', '0.5.2'}
             or scope['authoring_contract'] != _PAPER_AUTHORING_CONTRACT
             or scope['P_run'] != attempt.get('P_run')
             or attempt.get('authoring_scope_sha256') != _hash(_json_bytes(scope))
             or request.get('user') != 'digr-paper-' + _hash(_json_bytes(scope))
-            or not request['messages'] or request['messages'][0] != {'role': 'system', 'content': _PAPER_SYSTEM}):
+            or not request['messages'] or request['messages'][0] != {
+                'role': 'system', 'content': _paper_system(scope['addon_version'])}):
         raise ValueError('Consult paper authoring scope or prompt identity changed')
 
 
@@ -440,7 +462,7 @@ def prepare_request(
         raise ValueError('max_tokens must be a positive integer including hidden and public output')
     exchange_id = exchange_id or ('exchange-' + uuid.uuid4().hex)
     directory = _directory(root, exchange_id)
-    messages: list[dict] = [{'role': 'system', 'content': _SYSTEM}]
+    messages: list[dict] = [{'role': 'system', 'content': _generic_system(session['P_run'])}]
     parent_request_sha256 = None
     authoring_scope, paper_value, paper_batch = None, None, None
     if continue_from is not None:
@@ -459,14 +481,14 @@ def prepare_request(
             raise ValueError('Cannot continue generic Consult as paper authoring; start a separate exchange')
     elif paper_root is not None:
         authoring_scope, paper_value, paper_batch = _selected_paper(root, session, paper_root)
-        messages = [{'role': 'system', 'content': _PAPER_SYSTEM}]
+        messages = [{'role': 'system', 'content': _paper_system(authoring_scope['addon_version'])}]
     else:
         initial = session.get('initial_invocation', {})
         pin = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', session['P_run'])
         new_paper_invocation = (pin and tuple(map(int, pin.groups())) >= (0, 11, 0)
                                 and initial.get('addon_hint') == 'paper')
         new_native_addon = (session.get('execution_profile', {}).get('mode') != 'CONSULT'
-                            and any(scope['version'] in {'0.5.0', '0.5.1'} for scope in _paper_scopes(root, session)))
+                            and any(scope['version'] in {'0.5.0', '0.5.1', '0.5.2'} for scope in _paper_scopes(root, session)))
         if new_paper_invocation or new_native_addon:
             raise ValueError('Paper authoring requires an explicit --paper-root for its first exchange')
     info, raw = _source(input_path, 'CURRENT_INPUT')

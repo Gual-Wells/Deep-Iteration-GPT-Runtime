@@ -1,5 +1,13 @@
 # Changelog
 
+## Codex 0.12.0 / DIGRP 0.5.2 — logical argument as the analytical basis
+
+- Qualitative judgments can be settled by sufficient premises, mechanisms, inference and meaningful counterarguments. Missing trials or later feedback are no longer default objections, completion gaps or closing disclaimers.
+- Replace conflicting judgment/completion defaults and clarify that source responsibility is not an experimental obligation. Propagate the common method to the separate stable route and host ordinary instructions while retaining Alpha 5 machine contracts and old pins.
+- New reports use argument_scope and the fourth title 论证与适用范围; schema2 retains legacy verification_limits/title input compatibility without a task classifier or scoring gate.
+- Consult and paper authoring requests carry the logical judgment basis for new versions; old public prompt identities and paper versions remain usable under their original contracts.
+
+
 ## Codex 0.11.1 / DIGRP 0.5.1 — connected explanations across the family
 
 - Shared CHARACTER guidance applies to native DIGR, DIGRC and DIGRP: repair the current missing relationship, put corrections into the actual version, and learn mechanisms from historical cases without imposing one format or model ranking.

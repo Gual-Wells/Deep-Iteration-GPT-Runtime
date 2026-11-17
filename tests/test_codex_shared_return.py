@@ -35,7 +35,7 @@ class SharedReturnTests(unittest.TestCase):
                      'result': '给定解释已经完整写在正文，原件仅为补充。',
                      'key_changes': '本次形成了有范围的结论；没有虚构前后性能变化。',
                      'work_process': '| 时间／记录范围 | 工作与后果 |\n| --- | --- |\n| 未记录 | 完成选定解释；不补造工时。 |',
-                     'verification_limits': '未进行真实读者实验。',
+                     'verification_limits': '结论由给定前提与推论成立，只适用于原题界定的对象。',
                      'parameters': '测试夹具，不追认 N/R/D/V 或真实投入。',
                      'artifacts': [], 'sources': []}
         self.save()
@@ -61,6 +61,17 @@ class SharedReturnTests(unittest.TestCase):
         self.assertEqual(cli.returncode, 0, cli.stderr)
         self.assertEqual(cli.stdout, body.encode('utf-8'))
         self.assertEqual(close_return(self.session, reason='fixture result selected')['current_receipt'], 'CLOSED')
+
+    def test_argument_scope_uses_the_same_seal_body_close_path_without_empirical_gate(self):
+        self.data['argument_scope'] = self.data.pop('verification_limits')
+        self.save()
+        sealed = seal_return(self.session, self.input)
+        self.assertEqual(sealed['current_receipt'], 'READY_UNCLOSED')
+        body = response_body(self.session)
+        self.assertIn('## 论证与适用范围', body)
+        self.assertNotIn('## 核验与限制', body)
+        self.assertIn(self.data['argument_scope'], body)
+        self.assertEqual(close_return(self.session, reason='reasoned explanation completed')['current_receipt'], 'CLOSED')
 
     def test_unrelated_run_and_duplicate_replay_do_not_stale_selected_body(self):
         begin = self.visit('BEGIN', category='SOURCE')

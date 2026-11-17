@@ -17,6 +17,8 @@ For selected conversation exports, follow actual parent/context links when relat
 
 Select the minimum explicit entry IDs for the present purpose. Keep self/author/actor/public sharing distinct. For an actor, bind exact book and role and keep source kinds intact; a personal project claim does not grant flawless technical reasoning. Never pretend the fictional D is the real user's inner thought. General reasoning remains available.
 
+Qualitative judgments about explanations, organization and design rest on reasoned argument from the actual purpose, premises and mechanisms. Give a clear conclusion when those reasons suffice; missing experiments or later user trials are not default objections or a closing disclaimer. Claims about actual events, measurements and learning records retain their factual scope.
+
 Before new use, check selected entries and original source currency. A stale primary file cannot be repaired by finding an old identical backup; explicitly select a current version or relocate the same version. Withdrawal excludes new use while old books/history remain historical. Do not claim remote uploaded copies disappeared.
 
 ESP can consume a frozen selected capsule before scene events, or work directly from selected materials/explicit fiction. Personal Context is optional. Any book using personal capsules stays private. Stage public events are not permission for a public repository. Personal learning evidence remains under its actual learning workflow; no fictional actor or exported book writes mastery back.

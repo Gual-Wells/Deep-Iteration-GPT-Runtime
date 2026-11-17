@@ -157,7 +157,7 @@ def _input(root: Path, path: Path) -> tuple[dict[str, Any], set[Path], bytes]:
     new_body = data['schema_version'] == 2
     if _session(root)[1].get('return_schema') == 2 and not new_body:
         raise ValueError('this task requires schema 2: five-part response Markdown body')
-    fields = ('result', 'key_changes', 'work_process', 'verification_limits', 'parameters') if new_body else _TEXT_FIELDS
+    fields = ('result', 'key_changes', 'work_process', 'parameters') if new_body else _TEXT_FIELDS
     for field in fields:
         if not isinstance(data.get(field), str) or not data[field].strip():
             raise ValueError(f'explicit text required for {field}')

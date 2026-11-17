@@ -14,9 +14,18 @@ SECTIONS = (
     ('result', '结果'),
     ('key_changes', '关键变化'),
     ('work_process', '工作过程'),
-    ('verification_limits', '核验与限制'),
+    ('argument_scope', '论证与适用范围'),
     ('parameters', '参数'),
 )
+LEGACY_SCOPE = ('verification_limits', '核验与限制')
+
+
+def response_sections(data: Mapping[str, object]):
+    """Select the declared field without inventing an analysis classification."""
+    if 'argument_scope' in data and 'verification_limits' in data:
+        raise ValueError('provide argument_scope or legacy verification_limits, not both')
+    fourth = LEGACY_SCOPE if 'verification_limits' in data else SECTIONS[3]
+    return SECTIONS[:3] + (fourth,) + SECTIONS[4:]
 
 
 def _prose_lines(text: str):
@@ -139,7 +148,10 @@ def validate_response(text: str) -> None:
     parser.close()
     if parser.found:
         raise ValueError('raw HTML cannot carry the response report; quote code samples as Markdown code')
-    if [title for _, title in headings] != [title for _, title in SECTIONS]:
+    titles = tuple(title for _, title in headings)
+    current_titles = tuple(title for _, title in SECTIONS)
+    legacy_titles = current_titles[:3] + (LEGACY_SCOPE[1],) + current_titles[4:]
+    if titles not in (current_titles, legacy_titles):
         raise ValueError('response needs five ordered sections: ' + ' -> '.join(title for _, title in SECTIONS))
     if any(line.strip() for line in lines[:headings[0][0]]):
         raise ValueError('the response starts with the result section, without an outer code fence or preface')
@@ -155,7 +167,7 @@ def validate_response(text: str) -> None:
 def render_response(data: Mapping[str, object]) -> str:
     """Preserve authored Markdown inside a fixed, small report envelope."""
     parts = []
-    for field, title in SECTIONS:
+    for field, title in response_sections(data):
         body = data.get(field)
         if not isinstance(body, str) or not body.strip():
             raise ValueError('explicit Markdown body required for ' + field)

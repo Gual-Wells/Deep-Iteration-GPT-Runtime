@@ -228,7 +228,7 @@ class NativePaperPatchTests(NativePaperFixture, unittest.TestCase):
         self.candidate()
         self.assertEqual(paper.inspect(self.root)['status'], 'READY_LOCAL')
         scope = paper._load(self.root)['candidate']['consultation']['authoring_scope']
-        self.assertEqual(scope['addon_version'], '0.5.1')
+        self.assertEqual(scope['addon_version'], getattr(self, 'addon_version', '0.5.1'))
         followup = self.base / 'followup.txt'
         followup.write_text('Synthetic next source request in this same paper.', encoding='utf-8')
         result = consult.prepare_request(self.task, input_path=followup,
@@ -238,6 +238,11 @@ class NativePaperPatchTests(NativePaperFixture, unittest.TestCase):
         request = json.loads(Path(result['request_path']).read_text(encoding='utf-8'))
         self.assertTrue(any(message['role'] == 'assistant' and 'SYNTHETIC PUBLIC FIXTURE' in message['content']
                             for message in request['messages']))
+
+
+class LogicalNativePaperTests(NativePaperPatchTests):
+    core_version = '0.12.0'
+    addon_version = '0.5.2'
 
 
 if __name__ == '__main__':

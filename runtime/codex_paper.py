@@ -18,7 +18,7 @@ import re
 import time
 from typing import Any
 
-VERSION = '0.5.1'
+VERSION = '0.5.2'
 SINGLE_PDF_CONTRACT = 'single-pdf-one-message'
 X_PDF_CONTRACT = 'single-pdf-x-files'
 LEGACY_CONTRACT = 'legacy-multiple-volumes'
@@ -115,7 +115,8 @@ def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_r
     uses_x = bool(version and tuple(map(int, version.groups())) >= (0, 9, 0))
     uses_consult = bool(version and tuple(map(int, version.groups())) >= (0, 10, 0))
     uses_native = bool(version and tuple(map(int, version.groups())) >= (0, 11, 0))
-    addon_version = (VERSION if version and tuple(map(int, version.groups())) >= (0, 11, 1)
+    addon_version = (VERSION if version and tuple(map(int, version.groups())) >= (0, 12, 0)
+                     else '0.5.1' if version and tuple(map(int, version.groups())) >= (0, 11, 1)
                      else '0.5.0' if uses_native else '0.4.0' if uses_consult
                      else '0.3.0' if uses_x else '0.2.0')
     policy = None
