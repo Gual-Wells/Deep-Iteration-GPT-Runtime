@@ -18,7 +18,7 @@ source 默认 REQUIRED；auto 由模型按当前问题选择 REQUIRED/WAIVED 并
 
 ## 五档命名预设
 
-本版提供Light、Less、Default、More、Max。可写`DIGR(Less)：任务`、`DIGRC(More,N=20)：任务`或`DIGRP(Light)(X)：论文任务`，全角标点同义；每次只选一档。预设只填未显式指定的值，实际N/R/D/V仍按本文件完整单位履行，L始终为原生L3。
+本版提供Light、Less、Default、More、Max。可写`DIGR(Less)：任务`、`DIGR(More,N=20)：任务`或`DIGR(Light)(X)：论文任务`，全角标点同义；每次只选一档。预设只填未显式指定的值，实际N/R/D/V仍按本文件完整单位履行，L始终为原生L3。
 
 | 档位 | N | R | D | V | L | M |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -28,7 +28,7 @@ source 默认 REQUIRED；auto 由模型按当前问题选择 REQUIRED/WAIVED 并
 | More | 18 | 6 | 4 | 4 | 3 | 1 |
 | Max | 24 | 8 | 6 | 6 | 3 | 1 |
 
-裸DIGR、DIGRC、DIGRP均用Default，裸DIGR继续原生流程；`standard`兼容为Light，保留原N2/T0/R1/B0/S(0,0,0,0)/D0/V0/L3/M1及来源AUTO。显式Light仍是受管理的DIGR执行，不是日常宿主LIGHT模式。其余档B/b默认软策略，T/t及来源工作面、n/r按真实问题确定；不能把AUTO当已计时或为了达到时间而等待。M不随档位强增，各条新增M仍承担完整责任。
+统一DIGR默认使用Default，C/P兼容输入使用同一预设；协作职责由实际参与和对象决定，原生责任完整保留；`standard`兼容为Light，保留原N2/T0/R1/B0/S(0,0,0,0)/D0/V0/L3/M1及来源AUTO。显式Light仍是受管理的DIGR执行，不是日常宿主LIGHT模式。其余档B/b默认软策略，T/t及来源工作面、n/r按真实问题确定；不能把AUTO当已计时或为了达到时间而等待。M不随档位强增，各条新增M仍承担完整责任。
 
 预设是原生研究投入，不是模型effort、付费调用数或美元预算。Consult不抵扣N/R/D/V，不另计M，不是原生L3；高档不自动派生更多外部角色或费用。当前任务若用户撤销某档而要求正常执行，恢复Default并保留原任务与最新纠正，不另开任务。
 
@@ -36,7 +36,7 @@ source 默认 REQUIRED；auto 由模型按当前问题选择 REQUIRED/WAIVED 并
 
 ## 独立文件交付栏
 
-X与投入参数分别保存。`DIGR(X):…`、`DIGRP()(X):…`、`DIGR(N=16,R=4)(X=Gmail):…`均选本人Gmail；全角写法等价。X须单独占最后一栏。`parameter_text`保留完整原头，`execution_parameter_text`仅给投入解析，`delivery_selection`交给任务目标解析。本版仅支持Gmail目标及其私有注册别名；空值、重复或混合X在外发前指出。
+X与投入参数分别保存。`DIGR(X):…`、`DIGR()(X):…`、`DIGR(N=16,R=4)(X=Gmail):…`均选本人Gmail；全角写法等价。X须单独占最后一栏。`parameter_text`保留完整原头，`execution_parameter_text`仅给投入解析，`delivery_selection`交给任务目标解析。本版仅支持Gmail目标及其私有注册别名；空值、重复或混合X在外发前指出。
 
 新任务无X为本地；同任务后续无X消息继承原选择。X只控制实际最终文件，详细语义和工具见必读[DELIVERY](DELIVERY.md)。N/T/R/B/S/D/V/L/M的责任不受交付栏改变；初始化同时显示所选出口及实际接入状态，未绑定不称可发送。
 

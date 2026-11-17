@@ -1,4 +1,4 @@
 interface:
-  display_name: "DIGRP Paper Reading"
+  display_name: "DIGR Paper Reading"
   short_description: "Sonnet-driven whole-paper reading in one desktop PDF"
   default_prompt: "Use $digr-paper for Sonnet-driven reading of this complete paper and produce one standard-page desktop PDF."

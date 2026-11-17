@@ -440,6 +440,7 @@ runtime/assets/codex_timeline_view.js
 runtime/candidate_store.py
 runtime/clock_journal.py
 runtime/clock_probe.py
+runtime/codex_collaboration.py
 runtime/codex_consult.py
 runtime/codex_delivery.py
 runtime/codex_experience.py
@@ -904,6 +905,7 @@ tests/test_codex_shared_return.py
 tests/test_codex_split.py
 tests/test_codex_timeline.py
 tests/test_codex_transport.py
+tests/test_codex_unified.py
 tests/test_codex_visits.py
 tests/test_codex_voice.py
 tests/test_codex_workbench.py

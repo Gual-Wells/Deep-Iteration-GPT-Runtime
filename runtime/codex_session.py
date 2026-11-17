@@ -289,6 +289,14 @@ def create_session(root: Path, *, request: Path, p_run: str,
                 paper_authoring_contract='sonnet-native-v1',
                 consult_role='Sonnet-native content driving for the selected paper')
         metadata['parameter_selection'] = selection
+        from .codex_collaboration import unified
+        if unified(p_run):
+            metadata['execution_profile'] = {
+                'mode': 'DIGR', 'native_responsibilities': 'N/R/D/V/L/M remain Codex-owned',
+                'collaboration_selection': 'ACTUAL_REQUEST_MODEL_AND_SCOPE',
+                'consult_role': 'Derived for the current actual collaborator and content scope',
+                'legacy_invocation_key': invocation['invocation_key'], 'fee_authorization': False,
+            }
     if profile_uses_delivery:
         from .codex_delivery import resolve_policy
         selection = invocation['delivery_selection']
@@ -623,7 +631,10 @@ def summarize_activity(streams: Mapping[str, list[dict[str, Any]]], *, scope: st
 
 
 def _consult_snapshot(root: Path, metadata: Mapping[str, Any]) -> dict | None:
-    if metadata.get('execution_profile', {}).get('mode') != 'CONSULT' and not metadata.get('consult_addons'):
+    actual_unified_history = (metadata.get('execution_profile', {}).get('mode') == 'DIGR'
+                              and any((root / 'consult' / 'exchanges').glob('*/attempt.json')))
+    if (metadata.get('execution_profile', {}).get('mode') != 'CONSULT'
+            and not metadata.get('consult_addons') and not actual_unified_history):
         return None
     try:
         from .codex_consult import inspect_exchange
