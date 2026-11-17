@@ -8,4 +8,6 @@ D target zero does not disable D. L applicability follows actual D: without a co
 
 Before formal timing closes, execution must return to `MAIN`. Final synthesis/final task reasoning therefore remains counted task work rather than being silently performed after the ledger has moved to META/FINALIZING. The lifecycle then enters FINALIZING, writes the final summary, and only then becomes FINISHED.
 
+For an analytical task, a sufficiently developed argument and justified choice can complete the result. Missing experiments, benchmark comparisons or later user feedback are not default gaps or reasons to withhold the conclusion. Mechanical proof records execution facts; it neither certifies nor vetoes the logical judgment.
+
 The user-facing result comes first. Visible proof remains compact and canonical; it does not dump Strategy, EST, hidden reasoning, audit logs or schemas. Canonical actual durations are rendered by flooring verified/observed seconds to whole seconds; raw nanoseconds or arbitrary floating-point seconds must never leak into the user-facing proof. For B/b=1, lack of hard verification hides the corresponding actual as `?` rather than exposing an observed-but-unverified duration.
