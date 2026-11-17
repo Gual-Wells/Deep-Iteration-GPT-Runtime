@@ -1,10 +1,27 @@
-"""Derive duties from the actual request, without an alias or fee gate."""
+"""Apply current-user Claude selection, then derive actual collaboration duties."""
 from __future__ import annotations
 import re
 from typing import Any, Mapping
 
 FORMAT = 'digr-actual-collaboration-1'
 SONNET_MODEL = re.compile(r'anthropic/claude-(?:sonnet-[0-9]+(?:\.[0-9]+)*|[0-9]+(?:\.[0-9]+)*-sonnet)(?:-[0-9]{8})?')
+CLAUDE_MODEL = re.compile(r'(?:^|/)claude(?:[-/:]|$)', re.IGNORECASE)
+
+
+def delimiter_policy(p_run: str) -> bool:
+    version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', p_run)
+    return bool(version and tuple(map(int, version.groups())) >= (0, 15, 0))
+
+
+def require_claude_permission(p_run: str, model: str, lifecycle: Mapping[str, Any]) -> None:
+    """No credentials, reservations or transport before a current allow choice.
+
+    Local source-bound records are not user authentication or a budget grant.
+    Old pinned tasks retain their original admission rules.
+    """
+    if delimiter_policy(p_run) and CLAUDE_MODEL.search(model):
+        if lifecycle.get('claude_policy', {}).get('mode') != 'ALLOW':
+            raise ValueError('Claude is disabled by the current task choice; DIGR:: permits Claude, DIGR: does not')
 
 
 def unified(p_run: str) -> bool:

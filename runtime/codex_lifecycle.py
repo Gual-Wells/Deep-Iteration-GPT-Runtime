@@ -59,6 +59,38 @@ def _pin_reference(value: str | None) -> str | None:
     return value
 
 
+def _apply_claude_selection(value: dict, metadata: Mapping[str, Any], message: Mapping[str, Any],
+                            selection: str | None = None) -> None:
+    """Retain the actual current source; interpret prose only at the host.
+
+    A complete prefix supplies its structural choice. An optional prose choice
+    is a caller's interpretation of this selected user message, not a grant
+    inferred from credentials, task materials or another model's response.
+    """
+    from .codex_collaboration import delimiter_policy
+    from .codex_profile import classify_invocation
+    if not delimiter_policy(metadata['P_run']):
+        if selection is not None:
+            raise ValueError('Claude delimiter selection requires a 0.15+ task; old pins retain their rules')
+        return
+    if selection not in {None, 'ALLOW', 'DENY'}:
+        raise ValueError('Claude selection must be ALLOW or DENY')
+    surface = classify_invocation(message['source']['text'], p_run=metadata['P_run'])
+    if surface['classification'] in {'HELP', 'INVALID'} and selection is not None:
+        raise ValueError('help/malformed source cannot change Claude selection')
+    incoming = surface.get('claude_selection')
+    if incoming is not None:
+        if selection is not None and selection != incoming:
+            raise ValueError('Claude choice conflicts with the current user separator')
+        selection = incoming
+    if selection is not None:
+        value['claude_policy'] = {'mode': selection, 'message_id': message['id'],
+            'work_profile': 'CLAUDE_GUIDED' if selection == 'ALLOW' else 'EXECUTION',
+            'source': dict(message['source']),
+            'basis': 'INVOCATION_SEPARATOR' if incoming is not None else 'CURRENT_USER_DECISION',
+            'scope': 'current selected user choice; not authentication or fee authorization'}
+
+
 def _input_ref(message: Mapping[str, Any]) -> dict[str, Any]:
     """A stable task input anchor; ordinary post-return chat does not replace it."""
     return {'message_id': message['id'], 'source_sha256': message['source']['sha256'],
@@ -73,7 +105,7 @@ def initialize_lifecycle(root: Path, metadata: Mapping[str, Any]) -> dict[str, A
         raise ValueError('legacy pinned sessions are not silently upgraded')
     root = Path(root).resolve()
     source = _snapshot(root / 'REQUEST.txt', str(metadata['request_origin']))
-    surface = classify_invocation(source['text'])
+    surface = classify_invocation(source['text'], p_run=metadata['P_run'])
     if surface['classification'] != 'EXECUTING':
         raise ValueError('new managed session requires an EXECUTING original request')
     value = {'format': FORMAT, 'P_run': metadata['P_run'],
@@ -91,6 +123,7 @@ def initialize_lifecycle(root: Path, metadata: Mapping[str, Any]) -> dict[str, A
     value['current_message'].update({key: surface[key] for key in
         ('invocation_key', 'addon_hint', 'addon_selection') if key in surface})
     value['task_input_ref'] = _input_ref(value['current_message'])
+    _apply_claude_selection(value, metadata, value['current_message'])
     if metadata.get('delivery_contract') == 'x-files-v1':
         value['delivery_selection'] = metadata['delivery_selection']
         value['delivery_policy'] = metadata['initial_delivery_policy']
@@ -122,6 +155,24 @@ def load_lifecycle(root: Path) -> dict[str, Any]:
         raise ValueError('current lifecycle message identity mismatch')
     _validate_snapshot(current['source'])
     _pin_reference(current.get('upstream_route_pin_ref'))
+    from .codex_collaboration import delimiter_policy
+    if delimiter_policy(metadata['P_run']):
+        policy = value.get('claude_policy', {})
+        if policy.get('mode') not in {'ALLOW', 'DENY'} or policy.get('basis') not in {
+                'INVOCATION_SEPARATOR', 'CURRENT_USER_DECISION'}:
+            raise ValueError('missing/invalid current Claude choice')
+        if policy.get('work_profile') != ('CLAUDE_GUIDED' if policy['mode'] == 'ALLOW' else 'EXECUTION'):
+            raise ValueError('Claude work profile differs from its current choice')
+        _validate_snapshot(policy['source'])
+        observed = value['seen_source_refs'].get(policy['source']['source_ref'], {})
+        if (type(policy.get('message_id')) is not int or policy['message_id'] > value['handled_message_id']
+                or observed != {'sha256': policy['source']['sha256'], 'message_id': policy['message_id']}):
+            raise ValueError('Claude choice is not bound to a handled user source')
+        if policy['basis'] == 'INVOCATION_SEPARATOR':
+            from .codex_profile import classify_invocation
+            selected = classify_invocation(policy['source']['text'], p_run=metadata['P_run'])
+            if selected.get('claude_selection') != policy['mode']:
+                raise ValueError('Claude choice differs from its user separator')
     if value['status'] in TERMINAL and not value.get('closure'):
         raise ValueError('terminal lifecycle lacks its actual close record')
     value['managed'] = True
@@ -202,6 +253,8 @@ def consume_decision_message(root: Path, *, message_id: int, user_text: str,
         return value
     value['current_message']['handling'] = {'action': 'foundation-' + kind, 'reason': reason,
                                            'wall_ns': time.time_ns()}
+    from .codex_session import _session
+    _apply_claude_selection(value, _session(root)[1], value['current_message'])
     value['handled_message_id'] = message_id
     value['task_input_ref'] = _input_ref(value['current_message'])
     root = Path(root).resolve()
@@ -240,7 +293,7 @@ def ingest_message(root: Path, *, source: Path, source_ref: str,
         # the same still-pending input, without inventing another user message.
         if (route_pin is not None and candidate and current['source'] == selected):
             current['upstream_route_pin_ref'] = route_pin
-            current['surface'] = classify_invocation(selected['text'])['classification']
+            current['surface'] = classify_invocation(selected['text'], p_run=value['P_run'])['classification']
             return _save(root, value)
         raise ValueError('handle the pending source before ingesting another message')
     if selected['source_ref'] in value['seen_source_refs']:
@@ -251,7 +304,7 @@ def ingest_message(root: Path, *, source: Path, source_ref: str,
     value['message_id'] += 1
     value['current_message'] = {
         'id': value['message_id'], 'source': selected,
-        'surface': classify_invocation(selected['text'])['classification'] if not candidate or route_pin else 'ROUTE_PENDING',
+        'surface': classify_invocation(selected['text'], p_run=value['P_run'])['classification'] if not candidate or route_pin else 'ROUTE_PENDING',
         'route_required': candidate, 'upstream_route_pin_ref': route_pin,
         'route_basis': 'caller-supplied upstream pin reference; acquisition not performed by this helper',
         'handling': None}
@@ -290,7 +343,7 @@ def terminate_message(root: Path, *, source: Path, source_ref: str, action: str,
     value['recent_messages'] = [*value['recent_messages'], previous][-RECENT_LIMIT:]
     value['message_id'] += 1
     value['current_message'] = {'id': value['message_id'], 'source': selected,
-        'surface': classify_invocation(selected['text'])['classification'] if not candidate or route_pin else 'ROUTE_PENDING',
+        'surface': classify_invocation(selected['text'], p_run=value['P_run'])['classification'] if not candidate or route_pin else 'ROUTE_PENDING',
         'route_required': candidate, 'upstream_route_pin_ref': route_pin,
         'route_basis': 'upstream acquisition obligation; termination does not create execution eligibility',
         'handling': None}
@@ -328,7 +381,8 @@ def _revoke_if_present(root: Path, message: Mapping[str, Any], reason: str) -> N
 
 
 def handle_message(root: Path, *, message_id: int, action: str, reason: str,
-                   delivery_selection: dict | None = None, destinations: Path | None = None) -> dict[str, Any]:
+                   delivery_selection: dict | None = None, destinations: Path | None = None,
+                   claude_selection: str | None = None) -> dict[str, Any]:
     """Serialize a real policy change with pre-send reservation, not STOP.
 
     The message itself is already pending before this call; an external host
@@ -338,13 +392,14 @@ def handle_message(root: Path, *, message_id: int, action: str, reason: str,
         from .codex_delivery import policy_lock
         with policy_lock(Path(root).resolve()):
             return _handle_message(root,message_id=message_id,action=action,reason=reason,
-                delivery_selection=delivery_selection,destinations=destinations)
+                delivery_selection=delivery_selection,destinations=destinations,claude_selection=claude_selection)
     return _handle_message(root,message_id=message_id,action=action,reason=reason,
-        delivery_selection=delivery_selection,destinations=destinations)
+        delivery_selection=delivery_selection,destinations=destinations,claude_selection=claude_selection)
 
 
 def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
-                    delivery_selection: dict | None = None, destinations: Path | None = None) -> dict[str, Any]:
+                    delivery_selection: dict | None = None, destinations: Path | None = None,
+                    claude_selection: str | None = None) -> dict[str, Any]:
     """Apply a model-owned interpretation; this does not judge free-text intent.
 
     Message disposition is not task termination. Ordinary input to ACTIVE is
@@ -370,9 +425,13 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
         raise ValueError('paused task needs an actual resume decision, not implicit continuation')
     from .codex_session import _session, read_delivery_registry
     metadata = _session(root)[1]
+    if action not in {'stop', 'cancel'} and value['status'] not in TERMINAL:
+        _apply_claude_selection(value, metadata, message, claude_selection)
+    elif claude_selection is not None:
+        raise ValueError('a terminal task/source cannot change Claude selection')
     if metadata.get('delivery_contract') == 'x-files-v1' and action not in {'stop','cancel','pause'}:
         from .codex_profile import classify_invocation
-        surface = classify_invocation(message['source']['text'])
+        surface = classify_invocation(message['source']['text'], p_run=metadata['P_run'])
         incoming = surface.get('delivery_selection', {})
         current = value.get('delivery_selection', metadata['delivery_selection'])
         if delivery_selection is not None and surface['classification'] in {'HELP','INVALID','ROUTE_PENDING'}:

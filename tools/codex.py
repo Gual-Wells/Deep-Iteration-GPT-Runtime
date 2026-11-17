@@ -112,6 +112,8 @@ def main(argv: list[str] | None = None) -> int:
     handle.add_argument('--delivery-selection', type=Path,
                         help='actual current user choice JSON; ordinary followups otherwise inherit X')
     handle.add_argument('--destinations', type=Path, help='resolve a genuinely changed X target once')
+    handle.add_argument('--claude-selection', choices=('ALLOW', 'DENY'),
+                        help='actual current prose user choice; complete one/two-colon headers apply directly')
     lifecycle = ts.add_parser('lifecycle', help='read managed continuation state or explicit legacy status')
     lifecycle.add_argument('--root', required=True, type=Path)
     stop = ts.add_parser('terminate', help='stop/cancel a task; completed delivery uses return close')
@@ -219,7 +221,7 @@ def main(argv: list[str] | None = None) -> int:
                 result = handle_message(args.root, message_id=args.message_id,
                     action=args.message_action, reason=args.reason,
                     delivery_selection=read_object(args.delivery_selection) if args.delivery_selection else None,
-                    destinations=args.destinations)
+                    destinations=args.destinations, claude_selection=args.claude_selection)
             elif args.action == 'lifecycle':
                 result = load_lifecycle(args.root)
             elif args.action == 'terminate':

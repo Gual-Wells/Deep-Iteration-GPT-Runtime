@@ -1,5 +1,15 @@
 # Changelog
 
+## Codex 0.15.0 — execution tasks and mandatory Claude guidance for subjective work
+
+- `DIGR:` / `DIGR：` assigns specified execution and engineering to Codex without Claude or unsolicited subjective creation. `DIGR::` / `DIGR：：` requires consulting Claude for substantive subjective content choices and implementing applicable guidance; equivalent engineering and factual checks stay local.
+- Consume the complete one/two-colon separator, retain task bytes and preset/X groups, reject empty or overlong separators, and preserve broad routing, discussion and historical pinned semantics. C/P compatibility aliases cannot bypass the new boundary.
+- Bind the current choice to actual user sources; ordinary supplements inherit it and explicit changes preserve the task. Check Claude families before preparation, call preflight and send commitment. A withdrawal blocks prepared requests without a new fee reservation; prior public records and cost reconciliation remain readable.
+- Keep every task-owned input classification, including acquisition retries, priority termination and X handling, on its frozen P_run. New route heads do not reinterpret old triple-colon task bodies or silently discard an old delivery choice.
+- Finish local intent metadata construction before the final task check, retaining the durable unknown-outcome and no-retry boundary. Include retained choice-message content in generic/paper requests with its historical identity and existing exact-body replay dedup; current messages and fee authority remain separate.
+- Preserve Sonnet guidance priority, native Split, readable original-source preparation, streamed public relay, exact model identity, paper scope isolation, task continuity, five presets, X delivery, budget bounds and non-retrying recovery. The paper0.6 content contract remains unchanged; its updated discovery material points to the current core boundary.
+- Permission records do not certify subjective compliance, authenticated consent, quality or a new budget. Double-colon work with missing required guidance remains incomplete, with available engineering work continuing.
+
 ## Codex 0.14.0 / paper 0.6.0 — one DIGR entry and actual Sonnet participation
 
 - Unify new tasks under DIGR. Actual selected Sonnet requests activate content guidance and all existing preparation, Split, public relay, budget and recovery duties; C/P spellings remain compatibility inputs rather than access gates.

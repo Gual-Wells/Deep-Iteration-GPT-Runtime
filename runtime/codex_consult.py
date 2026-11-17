@@ -421,6 +421,23 @@ def _source_text(info: Mapping[str, Any], text: str, *, label: str = 'SOURCE DAT
             + ' sha256=' + info['sha256'] + ' ---\n' + text + '\n--- END ' + label + ' ---')
 
 
+def _claude_choice_source(lifecycle: Mapping[str, Any]) -> tuple[dict, str] | None:
+    """Keep a retained user choice's content, not only its local permission.
+
+    Lifecycle already validates this snapshot. Origin/current are supplied by
+    their existing paths; historical bodies use the existing replay dedup.
+    """
+    choice = lifecycle.get('claude_policy')
+    if not choice or choice['message_id'] in {0, lifecycle['current_message']['id']}:
+        return None
+    source = choice['source']
+    return {'kind': 'CLAUDE_SELECTION_USER_INPUT', 'path': source['path'],
+            'name': Path(source['path']).name, 'source_ref': source['source_ref'],
+            'message_id': choice['message_id'], 'byte_length': source['byte_length'],
+            'sha256': source['sha256'], 'content_included_in_request': True,
+            'transmission': 'PREPARED_NOT_SENT'}, source['text']
+
+
 def _paper_context(root: Path, lifecycle: Mapping[str, Any], scope: Mapping[str, Any],
                     value: Mapping[str, Any], batch: Mapping[str, Any],
                     previous_sources: Sequence[dict] = ()) -> tuple[list[dict], list[str]]:
@@ -462,6 +479,10 @@ def _paper_context(root: Path, lifecycle: Mapping[str, Any], scope: Mapping[str,
         raise ValueError('Actual paper selection input changed')
     info['source_ref'] = scope['authorization_source_ref']
     add_user_source(info, raw.decode('utf-8-sig'), 'RECORDED PAPER SELECTION - HISTORICAL USER INPUT')
+    retained = _claude_choice_source(lifecycle)
+    if retained is not None:
+        info, text = retained
+        add_user_source(info, text, 'HISTORICAL USER DECISION - APPLICABLE CLAUDE CHOICE')
     current = lifecycle['current_message']['source']
     info = {'kind': 'CURRENT_USER_INPUT_SNAPSHOT', 'path': current['path'],
             'name': Path(current['path']).name, 'source_ref': current['source_ref'],
@@ -501,6 +522,10 @@ def _generic_context(root: Path, lifecycle: Mapping[str, Any],
 
     info, raw = _source(root / 'REQUEST.txt', 'ORIGINAL_TASK_INPUT')
     add(info, raw.decode('utf-8-sig'), 'FROZEN TASK ORIGIN - HISTORICAL USER INPUT')
+    retained = _claude_choice_source(lifecycle)
+    if retained is not None:
+        info, text = retained
+        add(info, text, 'HISTORICAL USER DECISION - APPLICABLE CLAUDE CHOICE')
     current = lifecycle['current_message']['source']
     info = {'kind': 'CURRENT_USER_INPUT_SNAPSHOT', 'path': current['path'],
             'name': Path(current['path']).name, 'source_ref': current['source_ref'],
@@ -526,6 +551,7 @@ def prepare_request(
     """
     root, session, lifecycle = _task(root, active=True)
     _text('model', model)
+    codex_collaboration.require_claude_permission(session['P_run'], model, lifecycle)
     if effort not in {'low', 'medium', 'high', 'xhigh', 'max'}:
         raise ValueError('unsupported Consult effort')
     if type(max_tokens) is not int or max_tokens < 1:
@@ -900,6 +926,7 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
     root, session, lifecycle = _task(root, active=True)
     with _writer(root):
         directory, attempt, request = _load(root, exchange_id)
+        codex_collaboration.require_claude_permission(session['P_run'], request['model'], lifecycle)
         if attempt['transport_status'] != 'PREPARED':
             raise ValueError('Consult attempt already started; inspect/reconcile instead of repeating inference')
         _require_current_authoring(root, session, lifecycle, attempt)
@@ -930,19 +957,22 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
         attempt['pending_request_sha256'] = _hash(request_raw)
         _write(directory / 'attempt.json', attempt)
         _write_bytes(directory / 'request.json', request_raw)
-        # Construct transport and finish local preflight before the last actual
-        # task check. This is the managed send-commit boundary, not a claim that
-        # an already committed HTTP request can be recalled after a later STOP.
-        _, session, lifecycle = _task(root, active=True)
-        _require_current_authoring(root, session, lifecycle, attempt)
-        if split_record is not None and split_record['binding']['input_ref'] != _input_ref(lifecycle):
-            raise ValueError('New user input supersedes this Split; prepare the current task')
+        # Finish even timestamp/URI/intent construction before the last task
+        # check. Only the later durable write commits this prepared intent.
         attempt.update(request_sha256=_hash(request_raw), transport_status='ATTEMPTED',
                        billing_status='UNKNOWN', reserved_usd=float(ceiling_usd), started_at=_now(),
                        budget_facts=budget, endpoint_origin=urlunsplit((*urlsplit(config['endpoint'])[:2], '', '', '')))
         attempt.pop('pending_request_sha256', None)
         for source in attempt['sources']:
             source['transmission'] = 'ATTEMPTED_RECEIPT_UNCONFIRMED'
+        # Construct transport and finish local preflight before the last actual
+        # task check. This is the managed send-commit boundary, not a claim that
+        # an already committed HTTP request can be recalled after a later STOP.
+        _, session, lifecycle = _task(root, active=True)
+        codex_collaboration.require_claude_permission(session['P_run'], request['model'], lifecycle)
+        _require_current_authoring(root, session, lifecycle, attempt)
+        if split_record is not None and split_record['binding']['input_ref'] != _input_ref(lifecycle):
+            raise ValueError('New user input supersedes this Split; prepare the current task')
         _write(directory / 'attempt.json', attempt)
         sequence = 0
         public_hash = sha256()
