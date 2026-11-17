@@ -448,6 +448,9 @@ class PinnedAddonTests(unittest.TestCase):
             p.refresh_addon(root)
             manifest = p._read(root / 'paper/manifest.json')
             self.assertEqual(manifest['pdf_design'], 'paper/PDF_DESIGN.md')
+            self.assertEqual(manifest['authoring_contract'], 'sonnet-native-v1')
+            self.assertEqual(manifest['mapping_contract'], 'source-bound-native-v1')
+            self.assertNotIn('reader_order', manifest)
             self.assertEqual(manifest['file_sha256']['paper/PDF_DESIGN.md'],
                              sha256((root / 'paper/PDF_DESIGN.md').read_bytes()).hexdigest())
 

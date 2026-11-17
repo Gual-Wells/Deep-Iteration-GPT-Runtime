@@ -75,7 +75,7 @@ def main(argv: list[str] | None = None) -> int:
                 'voice': codex_voice.main}[argv[0]](argv[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
-    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery'):
+    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery', 'consult'):
         sub.add_parser(name, help=f'{name} commands; append --help for details')
     acquire = sub.add_parser('acquire', help='actually acquire a live, immutable Codex profile')
     acquire.add_argument('--stage', choices=('startup', 'help', 'execution'), default='startup')
