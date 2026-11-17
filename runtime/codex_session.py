@@ -224,7 +224,7 @@ def create_session(root: Path, *, request: Path, p_run: str,
     invocation = None
     if profile_requires_lifecycle:
         from .codex_profile import classify_invocation
-        invocation = classify_invocation(raw.decode('utf-8-sig'))
+        invocation = classify_invocation(raw.decode('utf-8-sig'), p_run=p_run)
         if invocation['classification'] != 'EXECUTING':
             raise ValueError('new managed session requires an EXECUTING original request; ordinary correction/help cannot create it')
         if invocation['invocation_key'] == 'DIGRC' and not profile_uses_consult:
@@ -297,6 +297,11 @@ def create_session(root: Path, *, request: Path, p_run: str,
                 'consult_role': 'Derived for the current actual collaborator and content scope',
                 'legacy_invocation_key': invocation['invocation_key'], 'fee_authorization': False,
             }
+            if 'claude_selection' in invocation:
+                metadata['initial_invocation'].update({key: invocation[key] for key in
+                    ('task_separator', 'claude_selection', 'work_profile')})
+                metadata['execution_profile']['claude_selection'] = invocation['claude_selection']
+                metadata['execution_profile']['work_profile'] = invocation['work_profile']
     if profile_uses_delivery:
         from .codex_delivery import resolve_policy
         selection = invocation['delivery_selection']

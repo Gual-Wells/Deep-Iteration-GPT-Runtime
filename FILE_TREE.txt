@@ -876,12 +876,14 @@ tests/test_clock_genesis_stress.py
 tests/test_clock_journal.py
 tests/test_clock_probe.py
 tests/test_codex_carrier.py
+tests/test_codex_claude_selection.py
 tests/test_codex_cli.py
 tests/test_codex_consult.py
 tests/test_codex_consult_paper.py
 tests/test_codex_delivery.py
 tests/test_codex_experience.py
 tests/test_codex_foundation.py
+tests/test_codex_frozen_input.py
 tests/test_codex_knowledge.py
 tests/test_codex_lifecycle.py
 tests/test_codex_native_paper_return.py

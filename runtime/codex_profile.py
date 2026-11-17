@@ -19,7 +19,7 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v11'
+PROFILE_PROTOCOL = 'digr-codex-native-v12'
 PROFILE_CORE = (
     'codex/FOUNDATION.md',
     'codex/CHARACTER.md', 'codex/PARAMETERS.md',
@@ -159,7 +159,7 @@ def _invocation_parameters(prelude: str) -> tuple[str, dict[str, Any]]:
     return execution, selection
 
 
-def classify_invocation(message: str) -> dict[str, Any]:
+def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, Any]:
     """Classify the versioned call surface AFTER live pinned startup acquisition.
 
     This is deliberately separate from the thin candidate router. It neither
@@ -207,9 +207,17 @@ def classify_invocation(message: str) -> dict[str, Any]:
         if stack:
             return {**base, 'classification': 'INVALID', 'reason': 'unclosed parameter parentheses'}
         return {**base, 'reason': 'protocol discussion without a complete invocation surface'}
-    prelude, task = tail[:separator], tail[separator + 1:]
+    from .codex_collaboration import delimiter_policy
+    modern_separator = p_run is None or delimiter_policy(p_run)
+    separator_length = 1
+    if modern_separator:
+        while separator + separator_length < len(tail) and tail[separator + separator_length] in ':：':
+            separator_length += 1
+    prelude, task = tail[:separator], tail[separator + separator_length:]
     if prelude.strip() and not (prelude.strip().startswith(('(', '（')) and prelude.strip().endswith((')', '）'))):
         return {**base, 'reason': 'discussion text before the task separator'}
+    if separator_length > 2:
+        return {**base, 'classification': 'INVALID', 'reason': 'use one or two task-separator colons'}
     if not task.strip():
         return {**base, 'classification': 'INVALID', 'reason': 'empty task'}
     try:
@@ -218,6 +226,9 @@ def classify_invocation(message: str) -> dict[str, Any]:
     except ValueError as exc:
         return {**base, 'classification': 'INVALID', 'reason': str(exc)}
     return {**base, 'classification': 'EXECUTING', 'task': task,
+            **({'task_separator': tail[separator:separator + separator_length],
+                'claude_selection': 'ALLOW' if separator_length == 2 else 'DENY',
+                'work_profile': 'CLAUDE_GUIDED' if separator_length == 2 else 'EXECUTION'} if modern_separator else {}),
             'parameter_text': prelude, 'execution_parameter_text': execution_parameters,
             'delivery_selection': delivery, 'addon_selection': addon_hint,
             'consult_selection': invocation_key in ('DIGRC', 'DIGRP'),

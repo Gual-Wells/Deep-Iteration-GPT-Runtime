@@ -1,4 +1,6 @@
-# DIGR for Codex · 0.14.0
+# DIGR for Codex · 0.15.0
+
+`DIGR：任务`表示由Codex按既定规格完成执行和工程、不调用Claude、不擅加主观创作；`DIGR：：任务`中凡有实质主观内容判断，都必须请教Claude并落实其有效意见。取材、事实核验、文件组装、工具操作和验证由Codex承担。既有适用指导可直接实现，不为机械步骤制造调用；咨询义务不新增预算。ASCII `:` / `::`等价，五档和X栏仍可置于分隔符前。无前缀补充继承选择，真实用户切换保留原任务；旧pin不静默迁移。[使用说明](codex/HELP.md)。
 
 0.13起的逐提交Split现统一进入DIGR，所有实际Claude通路在每次提交前采用[本机原生Split](codex/SPLIT.md)：Codex研究任务分工、完成必要本机工作，给Claude最小充分的原件和内容问题；工具逐次绑定请求与实际成果，缺少或过期计划不能发送。`consult split --input … --out …`机械附加当前绑定，`call --split-plan …`提交前本机检查。保留Claude内容判断、0.12.1公开增量转播及文本优先取材，旧pin按原版本接续；[完整合成示例](codex/examples/split/README.md)。
 

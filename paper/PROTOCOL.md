@@ -9,7 +9,7 @@
 
 先履行所选 DIGR 通道的真实在线获取、同 SHA pin、完整执行协议、任务对齐与持续授权。再取同一 SHA 的 `paper/manifest.json`、`paper/VERSION` 与清单成员，核对版本和散列。`codex/manifest.json` 的 `paper_addon` 声明该入口；技能安装路径和旧论文包都不替代本次获取。缺失的是当前阶段必需的仓库协议时，遵守所属路由的失败规则，不用旧版重建。
 
-正式入口统一为`DIGR：用Sonnet完整处理这篇论文……`，也可在同一DIGR中按实际任务自然接入。旧DIGRP与“按DIGRP”写法只是兼容来源，不是启用或付费的条件。宿主按用户真实用途绑定整篇对象、同pin取协议并登记来源；`paper acquire --continue-from`仍只续读原pin，不替代新前缀调用的获取。内部`--paper-root`选择本次实际论文，已有批次不强制所有通用Sonnet请求都使用论文作用域。
+核心0.15起，正式协作入口为`DIGR：：用Sonnet完整处理这篇论文……`，也可在同一任务经真实当前用户授权后接入；单冒号任务不因论文材料或内部paper登记而调用Claude。核心0.14旧pin保持其原入口。旧DIGRP与“按DIGRP”写法只是兼容来源，不能绕过当前核心的分隔符与费用边界。宿主按用户真实用途绑定整篇对象、同pin取协议并登记来源；`paper acquire --continue-from`仍只续读原pin，不替代新前缀调用的获取。内部`--paper-root`选择本次实际论文，已有批次不强制所有通用Sonnet请求都使用论文作用域。本增量0.6的内容契约保持不变。
 
 0.5 的论文创作契约为 `sonnet-native-v1`，来源映射契约为 `source-bound-native-v1`。旧任务保留原 pin 与原数据契约，不自动转换为新协作或新内容。统一DIGR中的其它内容对象不因本增量变成论文导读；论文内容的创作关系以下文为准，共用能力、费用和公开交换仍依核心 [CONSULT](../codex/CONSULT.md)。
 
