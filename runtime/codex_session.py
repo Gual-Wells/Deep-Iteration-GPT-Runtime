@@ -284,6 +284,10 @@ def create_session(root: Path, *, request: Path, p_run: str,
             'consult_role': 'higher-priority subjective guidance under equal actual conditions'
                             if invocation['consult_selection'] else None,
         }
+        if tuple(map(int, version.groups())) >= (0, 11, 0) and invocation.get('addon_selection') == 'paper':
+            metadata['execution_profile'].update(
+                paper_authoring_contract='sonnet-native-v1',
+                consult_role='Sonnet-native content driving for the selected paper')
         metadata['parameter_selection'] = selection
     if profile_uses_delivery:
         from .codex_delivery import resolve_policy

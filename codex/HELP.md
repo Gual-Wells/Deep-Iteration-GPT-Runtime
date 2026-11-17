@@ -4,7 +4,7 @@
 
 0.8.3接入社区[反防御性写作规则](../docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md)：先陈述有依据的主张，删除重复辩护和叠加保留，保留实际影响结论与使用的限定。核心规则已进入必读执行正文，完整技能随分发提供，可按写作用途调用。
 
-本版接通[ DIGRP 0.4.0 论文解构增量](../paper/PROTOCOL.md)的直接调用：`DIGRP：完整处理这篇论文……`，兼容`DIGR：按 DIGRP 完整处理……`。每篇完整M，在Consult指导下将内部职责综合为自然的阅读章节；桌面标准单页、每篇一份完整PDF，按任务X选择本地或经授权Gmail返回。完整调用才选择增量执行，`DIGRP/help`只看说明。全部论文和公共工作完成后再统筹结束。`python -B tools/codex.py paper --help`提供文件工具，原生宿主承担阅读、证明、教学、代理与发送。
+本版接通[ DIGRP 0.5.0 论文解构增量](../paper/PROTOCOL.md)的直接调用：`DIGRP：完整处理这篇论文……`，兼容`DIGR：按 DIGRP 完整处理……`。每篇完整M，由Sonnet根据原论文和用户用途形成内容与读序，取消预设小m拆分；桌面标准单页、每篇一份完整PDF，按任务X选择本地或经授权Gmail返回。完整调用才选择增量执行，`DIGRP/help`只看说明。全部论文和公共工作完成后再统筹结束。`python -B tools/codex.py paper --help`提供文件工具，原生宿主承担阅读、证明、教学、代理与发送。
 
 任务未按RETURN明确结束或被明令停止/取消前，后续消息沿当前DIGR作为补充处理；NEW_TURN、纠正、追问或技术中断不使它降级、重开前置或丢失投入。暂停保留任务，普通补充不自动恢复。再次命中前缀仍先获取仓库，当前P_run不变。已结束后的普通讨论也不复活DIGR。
 
@@ -66,6 +66,6 @@ python -B tools/codex.py clock --help
 
 `DIGR(Light)：任务`、`DIGRC(Less)：任务`、`DIGRP(More)(X)：论文任务`均可用。五档依次为Light N2/R1/D0/V0、Less N6/R2/D1/V1、Default N12/R4/D3/V3、More N18/R6/D4/V4、Max N24/R8/D6/V6；每档L3/M1，显式参数优先，裸调用Default。时间、来源工作和预算依真实任务；standard兼容Light。
 
-DIGR继续原生Main，DIGRC增加Consult，DIGRP0.4采用同一协作关系。Consult对同条件主观方向、风格、规格和内容/设计的指导优先，Main仍完整思考、生产和承担原生责任。参见[CONSULT](CONSULT.md)。普通话题和翻译不自动启用付费Consult。
+DIGR继续原生Main，DIGRC增加Consult，DIGRP0.5采用论文侧Sonnet原生内容驱动。Consult对同条件主观方向、风格、规格和内容/设计的指导优先，Main仍完整思考、生产和承担原生责任。参见[CONSULT](CONSULT.md)。普通话题和翻译不自动启用付费Consult。
 
 `python -B tools/codex.py profile presets`列出预设；`profile parameters --text '(Less,N=8)'`预览覆盖；`consult --help`查看实际公开对话、费用和恢复工具。角色、计数、hash和API200都不是品质证明。

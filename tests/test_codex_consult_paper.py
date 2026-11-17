@@ -64,8 +64,11 @@ class ConsultPaperTests(unittest.TestCase):
         payload["consultation"] = {"guidance": str(guidance), "source_ref": "synthetic-exchange",
                                    "scope": "Synthetic direction applies to this candidate; no provider claim."}
         p.prepare_candidate(root, payload, expected_revision=2, operation_id="candidate")
+        before = (root / "paper.json").read_bytes()
         observed = p.inspect(root)
         self.assertEqual(observed["status"], "READY_LOCAL")
+        self.assertEqual((root / "paper.json").read_bytes(), before)
+        self.assertEqual(p._load(root)["candidate"]["addon_version"], "0.4.0")
         self.assertEqual(p._load(root)["candidate"]["responsibility_report"], payload["responsibility_report"])
         guidance.write_text("Changed synthetic guidance.\n", encoding="utf-8")
         self.assertEqual(p.inspect(root)["status"], "STALE_OR_UNAVAILABLE")

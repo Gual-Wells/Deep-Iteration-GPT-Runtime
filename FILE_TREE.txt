@@ -77,7 +77,7 @@ docs/CLOCK_RELIABILITY.md
 docs/CODEX_0_8_UPGRADE.md
 docs/CODEX_ADAPTATION.md
 docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md
-docs/CODEX_FAMILY_UPGRADE_0_10_1.md
+docs/CODEX_FAMILY_UPGRADE_0_11_1.md
 docs/CODEX_QUALITY_DESIGN.md
 docs/CODEX_REAL_WORLD_CONTINUITY_UPGRADE.md
 docs/CODEX_RESPONSE_CLOCK_UPGRADE.md
@@ -878,7 +878,9 @@ tests/test_codex_experience.py
 tests/test_codex_foundation.py
 tests/test_codex_knowledge.py
 tests/test_codex_lifecycle.py
+tests/test_codex_native_paper_return.py
 tests/test_codex_paper.py
+tests/test_codex_paper_native.py
 tests/test_codex_permissions.py
 tests/test_codex_personal.py
 tests/test_codex_preprint.py

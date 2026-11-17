@@ -18,7 +18,7 @@ from unittest.mock import patch
 
 from runtime import codex_consult as consult
 from runtime import codex_paper as paper
-from runtime.codex_lifecycle import ingest_message, terminate_message
+from runtime.codex_lifecycle import handle_message, ingest_message, terminate_message
 from runtime.codex_session import create_session
 from tools.codex_consult import main as consult_cli
 
@@ -84,6 +84,12 @@ class ConsultFaultHandler(BaseHTTPRequestHandler):
             response = {'error': {'code': 400, 'message': SECRET + HIDDEN}}
         elif label == 'invalid-cost':
             response['usage']['cost'] = True
+        elif label == 'paper-model-confirmed':
+            response['model'] = consult.DEFAULT_MODEL
+        elif label == 'paper-model-missing':
+            response.pop('model')
+        elif label == 'paper-model-different-sonnet':
+            response['model'] = 'anthropic/claude-sonnet-4.6'
         raw = json.dumps(response, ensure_ascii=False).encode('utf-8')
         self.send_header('Content-Length', str(len(raw)))
         self.end_headers()
@@ -171,6 +177,41 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
 
     def public_files(self):
         return [path for path in (self.root / 'consult').rglob('*') if path.is_file() and path.name != '.writer.lock']
+
+    def authoring_fixture(self, label='authoring', *, invocation='DIGRP', same_user_text=False):
+        folder = self.folder / label
+        folder.mkdir()
+        original = folder / 'actual-user.txt'
+        original.write_text(invocation + '：保留完整论文，以一次真实请求讲清给初学读者。\n', encoding='utf-8')
+        task = folder / 'task'
+        pin = '0.11.0@' + 'd' * 40
+        create_session(task, request=original, p_run=pin, visits_path=folder / 'visits', run_id=label)
+        selection = folder / 'actual-paper-selection.txt'
+        if same_user_text:
+            selection.write_bytes(original.read_bytes())
+        else:
+            selection.write_text('这两篇各自完整处理；允许各篇发展自己的讲法。\n', encoding='utf-8')
+        batch = folder / 'batch'
+        paper.initialize(batch, p_run=pin, authorization=selection, source_ref=label + '-paper-choice', task_root=task)
+        parameters = {'N': 2, 'T': '0min', 'R': 1, 'B': 0,
+                      'S': {'n': 0, 't': '0min', 'r': 0, 'b': 0}, 'D': 0, 'V': 0, 'L': 3}
+        roots = []
+        for paper_id, title, line, sentinel in (
+                ('first', 'First selected source identity', 'M01', 'FIRST_ORIGINAL_NOT_SENT_BY_INVENTORY'),
+                ('second', 'OTHER_PAPER_TITLE_MUST_STAY_OUT', 'M02', 'OTHER_PAPER_CONTENT_MUST_STAY_OUT')):
+            selected = Path(paper.add_paper(batch, paper_id=paper_id, title=title, line=line,
+                owner='synthetic-native-host', parameters=parameters)['paper_root'])
+            source = folder / (paper_id + '-original.txt')
+            source.write_text(sentinel, encoding='utf-8')
+            paper.register_source(selected, {'id': paper_id + '-source', 'path': str(source),
+                'pages': 3, 'identity': title}, expected_revision=0, operation_id=paper_id + '-source')
+            roots.append(selected)
+        return task, batch, roots
+
+    def authoring_call(self, task, exchange_id):
+        with patch.dict(os.environ, {'DIGR_TEST_CONSULT_KEY': SECRET}):
+            return consult.call_once(task, exchange_id, facts=self.facts(), ceiling_usd=.2,
+                                     config_path=self.config(exchange_id))
 
     def test_actual_sources_are_prepared_then_transmitted_and_public_draft_is_byte_exact(self):
         prepared = self.prepare('complete', input_revision='revision-one')
@@ -445,7 +486,8 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
             consult.prepare_request(old, input_path=self.input)
 
     def test_paper_patch_selection_preserves_old_core_and_rejects_incompatible_scopes(self):
-        for version, expected in (('0.10.0', '0.4.0'), ('0.10.1', '0.4.1')):
+        for version, expected in (('0.10.0', '0.4.0'), ('0.10.1', '0.4.0'),
+                                  ('0.11.0', '0.5.0'), ('0.11.1', '0.5.1')):
             with self.subTest(core=version):
                 request = self.file('request-' + version + '.txt', 'DIGR：选择论文增量。\n')
                 parent_root = self.folder / ('parent-' + version)
@@ -458,19 +500,27 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
                 parent = json.loads((parent_root / 'session.json').read_text(encoding='utf-8'))
                 self.assertEqual(parent['execution_profile']['mode'], 'NATIVE')
                 self.assertEqual(parent['consult_addons'][0]['version'], expected)
+                kwargs = {}
+                if expected.startswith('0.5.'):
+                    selected = paper.add_paper(batch, paper_id='patch', title='Synthetic patch scope',
+                                               line='M01', owner='native-fixture',
+                                               parameters={'N': 2, 'R': 1, 'D': 0, 'V': 0,
+                                                           'L': 3, 'T': '1min', 'B': 0,
+                                                           'S': {'n': 0, 'r': 0, 't': '0min', 'b': 0}})
+                    kwargs['paper_root'] = Path(selected['paper_root'])
                 result = consult.prepare_request(parent_root, input_path=self.input,
-                                                 exchange_id='valid-patch', max_tokens=16000)
+                                                 exchange_id='valid-patch', max_tokens=16000, **kwargs)
                 self.assertEqual(result['exchange']['selected_paper_scopes'][0]['version'], expected)
                 # Matching forged records still cannot authorize a future addon,
                 # nor a newer known addon on a frozen older core.
-                invalid_versions = ['0.4.99'] + (['0.4.1'] if version == '0.10.0' else [])
+                invalid_versions = ['0.5.99', '0.4.1'] + (['0.5.1'] if version == '0.11.0' else [])
                 for invalid in invalid_versions:
                     parent['consult_addons'][0]['version'] = invalid
                     (parent_root / 'session.json').write_text(json.dumps(parent), encoding='utf-8')
                     (batch / 'batch.json').write_text(json.dumps(dict(value, addon_version=invalid)), encoding='utf-8')
                     with self.subTest(forged=invalid), self.assertRaisesRegex(ValueError, 'verified selected paper'):
                         consult.prepare_request(parent_root, input_path=self.input,
-                                                exchange_id='invalid-' + invalid, max_tokens=16000)
+                                                exchange_id='invalid-' + invalid, max_tokens=16000, **kwargs)
         self.assertEqual(len(self.server.post_calls), 0)
 
     def test_native_parent_real_selected_paper_addon_enables_only_verified_new_pin_scope(self):
@@ -515,6 +565,192 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'verified selected paper'):
             consult.prepare_request(old, input_path=self.input)
         self.assertEqual(len(self.server.post_calls), 1)
+
+    def test_paper_author_gets_actual_user_snapshots_and_only_selected_paper_inventory(self):
+        task, _, papers = self.authoring_fixture()
+        correction = self.file('author-correction.txt', '先解释原图里的排队时刻；不要照搬统一章节。\n')
+        selected = ingest_message(task, source=correction, source_ref='author-correction')
+        handle_message(task, message_id=selected['message_id'], action='continue', reason='Constructed relevant reader correction')
+        correction.write_text('CHANGED_LOCATOR_IS_NOT_THE_CURRENT_MESSAGE', encoding='utf-8')
+        prepared = consult.prepare_request(task, input_path=self.input, paper_root=papers[0],
+                                           exchange_id='paper-author', max_tokens=16000)
+        body = json.loads(Path(prepared['request_path']).read_text(encoding='utf-8'))
+        system = body['messages'][0]['content']
+        content = body['messages'][-1]['content']
+        self.assertNotEqual(system, consult._SYSTEM)
+        self.assertIn('author and content driver', system)
+        for private in ('N/R/D/V', 'm1', 'mapping_contract', 'P_run', 'M01'):
+            self.assertNotIn(private, system)
+        self.assertIn('保留完整论文，以一次真实请求讲清给初学读者', content)
+        self.assertIn('这两篇各自完整处理', content)
+        self.assertIn('先解释原图里的排队时刻', content)
+        self.assertNotIn('CHANGED_LOCATOR_IS_NOT_THE_CURRENT_MESSAGE', content)
+        self.assertIn('HISTORICAL USER INPUT', content)
+        self.assertIn('CURRENT MANAGED TASK USER MESSAGE', content)
+        self.assertIn('First selected source identity', content)
+        self.assertIn('NOT_TRANSMITTED_BY_INVENTORY', content)
+        self.assertNotIn('FIRST_ORIGINAL_NOT_SENT_BY_INVENTORY', content)
+        self.assertNotIn('OTHER_PAPER_TITLE_MUST_STAY_OUT', content)
+        self.assertNotIn('OTHER_PAPER_CONTENT_MUST_STAY_OUT', content)
+        scope = prepared['exchange']['authoring_scope']
+        self.assertEqual(scope['paper_root'], papers[0].as_posix())
+        self.assertEqual(scope['paper_id'], 'first')
+        self.assertEqual(scope['authoring_contract'], 'sonnet-native-v1')
+        self.assertEqual(body['user'], 'digr-paper-' + prepared['exchange']['authoring_scope_sha256'])
+        self.assertEqual(self.server.post_calls, [])
+
+    def test_paper_first_exchange_requires_explicit_selection_and_cli_expands_actual_content(self):
+        task, batch, papers = self.authoring_fixture()
+        with self.assertRaisesRegex(ValueError, 'explicit --paper-root'):
+            consult.prepare_request(task, input_path=self.input)
+        output = io.StringIO()
+        source = batch.parent / 'first-original.txt'
+        with patch('sys.stdout', output):
+            code = consult_cli(['prepare', '--root', str(task), '--input', str(self.input),
+                '--paper-root', str(papers[0]), '--material', str(source), '--exchange-id', 'paper-cli'])
+        self.assertEqual(code, 0)
+        prepared = json.loads(output.getvalue())
+        body = json.loads(Path(prepared['request_path']).read_text(encoding='utf-8'))
+        self.assertIn('FIRST_ORIGINAL_NOT_SENT_BY_INVENTORY', body['messages'][-1]['content'])
+        self.assertEqual(self.server.post_calls, [])
+
+    def test_author_continuation_replays_actual_public_work_without_cross_paper_or_generic_switch(self):
+        task, _, papers = self.authoring_fixture(invocation='DIGRC')
+        first = consult.prepare_request(task, input_path=self.input, paper_root=papers[0],
+                                        exchange_id='paper-first', max_tokens=16000)
+        self.authoring_call(task, 'paper-first')
+        self.input.write_text('已取得你要的原图，下面只补图与一个确定事实。', encoding='utf-8')
+        followup = consult.prepare_request(task, input_path=self.input, continue_from='paper-first',
+                                           exchange_id='paper-next', max_tokens=16000)
+        previous = json.loads(Path(first['request_path']).read_text(encoding='utf-8'))['messages']
+        continued = json.loads(Path(followup['request_path']).read_text(encoding='utf-8'))['messages']
+        self.assertEqual(continued[:-2], previous)
+        self.assertEqual(continued[-2], {'role': 'assistant', 'content': PUBLIC})
+        self.assertEqual(followup['exchange']['authoring_scope'], first['exchange']['authoring_scope'])
+        with self.assertRaisesRegex(ValueError, 'another paper'):
+            consult.prepare_request(task, input_path=self.input, continue_from='paper-first', paper_root=papers[1])
+        generic = consult.prepare_request(task, input_path=self.input, exchange_id='generic-stays-generic', max_tokens=16000)
+        body = json.loads(Path(generic['request_path']).read_text(encoding='utf-8'))
+        self.assertEqual(body['messages'][0], {'role': 'system', 'content': consult._SYSTEM})
+        self.assertNotIn('authoring_scope', generic['exchange'])
+        self.authoring_call(task, 'generic-stays-generic')
+        with self.assertRaisesRegex(ValueError, 'generic Consult'):
+            consult.prepare_request(task, input_path=self.input, continue_from='generic-stays-generic', paper_root=papers[0])
+        self.assertEqual(len(self.server.post_calls), 2)
+
+    def test_handled_user_correction_fences_prepared_author_context_until_reprepared(self):
+        task, _, papers = self.authoring_fixture()
+        consult.prepare_request(task, input_path=self.input, paper_root=papers[0],
+                                exchange_id='stale-paper', max_tokens=16000)
+        correction = self.file('handled-paper-correction.txt', '保留我新选的图，撤销上一版配图决定。')
+        selected = ingest_message(task, source=correction, source_ref='handled-paper-correction')
+        handle_message(task, message_id=selected['message_id'], action='continue', reason='Constructed correction already handled by host')
+        with self.assertRaisesRegex(ValueError, 'New user input'):
+            self.authoring_call(task, 'stale-paper')
+        self.assertEqual(self.server.post_calls, [])
+        prepared = consult.prepare_request(task, input_path=self.input, paper_root=papers[0],
+                                           exchange_id='current-paper', max_tokens=16000)
+        body = json.loads(Path(prepared['request_path']).read_text(encoding='utf-8'))
+        self.assertIn('撤销上一版配图决定', body['messages'][-1]['content'])
+
+    def test_native_paper_history_remains_readable_when_current_selection_is_unavailable(self):
+        task, batch, papers = self.authoring_fixture(invocation='DIGR')
+        with self.assertRaisesRegex(ValueError, 'explicit --paper-root'):
+            consult.prepare_request(task, input_path=self.input)
+        consult.prepare_request(task, input_path=self.input, paper_root=papers[0],
+                                exchange_id='native-paper-history', max_tokens=16000)
+        value = json.loads((batch / 'batch.json').read_text(encoding='utf-8'))
+        value['authoring_contract'] = 'not-the-selected-contract'
+        (batch / 'batch.json').write_text(json.dumps(value), encoding='utf-8')
+        observed = consult.inspect_exchange(task, 'native-paper-history')
+        self.assertEqual(observed['exchange']['authoring_scope']['paper_id'], 'first')
+        with self.assertRaisesRegex(ValueError, 'verified selected paper'):
+            self.authoring_call(task, 'native-paper-history')
+        self.assertEqual(self.server.post_calls, [])
+        parent = json.loads((task / 'session.json').read_text(encoding='utf-8'))
+        self.assertEqual(parent['execution_profile']['mode'], 'NATIVE')
+
+    def test_old_paper_prompt_is_not_promoted_and_authoring_scope_edits_are_detected(self):
+        old_batch = self.folder / 'old-consult-batch'
+        paper.initialize(old_batch, p_run=PIN, authorization=self.original,
+                         source_ref='old-consult-paper', task_root=self.root)
+        prepared = self.prepare('old-paper-is-generic')
+        body = json.loads(Path(prepared['request_path']).read_text(encoding='utf-8'))
+        self.assertEqual(body['messages'][0], {'role': 'system', 'content': consult._SYSTEM})
+        self.assertNotIn('authoring_scope', prepared['exchange'])
+        with self.assertRaisesRegex(ValueError, 'registered paper 0.5'):
+            consult.prepare_request(self.root, input_path=self.input, paper_root=old_batch / 'papers' / 'fake')
+        task, _, papers = self.authoring_fixture()
+        native = consult.prepare_request(task, input_path=self.input, paper_root=papers[0],
+                                         exchange_id='scope-edited', max_tokens=16000)
+        attempt_path = Path(native['request_path']).with_name('attempt.json')
+        attempt = json.loads(attempt_path.read_text(encoding='utf-8'))
+        attempt['authoring_scope']['paper_id'] = 'second'
+        attempt['authoring_scope_sha256'] = sha256(consult._json_bytes(attempt['authoring_scope'])).hexdigest()
+        attempt_path.write_text(json.dumps(attempt), encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'authoring scope'):
+            consult.inspect_exchange(task, 'scope-edited')
+
+    def test_paper_model_requires_exact_observed_selected_sonnet_without_losing_paid_public_work(self):
+        task, _, papers = self.authoring_fixture()
+        for model in ('openai/gpt-5.5', 'anthropic/claude-opus-5.5', 'sonnet',
+                      'anthropic/claude-sonnet-5.5:unverified-alias'):
+            with self.subTest(requested=model), self.assertRaisesRegex(ValueError, 'canonical Anthropic Sonnet'):
+                consult.prepare_request(task, input_path=self.input, paper_root=papers[0], model=model)
+        generic = consult.prepare_request(self.root, input_path=self.input, model='openai/explicit-other-model',
+                                           exchange_id='generic-other-model')
+        generic_request = json.loads(Path(generic['request_path']).read_text(encoding='utf-8'))
+        self.assertEqual(generic_request['model'], 'openai/explicit-other-model')
+        self.assertNotIn('paper_model_identity', generic)
+        for label, expected in (('paper-model-confirmed', 'CONFIRMED'),
+                                ('paper-model-missing', 'UNCONFIRMED'),
+                                ('paper-model-different-sonnet', 'UNCONFIRMED'),
+                                ('paper-model-other-family', 'UNCONFIRMED')):
+            prepared = consult.prepare_request(task, input_path=self.input, paper_root=papers[0],
+                                               exchange_id=label, max_tokens=16000)
+            self.assertEqual(prepared['paper_model_identity']['status'], 'UNCONFIRMED')
+            result = self.authoring_call(task, label)
+            with self.subTest(observed=label):
+                self.assertEqual(result['paper_model_identity']['status'], expected)
+                self.assertEqual(result['paper_model_identity']['requested_model'], consult.DEFAULT_MODEL)
+                self.assertEqual(result['exchange']['public_status'], 'COMPLETE')
+                self.assertEqual(result['exchange']['known_cost_usd'], .03)
+                self.assertEqual(Path(result['public_path']).read_bytes(), PUBLIC.encode('utf-8'))
+                with self.assertRaisesRegex(ValueError, 'already started'):
+                    self.authoring_call(task, label)
+        self.assertEqual(len(self.server.post_calls), 4)
+
+    def test_identical_paper_user_bodies_expand_once_but_keep_all_three_source_roles(self):
+        task, _, papers = self.authoring_fixture(same_user_text=True)
+        prepared = consult.prepare_request(task, input_path=self.input, paper_root=papers[0],
+                                           exchange_id='one-user-body', max_tokens=16000)
+        body = json.loads(Path(prepared['request_path']).read_text(encoding='utf-8'))['messages'][-1]['content']
+        original = (task / 'REQUEST.txt').read_bytes().decode('utf-8-sig')
+        self.assertEqual(body.count(original), 1)
+        sources = prepared['exchange']['sources'][:3]
+        self.assertEqual([item['kind'] for item in sources],
+                         ['ORIGINAL_TASK_INPUT', 'PAPER_SELECTION_INPUT', 'CURRENT_USER_INPUT_SNAPSHOT'])
+        self.assertEqual([item['content_representation'] for item in sources],
+                         ['INLINE', 'EXACT_BODY_REFERENCE', 'EXACT_BODY_REFERENCE'])
+        self.assertTrue(all(item['public_body_sha256'] == sha256(original.encode('utf-8')).hexdigest()
+                            and item['sha256'] for item in sources))
+        self.assertIn('RECORDED PAPER SELECTION - HISTORICAL USER INPUT', body)
+        self.assertIn('CURRENT MANAGED TASK USER MESSAGE', body)
+        self.assertIn('message_id=0', body)
+        self.assertIn('also the current user message', body)
+        correction_text = '改为从原图的排队时刻进入；原先完整范围仍保留。\n'
+        correction = self.file('distinct-user-body.txt', correction_text)
+        selected = ingest_message(task, source=correction, source_ref='distinct-user-body')
+        handle_message(task, message_id=selected['message_id'], action='continue', reason='Constructed distinct current correction')
+        current = consult.prepare_request(task, input_path=self.input, paper_root=papers[0],
+                                          exchange_id='distinct-current-body', max_tokens=16000)
+        content = json.loads(Path(current['request_path']).read_text(encoding='utf-8'))['messages'][-1]['content']
+        self.assertEqual(content.count(original), 1)
+        self.assertEqual(content.count(correction_text), 1)
+        self.assertEqual(current['exchange']['sources'][2]['content_representation'], 'INLINE')
+        self.assertEqual(current['exchange']['sources'][2]['message_id'], 1)
+        self.assertIn('message_id=1', content)
+        self.assertEqual(self.server.post_calls, [])
 
 
 if __name__ == '__main__':

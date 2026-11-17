@@ -18,7 +18,7 @@ import re
 import time
 from typing import Any
 
-VERSION = '0.4.1'
+VERSION = '0.5.1'
 SINGLE_PDF_CONTRACT = 'single-pdf-one-message'
 X_PDF_CONTRACT = 'single-pdf-x-files'
 LEGACY_CONTRACT = 'legacy-multiple-volumes'
@@ -30,6 +30,8 @@ PAGE_PROFILES = {'A4': (210 * 72 / 25.4, 297 * 72 / 25.4),
 PAGE_TOLERANCE_PT = 1.0
 PARTS = ('m1', 'm4', 'm2', 'm3', 'm5')
 DISPOSITIONS = {'explained', 'context', 'non_content', 'unavailable'}
+NATIVE_MAPPING_CONTRACT = 'source-bound-native-v1'
+NATIVE_AUTHORING_CONTRACT = 'sonnet-native-v1'
 
 
 def _text(value, name):
@@ -112,8 +114,10 @@ def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_r
     version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@.+', p_run)
     uses_x = bool(version and tuple(map(int, version.groups())) >= (0, 9, 0))
     uses_consult = bool(version and tuple(map(int, version.groups())) >= (0, 10, 0))
-    addon_version = (VERSION if version and tuple(map(int, version.groups())) >= (0, 10, 1)
-                     else '0.4.0' if uses_consult else '0.3.0' if uses_x else '0.2.0')
+    uses_native = bool(version and tuple(map(int, version.groups())) >= (0, 11, 0))
+    addon_version = (VERSION if version and tuple(map(int, version.groups())) >= (0, 11, 1)
+                     else '0.5.0' if uses_native else '0.4.0' if uses_consult
+                     else '0.3.0' if uses_x else '0.2.0')
     policy = None
     if uses_x:
         from .codex_session import _session, task_delivery_policy
@@ -143,6 +147,9 @@ def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_r
             value.update(task_root=task_root.as_posix(), delivery_policy=policy)
         if uses_consult:
             value.update(consult_enabled=True, mapping_contract='integrated-functions-v1')
+        if uses_native:
+            value.update(authoring_contract=NATIVE_AUTHORING_CONTRACT,
+                         mapping_contract=NATIVE_MAPPING_CONTRACT)
         _write(root / 'batch.json', value)
     if uses_consult:
         # A user-selected paper addon can be entered inside a native DIGR task.
@@ -151,8 +158,11 @@ def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_r
         from .codex_session import _write_json
         task_root, parent = _session(task_root)
         scopes = list(parent.get('consult_addons', []))
-        scopes.append({'addon': 'paper', 'version': addon_version, 'batch': root.as_posix(),
-                       'authorization_source_ref': source_ref})
+        scope = {'addon': 'paper', 'version': addon_version, 'batch': root.as_posix(),
+                 'authorization_source_ref': source_ref}
+        if uses_native:
+            scope['authoring_contract'] = NATIVE_AUTHORING_CONTRACT
+        scopes.append(scope)
         parent['consult_addons'] = scopes
         _write_json(task_root / 'session.json', parent)
     return value
@@ -194,7 +204,10 @@ def add_paper(batch, *, paper_id, title, line, owner, parameters):
             value.update(task_root=index['task_root'],
                          delivery_policy=task_delivery_policy(Path(index['task_root'])))
         if index.get('consult_enabled'):
-            value.update(consult_enabled=True, mapping_contract='integrated-functions-v1')
+            value.update(consult_enabled=True,
+                         mapping_contract=index.get('mapping_contract', 'integrated-functions-v1'))
+        if index.get('authoring_contract') == NATIVE_AUTHORING_CONTRACT:
+            value.update(authoring_contract=NATIVE_AUTHORING_CONTRACT, batch_root=batch.as_posix())
         _write(root / 'paper.json', value)
         index['papers'][paper_id] = {'path': 'papers/' + paper_id, 'line': line}
         _write(batch / 'batch.json', index)
@@ -265,6 +278,28 @@ def _part_locations(mapping, integrated=False):
 
 def map_paper(root, payload, **revision):
     def update(value):
+        if value.get('mapping_contract') == NATIVE_MAPPING_CONTRACT:
+            if payload.get('mapping_contract') != NATIVE_MAPPING_CONTRACT:
+                raise ValueError('new paper mapping needs its source-bound-native-v1 contract')
+            if 'parts' in payload:
+                raise ValueError('source-bound native papers do not use the legacy parts framework')
+            rows = payload.get('coverage')
+            if not isinstance(rows, list) or not rows:
+                raise ValueError('native mapping needs actual original-source coverage')
+            ids = set()
+            for row in rows:
+                if not isinstance(row, dict):
+                    raise ValueError('each coverage row must be an original-source object')
+                item_id = _text(row.get('id'), 'coverage id')
+                if item_id in ids:
+                    raise ValueError('duplicate coverage id')
+                ids.add(item_id)
+                _anchor(value, row.get('anchor'))
+                _text(row.get('location'), 'actual guide location')
+                if row.get('disposition') not in DISPOSITIONS:
+                    raise ValueError('coverage needs an explicit disposition')
+            value['mapping'] = deepcopy(payload)
+            return
         if set(payload.get('parts', {})) != set(PARTS):
             raise ValueError('reader order must be m1, m4, m2, m3, m5')
         integrated = bool(value.get('consult_enabled'))
@@ -300,6 +335,42 @@ def map_paper(root, payload, **revision):
     return _mutate(root, action='map', payload=payload, update=update, **revision)
 
 
+def _authoring_scope(root, value):
+    return {'paper_root': Path(root).resolve().as_posix(),
+            'batch_root': Path(value['batch_root']).resolve().as_posix(),
+            'paper_id': value['paper_id'], 'line': value['line'],
+            'addon_version': value['addon_version'],
+            'authoring_contract': value['authoring_contract'], 'P_run': value['P_run'],
+            'authorization_source_ref': value['authorization_source_ref']}
+
+
+def _native_consultation(root, value, supplied):
+    """Bind this paper's observed public authoring, independent of billing updates."""
+    if not isinstance(supplied, dict):
+        raise ValueError('native paper candidate needs an actual scoped Sonnet exchange')
+    exchange_id = _text(supplied.get('exchange_id'), 'actual Sonnet exchange_id')
+    from .codex_consult import inspect_exchange
+    observed = inspect_exchange(Path(value['task_root']), exchange_id)
+    attempt = observed['exchange']
+    if attempt.get('public_status') != 'COMPLETE' or observed.get('public_integrity') != 'MATCH':
+        raise ValueError('paper authoring needs the actual COMPLETE, unchanged public output')
+    model_identity = observed.get('paper_model_identity')
+    if not isinstance(model_identity, dict) or model_identity.get('status') != 'CONFIRMED':
+        raise ValueError('paper authoring model identity is unconfirmed; actual Sonnet request and response needed')
+    expected = _authoring_scope(root, value)
+    scope = attempt.get('authoring_scope')
+    if not isinstance(scope, dict) or any(scope.get(key) != item for key, item in expected.items()):
+        raise ValueError('Sonnet exchange authoring scope differs from this paper')
+    guidance = _file(root, observed['public_path'], 'consult_guidance')
+    if guidance['sha256'] != attempt.get('public_sha256'):
+        raise ValueError('Sonnet public output changed while preparing the paper candidate')
+    _text((Path(root) / guidance['path']).read_text(encoding='utf-8-sig'), 'actual Sonnet public work')
+    return {'exchange_id': exchange_id, 'guidance': guidance, 'authoring_scope': expected,
+            'model_identity': {key: model_identity[key]
+                               for key in ('status', 'requested_model', 'response_model')},
+            'scope': _text(supplied.get('scope'), 'actual applicable authoring scope')}
+
+
 def _candidate_issues(root, value):
     issues = []
     for source in value['sources'].values():
@@ -312,6 +383,12 @@ def _candidate_issues(root, value):
                 issues.append('task X choice changed; review a candidate under the current task policy')
         if candidate['mapping_digest'] != _digest(value['mapping']):
             issues.append('mapping changed after candidate review')
+        if candidate.get('authoring_contract') == NATIVE_AUTHORING_CONTRACT:
+            try:
+                if _native_consultation(root, value, candidate.get('consultation')) != candidate.get('consultation'):
+                    issues.append('selected paper authoring identity changed')
+            except (OSError, ValueError, KeyError, TypeError) as error:
+                issues.append('selected paper authoring unavailable: ' + str(error))
         for file in candidate['files']:
             issues.extend(_file_issues(root, file))
         for delivery in value['deliveries']:
@@ -407,12 +484,16 @@ def prepare_candidate(root, payload, **revision):
                 heading_order.setdefault(re.sub(r'^#+\s*', '', line).strip(), position)
         headings = set(heading_order)
         integrated = bool(value.get('consult_enabled'))
-        locations = _part_locations(value['mapping'], integrated)
-        for group in ('assumptions', 'claims', 'chains', 'experiments', 'coverage'):
-            locations.extend(row['location'] for row in value['mapping'][group])
+        native = value.get('mapping_contract') == NATIVE_MAPPING_CONTRACT
+        if native:
+            locations = [row['location'] for row in value['mapping']['coverage']]
+        else:
+            locations = _part_locations(value['mapping'], integrated)
+            for group in ('assumptions', 'claims', 'chains', 'experiments', 'coverage'):
+                locations.extend(row['location'] for row in value['mapping'][group])
         if any(location not in headings for location in locations):
             raise ValueError('mapping location is absent from Markdown headings')
-        if not integrated:
+        if not integrated and not native:
             positions = [heading_order[value['mapping']['parts'][part]] for part in PARTS]
             if positions != sorted(positions) or len(set(positions)) != len(PARTS):
                 raise ValueError('guide parts must actually appear in reader order m1, m4, m2, m3, m5')
@@ -422,7 +503,10 @@ def prepare_candidate(root, payload, **revision):
         geometry = _pdf_geometry(root, pdfs[0], payload.get('page_profile', 'A4'))
         files = [markdown, *pdfs, _file(root, payload['qa'], 'qa'), _file(root, payload['review'], 'review')]
         consultation = None
-        if integrated:
+        if native:
+            consultation = _native_consultation(root, value, payload.get('consultation'))
+            files.append(consultation['guidance'])
+        elif integrated:
             supplied = payload.get('consultation')
             if not isinstance(supplied, dict):
                 raise ValueError('new paper candidate needs actual Consult public guidance and applicable scope')
@@ -463,6 +547,9 @@ def prepare_candidate(root, payload, **revision):
             candidate['delivery_policy_id'] = value['delivery_policy']['policy_id']
         if consultation is not None:
             candidate['consultation'] = consultation
+        if native:
+            candidate.update(authoring_contract=NATIVE_AUTHORING_CONTRACT,
+                             mapping_contract=NATIVE_MAPPING_CONTRACT)
         for key in ('N', 'R', 'D', 'V'):
             actual = candidate['responsibility_report'].get(key)
             if type(actual) is not int or actual < value['parameters'][key]:
@@ -790,9 +877,9 @@ def refresh_addon(root):
     manifest = {'name': 'DIGRP Paper Reading', 'version': version, 'protocol': 'digrp-codex-1',
         'version_path': 'paper/VERSION', 'entrypoint': 'paper/PROTOCOL.md',
         'pdf_design': 'paper/PDF_DESIGN.md',
-        'skill': '.agents/skills/digr-paper/SKILL.md', 'reader_order': list(PARTS),
-        'reader_order_policy': 'CONSULT_GUIDED_NATURAL_CHAPTERS_WITH_COMPLETE_FUNCTION_COVERAGE',
-        'consult_enabled': True, 'mapping_contract': 'integrated-functions-v1',
+        'skill': '.agents/skills/digr-paper/SKILL.md',
+        'consult_enabled': True, 'authoring_contract': NATIVE_AUTHORING_CONTRACT,
+        'mapping_contract': NATIVE_MAPPING_CONTRACT,
         'file_sha256': {path: sha256((root / path).read_bytes()).hexdigest() for path in paths}}
     _write(root / 'paper/manifest.json', manifest)
     core = _read(root / 'codex/manifest.json')
