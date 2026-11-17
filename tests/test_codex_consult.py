@@ -444,6 +444,35 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'explicitly initialized'):
             consult.prepare_request(old, input_path=self.input)
 
+    def test_paper_patch_selection_preserves_old_core_and_rejects_incompatible_scopes(self):
+        for version, expected in (('0.10.0', '0.4.0'), ('0.10.1', '0.4.1')):
+            with self.subTest(core=version):
+                request = self.file('request-' + version + '.txt', 'DIGR：选择论文增量。\n')
+                parent_root = self.folder / ('parent-' + version)
+                pin = version + '@' + 'd' * 40
+                create_session(parent_root, request=request, p_run=pin)
+                batch = self.folder / ('batch-' + version)
+                value = paper.initialize(batch, p_run=pin, authorization=request,
+                                         source_ref='selected-paper', task_root=parent_root)
+                self.assertEqual(value['addon_version'], expected)
+                parent = json.loads((parent_root / 'session.json').read_text(encoding='utf-8'))
+                self.assertEqual(parent['execution_profile']['mode'], 'NATIVE')
+                self.assertEqual(parent['consult_addons'][0]['version'], expected)
+                result = consult.prepare_request(parent_root, input_path=self.input,
+                                                 exchange_id='valid-patch', max_tokens=16000)
+                self.assertEqual(result['exchange']['selected_paper_scopes'][0]['version'], expected)
+                # Matching forged records still cannot authorize a future addon,
+                # nor a newer known addon on a frozen older core.
+                invalid_versions = ['0.4.99'] + (['0.4.1'] if version == '0.10.0' else [])
+                for invalid in invalid_versions:
+                    parent['consult_addons'][0]['version'] = invalid
+                    (parent_root / 'session.json').write_text(json.dumps(parent), encoding='utf-8')
+                    (batch / 'batch.json').write_text(json.dumps(dict(value, addon_version=invalid)), encoding='utf-8')
+                    with self.subTest(forged=invalid), self.assertRaisesRegex(ValueError, 'verified selected paper'):
+                        consult.prepare_request(parent_root, input_path=self.input,
+                                                exchange_id='invalid-' + invalid, max_tokens=16000)
+        self.assertEqual(len(self.server.post_calls), 0)
+
     def test_native_parent_real_selected_paper_addon_enables_only_verified_new_pin_scope(self):
         request = self.file('native-paper-task.txt', 'DIGR：按DIGRP处理这篇论文。\n')
         native = self.folder / 'native-paper-parent'

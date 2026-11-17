@@ -18,7 +18,7 @@ import re
 import time
 from typing import Any
 
-VERSION = '0.4.0'
+VERSION = '0.4.1'
 SINGLE_PDF_CONTRACT = 'single-pdf-one-message'
 X_PDF_CONTRACT = 'single-pdf-x-files'
 LEGACY_CONTRACT = 'legacy-multiple-volumes'
@@ -112,6 +112,8 @@ def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_r
     version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@.+', p_run)
     uses_x = bool(version and tuple(map(int, version.groups())) >= (0, 9, 0))
     uses_consult = bool(version and tuple(map(int, version.groups())) >= (0, 10, 0))
+    addon_version = (VERSION if version and tuple(map(int, version.groups())) >= (0, 10, 1)
+                     else '0.4.0' if uses_consult else '0.3.0' if uses_x else '0.2.0')
     policy = None
     if uses_x:
         from .codex_session import _session, task_delivery_policy
@@ -132,7 +134,7 @@ def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_r
         if (root / 'batch.json').exists():
             raise ValueError('batch already exists')
         value = {'format': 'digrp-batch-1',
-                 'addon_version': VERSION if uses_consult else '0.3.0' if uses_x else '0.2.0', 'P_run': p_run,
+                 'addon_version': addon_version, 'P_run': p_run,
                  'authorization': _file(root, authorization),
                  'authorization_source_ref': _text(source_ref, 'actual user source_ref'),
                  'recipient': recipient,
@@ -149,7 +151,7 @@ def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_r
         from .codex_session import _write_json
         task_root, parent = _session(task_root)
         scopes = list(parent.get('consult_addons', []))
-        scopes.append({'addon': 'paper', 'version': VERSION, 'batch': root.as_posix(),
+        scopes.append({'addon': 'paper', 'version': addon_version, 'batch': root.as_posix(),
                        'authorization_source_ref': source_ref})
         parent['consult_addons'] = scopes
         _write_json(task_root / 'session.json', parent)

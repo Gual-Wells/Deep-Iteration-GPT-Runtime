@@ -27,7 +27,7 @@ Each selected paper gets a complete M with its own core responsibilities. Share 
 - Read every figure/table's conditions and axes, not just the caption or favorable trend. Put relevant overhead and unchanged/unfavorable outcomes into the same comparison.
 - Start the original coverage pass early. Send material findings back to the relevant chapter; finish with a meaningful route through the original and the roles of its citations/appendices.
 
-Use the actual task's learner guidance. “I don't understand” calls for a different explanation of the missing connection, not automatic reduction to trivial examples. Ask only useful, optional feedback questions during teaching. A prepared guide or mail delivery is not a mastery diagnosis.
+Use the actual task's learner guidance. At a difficulty, identify the current source-bound relation the reader is missing or conflating; change the example, ordering or omitted step and reconnect it to the paper. “I don't understand” does not automatically call for trivial examples, a new artifact or a rebuilt curriculum. Technical knowledge needed by the reader remains content while Codex performs the implementation work. Check numbers and premises independently under applicable Consult guidance. Apply corrections to the actual current draft; sibling-branch repairs count only when carried into it. Ask only useful, optional feedback questions during teaching. A prepared guide or mail delivery is not a mastery diagnosis.
 
 ## Make the actual artifact work
 
