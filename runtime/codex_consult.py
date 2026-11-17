@@ -22,6 +22,8 @@ from urllib.parse import urlencode, urlsplit, urlunsplit
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 import uuid
 
+from . import codex_split
+
 FORMAT = 'digr-codex-consult-1'
 DEFAULT_MODEL = 'anthropic/claude-sonnet-5.5'
 DEFAULT_EFFORT = 'high'
@@ -91,7 +93,7 @@ def _generic_system(p_run: str) -> str:
 
 
 def _paper_system(addon_version: str) -> str:
-    return _LOGICAL_PAPER_SYSTEM if addon_version in {'0.5.2', '0.5.3'} else _PAPER_SYSTEM
+    return _LOGICAL_PAPER_SYSTEM if addon_version in {'0.5.2', '0.5.3', '0.5.4'} else _PAPER_SYSTEM
 
 
 def streams_public(p_run: str) -> bool:
@@ -188,7 +190,7 @@ def _paper_scopes(root: Path, session: Mapping[str, Any]) -> list[dict]:
     core = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', session['P_run'])
     core_version = tuple(map(int, core.groups())) if core else ()
     compatible = {'0.4.0': (0, 10, 0), '0.5.0': (0, 11, 0),
-                  '0.5.1': (0, 11, 1), '0.5.2': (0, 12, 0), '0.5.3': (0, 12, 1)}
+                  '0.5.1': (0, 11, 1), '0.5.2': (0, 12, 0), '0.5.3': (0, 12, 1), '0.5.4': (0, 13, 0)}
     for scope in scopes:
         if not isinstance(scope, Mapping) or scope.get('addon') != 'paper':
             continue
@@ -209,7 +211,7 @@ def _paper_scopes(root: Path, session: Mapping[str, Any]) -> list[dict]:
                 continue
             verified = {'addon': 'paper', 'version': scope['version'], 'batch': batch_root.as_posix(),
                         'authorization_source_ref': source_ref}
-            if scope['version'] in {'0.5.0', '0.5.1', '0.5.2', '0.5.3'}:
+            if scope['version'] in {'0.5.0', '0.5.1', '0.5.2', '0.5.3', '0.5.4'}:
                 version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', session['P_run'])
                 if (not version or tuple(map(int, version.groups())) < (0, 11, 0)
                         or scope.get('authoring_contract') != _PAPER_AUTHORING_CONTRACT
@@ -226,7 +228,7 @@ def _selected_paper(root: Path, session: Mapping[str, Any], paper_root: Path) ->
     """Resolve one registered 0.5 paper; no other paper's state becomes context."""
     paper_root = Path(paper_root).resolve()
     for registered in _paper_scopes(root, session):
-        if registered['version'] not in {'0.5.0', '0.5.1', '0.5.2', '0.5.3'}:
+        if registered['version'] not in {'0.5.0', '0.5.1', '0.5.2', '0.5.3', '0.5.4'}:
             continue
         batch_root = Path(registered['batch'])
         batch = _read(batch_root / 'batch.json')
@@ -265,7 +267,7 @@ def _verify_authoring_record(attempt: Mapping[str, Any], request: Mapping[str, A
                 'authoring_contract', 'P_run', 'authorization_source_ref'}
     if (not isinstance(scope, Mapping) or set(scope) != required
             or any(not isinstance(scope[key], str) or not scope[key].strip() for key in required)
-            or scope['addon_version'] not in {'0.5.0', '0.5.1', '0.5.2', '0.5.3'}
+            or scope['addon_version'] not in {'0.5.0', '0.5.1', '0.5.2', '0.5.3', '0.5.4'}
             or scope['authoring_contract'] != _PAPER_AUTHORING_CONTRACT
             or scope['P_run'] != attempt.get('P_run')
             or attempt.get('authoring_scope_sha256') != _hash(_json_bytes(scope))
@@ -392,23 +394,27 @@ def _source_text(info: Mapping[str, Any], text: str, *, label: str = 'SOURCE DAT
 
 
 def _paper_context(root: Path, lifecycle: Mapping[str, Any], scope: Mapping[str, Any],
-                   value: Mapping[str, Any], batch: Mapping[str, Any]) -> tuple[list[dict], list[str]]:
+                    value: Mapping[str, Any], batch: Mapping[str, Any],
+                    previous_sources: Sequence[dict] = ()) -> tuple[list[dict], list[str]]:
     """Supply actual user bytes and a limited inventory, not private work records."""
     sources, parts = [], []
     bodies: dict[str, str] = {}
+    historical_bodies = {source.get('public_body_sha256') for source in previous_sources
+                         if source.get('public_body_sha256')}
 
     def add_user_source(info: dict, text: str, label: str) -> None:
         # Compare exact decoded public text: no summary, whitespace folding or
         # rewriting of earlier messages. Every actual source keeps its own SHA.
         body_sha256 = _hash(text.encode('utf-8'))
         info['public_body_sha256'] = body_sha256
-        info['content_representation'] = 'EXACT_BODY_REFERENCE' if text in bodies else 'INLINE'
+        present = text in bodies or body_sha256 in historical_bodies
+        info['content_representation'] = 'EXACT_BODY_REFERENCE' if present else 'INLINE'
         sources.append(info)
         identity = label
         if 'message_id' in info:
             identity += ' message_id=' + str(info['message_id'])
-        if text in bodies:
-            reference = ('Exact public UTF-8 body already included as ' + bodies[text]
+        if present:
+            reference = ('Exact public UTF-8 body already included as ' + bodies.get(text, 'replayed public context')
                          + '; public_body_sha256=' + body_sha256 + '. ')
             if info['kind'] == 'CURRENT_USER_INPUT_SNAPSHOT':
                 reference += 'That text is also the current user message, with the current identity above.'
@@ -446,6 +452,37 @@ def _paper_context(root: Path, lifecycle: Mapping[str, Any], scope: Mapping[str,
     return sources, parts
 
 
+def _generic_context(root: Path, lifecycle: Mapping[str, Any],
+                     previous_sources: Sequence[dict]) -> tuple[list[dict], list[str]]:
+    """Supply exact requirements; do not equate a fresh binding with inclusion."""
+    sources, parts = [], []
+    bodies = {item.get('public_body_sha256') for item in previous_sources
+              if item.get('public_body_sha256')}
+
+    def add(info: dict, text: str, label: str) -> None:
+        digest = _hash(text.encode('utf-8'))
+        info['public_body_sha256'] = digest
+        info['content_representation'] = 'EXACT_BODY_REFERENCE' if digest in bodies else 'INLINE'
+        sources.append(info)
+        if digest in bodies:
+            text = ('Exact UTF-8 user body is already included in this replayed public context; '
+                    'public_body_sha256=' + digest + '. The source retains the identity stated above.')
+        else:
+            bodies.add(digest)
+        parts.append(_source_text(info, text, label=label))
+
+    info, raw = _source(root / 'REQUEST.txt', 'ORIGINAL_TASK_INPUT')
+    add(info, raw.decode('utf-8-sig'), 'FROZEN TASK ORIGIN - HISTORICAL USER INPUT')
+    current = lifecycle['current_message']['source']
+    info = {'kind': 'CURRENT_USER_INPUT_SNAPSHOT', 'path': current['path'],
+            'name': Path(current['path']).name, 'source_ref': current['source_ref'],
+            'message_id': lifecycle['current_message']['id'], 'byte_length': current['byte_length'],
+            'sha256': current['sha256'], 'content_included_in_request': True,
+            'transmission': 'PREPARED_NOT_SENT'}
+    add(info, current['text'], 'CURRENT MANAGED TASK USER MESSAGE - ACTUAL REQUIREMENTS')
+    return sources, parts
+
+
 def prepare_request(
     root: Path, *, input_path: Path, materials: Sequence[Path] = (), images: Sequence[Path] = (),
     continue_from: str | None = None, exchange_id: str | None = None,
@@ -469,6 +506,7 @@ def prepare_request(
     directory = _directory(root, exchange_id)
     messages: list[dict] = [{'role': 'system', 'content': _generic_system(session['P_run'])}]
     parent_request_sha256 = None
+    previous_sources = []
     authoring_scope, paper_value, paper_batch = None, None, None
     if continue_from is not None:
         parent_dir, parent, previous = _load(root, continue_from)
@@ -476,6 +514,7 @@ def prepare_request(
             raise ValueError('Prior exchange has no observed public answer to continue')
         messages = previous['messages'] + [{'role': 'assistant', 'content': (parent_dir / 'public.md').read_bytes().decode('utf-8')}]
         parent_request_sha256 = parent['request_sha256']
+        previous_sources = parent['sources']
         inherited = parent.get('authoring_scope')
         if inherited is not None:
             selected = Path(paper_root) if paper_root is not None else Path(inherited['paper_root'])
@@ -493,7 +532,7 @@ def prepare_request(
         new_paper_invocation = (pin and tuple(map(int, pin.groups())) >= (0, 11, 0)
                                 and initial.get('addon_hint') == 'paper')
         new_native_addon = (session.get('execution_profile', {}).get('mode') != 'CONSULT'
-                            and any(scope['version'] in {'0.5.0', '0.5.1', '0.5.2', '0.5.3'} for scope in _paper_scopes(root, session)))
+                            and any(scope['version'] in {'0.5.0', '0.5.1', '0.5.2', '0.5.3', '0.5.4'} for scope in _paper_scopes(root, session)))
         if new_paper_invocation or new_native_addon:
             raise ValueError('Paper authoring requires an explicit --paper-root for its first exchange')
     info, raw = _source(input_path, 'CURRENT_INPUT')
@@ -502,7 +541,13 @@ def prepare_request(
     if authoring_scope is not None:
         if not _SONNET_MODEL.fullmatch(model):
             raise ValueError('Paper authoring requires a supported canonical Anthropic Sonnet model identifier')
-        sources, parts = _paper_context(root, lifecycle, authoring_scope, paper_value, paper_batch)
+        sources, parts = _paper_context(root, lifecycle, authoring_scope, paper_value, paper_batch,
+            previous_sources if codex_split.required(session['P_run']) else ())
+        info['kind'] = 'HOST_WORKING_INPUT'
+        sources.append(info)
+        parts.append(_source_text(info, current, label='HOST WORKING INPUT - CURRENT QUESTIONS AND FINDINGS'))
+    elif codex_split.required(session['P_run']):
+        sources, parts = _generic_context(root, lifecycle, previous_sources)
         info['kind'] = 'HOST_WORKING_INPUT'
         sources.append(info)
         parts.append(_source_text(info, current, label='HOST WORKING INPUT - CURRENT QUESTIONS AND FINDINGS'))
@@ -606,12 +651,13 @@ def _public_output(root: Path, attempt: Mapping[str, Any]) -> dict:
 
 def inspect_exchange(root: Path, exchange_id: str | None = None) -> dict:
     """Read records and task-wide spend without invoking a model or credentials."""
-    root, _, lifecycle = _task(root, active=False)
+    root, session, lifecycle = _task(root, active=False)
     attempts = _all_attempts(root)
     result = {'scope': 'actual helper-managed public exchanges and billable attempts only',
               'task_status': lifecycle.get('status'), 'totals': _totals(attempts),
               'local_path': (root / 'consult').as_posix(),
-              'automatic_inference_retries': 0, 'semantic_approval': False}
+              'automatic_inference_retries': 0, 'semantic_approval': False,
+              'split_required_for_submission': codex_split.required(session['P_run'])}
     result['public_outputs'] = [_public_output(root, attempt)
         for attempt in attempts if attempt.get('public_sha256')]
     if exchange_id is None:
@@ -626,9 +672,46 @@ def inspect_exchange(root: Path, exchange_id: str | None = None) -> dict:
         result['public_integrity'] = ('MATCH' if present and _hash((directory / 'public.md').read_bytes()) == attempt.get('public_sha256')
                                       else 'MISSING' if not present else 'UNCOMMITTED_OR_CHANGED')
         result['newer_user_input_since_prepare'] = attempt['input_ref'] != _input_ref(lifecycle)
+        split = attempt.get('split')
+        if split is not None:
+            path = directory / 'split.json'
+            matches = path.is_file() and _hash(path.read_bytes()) == split['receipt_sha256']
+            result['split'] = {'integrity': 'MATCH' if matches else 'MISSING_OR_CHANGED',
+                               'path': path.as_posix(), 'receipt': _read(path) if matches else None,
+                               'semantic_approval': False}
         if attempt.get('authoring_scope') is not None:
             result['paper_model_identity'] = paper_model_identity(request.get('model'), attempt.get('response_model'))
     return result
+
+
+def _split_brief(session: Mapping[str, Any], lifecycle: Mapping[str, Any],
+                 attempt: Mapping[str, Any], request: Mapping[str, Any]) -> dict:
+    return codex_split.brief(p_run=session['P_run'], exchange_id=attempt['exchange_id'],
+        request_sha256=_hash(_json_bytes(request)), prepared_input=attempt['input_ref'],
+        current_input=_input_ref(lifecycle), authoring_scope=attempt.get('authoring_scope'), request=request)
+
+
+def split_brief(root: Path, exchange_id: str) -> dict:
+    """Read a fresh local binding; the native model performs the actual research."""
+    root, session, lifecycle = _task(root, active=True)
+    _, attempt, request = _load(root, exchange_id)
+    if attempt['transport_status'] != 'PREPARED':
+        raise ValueError('Split binding is for an unsent prepared request; do not repeat inference')
+    _require_current_authoring(root, session, lifecycle, attempt)
+    return _split_brief(session, lifecycle, attempt, request)
+
+
+def bind_split_decision(root: Path, exchange_id: str, *, input_path: Path, output: Path) -> dict:
+    """Bind an actual native decision without manual opaque-field copying."""
+    root, _, _ = _task(root, active=True)
+    with _writer(root):
+        current = split_brief(root, exchange_id)
+        plan = codex_split.bind_decision(input_path, current_brief=current)
+        output = Path(output).resolve()
+        output.parent.mkdir(parents=True, exist_ok=True)
+        _write(output, plan, new=True)
+    return {**current, 'plan_path': output.as_posix(), 'plan_sha256': _hash(_json_bytes(plan)),
+            'binding_only': True}
 
 
 def _budget(facts: Mapping[str, Any], request: Mapping[str, Any], attempts: Sequence[dict], ceiling: float) -> dict:
@@ -763,7 +846,7 @@ def _usage(data: Mapping[str, Any]) -> dict:
 
 
 def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling_usd: float,
-              config_path: Path | None = None,
+              config_path: Path | None = None, split_path: Path | None = None,
               on_public_event: Callable[[dict], None] | None = None) -> dict:
     """Perform at most one generation POST; never automatically retry any outcome."""
     root, session, lifecycle = _task(root, active=True)
@@ -772,22 +855,40 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
         if attempt['transport_status'] != 'PREPARED':
             raise ValueError('Consult attempt already started; inspect/reconcile instead of repeating inference')
         _require_current_authoring(root, session, lifecycle, attempt)
+        split_record = None
+        if codex_split.required(session['P_run']) or split_path is not None:
+            split_record = codex_split.Split(split_path,
+                current_brief=_split_brief(session, lifecycle, attempt, request))
         budget = _budget(facts, request, _all_attempts(root), ceiling_usd)
         config, secret = _config(config_path)
-        _, session, lifecycle = _task(root, active=True)
-        _require_current_authoring(root, session, lifecycle, attempt)
+        if split_record is not None:
+            _write(directory / 'split.json', split_record)
+            attempt['split'] = {'contract': codex_split.CONTRACT,
+                                'receipt_sha256': _hash(_json_bytes(split_record)),
+                                'prepared_request_sha256': split_record['binding']['request_sha256']}
         # Price filters accompany the exact saved request. Their documented
         # units are USD per million tokens (and USD for a per-request fee).
         request['provider']['max_price'] = {'prompt': budget['prompt_usd_per_million'],
                                             'completion': budget['completion_usd_per_million'],
                                             'request': budget['request_usd']}
         request_raw = _json_bytes(request)
+        opener = _opener(config)
+        req = Request(config['endpoint'], data=request_raw, method='POST',
+                      headers={'Authorization': 'Bearer ' + secret, 'Content-Type': 'application/json',
+                               'X-Title': 'DIGR private Consult'})
         # An interruption while finalizing a still-unsent request can leave
         # either hash. No generation is possible before the later ATTEMPTED
         # intent. This keeps preflight recovery distinct from inference replay.
         attempt['pending_request_sha256'] = _hash(request_raw)
         _write(directory / 'attempt.json', attempt)
         _write_bytes(directory / 'request.json', request_raw)
+        # Construct transport and finish local preflight before the last actual
+        # task check. This is the managed send-commit boundary, not a claim that
+        # an already committed HTTP request can be recalled after a later STOP.
+        _, session, lifecycle = _task(root, active=True)
+        _require_current_authoring(root, session, lifecycle, attempt)
+        if split_record is not None and split_record['binding']['input_ref'] != _input_ref(lifecycle):
+            raise ValueError('New user input supersedes this Split; prepare the current task')
         attempt.update(request_sha256=_hash(request_raw), transport_status='ATTEMPTED',
                        billing_status='UNKNOWN', reserved_usd=float(ceiling_usd), started_at=_now(),
                        budget_facts=budget, endpoint_origin=urlunsplit((*urlsplit(config['endpoint'])[:2], '', '', '')))
@@ -795,7 +896,6 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
         for source in attempt['sources']:
             source['transmission'] = 'ATTEMPTED_RECEIPT_UNCONFIRMED'
         _write(directory / 'attempt.json', attempt)
-        opener = _opener(config)
         sequence = 0
         public_hash = sha256()
         public_bytes = 0
@@ -824,9 +924,6 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
                     # An observer fault must not discard or repeat a paid answer.
                     attempt['observer_error_class'] = type(error).__name__
 
-        req = Request(config['endpoint'], data=request_raw, method='POST',
-                      headers={'Authorization': 'Bearer ' + secret, 'Content-Type': 'application/json',
-                               'X-Title': 'DIGR private Consult'})
         try:
             try:
                 response = opener.open(req, timeout=config['timeout_seconds'])

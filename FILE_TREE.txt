@@ -41,6 +41,7 @@ codex/PROTOCOL.md
 codex/RETURN.md
 codex/RETURN_VISUAL.md
 codex/ROUTER.experimental.txt
+codex/SPLIT.md
 codex/STARTUP.md
 codex/VERSION
 codex/WORKBENCH.md
@@ -49,6 +50,7 @@ codex/examples/UNIT_RESPONSIBILITY.md
 codex/examples/assembly/WORK.md
 codex/examples/assembly/reader-example.html
 codex/examples/foundation/proposal.json
+codex/examples/split/README.md
 codex/examples/visual-return/multi-main.json
 codex/examples/visual-return/pipeline.json
 codex/examples/visual-return/pipeline.png
@@ -460,6 +462,7 @@ runtime/codex_public_stream.py
 runtime/codex_response.py
 runtime/codex_return.py
 runtime/codex_session.py
+runtime/codex_split.py
 runtime/codex_timeline.py
 runtime/codex_transport.py
 runtime/codex_visits.py
@@ -898,6 +901,7 @@ tests/test_codex_response.py
 tests/test_codex_return.py
 tests/test_codex_session.py
 tests/test_codex_shared_return.py
+tests/test_codex_split.py
 tests/test_codex_timeline.py
 tests/test_codex_transport.py
 tests/test_codex_visits.py

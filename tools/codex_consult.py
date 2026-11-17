@@ -42,6 +42,13 @@ def main(argv=None):
     call.add_argument('--facts', type=Path, required=True, help='actual current authorization, prices, input bound and wallet/budget facts')
     call.add_argument('--ceiling-usd', type=float, required=True, help='positive conservative call reservation; not a provider invoice guarantee')
     call.add_argument('--config', type=Path, help='explicit private provider/credential config; never copied into the task')
+    call.add_argument('--split-plan', type=Path,
+                      help='native Codex Split result bound to this request; required for new 0.13+ submissions')
+    split = commands.add_parser('split', help='read the current local Split binding; native Codex performs the research')
+    split.add_argument('--root', type=Path, required=True)
+    split.add_argument('--exchange-id', required=True)
+    split.add_argument('--input', type=Path, help='actual unbound native decision; no generated research text')
+    split.add_argument('--out', type=Path, help='write a new bound plan; use together with --input')
     view = commands.add_parser('inspect', help='read public source/output facts and all task exchange costs; no network or credentials')
     view.add_argument('--root', type=Path, required=True)
     view.add_argument('--exchange-id')
@@ -65,10 +72,15 @@ def main(argv=None):
             emit = (lambda event: print(json.dumps(event, ensure_ascii=False, allow_nan=False), flush=True)) if live else None
             result = consult.call_once(args.root, args.exchange_id, facts=read(args.facts),
                                        ceiling_usd=args.ceiling_usd, config_path=args.config,
-                                       on_public_event=emit)
+                                       split_path=args.split_plan, on_public_event=emit)
             if live:
                 print(json.dumps({'event': 'result', 'result': result}, ensure_ascii=False, allow_nan=False), flush=True)
                 return 0
+        elif args.command == 'split':
+            if (args.input is None) != (args.out is None):
+                raise ValueError('split --input and --out must be used together')
+            result = (consult.bind_split_decision(args.root, args.exchange_id,
+                input_path=args.input, output=args.out) if args.input else consult.split_brief(args.root, args.exchange_id))
         elif args.command == 'inspect':
             result = consult.inspect_exchange(args.root, args.exchange_id)
         else:

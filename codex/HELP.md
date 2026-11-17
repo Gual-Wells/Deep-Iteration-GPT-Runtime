@@ -68,4 +68,4 @@ python -B tools/codex.py clock --help
 
 DIGR继续原生Main，DIGRC增加Consult，DIGRP0.5采用论文侧Sonnet原生内容驱动。Consult对同条件主观方向、风格、规格和内容/设计的指导优先，Main仍完整思考、生产和承担原生责任。参见[CONSULT](CONSULT.md)。普通话题和翻译不自动启用付费Consult。
 
-`python -B tools/codex.py profile presets`列出预设；`profile parameters --text '(Less,N=8)'`预览覆盖；`consult --help`查看实际公开对话、费用和恢复工具。角色、计数、hash和API200都不是品质证明。
+`python -B tools/codex.py profile presets`列出预设；`profile parameters --text '(Less,N=8)'`预览覆盖；`consult --help`查看实际公开对话、费用和恢复工具；0.13起每次Claude提交前按[SPLIT](SPLIT.md)完成本机原生分工，`consult split`取绑定，`call --split-plan`核对后提交。角色、计数、hash和API200都不是品质证明。

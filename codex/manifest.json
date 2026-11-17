@@ -1,7 +1,7 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "0.12.1",
-  "protocol": "digr-codex-native-v9",
+  "version": "0.13.0",
+  "protocol": "digr-codex-native-v10",
   "status": "experimental",
   "language": "zh-CN",
   "version_path": "codex/VERSION",
@@ -16,6 +16,7 @@
     "codex/COLLABORATION.md",
     "codex/PERMISSIONS.md",
     "codex/CONSULT.md",
+    "codex/SPLIT.md",
     "codex/DELIVERY.md",
     "codex/RETURN.md"
   ],
@@ -73,25 +74,29 @@
     "native_default_preserved": true,
     "consult_is_native_l3": false,
     "consult_guidance": "SUBJECTIVE_PRIORITY_UNDER_EQUAL_ACTUAL_CONDITIONS",
-    "paper_content_driver": "SONNET_NATIVE_FOR_SELECTED_PAPER_0_5"
+    "paper_content_driver": "SONNET_NATIVE_FOR_SELECTED_PAPER_0_5",
+    "consult_split": "NATIVE_CODEX_RESEARCH_AND_PER_SUBMISSION_LOCAL_BINDING",
+    "split_contract": "digr-native-split-1",
+    "split_external_model_calls": 0
   },
   "file_sha256": {
-    "codex/VERSION": "f6ee69bf1c4b27a242266ccb5aeb4aa8c8306345b9ebe4ff7335b8c940452b81",
+    "codex/VERSION": "d84c9e596c7d6a94e5f74579ef8d8912a807b0d28582474900ad35dfb3edfcf4",
     "codex/AGENTS.light.md": "5abd877bc2f684ce54e34bbefcc9da17a0c00e1c8bbdadfa5a7f1aadcb700abd",
     "codex/ROUTER.experimental.txt": "6aa91d9aea27e029155349bbc9abed5cf5b216a65ad74a45788a8cf16a845347",
-    "codex/STARTUP.md": "addaf40bf661702a5d3d1426ea2b43e43ee860bdcd5e1eaeb7080588dea02faf",
-    "codex/PROTOCOL.md": "37c391e74a0895ec700eb726f0f8b746e822e9d9970675c5608eac89bb4e38bc",
+    "codex/STARTUP.md": "e5b9b5e95de724c71de4a5e5f5c0f195e7a3501124b999ff0f5f9e4c06dda095",
+    "codex/PROTOCOL.md": "a1d8291daf98a9bd3e554cbbb27c621455324a9a07231a2295450f488ac9124b",
     "codex/FOUNDATION.md": "0ec46005599db9050e51f369aa3287d03762858b4c6b1e3ecd5554a95c037099",
-    "codex/HELP.md": "34731b4f0032518e81d3baf1d955870ef5f05e2e1c4d94a7237f42ea49197871",
+    "codex/HELP.md": "bde6130747a5e2c58c29faaa5f42f2e3f05235c946b0825c6c23b98aed085e24",
     "codex/PARAMETERS.md": "a07743b151e30df9a812cfa301f6485ce3ef8bd638f79d75a8e597ecc8fa8689",
-    "codex/WORKBENCH.md": "7b021a4a4d67d1c874c59579958a4a9ab521044f0503df8d29b1f37ce67f5fde",
+    "codex/WORKBENCH.md": "6430abf3b73bedb391aea4460f421705a16348920fe1538f99ba6e798511a4ef",
     "codex/CHARACTER.md": "71afee9819922f10e0e3881256dbeabd8fba6328acdac5d5658f003be3ae5e55",
     "codex/COLLABORATION.md": "8836fd94358a3c6520f6bf3d265ed244cb4728191d4dc18e025f842bb063ea62",
-    "codex/CONSULT.md": "8838b7291437aee9fb62294fd66f1a55f3fc71501439ff0ae5bf0d166ea3c6b1",
+    "codex/CONSULT.md": "861d346eba813ff96713dfc5db681e92d0246ea356ad64d2b0015961d99c19fc",
+    "codex/SPLIT.md": "efde55f979aa8a80a3c87f3fe15b70fd464c614f2047ac5fb984e9a6324a0390",
     "codex/PERMISSIONS.md": "3c59a22111c9ae058342d48cf091216cc661c0ff28206700a1d94b25ffecd58b",
     "codex/DELIVERY.md": "e7915c14e9ccd71dae5e2c4b86af9d45cf392b7ea69e51870a4f6d10dd986b00",
     "codex/RETURN.md": "8b59d5a209195ee92aacadb2a367662943ac27d915c94dbee067e3da656b3fe9",
-    "codex/EXECUTION_PROTOCOL.json": "fe52bf757d77085d568d95d6363b3f7a5605a7c51b907682df95c0fe3ca3ea5f"
+    "codex/EXECUTION_PROTOCOL.json": "4ba7293574176da804e4a113a94c535ddbf087d0c7372432b05b259ef9c56efa"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {
@@ -173,13 +178,14 @@
       "codex/COLLABORATION.md",
       "codex/PERMISSIONS.md",
       "codex/CONSULT.md",
+      "codex/SPLIT.md",
       "codex/DELIVERY.md",
       "codex/RETURN.md"
     ]
   },
   "paper_addon": {
     "manifest": "paper/manifest.json",
-    "version": "0.5.3",
-    "sha256": "c5c39bb9eeef42f6311e0e30753d0c05d718774879bacd26b4a8d435af89562b"
+    "version": "0.5.4",
+    "sha256": "c9343e2438740a2feaa8c90588c5e4221218bc160eb154c3960a633abfb115a0"
   }
 }
