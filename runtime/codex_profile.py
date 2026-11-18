@@ -19,16 +19,15 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v15'
+PROFILE_PROTOCOL = 'digr-codex-native-v16'
 PROFILE_CORE = (
     'codex/FOUNDATION.md',
-    'codex/CHARACTER.md', 'codex/PARAMETERS.md',
+    'codex/METHOD.md', 'codex/CHARACTER.md', 'codex/PARAMETERS.md',
     'codex/COLLABORATION.md', 'codex/PERMISSIONS.md',
     'codex/CONSULT.md',
     'codex/SPLIT.md',
     'codex/COUNCIL.md',
     'codex/USAGE.md',
-    'codex/ALLOT.md',
     'codex/CHAT.md',
     'codex/LIVE.md',
     'codex/DELIVERY.md',
@@ -41,6 +40,7 @@ PROFILE_FILES = (
     'codex/STARTUP.md',
     'codex/PROTOCOL.md',
     'codex/FOUNDATION.md',
+    'codex/METHOD.md',
     'codex/HELP.md',
     'codex/PARAMETERS.md',
     'codex/WORKBENCH.md',
@@ -54,7 +54,6 @@ PROFILE_FILES = (
     'codex/EXECUTION_PROTOCOL.json',
     'codex/COUNCIL.md',
     'codex/USAGE.md',
-    'codex/ALLOT.md',
     'codex/CHAT.md',
     'codex/CHAT_LIGHT.md',
     'codex/CHAT_DEEP.md',
@@ -235,7 +234,7 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
         if stack:
             return {**base, 'classification': 'INVALID', 'reason': 'unclosed parameter parentheses'}
         return {**base, 'reason': 'protocol discussion without a complete invocation surface'}
-    from .codex_collaboration import delimiter_policy
+    from .codex_collaboration import COUNCIL_ONLY, delimiter_policy, layered_policy
     modern_separator = p_run is None or delimiter_policy(p_run)
     separator_length = 1
     if modern_separator:
@@ -253,10 +252,16 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
         defaults = resolve_defaults(execution_parameters)
     except ValueError as exc:
         return {**base, 'classification': 'INVALID', 'reason': str(exc)}
+    layered = p_run is None or layered_policy(p_run)
+    selection = {}
+    if modern_separator:
+        double = separator_length == 2
+        selection = {'task_separator': tail[separator:separator + separator_length],
+                     'claude_selection': 'ALLOW' if double else COUNCIL_ONLY if layered else 'DENY'}
+        if not layered:
+            selection['work_profile'] = 'CLAUDE_GUIDED' if double else 'EXECUTION'
     return {**base, 'classification': 'EXECUTING', 'task': task,
-            **({'task_separator': tail[separator:separator + separator_length],
-                'claude_selection': 'ALLOW' if separator_length == 2 else 'DENY',
-                'work_profile': 'CLAUDE_GUIDED' if separator_length == 2 else 'EXECUTION'} if modern_separator else {}),
+            **selection,
             'parameter_text': prelude, 'execution_parameter_text': execution_parameters,
             'delivery_selection': delivery, 'addon_selection': addon_hint,
             'consult_selection': invocation_key in ('DIGRC', 'DIGRP'),

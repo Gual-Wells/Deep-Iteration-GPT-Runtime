@@ -17,7 +17,7 @@ ROUTINE = frozenset({
 EXPLICIT = frozenset({'purchase', 'message_external', 'irreversible_bulk_delete'})
 
 
-def assess_restriction(value: Mapping[str, Any] | None) -> dict[str, Any]:
+def assess_restriction(value: Mapping[str, Any] | None, *, stable: bool = True) -> dict[str, Any]:
     """Admit a proposed workflow blocker, never grant permission to act.
 
     This checks a reviewable source/applicability declaration. It does not
@@ -38,8 +38,11 @@ def assess_restriction(value: Mapping[str, Any] | None) -> dict[str, Any]:
         reasons.append('an unsatisfied condition has not been established')
     if value.get('alternative_allows_progress') is not False:
         reasons.append('a safe continuation has not been ruled out for this affected scope')
-    if (value.get('purpose') == 'analysis'
-            and value.get('evidence_kind') in {'experiment', 'future_feedback', 'full_measurement'}
+    purpose = value.get('purpose')
+    empirical = value.get('evidence_kind') in {'experiment', 'future_feedback', 'full_measurement'}
+    adds_analysis_gate = purpose == 'analysis' or (
+        stable and purpose not in ('implementation', 'empirical_claim'))
+    if (adds_analysis_gate and empirical
             and not (value.get('origin') == 'user' and value.get('explicit_user_requirement') is True)):
         reasons.append('analysis does not acquire validity through an added empirical prerequisite')
     unaffected = value.get('unaffected_work')

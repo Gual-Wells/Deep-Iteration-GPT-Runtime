@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One source-checkout CLI for the experimental Codex profile and work tools.
+"""One source-checkout CLI for the Codex profile and work tools.
 
 Only explicit consult call or council run-round sends configured model requests.
 There is no native-agent scheduler or permission escalation.
@@ -7,6 +7,7 @@ There is no native-agent scheduler or permission escalation.
 from __future__ import annotations
 
 import argparse
+from importlib import import_module
 import json
 from pathlib import Path
 import sys
@@ -28,6 +29,10 @@ from runtime.codex_lifecycle import (
     MESSAGE_ACTIONS, ingest_message, handle_message, load_lifecycle, close_session, recover_session, terminate_message,
 )
 
+TOOL_GROUPS = ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice',
+               'return', 'preprint', 'personal', 'visits', 'paper', 'delivery',
+               'consult', 'council', 'usage', 'allot', 'live')
+
 
 def read_object(path: Path) -> dict:
     value = json.loads(path.read_text(encoding='utf-8-sig'))
@@ -45,49 +50,11 @@ def read_message(path: Path) -> str:
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else list(argv)
     # Pass through argument parsing rather than duplicate mature CLI surfaces.
-    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery', 'consult', 'council', 'usage', 'allot', 'live'):
-        from tools import codex_experience, codex_profile, codex_workbench, codex_knowledge, codex_timeline, codex_voice
-        if argv[0] == 'council':
-            from tools.codex_council import main as council_main
-            return council_main(argv[1:])
-        if argv[0] == 'usage':
-            from tools.codex_usage import main as usage_main
-            return usage_main(argv[1:])
-        if argv[0] == 'allot':
-            from tools.codex_allot import main as allot_main
-            return allot_main(argv[1:])
-        if argv[0] == 'live':
-            from tools.codex_live import main as live_main
-            return live_main(argv[1:])
-        if argv[0] == 'consult':
-            from tools.codex_consult import main as consult_main
-            return consult_main(argv[1:])
-        if argv[0] == 'return':
-            from tools.codex_return import main as return_main
-            return return_main(argv[1:])
-        if argv[0] == 'visits':
-            from tools.codex_visits import main as visits_main
-            return visits_main(argv[1:])
-        if argv[0] == 'preprint':
-            from tools.codex_preprint import main as preprint_main
-            return preprint_main(argv[1:])
-        if argv[0] == 'personal':
-            from tools.codex_personal import main as personal_main
-            return personal_main(argv[1:])
-        if argv[0] == 'paper':
-            from tools.codex_paper import main as paper_main
-            return paper_main(argv[1:])
-        if argv[0] == 'delivery':
-            from tools.codex_delivery import main as delivery_main
-            return delivery_main(argv[1:])
-        return {'profile': codex_profile.main, 'workbench': codex_workbench.main,
-                'experience': codex_experience.main,
-                'knowledge': codex_knowledge.main,
-                'timeline': codex_timeline.main,
-                'voice': codex_voice.main}[argv[0]](argv[1:])
+    if argv and argv[0] in TOOL_GROUPS:
+        return import_module('tools.codex_' + argv[0]).main(argv[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
-    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery', 'consult', 'council', 'usage', 'allot', 'live'):
+    for name in TOOL_GROUPS:
         sub.add_parser(name, help=f'{name} commands; append --help for details')
     acquire = sub.add_parser('acquire', help='actually acquire a live, immutable Codex profile')
     acquire.add_argument('--stage', choices=('startup', 'help', 'execution'), default='startup')
@@ -124,7 +91,7 @@ def main(argv: list[str] | None = None) -> int:
     handle.add_argument('--delivery-selection', type=Path,
                         help='actual current user choice JSON; ordinary followups otherwise inherit X')
     handle.add_argument('--destinations', type=Path, help='resolve a genuinely changed X target once')
-    handle.add_argument('--claude-selection', choices=('ALLOW', 'DENY'),
+    handle.add_argument('--claude-selection', choices=('ALLOW', 'COUNCIL_ONLY', 'DENY'),
                         help='actual current prose user choice; complete one/two-colon headers apply directly')
     lifecycle = ts.add_parser('lifecycle', help='read managed continuation state or explicit legacy status')
     lifecycle.add_argument('--root', required=True, type=Path)

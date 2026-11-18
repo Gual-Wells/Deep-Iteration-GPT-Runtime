@@ -293,7 +293,7 @@ def create_session(root: Path, *, request: Path, p_run: str,
                 paper_authoring_contract='sonnet-native-v1',
                 consult_role='Sonnet-native content driving for the selected paper')
         metadata['parameter_selection'] = selection
-        from .codex_collaboration import unified
+        from .codex_collaboration import layered_policy, unified
         if unified(p_run):
             metadata['execution_profile'] = {
                 'mode': 'DIGR', 'native_responsibilities': 'N/R/D/V/L/M remain Codex-owned',
@@ -303,9 +303,15 @@ def create_session(root: Path, *, request: Path, p_run: str,
             }
             if 'claude_selection' in invocation:
                 metadata['initial_invocation'].update({key: invocation[key] for key in
-                    ('task_separator', 'claude_selection', 'work_profile')})
+                    ('task_separator', 'claude_selection', 'work_profile') if key in invocation})
                 metadata['execution_profile']['claude_selection'] = invocation['claude_selection']
+            if 'work_profile' in invocation:
                 metadata['execution_profile']['work_profile'] = invocation['work_profile']
+            if layered_policy(p_run):
+                metadata['execution_profile']['native_model_selection'] = 'ACTIVE_CODEX_SETTINGS'
+                metadata['execution_profile'].pop('fee_authorization', None)
+                metadata['execution_profile']['initial_fee_basis'] = (
+                    'COUNCIL_WALLET_ONLY' if invocation['claude_selection'] == 'COUNCIL_ONLY' else 'USER_BUDGET_DECISION')
     if profile_uses_delivery:
         from .codex_delivery import resolve_policy
         selection = invocation['delivery_selection']
@@ -829,14 +835,16 @@ def line_packet(root: Path, line_id: str, *, topic: str | None = None,
     # Allot exposes only shared policy and execution metadata. Full selection
     # evidence may contain another researcher's private work and is not part
     # of a line's recovery context.
-    from .codex_allot import context_summary
-    allot = context_summary(root)
-    if allot.get('policy') is not None or allot.get('selections'):
-        parts += ['## 当前Allot政策与原生执行概况',
-                  json.dumps(allot, ensure_ascii=False, indent=2, allow_nan=False),
-                  '选择记录待宿主应用的配置，观察记录实际取得的模型与effort；'
-                  '未观察的选择不能当作已经执行。当前政策须由宿主真实应用，'
-                  '本摘要不能证明Main已经切换；过时选择的历史观察不授权继续执行。']
+    from .codex_collaboration import layered_policy
+    if not layered_policy(metadata['P_run']):
+        from .codex_allot import context_summary
+        allot = context_summary(root)
+        if allot.get('policy') is not None or allot.get('selections'):
+            parts += ['## 当前Allot政策与原生执行概况',
+                      json.dumps(allot, ensure_ascii=False, indent=2, allow_nan=False),
+                      '选择记录待宿主应用的配置，观察记录实际取得的模型与effort；'
+                      '未观察的选择不能当作已经执行。当前政策须由宿主真实应用，'
+                      '本摘要不能证明Main已经切换；过时选择的历史观察不授权继续执行。']
     # Keep the current shared material after old work/candidate/state so its
     # actual contents, rather than an obsolete NEXT section, frame re-entry.
     # Include the source once: duplicating a long decision file wastes context

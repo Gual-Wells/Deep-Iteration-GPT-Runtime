@@ -44,6 +44,7 @@ codex/EXECUTION_PROTOCOL.json
 codex/FOUNDATION.md
 codex/HELP.md
 codex/LIVE.md
+codex/METHOD.md
 codex/PARAMETERS.md
 codex/PERMISSIONS.md
 codex/PROTOCOL.md
@@ -94,6 +95,7 @@ docs/CODEX_QUALITY_DESIGN.md
 docs/CODEX_REAL_WORLD_CONTINUITY_UPGRADE.md
 docs/CODEX_RESPONSE_CLOCK_UPGRADE.md
 docs/CODEX_RUN_REVIEW_20261107.md
+docs/CODEX_STABLE_COMPATIBILITY.md
 docs/CODEX_TRIAL_RESULTS.md
 docs/DV_AUTONOMY_UPDATE_PREPARATION.md
 docs/ENGINEERING_VALIDATION_LOG.md
@@ -454,6 +456,7 @@ runtime/codex_allot.py
 runtime/codex_allot_labor.py
 runtime/codex_collaboration.py
 runtime/codex_consult.py
+runtime/codex_consult_budget.py
 runtime/codex_council.py
 runtime/codex_delivery.py
 runtime/codex_experience.py
@@ -902,6 +905,7 @@ tests/test_codex_carrier.py
 tests/test_codex_claude_selection.py
 tests/test_codex_cli.py
 tests/test_codex_consult.py
+tests/test_codex_consult_budget.py
 tests/test_codex_consult_paper.py
 tests/test_codex_consult_parallel.py
 tests/test_codex_council.py
@@ -913,6 +917,8 @@ tests/test_codex_frozen_input.py
 tests/test_codex_guidance_binding.py
 tests/test_codex_io.py
 tests/test_codex_knowledge.py
+tests/test_codex_layered_foundation.py
+tests/test_codex_layered_interop.py
 tests/test_codex_lifecycle.py
 tests/test_codex_live.py
 tests/test_codex_live_batching.py

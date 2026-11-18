@@ -37,6 +37,7 @@ def main(argv: list[str] | None = None) -> int:
     boundary.add_argument('--input', required=True, type=Path, help='UTF-8 JSON input')
     classify = sub.add_parser('classify', help='classify the pinned call surface after live startup acquisition')
     classify.add_argument('--message-file', required=True, type=Path)
+    classify.add_argument('--pin', help='preview a historical version using its frozen version@SHA')
     caps = sub.add_parser('capabilities', help='report declared availability, not run proof')
     caps.add_argument('--input', required=True, type=Path, help='UTF-8 JSON availability map')
     args = ap.parse_args(argv)
@@ -53,7 +54,7 @@ def main(argv: list[str] | None = None) -> int:
             result = resolve_defaults(args.text,
                 json.loads(args.overrides.read_text(encoding='utf-8-sig')) if args.overrides else None)
         elif args.command == 'classify':
-            result = classify_invocation(args.message_file.read_bytes().decode('utf-8-sig'))
+            result = classify_invocation(args.message_file.read_bytes().decode('utf-8-sig'), p_run=args.pin)
         elif args.command == 'instructions':
             print(instruction_text(ROOT, args.layer), end='')
             return 0

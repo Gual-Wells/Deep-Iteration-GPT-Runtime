@@ -1,29 +1,48 @@
-# 可见过程与公开流：来源、正文和显示声明
+# 用户可见过程
 
-本节修复中间过程退成普通摘要、逐token JSON过长截断、断线后遗漏正文的问题。**实际commentary仍是用户可见入口。** 工具生成的display_text、stdout、文件或ACK不能自己证明消息已被用户看到；宿主必须实际发出，工具只记录其显示声明。
+**在实际边界发出 commentary。** Main 在当前对话显示进度、独立返回与处理。代理发回消息后，宿主确认它是否已在用户侧发布。只到达 Main 或工具结果的公开返回，由 Main 及时按原身份转发。发布、收到和处理分别陈述。发布指宿主在对话中发出消息，用户是否已读由实际反馈确定。
 
-## 原生责任进度
+## 原生工作
 
-每个实际N/R/n/r有具体问题与有意义方法后报告开始，结束报告所得和后果；D/V的形成、再入、返回与Main处理分别可辨。标题标真实actor及N/R/D/V/S单位，另行标阶段：▶开始、⋯进展、↻再入、↩返回、◆主线处理、✓完成、■线路关闭或⏸受阻。按真正发生合并相邻边界，不按命令凑单位，不预编未启动人物。
+标题写真正执行者、工作单位和具体问题，第二行独立写阶段，正文说当前问题、关键所得或后果。可用同一条 commentary 承载相邻实际边界，各自保留标题和阶段。达到边界即可直接发出，工作记录、工具命令、准备文件与确认游标均为接续辅助。
 
-独立返回的公开原文或标明概括放引用块，Main中心主张处理另行说明采用/拒绝/待落实和实际后果。普通摘要可以承载实质发现，不能抹掉这些来源和阶段。发生漏报就承认漏报、从当前真实状态恢复；没有记录到的开始保持缺口，不倒填为当时已通知。
+| 工作 | 标题示例 |
+| --- | --- |
+| 前置研究 | 🟦 **U0·Main｜从旧稿恢复一条完整论证** |
+| 主线推进 | 🟦 **M01·N03·Main｜重建从队列到目标函数的推导** |
+| 整体重开 | 🟪 **M01·R02·Main｜现有候选是否依赖未成立的假设** |
+| 独立介入 | 🟧 **M01·D05｜把原件恢复放在分章重写之前** |
+| 持续异质领域 | 🟩 **M01·V02.2·实际代理｜读者在第二章需要的前提** |
+| 来源推进或重开 | 🟨 **M01·S1.n02·Main｜核对真实导出能力** |
+| 一条主进度 | 🟥 **M02·实际主线执行者｜收敛候选** |
+| 仲裁 | 🟥 **M01·仲裁·实际主持者｜决定采用的解释与后果** |
 
-`live work --root TASK --input work.json`保存一次真实公开工作事件，字段为actor、kind、unit、stage、text、operation_id、source_ref。kind支持U0/N/R/D/V/S/M/SIDECAR；RETURN/HANDLED须指向实际返回或处理依据。operation_id只重放同一事实，不能改写为新内容。若没有START，记录missing_start，不补造历史。
+阶段用 **▶ 开始、⋯ 进展、↻ 再入、↩ 返回、◆ 主线处理、✓ 完成、■ 线路关闭、⏸ 受阻**。M1 可省 M01，执行者本身就是已识别的工作单位时只写一次。D/V 初次及实际执行者变化时标出真实代理。V02.2 表示同一 V 的第二次进入。S 面的重开写 r。每个实质 N/R/n/r 在问题和方法已形成、工作真正开始时报告该边界，在真正结束时说明所得和后果。较长工作在有发现或取舍时沿同一身份更新。
 
-## Claude公开正文
+前置投入形成后，Main 按 [FOUNDATION](FOUNDATION.md) 发出 `[DIGR U0 INIT]`。明确了实际用户决定后，按同章显示 U0 的确认依据和范围。正式配置生效后、首项正式工作前，由真实负责该线的 Main 按 [PARAMETERS](PARAMETERS.md) 显示 `[DIGR INIT OK]` 和完整生效配置，实质冲突未解时显示 `[DIGR INIT BLOCKED]` 与它影响的工作。仲裁由实际主持者显示比较过的主张、决定和直接后果。已有确认的接续显示本次保留和改变的决定。
 
-0.16 `consult call`和`council run-round`默认按exchange/成员无损合并相邻正文，保留换行；段落到达、长度上限或短延迟即发送`public_text`，不等整稿。正文不做摘要、不机械删尾；未完、连接、异常与完整状态分别显示。`--raw-events`仅用于诊断，不替代可读commentary。结束事件只打印小摘要，完整交换用inspect读回，避免结果元数据淹没正文。
+独立返回保留原身份，注明逐字引文或概括并放入引用块。Main 另以自己的身份标记 `◆ 主线处理`，答复其中心主张，说明理由、采用范围以及已落实、待落实或拒绝的具体后果。收到返回时如尚未完成处理，先显示返回。普通宿主进度与转述用实际来源和适当粒度；Claude 等外部内容协作者的公开文字按下节直接转播。
 
-原始公开事件与正文仍持久保存；不保留隐藏思考或任意服务字段。中断恢复先读同一exchange，不新发推理，不用“重试一次”补正文。不把本轮普通Consult冒称子议会实际已运行。
+## 外部协作者
 
-## 断点读取与待转播
+在真实的 `consult call` 或 `council run-round` 运行期间，宿主留出可发送 commentary 的工作循环。例如以可轮询的工具会话启动已授权调用，用当前任务的真实 exchange ID 并行读取公开流，然后即时发布。多成员轮分别按各自 exchange ID 读取。选定一次正文转播来源，持续使用同一 exchange 和 reader，避免正文在工具流和读盘路径各发一遍。
+
+用 `live read` 把同一 exchange 已到达的相邻公开增量合为可读小段，正文保留每个字和原换行。短片段及时发出，正文量超界则分批。`consult` 和 `council` 的 `public_text` 使用相同的来源标题和正文渲染，可作为流到达的提示。宿主连接、部分正文、完整返回和异常是不同事实。连接与结束状态单列，实际服务标识和请求型号分别标注。转播范围仅为公开内容。Main 对内容的处理另发自己的 commentary。
 
 ```text
-python -B tools/codex.py live read --root TASK --reader commentary --exchange-id ACTUAL_ID --max-chars 8000
-# 实际将display_text/segments原文发到用户commentary后：
+python -B tools/codex.py live read --root TASK --reader commentary --exchange-id EXCHANGE --format commentary
+# 宿主将工具输出首行之后的 Markdown 实际发到用户可见 commentary。
 python -B tools/codex.py live ack --root TASK --delivery-id ID --evidence-ref ACTUAL_COMMENTARY_REFERENCE --compact
 ```
 
-省略exchange-id读取原生工作事件。read本身不前移游标，未ACK会重读相同正文。同一exchange和成员的相邻公开增量合并为一段，只标一次来源，宿主连接与结束状态仍单列。大段按字符分批，`segments`保留精确原文及在原事件流中的起止位置，拼接可以还原正文。`from`、`to`沿用原事件下标、段内偏移和哈希。ACK需要宿主真实显示引用，记录为HOST_REPORTED_DISPLAYED。旧ACK不能将游标移回，来源内容改动或截断会报错。`--compact`只打印ACK元数据，持久收据仍保留完整批次、原文及显示引用。省略此选项仍返回完整收据。
+`--format commentary` 首行为小型 JSON 元数据，`delivery_id` 存在时，其余内容为可直接发布的 Markdown。`remaining` 说明当前已读快照还有没有待取片段。交换仍在进行时继续小批取流，直到实际终态且待发段落已处理。默认正文上限为 2000 字符，可按实际载体调整 `--max-chars`。
 
-宿主须持续取流，不等待整包。收到公开段落及时原文转播；如工具输出被截断，明确说明，使用同一exchange的live read补取尚未报告部分，称补转而非伪造实时。停止、撤销与真实预算按原协议；可见过程修复不新增外部费用授权。
+读取保持游标。确已发出这批内容且有可定位的实际对话引用时，再以同一 `delivery_id` 回执并推进游标。回执记录宿主陈述 `HOST_REPORTED_DISPLAYED`，可据对应消息核对。若回执路径暂不可用，直接发出已收到的源片段，沿实际对话中的原文边界接续。`--format json` 的 `segments` 保留原文与原事件起止位置。费用、停止、撤销及是否可调用由各自的协议决定。
+
+## 恢复
+
+发现原生漏报时，在当前 commentary 明说缺失的实际边界，然后显示当前执行者和已到达的真实状态。已有而未报的独立返回从原来源补转，Main 处理仍显示其实际状态。保留缺失的开始，不把事后说明写成当时已经发布。
+
+遇到工具输出截断、流中断或宿主接续，用同一 exchange 及 reader 的 `live read --catch-up` 取已保存的未报部分。先按实际对话核对已经发布的批次，必要时用原 `delivery_id` 和实际消息引用补回执。明确标为补转。若相应事件流不全，按同一 exchange 的 `consult inspect` 核对原始 `public.md` 与交换状态，只补原件能支持的缺段，保留未知的终态与缺失内容。恢复读取不发新推理。
+
+需要给原生工作保留可重读的位置时，可用 `live work --root TASK --input work.json` 保存实际事件。输入含 `actor`、`kind`、`unit`、`stage`、`text`、`operation_id`，可附 `line`、`topic`，`RETURN` 与 `HANDLED` 附实际 `source_ref`。`RETURN` 的 `return_mode` 用 `quote` 标逐字引文，默认 `summary` 为概括。`kind` 支持 `U0`、`INIT`、`N`、`R`、`D`、`V`、`S`、`M`、`ARBITRATION`、`SIDECAR`。复用 `operation_id` 只为同一事实。省略 `--exchange-id` 的 `live read` 读取这些原生记录。无会话记录或游标时，照常将真实边界直接发到对话。

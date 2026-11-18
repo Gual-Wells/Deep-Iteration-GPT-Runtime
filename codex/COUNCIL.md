@@ -1,6 +1,6 @@
 # 单一原生议会与内部 Claude 子议会
 
-本节属于 Codex 0.16 候选 profile；旧 pin 不迁移。只有一个原生议会，Claude 子议会是其内部研究成员。原生独立者完成初议，待两侧达到完整或明确异常终态后，由原生独立者取得真实公开材料，自主再议并形成返回。Main 负责真实调用、权限费用、来源、暂存和忠实转交，不能先筛 Claude 观点、改写成议会结论。Main 继续完成主线作品和处理返回。
+第一层 Claude 是原生议会内的外部研究成员，参与竞争解释、选择与仲裁。每项议会在同一原生研究链上推进。原生独立者完成初议，待两侧达到完整或明确异常终态后，由原生独立者取得真实公开材料，自主再议并形成返回。Main 负责真实调用、权限费用、来源、暂存和忠实转交，不能先筛 Claude 观点、改写成议会结论。Main 继续完成主线作品和处理返回。
 
 ## 实际身份、观点距离与来源
 
@@ -22,6 +22,8 @@ Claude 成员具有独立 `participation_role=council_member`，按 `council_id/
 
 ## 两阶段、异常与迟到
 
+Stable 的实际成员发送统一从已登记的 `council run-round` 进入，保留单次提交、真实成员和共享钱包检查。等待费用答复时可以先按拟议成员估算，取得批准后再开启议会。已封存成员的待发请求退出本批，其余可派发成员依本轮继续。已经在途的回执按原身份处理，迟到公开正文供后续相关再入。
+
 `INITIAL → REDELIBERATION → COMPLETE` 是本机研究对象的阶段，不代表代码认证了内容质量。每个原生初议 actor 和每个相关 Claude 成员分别封存 `COMPLETE/PARTIAL/FAILED/BUDGET_STOPPED/TIMEOUT/CANCELLED/OUTCOME_UNKNOWN`。只有两侧都进入终态才能释放屏障；异常解除等待，不证明研究完成，不视为支持或反对。
 
 默认 deadline 是每个 cycle 300 秒，可在创建时明确覆盖；不静默延长。屏障只限制相关议会决定，其他主线工作继续。`run-round` 真正并发发送当轮已准备的各成员请求。到 deadline 先返回明确异常阶段，不等待所有 future 的网络工作完成；HTTP 超时也以剩余 deadline 为上限。服务端是否取消和收费仍可能未知，保留共享钱包预留。
@@ -40,7 +42,7 @@ Claude 成员具有独立 `participation_role=council_member`，按 `council_id/
 
 ## 本机可运行路径
 
-以下路径仅示例。单冒号可以创建纯原生议会；`--claude` 必须同时具备当前 ALLOW、真实研究对象、适用费用授权及共享钱包可预留空间。双冒号及凭据存在均不授权任意规模。
+按真实对象开议会。可用纯原生参与，也可通过 `--claude` 加入第一层。当前选择须允许该角色。单冒号按真实共享钱包可用余额使用，双冒号先取得已说明范围的预算决定。实际发送对每个成员和请求分别核对 Split、费用和当前任务输入。识别模式和费用来源见 [PROTOCOL](PROTOCOL.md) 与 [WORKBENCH](WORKBENCH.md)。
 
 ```text
 python -B tools/codex.py council create --root D:/task/session --council-id c1 --native-actor <实际原生代理id>

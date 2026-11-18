@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Operate a native council; only run-round can invoke prepared Claude members.
+"""Operate a native council with run-round as the Stable member dispatch entry.
 
 Native identities are host assertions. Shared-disk records are not OS secrecy.
 Every paid job still needs its own actual Split and current shared-wallet facts.
@@ -106,8 +106,9 @@ def main(argv=None):
             emit = lambda event: print(json.dumps(event, ensure_ascii=False, allow_nan=False), flush=True)
             relay = None
             if not args.raw_events:
-                from runtime.codex_live import ParagraphRelay
-                relay = ParagraphRelay(emit)
+                from runtime.codex_live import ParagraphRelay, stable_live
+                stable = stable_live(read(args.root / 'session.json')['P_run'])
+                relay = ParagraphRelay(emit, stable=stable)
                 def source_event(event):
                     exchange = event.get('exchange_id')
                     path = args.root / 'consult/exchanges' / str(exchange) / 'request.json'
@@ -122,7 +123,8 @@ def main(argv=None):
                     'phase': result.get('phase'), 'cycle_id': result.get('cycle_id'),
                     'round_id': args.round_id, 'local_path': result.get('local_path'),
                     'visibility': 'public_text is ready for host commentary, not proof it was displayed',
-                    'recovery': 'live read --reader commentary --exchange-id ACTUAL_EXCHANGE'},
+                    'recovery': 'live read --reader commentary --exchange-id ACTUAL_EXCHANGE'
+                                + (' --format commentary' if stable else '')},
                     ensure_ascii=False, allow_nan=False), flush=True)
                 return 0
         elif args.command == 'seal-member':

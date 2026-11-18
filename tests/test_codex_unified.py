@@ -40,10 +40,10 @@ class UnifiedDIGRTests(unittest.TestCase):
         value=ingest_message(self.root, source=self.file(ref+'.txt',text), source_ref=ref)
         handle_message(self.root,message_id=value['message_id'],action='continue',reason='Apply actual synthetic selection')
 
-    def paper_scope(self):
+    def paper_scope(self, version='0.6.0'):
         batch=self.folder/'paper-batch'
         value=paper.initialize(batch,p_run=self.pin,authorization=self.original,source_ref='actual-whole-paper-product',task_root=self.root)
-        self.assertEqual(value['addon_version'],'0.6.0')
+        self.assertEqual(value['addon_version'], version)
         item=paper.add_paper(batch,paper_id='source',title='Synthetic complete source',line='M01',owner='fixture',
             parameters={'N':2,'R':1,'D':0,'V':0,'L':3,'T':'0min','B':0,'S':{'n':0,'r':0,'t':'0min','b':0}})
         return Path(item['paper_root'])
@@ -102,6 +102,17 @@ class UnifiedDIGRTests(unittest.TestCase):
         request=json.loads(Path(result['request_path']).read_text(encoding='utf-8'))
         self.assertNotEqual(request['messages'][0]['content'],consult._LOGICAL_PAPER_SYSTEM)
         self.assertFalse((self.folder/'paper-batch').exists())
+
+    def test_stable_paper_scope_is_registered_for_formal_content(self):
+        self.pin = '1.0.0@' + 'e' * 40
+        self.root = self.folder / 'stable-paper-task'
+        self.original = self.file('stable-paper-user.txt', 'DIGR:: Prepare this complete paper guide.')
+        create_session(self.root, request=self.original, p_run=self.pin)
+        scope = self.paper_scope(version=paper.VERSION)
+        result = self.prepare('stable-paper', paper_root=scope)
+        self.assertEqual(result['exchange']['authoring_scope']['addon_version'], '0.6.1')
+        self.assertEqual(result['collaboration']['claude_layer'], 'CONTENT')
+        self.assertEqual(self.server.post_calls, [])
 
     def test_plain_entry_paper_and_later_generic_work_keep_separate_scopes(self):
         scope=self.paper_scope()
