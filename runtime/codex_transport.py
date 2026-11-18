@@ -58,6 +58,14 @@ def profile_layout(manifest: dict, version: str) -> dict[str, Any]:
     required = {VERSION, *paths['startup_slice'], *paths['core'],
                 *(paths[key] for key in ('entrypoint', 'help', 'light_instructions',
                                         'experimental_router', 'workbench_guide'))}
+    supporting = manifest.get('supporting_instructions', [])
+    if not isinstance(supporting, list):
+        raise ValueError('Codex supporting_instructions must be a path list')
+    if supporting:
+        paths['supporting_instructions'] = [_profile_path(path) for path in supporting]
+        if len(set(paths['supporting_instructions'])) != len(supporting):
+            raise ValueError('duplicate supporting instruction path')
+        required.update(paths['supporting_instructions'])
     bundle = manifest.get('execution_bundle')
     if bundle is not None:
         if not isinstance(bundle, dict) or bundle.get('schema') != 1:

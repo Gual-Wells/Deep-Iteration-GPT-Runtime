@@ -2,7 +2,66 @@
 from __future__ import annotations
 
 import json
+import socket
+import threading
+import time
 from typing import Callable, Mapping
+
+
+class ReadDeadline:
+    """Interrupt a blocking HTTP read even when bytes arrive without a line.
+
+    Socket timeouts measure inactivity. A daemon watchdog instead shuts down
+    registered sockets at one absolute monotonic deadline; this only closes
+    the local connection and cannot certify provider cancellation or billing.
+    """
+    def __init__(self, seconds: float):
+        self.expires = time.monotonic() + max(seconds, 0.0)
+        self.expired = False
+        self._sockets = []
+        self._lock = threading.Lock()
+        self._timer = None
+
+    def remaining(self) -> float:
+        return max(self.expires - time.monotonic(), 0.0)
+
+    @staticmethod
+    def _shutdown(sock):
+        try:
+            sock.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+
+    def bind(self, sock):
+        if sock is None:
+            return
+        with self._lock:
+            self._sockets.append(sock)
+            expired = self.expired or self.remaining() <= 0
+        if expired:
+            self._shutdown(sock)
+            self.check()
+
+    def _expire(self):
+        with self._lock:
+            self.expired = True
+            sockets = list(self._sockets)
+        for sock in sockets:
+            self._shutdown(sock)
+
+    def start(self):
+        self.check()
+        self._timer = threading.Timer(self.remaining(), self._expire)
+        self._timer.daemon = True
+        self._timer.start()
+
+    def check(self):
+        if self.expired or self.remaining() <= 0:
+            raise TimeoutError('Absolute local read deadline reached; provider cancellation is unconfirmed')
+
+    def stop(self):
+        if self._timer is not None:
+            self._timer.cancel()
 
 
 class _PublicRedactor:
@@ -23,10 +82,14 @@ class _PublicRedactor:
         return result
 
 
-def _sse_data(response):
+def _sse_data(response, check_read=None):
     fields = []
     while True:
+        if check_read is not None:
+            check_read()
         raw = response.readline()
+        if check_read is not None:
+            check_read()
         if not raw:
             if fields:
                 yield '\n'.join(fields)
@@ -41,7 +104,8 @@ def _sse_data(response):
             fields.append(value[1:] if value.startswith(' ') else value)
 
 
-def read_public_response(response, *, secret: str, on_delta: Callable[[str], None]) -> dict:
+def read_public_response(response, *, secret: str, on_delta: Callable[[str], None],
+                         check_read: Callable[[], None] | None = None) -> dict:
     """Relay only public content; return an aggregate suitable for cost/identity.
 
     JSON fallbacks are identified as non-streaming. EOF without [DONE] does
@@ -90,13 +154,18 @@ def read_public_response(response, *, secret: str, on_delta: Callable[[str], Non
             emit(message['content'])
 
     if streamed:
-        for payload in _sse_data(response):
+        for payload in _sse_data(response, check_read):
             if payload.strip() == '[DONE]':
                 result['stream_ended'] = True
                 break
             consume(json.loads(payload))
     else:
-        consume(json.loads(response.read()))
+        if check_read is not None:
+            check_read()
+        raw = response.read()
+        if check_read is not None:
+            check_read()
+        consume(json.loads(raw))
     emit('', final=True)
     result['choices'][0]['message']['content'] = ''.join(parts)
     result['public_redacted'] = redactor.changed
