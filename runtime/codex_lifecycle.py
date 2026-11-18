@@ -97,6 +97,27 @@ def _input_ref(message: Mapping[str, Any]) -> dict[str, Any]:
             'source_ref': message['source']['source_ref'], 'path': message['source']['path']}
 
 
+def _message_surface(text: str, lifecycle: Mapping[str, Any], *, route_pending: bool) -> dict[str, Any]:
+    from .codex_profile import classify_invocation
+    if route_pending:
+        return {'surface': 'ROUTE_PENDING'}
+    invocation = classify_invocation(text, p_run=lifecycle['P_run'])
+    surface = {'surface': invocation['classification']}
+    if 'supplement' in invocation:
+        if lifecycle['status'] not in {'ACTIVE', 'PAUSED'}:
+            raise ValueError('DO supplement requires an unfinished DIGR task; specify the target or start a new DIGR invocation')
+        surface['supplement'] = invocation['supplement']
+    return surface
+
+
+def _recent_message(message: Mapping[str, Any]) -> dict[str, Any]:
+    previous = {key: message.get(key) for key in ('id', 'surface', 'upstream_route_pin_ref', 'handling')}
+    previous['source'] = {key: message['source'][key] for key in ('path', 'source_ref', 'sha256', 'byte_length')}
+    if 'supplement' in message:
+        previous['supplement'] = {key: message['supplement'][key] for key in ('kind', 'prefix')}
+    return previous
+
+
 def initialize_lifecycle(root: Path, metadata: Mapping[str, Any]) -> dict[str, Any]:
     """Initialize only a newly created 0.8+ session, not a legacy migration."""
     from .codex_profile import classify_invocation
@@ -155,6 +176,10 @@ def load_lifecycle(root: Path) -> dict[str, Any]:
         raise ValueError('current lifecycle message identity mismatch')
     _validate_snapshot(current['source'])
     _pin_reference(current.get('upstream_route_pin_ref'))
+    from .codex_profile import parse_do_supplement
+    supplement = parse_do_supplement(current['source']['text'], p_run=metadata['P_run'])
+    if current.get('supplement') != supplement:
+        raise ValueError('DO supplement does not match the selected user source')
     from .codex_collaboration import delimiter_policy
     if delimiter_policy(metadata['P_run']):
         policy = value.get('claude_policy', {})
@@ -298,13 +323,12 @@ def ingest_message(root: Path, *, source: Path, source_ref: str,
         raise ValueError('handle the pending source before ingesting another message')
     if selected['source_ref'] in value['seen_source_refs']:
         raise ValueError('source reference was already observed; an old reply cannot become a new input')
-    previous = {key: current.get(key) for key in ('id', 'surface', 'upstream_route_pin_ref', 'handling')}
-    previous['source'] = {key: current['source'][key] for key in ('path', 'source_ref', 'sha256', 'byte_length')}
-    value['recent_messages'] = [*value['recent_messages'], previous][-RECENT_LIMIT:]
+    surface = _message_surface(selected['text'], value, route_pending=candidate and route_pin is None)
+    value['recent_messages'] = [*value['recent_messages'], _recent_message(current)][-RECENT_LIMIT:]
     value['message_id'] += 1
     value['current_message'] = {
         'id': value['message_id'], 'source': selected,
-        'surface': classify_invocation(selected['text'], p_run=value['P_run'])['classification'] if not candidate or route_pin else 'ROUTE_PENDING',
+        **surface,
         'route_required': candidate, 'upstream_route_pin_ref': route_pin,
         'route_basis': 'caller-supplied upstream pin reference; acquisition not performed by this helper',
         'handling': None}
@@ -319,7 +343,6 @@ def terminate_message(root: Path, *, source: Path, source_ref: str, action: str,
     This path can only terminate. It preserves the real source and prior fence;
     it cannot supersede a correction in order to continue an old plan.
     """
-    from .codex_profile import classify_invocation
     from .routing import candidate_route_key
     if action not in {'stop', 'cancel'}:
         raise ValueError('priority message may only stop or cancel')
@@ -337,13 +360,13 @@ def terminate_message(root: Path, *, source: Path, source_ref: str, action: str,
             if value['handled_message_id'] != value['message_id']:
                 return handle_message(root, message_id=value['message_id'], action=action, reason=reason)
         raise ValueError('source reference was already observed; do not replay an old termination')
-    previous = {key: current.get(key) for key in ('id', 'surface', 'upstream_route_pin_ref', 'handling')}
-    previous['source'] = {key: current['source'][key] for key in ('path', 'source_ref', 'sha256', 'byte_length')}
+    surface = _message_surface(selected['text'], value, route_pending=candidate and route_pin is None)
+    previous = _recent_message(current)
     previous['pending_at_termination'] = value['message_id'] != value['handled_message_id']
     value['recent_messages'] = [*value['recent_messages'], previous][-RECENT_LIMIT:]
     value['message_id'] += 1
     value['current_message'] = {'id': value['message_id'], 'source': selected,
-        'surface': classify_invocation(selected['text'], p_run=value['P_run'])['classification'] if not candidate or route_pin else 'ROUTE_PENDING',
+        **surface,
         'route_required': candidate, 'upstream_route_pin_ref': route_pin,
         'route_basis': 'upstream acquisition obligation; termination does not create execution eligibility',
         'handling': None}

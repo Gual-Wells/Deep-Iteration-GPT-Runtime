@@ -38,6 +38,7 @@ codex/CONSULT.md
 codex/COUNCIL.md
 codex/DELIVERY.md
 codex/DESIGN_0_16.md
+codex/DESIGN_0_17.md
 codex/EXECUTION_PROTOCOL.json
 codex/FOUNDATION.md
 codex/HELP.md
@@ -449,6 +450,7 @@ runtime/candidate_store.py
 runtime/clock_journal.py
 runtime/clock_probe.py
 runtime/codex_allot.py
+runtime/codex_allot_labor.py
 runtime/codex_collaboration.py
 runtime/codex_consult.py
 runtime/codex_council.py
@@ -890,6 +892,9 @@ tests/test_clock_genesis_stress.py
 tests/test_clock_journal.py
 tests/test_clock_probe.py
 tests/test_codex_allot.py
+tests/test_codex_allot_labor.py
+tests/test_codex_allot_policy.py
+tests/test_codex_allot_recovery.py
 tests/test_codex_carrier.py
 tests/test_codex_claude_selection.py
 tests/test_codex_cli.py
@@ -898,6 +903,7 @@ tests/test_codex_consult_paper.py
 tests/test_codex_consult_parallel.py
 tests/test_codex_council.py
 tests/test_codex_delivery.py
+tests/test_codex_do_supplement.py
 tests/test_codex_experience.py
 tests/test_codex_foundation.py
 tests/test_codex_frozen_input.py

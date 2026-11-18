@@ -1,4 +1,8 @@
-# DIGR Codex 0.16 使用说明
+# DIGR Codex 0.17 使用说明
+
+Allot现以6.1 Sol/max、6.2 Sol/max为智力主力，仅明确大批量非智力受控重复劳动可有据降effort，具体Max不足或真实任务失败反馈驱动升级；五档研究责任不映射effort。旧pin不迁移，当前用户明确改选可用`allot set-policy`持久保存，见ALLOT。
+
+`DO：补充`或`DO:补充`直接进入已有未结束任务，保留P_run、职责和有效决定，不重开前置。它不是新DIGR入口，其正文不自动重选Claude/X或新增费用；暂停不自动恢复、终态不复活。无可接续对象时明确目标，实际停止/修订由正文决定。
 
 可见过程工具`live work/read/ack`保存真实单位阶段，按来源无损分批读取公开流。read不前移游标；宿主实际发commentary后才报告显示声明。它不认证用户看到，不替代公开过程；见LIVE。新pin公开CLI默认可读段落，诊断可选raw-events。
 
