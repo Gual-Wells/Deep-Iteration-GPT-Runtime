@@ -1,4 +1,6 @@
-# DIGR for Codex · 0.17.0
+# DIGR for Codex · 0.18.0
+
+0.18以逻辑论证决定档位适配和方案选择，不把测试或未来反馈变成结论资格。提高限制的阻断准入要求，FOUNDATION不再默认将每个问题设为blocking；模型/顾问建议不能自行升级为硬前置。Allot默认固定为6.2 Sol/max，显式6.1保留，旧pin政策及哈希不迁移；同时修正早期Claude同任务来源绑定、迟到用量归属与公开正文续读。[本版设计](codex/DESIGN_0_18.md)。
 
 0.17将模型策略直接落实[Allot](codex/ALLOT.md)：6.1 Sol/max、6.2 Sol/max为智力主力；明确大批量非智力受控重复劳动才降effort，具体Max不足或真实任务反馈才升级实际模型。`DO：`/`DO:`直接补充当前任务，不重开前置、不重置pin或授权。五档责任、根Stable和旧pin保留。[本版设计](codex/DESIGN_0_17.md)。
 

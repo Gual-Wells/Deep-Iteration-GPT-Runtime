@@ -64,7 +64,8 @@ def _tool_paths() -> set[Path]:
               'codex_session', 'codex_foundation', 'codex_lifecycle', 'codex_delivery')}
     files.update({runtime.parent / 'tools' / name for name in ('codex.py', 'codex_return.py')})
     files.update(path for path in (runtime / 'assets').glob('codex_timeline*') if path.is_file())
-    for name in ('codex_usage', 'codex_council', 'codex_allot', 'codex_wallet', 'codex_live', 'codex_io'):
+    for name in ('codex_usage', 'codex_council', 'codex_allot', 'codex_wallet', 'codex_live', 'codex_io',
+                 'codex_guidance', 'codex_consult', 'codex_permissions'):
         path = runtime / (name + '.py')
         if path.is_file():
             files.add(path)

@@ -157,6 +157,32 @@ def _json_bytes(value: Mapping[str, Any]) -> bytes:
     return (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False) + '\n').encode('utf-8')
 
 
+def task_bound(p_run: str) -> bool:
+    version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', p_run)
+    return bool(version and tuple(map(int, version.groups())) >= (0, 18, 0))
+
+
+def _task_binding(session: Mapping[str, Any], role: str, authoring_scope=None,
+                  council_scope=None) -> dict:
+    identity = session.get('task_uuid')
+    if not isinstance(identity, str) or not re.fullmatch(r'[0-9a-f]{32}', identity):
+        raise ValueError('Task-bound Consult requires the frozen session task UUID')
+    return {'format': 'digr-consult-task-binding-1', 'task_uuid': identity,
+            'P_run': session['P_run'], 'task_request_sha256': session['request_sha256'],
+            'participation_role': role, 'authoring_scope': authoring_scope,
+            'council_scope': council_scope}
+
+
+def _binding_user(binding: Mapping[str, Any]) -> str:
+    return 'digr-task-' + _hash(_json_bytes(binding))
+
+
+def _scope_user(attempt: Mapping[str, Any], kind: str, scope: Mapping[str, Any]) -> str:
+    if task_bound(attempt['P_run']):
+        return _binding_user(attempt['task_binding'])
+    return 'digr-' + kind + '-' + _hash(_json_bytes(scope))
+
+
 def _read(path: Path) -> dict[str, Any]:
     value = json.loads(codex_io.read_bytes(path).decode('utf-8-sig'))
     if not isinstance(value, dict):
@@ -318,7 +344,7 @@ def _verify_authoring_record(attempt: Mapping[str, Any], request: Mapping[str, A
             or scope['authoring_contract'] != _PAPER_AUTHORING_CONTRACT
             or scope['P_run'] != attempt.get('P_run')
             or attempt.get('authoring_scope_sha256') != _hash(_json_bytes(scope))
-            or request.get('user') != 'digr-paper-' + _hash(_json_bytes(scope))
+            or request.get('user') != _scope_user(attempt, 'paper', scope)
             or not request['messages'] or request['messages'][0] != {
                 'role': 'system', 'content': _paper_system(scope['addon_version'])}):
         raise ValueError('Consult paper authoring scope or prompt identity changed')
@@ -479,6 +505,12 @@ def _load(root: Path, exchange_id: str, *, verify_public: bool = True) -> tuple[
     request = json.loads(request_raw)
     if not isinstance(request, dict) or not isinstance(request.get('messages'), list):
         raise ValueError('Consult request has no public messages')
+    if task_bound(session['P_run']):
+        expected_binding = _task_binding(session, attempt.get('participation_role'),
+            attempt.get('authoring_scope'), attempt.get('council_scope'))
+        if (attempt.get('task_binding') != expected_binding
+                or request.get('user') != _binding_user(expected_binding)):
+            raise ValueError('Consult exchange/request belongs to a different task UUID or scope')
     _verify_authoring_record(attempt, request)
     if codex_collaboration.unified(session['P_run']):
         role = attempt.get('participation_role', 'consult_guidance')
@@ -488,7 +520,7 @@ def _load(root: Path, exchange_id: str, *, verify_public: bool = True) -> tuple[
         if role == 'council_member':
             _member_scope(root, scope, active=False, exchange_id=exchange_id)
             if (attempt.get('council_scope_sha256') != _hash(_json_bytes(scope))
-                    or request.get('user') != 'digr-council-' + _hash(_json_bytes(scope))):
+                    or request.get('user') != _scope_user(attempt, 'council', scope)):
                 raise ValueError('Council member request/scope identity changed')
         if attempt.get('collaboration_contract') != expected:
             raise ValueError('Actual collaboration model/scope contract changed; prepare a current DIGR request')
@@ -754,6 +786,10 @@ def prepare_request(
         request['user'] = 'digr-paper-' + _hash(_json_bytes(authoring_scope))
     if participation_role == 'council_member':
         request['user'] = 'digr-council-' + _hash(_json_bytes(council_scope))
+    binding = None
+    if task_bound(session['P_run']):
+        binding = _task_binding(session, participation_role, authoring_scope, council_scope)
+        request['user'] = _binding_user(binding)
     attempt = {'format': FORMAT, 'exchange_id': exchange_id, 'P_run': session['P_run'],
                'task_request_sha256': session['request_sha256'], 'created_at': _now(),
                'input_ref': _input_ref(lifecycle), 'input_revision': input_revision,
@@ -764,6 +800,8 @@ def prepare_request(
                'generation_id': None, 'public_sha256': None, 'known_cost_usd': None,
                'reserved_usd': 0.0, 'native_responsibility_credit': False,
                'evidence_scope': 'selected actual public bytes; no semantic or authorization certification'}
+    if binding is not None:
+        attempt['task_binding'] = binding
     if authoring_scope is not None:
         attempt['authoring_scope'] = authoring_scope
         attempt['authoring_scope_sha256'] = _hash(_json_bytes(authoring_scope))

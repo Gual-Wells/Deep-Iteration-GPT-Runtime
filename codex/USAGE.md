@@ -10,7 +10,9 @@ Claude美元与Codex额度都返回，但保留真实分母与账目状态。百
 
 只有旧式通知时用有据累计差或单次last aggregate。start/turn边界穿过两次累计观测之间时，不把整个区间差归入任务；可单独保留标明“末次响应在边界后完成”的last归属假设，其余列累计归因缺口，last自身跨边界的可能性也不隐去。精确response及真实turn成员关系可消除对应别名的不确定性。跨累计计数倒退另开覆盖epoch，不相减。
 
-输入已包含cached input，输出已包含reasoning output时，各子集只列分解，不再相加。实际model/effort/speed缺失分别留未知；effort不乘未经证明的固定倍数。晚到的payload实际模型字段可纠正早先context或caller推定；同等强来源的矛盾使该字段及依赖它的加权归因保持未知，不永久冻结首次猜测。
+输入已包含cached input，输出已包含reasoning output时，各子集只列分解。逐响应明报的model/effort/speed优先于同一thread和turn的上下文。缺失字段留未知，明确的调用方填充使用较低等级的标签。迟到事件按原turn取上下文，晚到的旧turn累计别名沿用原覆盖epoch。累计两端属于同一turn时，按该turn内的改道和实报冲突判断字段覆盖；跨turn时核对活动线程跨度内的字段变化。同等强来源矛盾时，相应字段及依赖它的加权归因保持未知。
+
+旧投影的回合上下文归属可以用原明示rollout和任务边界重新采集。同一响应重新出现时更新上下文标签，能从旧记录识别的逐响应明报字段仍保留，聚合总量不因标签更新而重复加账。保存旧快照及其观测截止。先前来源不全或聚合边界有疑义时，以已有授权选定的文件全量重投影，并报告仍无法复核的覆盖。
 
 ```text
 python tools/codex.py usage collect --root TASK --rollout SELECTED.jsonl --actor Main --turn-id ACTUAL_TURN_ID

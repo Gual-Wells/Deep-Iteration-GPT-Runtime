@@ -21,9 +21,9 @@
 ```text
 python -B tools/codex.py live read --root TASK --reader commentary --exchange-id ACTUAL_ID --max-chars 8000
 # 实际将display_text/segments原文发到用户commentary后：
-python -B tools/codex.py live ack --root TASK --delivery-id ID --evidence-ref ACTUAL_COMMENTARY_REFERENCE
+python -B tools/codex.py live ack --root TASK --delivery-id ID --evidence-ref ACTUAL_COMMENTARY_REFERENCE --compact
 ```
 
-省略exchange-id读取原生工作事件。read本身不前移游标；未ACK会重读相同正文，避免把取回当已发送。大段按字符分批，segments保留精确原文，拼接可还原；每批有来源、起止位置和剩余状态。ACK需要宿主真实显示引用，标为HOST_REPORTED_DISPLAYED而非工具认证。缺真实引用不能ACK，旧ACK不能把游标移回。来源内容改动或截断会报错，不静默跳过。
+省略exchange-id读取原生工作事件。read本身不前移游标，未ACK会重读相同正文。同一exchange和成员的相邻公开增量合并为一段，只标一次来源，宿主连接与结束状态仍单列。大段按字符分批，`segments`保留精确原文及在原事件流中的起止位置，拼接可以还原正文。`from`、`to`沿用原事件下标、段内偏移和哈希。ACK需要宿主真实显示引用，记录为HOST_REPORTED_DISPLAYED。旧ACK不能将游标移回，来源内容改动或截断会报错。`--compact`只打印ACK元数据，持久收据仍保留完整批次、原文及显示引用。省略此选项仍返回完整收据。
 
 宿主须持续取流，不等待整包。收到公开段落及时原文转播；如工具输出被截断，明确说明，使用同一exchange的live read补取尚未报告部分，称补转而非伪造实时。停止、撤销与真实预算按原协议；可见过程修复不新增外部费用授权。

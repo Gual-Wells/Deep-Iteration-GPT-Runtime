@@ -27,6 +27,7 @@ def main(argv=None):
     ack.add_argument('--root', type=Path, required=True)
     ack.add_argument('--delivery-id', required=True)
     ack.add_argument('--evidence-ref', required=True)
+    ack.add_argument('--compact', action='store_true', help='show acknowledgement metadata without repeating the batch')
     args = parser.parse_args(argv)
     try:
         if args.action == 'work':
@@ -36,6 +37,9 @@ def main(argv=None):
             result = live.pending(args.root, reader=args.reader, exchange_id=args.exchange_id, max_chars=args.max_chars)
         else:
             result = live.acknowledge(args.root, args.delivery_id, evidence_ref=args.evidence_ref)
+            if args.compact:
+                result = {key: result[key] for key in
+                          ('delivery_id', 'reader', 'source', 'to', 'visibility', 'acknowledged_at')}
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     except (OSError, ValueError, KeyError, TypeError) as error:

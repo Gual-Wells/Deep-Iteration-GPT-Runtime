@@ -1,10 +1,12 @@
 # Allot：Sol Max 主力与反馈驱动的实际调度
 
-0.17起，智力主力为 **GPT-6.1 Sol/max、GPT-6.2 Sol/max**。Main研究、设计、论证、综合、整体再议和实质D/V均沿此起点；两代按任务、既有连续性和真实宿主能力选择，不假定严格的代际强弱阶梯。Light/Less/Default/More/Max只改变研究职责，不映射effort；不按五档预留Astra席位，不沿用Pro100固定计划点或从Pro名称推断价格与token容量。未另选速度时用Standard，提速不等于智力升级。
+Sol/max 是 Main 研究、设计、论证、综合、整体再议和实质 D/V 的智力基线。0.18 pin 的 `default_primary_model` 固定为 GPT-6.2 Sol，effort默认为max；显式 GPT-6.1 Sol/max 继续支持。选择先按任务链、能力、约束与成本机制论证，不设模型评测或效果实验准入；小样tokens不代表Pro套餐效率。Light/Less/Default/More/Max只改变研究职责，不映射effort；不按五档预留Astra席位，不沿用Pro100固定计划点或从Pro名称推断价格与token容量。未另选速度时用Standard，提速不等于智力升级。见[完整适配设计](DESIGN_0_18.md)。
 
 ## 持久策略与完整输入身份
 
-新pin的 `allot plan` 默认执行本策略；旧pin不迁移。当前用户明确改选时，可用 `allot set-policy --root TASK --input actual-user-policy.json` 保存 `{profile:"sol-max-feedback",source_ref:"实际当前来源",reason:"决定与后果"}`。工具不凭关键词替用户作决定。政策有版本和来源，恢复包带共同政策与安全执行概要。plan绑定完整消息身份和政策修订；同文的两次真实DO是不同消息，旧block不能跨新输入复用。
+`allot plan` 按任务 `P_run` 解析政策。0.18 pin 的工作块省略 `model` 时采用该 pin 的 `default_primary_model`；显式填写的 `model` 按原有规则校验，`null` 无效。宿主缺少选中的型号或所需 effort 时，`plan` 或 `ready` 报错。0.17 仍要求显式型号，0.17 与更早 pin 沿用原有政策及已保存的政策哈希。
+
+当前用户明确改选政策时，可用 `allot set-policy --root TASK --input actual-user-policy.json` 保存 `{profile:"sol-max-feedback",source_ref:"实际当前来源",reason:"决定与后果"}`。该操作记下政策修订和来源。0.18 pin 的 `allot inspect --root TASK` 显示完整生效政策记录，单一默认型号见 `policy.policy.default_primary_model`。恢复包带同一政策的公共字段与安全执行概要。`plan` 绑定完整消息身份和政策修订；同文的两次真实 DO 是不同消息，旧 block 不能跨新输入复用。
 
 ## 仅受控批量劳动可降低effort
 

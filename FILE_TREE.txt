@@ -39,6 +39,7 @@ codex/COUNCIL.md
 codex/DELIVERY.md
 codex/DESIGN_0_16.md
 codex/DESIGN_0_17.md
+codex/DESIGN_0_18.md
 codex/EXECUTION_PROTOCOL.json
 codex/FOUNDATION.md
 codex/HELP.md
@@ -457,6 +458,7 @@ runtime/codex_council.py
 runtime/codex_delivery.py
 runtime/codex_experience.py
 runtime/codex_foundation.py
+runtime/codex_guidance.py
 runtime/codex_io.py
 runtime/codex_knowledge.py
 runtime/codex_lifecycle.py
@@ -894,6 +896,7 @@ tests/test_clock_probe.py
 tests/test_codex_allot.py
 tests/test_codex_allot_labor.py
 tests/test_codex_allot_policy.py
+tests/test_codex_allot_primary_model.py
 tests/test_codex_allot_recovery.py
 tests/test_codex_carrier.py
 tests/test_codex_claude_selection.py
@@ -907,10 +910,12 @@ tests/test_codex_do_supplement.py
 tests/test_codex_experience.py
 tests/test_codex_foundation.py
 tests/test_codex_frozen_input.py
+tests/test_codex_guidance_binding.py
 tests/test_codex_io.py
 tests/test_codex_knowledge.py
 tests/test_codex_lifecycle.py
 tests/test_codex_live.py
+tests/test_codex_live_batching.py
 tests/test_codex_native_paper_return.py
 tests/test_codex_paper.py
 tests/test_codex_paper_native.py
@@ -927,6 +932,7 @@ tests/test_codex_profile.py
 tests/test_codex_public_stream.py
 tests/test_codex_resource_return.py
 tests/test_codex_response.py
+tests/test_codex_restriction_admission.py
 tests/test_codex_return.py
 tests/test_codex_session.py
 tests/test_codex_shared_return.py
@@ -935,6 +941,7 @@ tests/test_codex_timeline.py
 tests/test_codex_transport.py
 tests/test_codex_unified.py
 tests/test_codex_usage.py
+tests/test_codex_usage_turn_scope.py
 tests/test_codex_visits.py
 tests/test_codex_voice.py
 tests/test_codex_workbench.py

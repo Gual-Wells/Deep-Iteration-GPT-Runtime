@@ -111,10 +111,15 @@ def _select_legacy(block: Mapping, capabilities: Mapping) -> dict:
 
 
 SOL_MODELS = ('gpt-6.1-sol', 'gpt-6.2-sol')
+# Preserve the 0.17 policy fields, which are part of persisted selection hashes.
 POLICY = {'profile': 'sol-max-feedback', 'primary_models': list(SOL_MODELS),
           'default_effort': 'max', 'speed': 'standard',
           'downshift': 'only explicitly selected, large, fully specified, non-intellectual controlled repetitive labor',
           'escalation': 'concrete Max capability gap or substantive task failure feedback; no fixed stronger-model seats'}
+_PRIMARY_DEFAULT_VERSION = (0, 18, 0)
+# Pinned engineering default: logic-first architecture fit and existing Claude
+# guidance; local sample token counts do not establish subscription efficiency.
+CANDIDATE_DEFAULT_PRIMARY_MODEL = 'gpt-6.2-sol'
 
 
 def _anchor(lifecycle):
@@ -122,24 +127,40 @@ def _anchor(lifecycle):
     return _input_ref(lifecycle['current_message'])
 
 
-def _modern(p_run):
+def _pin_version(p_run):
     match = re.match(r'^(\d+)\.(\d+)\.(\d+)@', p_run)
-    return bool(match and tuple(map(int, match.groups())) >= (0, 17, 0))
+    return tuple(map(int, match.groups())) if match else (0, 0, 0)
+
+
+def _candidate_policy():
+    if CANDIDATE_DEFAULT_PRIMARY_MODEL not in SOL_MODELS:
+        raise ValueError('the pinned Allot policy needs a supported default_primary_model')
+    return {**POLICY, 'primary_models': list(SOL_MODELS),
+            'default_primary_model': CANDIDATE_DEFAULT_PRIMARY_MODEL}
+
+
+def _policy_for_pin(p_run, *, explicit=False):
+    version = _pin_version(p_run)
+    if version >= _PRIMARY_DEFAULT_VERSION:
+        return _candidate_policy()
+    if explicit or version >= (0, 17, 0):
+        return {**POLICY, 'primary_models': list(SOL_MODELS)}
+    return {'profile': 'legacy'}
 
 
 def current_policy(root: Path) -> dict:
     """Read the immutable task pin or an explicit, source-bound task override."""
     from .codex_session import _session
     root, session = _session(root)
+    p_run = session['P_run']
     path = root / 'allot' / 'policy.json'
     if path.exists():
         value = json.loads(path.read_text(encoding='utf-8'))
-        if value.get('P_run') != session['P_run'] or value.get('policy') != POLICY:
+        if value.get('P_run') != p_run or value.get('policy') != _policy_for_pin(p_run, explicit=True):
             raise ValueError('Allot policy does not match this task or supported policy')
         return value
-    policy = dict(POLICY) if _modern(session['P_run']) else {'profile': 'legacy'}
-    return {'format': 'digr-native-allot-policy-1', 'P_run': session['P_run'],
-            'revision': 0, 'policy': policy, 'source': 'PINNED_PROFILE_DEFAULT'}
+    return {'format': 'digr-native-allot-policy-1', 'P_run': p_run, 'revision': 0,
+            'policy': _policy_for_pin(p_run), 'source': 'PINNED_PROFILE_DEFAULT'}
 
 
 def _policy_hash(policy):
@@ -172,7 +193,7 @@ def set_policy(root: Path, value: Mapping) -> dict:
             and previous.get('implementation') == implementation):
         return previous
     record = {'format': 'digr-native-allot-policy-1', 'P_run': session['P_run'],
-              'revision': previous['revision'] + 1, 'policy': dict(POLICY),
+              'revision': previous['revision'] + 1, 'policy': _policy_for_pin(session['P_run'], explicit=True),
               'input_ref': _anchor(lifecycle), 'source': source['source_ref'],
               'reason': reason, 'implementation': implementation,
               'created_at': datetime.now(timezone.utc).isoformat()}
@@ -238,11 +259,14 @@ def select(block: Mapping, capabilities: Mapping, *, policy: Mapping | None = No
     policy = POLICY if policy is None else policy
     if policy.get('profile') == 'legacy':
         return _select_legacy(block, capabilities)
-    if policy != POLICY:
+    if policy != POLICY and policy != _candidate_policy():
         raise ValueError('unsupported Allot selection policy')
-    model = block.get('model')
+    uses_default = 'model' not in block and 'default_primary_model' in policy
+    model = block.get('model', policy.get('default_primary_model'))
     supported = catalogue(capabilities).get(model)
     if not supported:
+        if uses_default:
+            raise ValueError(f'pinned default_primary_model {model!r} is absent from the supplied host catalogue')
         raise ValueError('requested model is absent from the supplied host catalogue')
     kind, evidence = block.get('kind'), block.get('evidence')
     if kind not in {'routine', 'maintenance', 'response', 'architecture', 'breakthrough'}:
@@ -368,7 +392,7 @@ def ready(root: Path, block_id: str, capabilities: Mapping) -> dict:
     if not _ID.fullmatch(block_id):
         raise ValueError('invalid block id')
     selected = json.loads((root / 'allot' / block_id / 'selection.json').read_text(encoding='utf-8'))
-    if not _selection_current(root, selected, lifecycle):
+    if not _selection_current(selected, lifecycle, current_policy(root)):
         raise ValueError('selection was superseded; plan the current affected work instead')
     if (root / 'allot' / block_id / 'observation.json').exists():
         raise ValueError('this block already has an execution observation; a new attempt needs a new block')
@@ -430,7 +454,7 @@ def observe(root: Path, block_id: str, observation: Mapping) -> dict:
             save_feedback(root, selected, submitted_feedback, previous['observed_input_ref'])
         return previous
     if modern:
-        record.update(superseded=not _selection_current(root, selected, lifecycle),
+        record.update(superseded=not _selection_current(selected, lifecycle, current_policy(root)),
                       observed_input_ref=_anchor(lifecycle),
                       execution_authorization=False)
         if observation.get('feedback') is not None:
@@ -473,18 +497,18 @@ def resolve_labor(root: Path, value: Mapping) -> dict:
     scope = selected['selection_basis'].get('labor_scope')
     if not scope:
         raise ValueError('solver needs the actual affected labor scope, without claiming it is mechanical')
-    if not _selection_current(root, selected, lifecycle) and value.get('current_scope') != scope:
+    if not _selection_current(selected, lifecycle, current_policy(root)) and value.get('current_scope') != scope:
         raise ValueError('reusing an earlier solver needs explicit current adoption of the unchanged scope and validation; this does not authorize redispatch')
     return resolve(root, scope, value, selected, observed, _anchor(lifecycle))
 
 
-def _selection_current(root, selected, lifecycle):
+def _selection_current(selected, lifecycle, policy):
     if selected.get('format') == 'digr-native-allot-2':
         same_input = selected['input_ref'] == _anchor(lifecycle)
-        same_policy = selected.get('policy_sha256') == _policy_hash(current_policy(root))
+        same_policy = selected.get('policy_sha256') == _policy_hash(policy)
     else:
         same_input = selected['input_ref'] == lifecycle['current_message']['source']['sha256']
-        same_policy = current_policy(root)['policy']['profile'] == 'legacy'
+        same_policy = policy['policy']['profile'] == 'legacy'
     return (same_input and same_policy and lifecycle['status'] == 'ACTIVE'
             and lifecycle['handled_message_id'] == lifecycle['message_id'])
 
@@ -507,7 +531,7 @@ def context_summary(root: Path, *, limit: int = 16) -> dict:
         selection = json.loads(path.read_text(encoding='utf-8'))
         observed = path.with_name('observation.json')
         observation = json.loads(observed.read_text(encoding='utf-8')) if observed.exists() else None
-        now_current = _selection_current(root, selection, lifecycle)
+        now_current = _selection_current(selection, lifecycle, policy)
         observation_summary = ({key: observation.get(key) for key in
                                 ('actual_model', 'actual_effort', 'matches_selection', 'superseded')}
                                if observation else None)
@@ -542,7 +566,7 @@ def context_summary(root: Path, *, limit: int = 16) -> dict:
 
 def inspect(root: Path) -> dict:
     from .codex_session import _session
-    root, _ = _session(root)
+    root, session = _session(root)
     rows = []
     for path in sorted((root / 'allot').glob('*/selection.json')):
         row = json.loads(path.read_text(encoding='utf-8'))
@@ -553,4 +577,7 @@ def inspect(root: Path) -> dict:
         observation = path.with_name('observation.json')
         row['observation'] = json.loads(observation.read_text(encoding='utf-8')) if observation.exists() else None
         rows.append(row)
-    return {'selections': rows, 'automatic_model_calls': 0}
+    result = {'selections': rows, 'automatic_model_calls': 0}
+    if _pin_version(session['P_run']) >= _PRIMARY_DEFAULT_VERSION:
+        result['policy'] = current_policy(root)
+    return result
