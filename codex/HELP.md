@@ -1,4 +1,8 @@
-# DIGR Codex 0.15 使用说明
+# DIGR Codex 0.16 使用说明
+
+可见过程工具`live work/read/ack`保存真实单位阶段，按来源无损分批读取公开流。read不前移游标；宿主实际发commentary后才报告显示声明。它不认证用户看到，不替代公开过程；见LIVE。新pin公开CLI默认可读段落，诊断可选raw-events。
+
+新增`council`、`usage`、`allot`工具：内嵌子议会的真实公开请求与两阶段原生再议，按任务保存的美元/额度报告，以及原生宿主薄档位选择。单冒号不调用Claude，双冒号仍须真实费用授权；成员身份不等于正式Consult。完整语义读COUNCIL/USAGE/ALLOT。`profile export chat-light|chat-deep --out FILE`导出同源Chat指令，导出不等于远端配置安装。旧pin不迁移。
 
 统一使用DIGR：`DIGR：任务`由Codex按既定规格完成执行与工程，不调用Claude、不擅加主观创作；`DIGR：：任务`凡涉及实质主观内容判断，都必须请教Claude并落实其有效意见。`深度迭代`及ASCII `:` / `::`含义相同。真实获取候选分支、固定同SHA协议后才解析；双冒号整体是分隔符，不能残留在正文；三枚以上连续分隔冒号和空任务无效。完整只读/询问调用仍是深执行，但操作授权按实际委托；精确`/help`只看帮助，讨论不新建执行。DIGRC、DIGRP仅保留兼容拼写，也服从当前分隔符边界。
 

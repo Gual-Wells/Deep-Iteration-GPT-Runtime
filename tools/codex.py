@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """One source-checkout CLI for the experimental Codex profile and work tools.
 
-Only the explicit consult call command invokes an externally configured model.
-There is no agent scheduler or permission escalation.
+Only explicit consult call or council run-round sends configured model requests.
+There is no native-agent scheduler or permission escalation.
 """
 from __future__ import annotations
 
@@ -45,8 +45,20 @@ def read_message(path: Path) -> str:
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else list(argv)
     # Pass through argument parsing rather than duplicate mature CLI surfaces.
-    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery', 'consult'):
+    if argv and argv[0] in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery', 'consult', 'council', 'usage', 'allot', 'live'):
         from tools import codex_experience, codex_profile, codex_workbench, codex_knowledge, codex_timeline, codex_voice
+        if argv[0] == 'council':
+            from tools.codex_council import main as council_main
+            return council_main(argv[1:])
+        if argv[0] == 'usage':
+            from tools.codex_usage import main as usage_main
+            return usage_main(argv[1:])
+        if argv[0] == 'allot':
+            from tools.codex_allot import main as allot_main
+            return allot_main(argv[1:])
+        if argv[0] == 'live':
+            from tools.codex_live import main as live_main
+            return live_main(argv[1:])
         if argv[0] == 'consult':
             from tools.codex_consult import main as consult_main
             return consult_main(argv[1:])
@@ -75,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
                 'voice': codex_voice.main}[argv[0]](argv[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
-    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery', 'consult'):
+    for name in ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice', 'return', 'preprint', 'personal', 'visits', 'paper', 'delivery', 'consult', 'council', 'usage', 'allot', 'live'):
         sub.add_parser(name, help=f'{name} commands; append --help for details')
     acquire = sub.add_parser('acquire', help='actually acquire a live, immutable Codex profile')
     acquire.add_argument('--stage', choices=('startup', 'help', 'execution'), default='startup')

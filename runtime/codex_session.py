@@ -271,6 +271,10 @@ def create_session(root: Path, *, request: Path, p_run: str,
                 'explicit_parameters': explicit, 'clock_anchor': anchor, 'clock_issue': clock_issue,
                 'created_wall_ns': time.time_ns(), 'execution_started_by_helper': False,
                 'foundation_required': require_foundation}
+    if version and tuple(map(int, version.groups())) >= (0, 16, 0):
+        # Storage locations may change during recovery. This identity is born
+        # once with the task and is preserved with its frozen session record.
+        metadata['task_uuid'] = uuid.uuid4().hex
     if profile_requires_lifecycle:
         metadata['lifecycle_required'] = True
         metadata['initial_invocation'] = {key: invocation[key] for key in ('classification', 'route_key', 'reason')}

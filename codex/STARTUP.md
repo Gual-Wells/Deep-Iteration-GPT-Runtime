@@ -1,4 +1,8 @@
-# DIGR Codex 0.15.0 — 启动与宿主边界
+# DIGR Codex 0.16.0 — 启动与宿主边界
+
+当前完整核心亦含LIVE；实际commentary身份阶段与外部公开流原文及时转播继续是宿主责任，不能由stdout、事件文件或最后回放替代。
+
+0.16完整核心新增COUNCIL/USAGE/ALLOT/CHAT。内嵌Claude成员与正式顾问身份分开；初议、屏障、原生再议和实际同线再入由完整核心定义。单/双冒号与X保持原义，创建状态不自动付费。返回区分实际美元、账户窗口和有据模型/effort近似。旧pin/旧任务不迁移。
 
 本文件只在用户明确选用 Codex 候选通道，且已经真实取得该通道的不可变仓库 pin 后生效。`codex/manifest.json` 与 `codex/VERSION` 必须属于同一 SHA、版本一致。根目录 Alpha 5 协议与此 profile 是两个入口，不能混用参数解析器、时钟前提或证明格式。
 

@@ -12,6 +12,7 @@ from html import escape
 import json
 import os
 from pathlib import Path
+import re
 from typing import Any, Mapping
 import uuid
 
@@ -28,6 +29,12 @@ _TASK_FIELDS = ('format', 'P_run', 'request_sha256', 'M_target',
                 'foundation_required', 'lifecycle_required', 'decisions', 'visit_clock', 'return_schema',
                 'delivery_contract', 'delivery_selection', 'initial_delivery_policy')
 _TASK_FIELDS += ('execution_profile', 'parameter_selection', 'consult_addons')
+_TASK_FIELDS += ('task_uuid',)
+
+
+def _resources_enabled(metadata: Mapping[str, Any]) -> bool:
+    match = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', metadata.get('P_run', ''))
+    return bool(match and tuple(map(int, match.groups())) >= (0, 16, 0))
 
 
 def _path(base: Path, supplied: str | Path) -> Path:
@@ -57,6 +64,10 @@ def _tool_paths() -> set[Path]:
               'codex_session', 'codex_foundation', 'codex_lifecycle', 'codex_delivery')}
     files.update({runtime.parent / 'tools' / name for name in ('codex.py', 'codex_return.py')})
     files.update(path for path in (runtime / 'assets').glob('codex_timeline*') if path.is_file())
+    for name in ('codex_usage', 'codex_council', 'codex_allot', 'codex_wallet', 'codex_live', 'codex_io'):
+        path = runtime / (name + '.py')
+        if path.is_file():
+            files.add(path)
     return files
 
 
@@ -76,6 +87,14 @@ def _native_state(root: Path) -> dict[str, Any]:
         files.add(root / 'foundation.json')
     if metadata.get('decisions'):
         files.add(_path(root, metadata['decisions']))
+    if _resources_enabled(metadata):
+        from .codex_usage import usage_dependency_paths
+        files.update(usage_dependency_paths(root))
+        for folder in ('allot', 'councils', 'live'):
+            location = root / folder
+            if location.is_dir():
+                files.update(path for path in location.rglob('*')
+                             if path.is_file() and path.suffix in {'.json', '.jsonl', '.md', '.txt'})
     exchanges = root / 'consult' / 'exchanges'
     if exchanges.is_dir():
         for exchange in exchanges.iterdir():
@@ -120,6 +139,9 @@ def _native_state(root: Path) -> dict[str, Any]:
             'task_input_ref': lifecycle.get('task_input_ref'),
             'files': _fingerprints(files), 'directory_candidates': candidates,
             'open_activity': active, 'unreadable_activity': unknown}
+    if _resources_enabled(metadata):
+        from .codex_usage import usage_live_state
+        state['task_usage_live_state'] = usage_live_state(root)
     if metadata.get('delivery_contract') == 'x-files-v1':
         state['delivery_selection'] = lifecycle.get('delivery_selection', metadata['delivery_selection'])
         state['delivery_policy'] = lifecycle.get('delivery_policy', metadata['initial_delivery_policy'])
@@ -198,6 +220,11 @@ def _input(root: Path, path: Path) -> tuple[dict[str, Any], set[Path], bytes]:
                 raise ValueError('selected X file delivery is incomplete: ' + json.dumps(completion, ensure_ascii=False))
             data['delivery_files'] = [item.as_posix() for item in final_paths]
             data['delivery_completion'] = completion
+        if _resources_enabled(_session(root)[1]):
+            from .codex_usage import build_usage_report, render_usage_markdown
+            report = build_usage_report(root)
+            data['usage_report'] = report
+            data['parameters'] += '\n\n### 本任务用量（自动附录）\n\n' + render_usage_markdown(report)
         render_response(data)
         return data, paths, raw
     if isinstance(timeline, str):
@@ -356,6 +383,12 @@ def return_status(root: Path, *, refresh_entry: bool = False) -> dict[str, Any]:
         result['cannot_close'].append('managed task is ' + lifecycle['status'])
     if lifecycle.get('managed') and lifecycle.get('message_id') != lifecycle.get('handled_message_id'):
         result['cannot_close'].append('new user message is pending; process its actual consequence first')
+    if _resources_enabled(metadata):
+        from .codex_council import completion_status
+        councils = completion_status(root)
+        result['council_completion'] = councils
+        if not councils['complete']:
+            result['cannot_close'].append('active or unresolved native council obligations remain; preserve actual partial/exceptional scope before closing')
     if result['current_receipt'] not in {'READY_UNCLOSED', 'CLOSED'}:
         result['cannot_close'].append('a current sealed return is required before normal task closure')
     result['can_close'] = result['current_receipt'] == 'READY_UNCLOSED' and not result['cannot_close']

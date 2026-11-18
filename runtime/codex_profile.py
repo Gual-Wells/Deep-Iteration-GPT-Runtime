@@ -19,13 +19,18 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v12'
+PROFILE_PROTOCOL = 'digr-codex-native-v13'
 PROFILE_CORE = (
     'codex/FOUNDATION.md',
     'codex/CHARACTER.md', 'codex/PARAMETERS.md',
     'codex/COLLABORATION.md', 'codex/PERMISSIONS.md',
     'codex/CONSULT.md',
     'codex/SPLIT.md',
+    'codex/COUNCIL.md',
+    'codex/USAGE.md',
+    'codex/ALLOT.md',
+    'codex/CHAT.md',
+    'codex/LIVE.md',
     'codex/DELIVERY.md',
     'codex/RETURN.md',
 )
@@ -47,6 +52,13 @@ PROFILE_FILES = (
     'codex/DELIVERY.md',
     'codex/RETURN.md',
     'codex/EXECUTION_PROTOCOL.json',
+    'codex/COUNCIL.md',
+    'codex/USAGE.md',
+    'codex/ALLOT.md',
+    'codex/CHAT.md',
+    'codex/CHAT_LIGHT.md',
+    'codex/CHAT_DEEP.md',
+    'codex/LIVE.md',
 )
 CAPABILITY_NAMES = (
     'files', 'shell', 'persistent_workspace', 'repository_transport',
@@ -411,6 +423,8 @@ def instruction_text(root: Path, layer: str) -> str:
     paths = {
         'light': 'codex/AGENTS.light.md',
         'experimental-router': 'codex/ROUTER.experimental.txt',
+        'chat-light': 'codex/CHAT_LIGHT.md',
+        'chat-deep': 'codex/CHAT_DEEP.md',
     }
     if layer not in paths:
         raise ValueError('layer must be light, experimental-router or codex-agents')

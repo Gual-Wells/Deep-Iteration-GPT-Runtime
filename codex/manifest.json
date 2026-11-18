@@ -1,7 +1,7 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "0.15.0",
-  "protocol": "digr-codex-native-v12",
+  "version": "0.16.0",
+  "protocol": "digr-codex-native-v13",
   "status": "experimental",
   "language": "zh-CN",
   "version_path": "codex/VERSION",
@@ -17,6 +17,11 @@
     "codex/PERMISSIONS.md",
     "codex/CONSULT.md",
     "codex/SPLIT.md",
+    "codex/COUNCIL.md",
+    "codex/USAGE.md",
+    "codex/ALLOT.md",
+    "codex/CHAT.md",
+    "codex/LIVE.md",
     "codex/DELIVERY.md",
     "codex/RETURN.md"
   ],
@@ -92,26 +97,42 @@
     "subjective_content_driver": "CLAUDE_MANDATORY_IN_DOUBLE_COLON",
     "ordinary_followup_inherits_claude_selection": true,
     "selection_is_fee_authorization": false,
-    "legacy_pins_retain_collaboration_rules": true
+    "legacy_pins_retain_collaboration_rules": true,
+    "council": "NATIVE_INITIAL_AND_EMBEDDED_CLAUDE_THEN_NATIVE_REDELIBERATION",
+    "collaborator_role": "EXPLICIT_MEMBER_OR_FORMAL_GUIDANCE",
+    "consult_concurrency": "PER_EXCHANGE_NETWORK_LOCK_AND_SHARED_WALLET_TRANSACTIONS",
+    "usage_return": "AUTOMATIC_TASK_SCOPED_USD_AND_NATIVE_QUOTA_OBSERVATIONS",
+    "allot": "NATIVE_HOST_SELECTION_AND_OBSERVATION",
+    "chat_port": "VERSIONED_LIGHT_AND_ON_DEMAND_DEEP",
+    "council_default_members": 2,
+    "council_default_deadline_seconds": 300,
+    "public_relay": "LOSSLESS_PARAGRAPHS_AND_HOST_REPORTED_COMMENTARY_CURSORS"
   },
   "file_sha256": {
-    "codex/VERSION": "f8405a7330c287028d470c3ee3506f878f1ad85ed79c1d1adc19df2ff7398915",
+    "codex/VERSION": "aa037454b5e8320521a32b278a3f4aff05fc79009ab5503f5d4a1b9a33b38c47",
     "codex/AGENTS.light.md": "5abd877bc2f684ce54e34bbefcc9da17a0c00e1c8bbdadfa5a7f1aadcb700abd",
     "codex/ROUTER.experimental.txt": "6aa91d9aea27e029155349bbc9abed5cf5b216a65ad74a45788a8cf16a845347",
-    "codex/STARTUP.md": "ad6e937098f9798d05cd0534027950a0191a8830a07bcbd02db1fb29b565f8ef",
-    "codex/PROTOCOL.md": "2fe2230fb0a50dbce35925771d7e6c433d67ef87141b721a8fad7ae74c585eda",
+    "codex/STARTUP.md": "f4e3fb1e27592397836616ae2db81a2dde809925e0cba6dccc5c23f8601e138e",
+    "codex/PROTOCOL.md": "9aa59a4040c48e28ec616a6f5bccf007d88445bbdc1109abab92c74495ee8479",
     "codex/FOUNDATION.md": "0ec46005599db9050e51f369aa3287d03762858b4c6b1e3ecd5554a95c037099",
-    "codex/HELP.md": "3afa7cd21c56e8c5cf5097058664cd2abbe37dc69bef32050793e7ee23732542",
+    "codex/HELP.md": "57f94ed026ac4478f60facb427df558199599084a1ce5aed0233b11587f283e2",
     "codex/PARAMETERS.md": "19ffef78ac9b0235eb47c7a8e3f5d637c23b97b5eb5c2b749ce293b4c3c06372",
     "codex/WORKBENCH.md": "20b3f0bb8c1d8ff70ff54dddaa15dafae2d8dcba4ee4a37308780f76e698e41d",
     "codex/CHARACTER.md": "71afee9819922f10e0e3881256dbeabd8fba6328acdac5d5658f003be3ae5e55",
-    "codex/COLLABORATION.md": "3492b7f34493210ea1ca23142422217df150450248cd8f53cbf266c009f93d49",
-    "codex/CONSULT.md": "e17bcfe71aa3ece309884dce17695be195011ff152e83d8c5fc4efed39c44973",
+    "codex/COLLABORATION.md": "1754ac121b2d121be3dc24eff98fec67f3154b375d3b46b6ffee98582947cfe2",
+    "codex/CONSULT.md": "d03f4567e6a4cb886b54828c665af574c0a885de292c5c2dbdc98ceeb45db846",
     "codex/SPLIT.md": "fb6d4ff23e1cba579a3b2aa80a35440d00557c1462ca927c537013a29cff6ca4",
     "codex/PERMISSIONS.md": "3c59a22111c9ae058342d48cf091216cc661c0ff28206700a1d94b25ffecd58b",
     "codex/DELIVERY.md": "6a375e03e7930f49626ff86bf876aa4cc21b32444d1da77cce5002c88ddcb04b",
-    "codex/RETURN.md": "14aee4a995e1a82483449256722d13542aca4628f458e29754da52e82f310b0a",
-    "codex/EXECUTION_PROTOCOL.json": "68c7ec643cf75903f41e5ff7c2e5832c47ee379de1fdd16ba8869ba477559a41"
+    "codex/RETURN.md": "67e22484069dd46736c6c967f427a234318d9e0386d6c7429cf908e1eddfaa73",
+    "codex/EXECUTION_PROTOCOL.json": "5fc62c91229af5a6fbc5ae8e1f75c3b3da609aa7d7aa92b625ce7278a4e24e04",
+    "codex/COUNCIL.md": "b74d5f8ad6c3e8c259994bb39805835f91d734fd2a040d018ebd3f9d89840c61",
+    "codex/USAGE.md": "fabb1a4137c52a620a230ea4508a59be8d9c9b925333ef7470fffc7e04f248ef",
+    "codex/ALLOT.md": "6937904d57a9cd7ba688ac21f6e3a449413d9813c6d47bea8cd2ad60f97379fa",
+    "codex/CHAT.md": "78ac198a70adf5cfb15107d51137b882b1cbb99b2cec13695679bccd074cb41b",
+    "codex/CHAT_LIGHT.md": "74afe64c3980e74544ca3b7af32c28d5b5306ea2c24c5d11a3240803b7b69fe7",
+    "codex/CHAT_DEEP.md": "4a160870ee360cd3d9cb21313fa4ecf90389d4ebd92ec176ef209ccd1277ef3f",
+    "codex/LIVE.md": "d822ab225b1d40a29c94a1dcdf8ee4e6eed270c9159951f1cf22176d61a2949d"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {
@@ -194,6 +215,11 @@
       "codex/PERMISSIONS.md",
       "codex/CONSULT.md",
       "codex/SPLIT.md",
+      "codex/COUNCIL.md",
+      "codex/USAGE.md",
+      "codex/ALLOT.md",
+      "codex/CHAT.md",
+      "codex/LIVE.md",
       "codex/DELIVERY.md",
       "codex/RETURN.md"
     ]
@@ -202,5 +228,9 @@
     "manifest": "paper/manifest.json",
     "version": "0.6.0",
     "sha256": "e61fe339e69b361438f8ce534cc4d94c08d28f030384464e9f16910b792f7f85"
-  }
+  },
+  "supporting_instructions": [
+    "codex/CHAT_LIGHT.md",
+    "codex/CHAT_DEEP.md"
+  ]
 }
