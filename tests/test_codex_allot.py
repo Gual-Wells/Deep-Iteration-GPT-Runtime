@@ -1,5 +1,10 @@
 import unittest
-from runtime.codex_allot import select
+from runtime.codex_allot import select as select_current
+
+
+def select(block, capabilities):
+    # Legacy pinned sessions keep their historical selection semantics.
+    return select_current(block, capabilities, policy={'profile': 'legacy'})
 
 
 CATALOGUE = {'data': [{'model': 'selected-model', 'supportedReasoningEfforts':

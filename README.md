@@ -1,4 +1,6 @@
-# DIGR for Codex · 0.16.0
+# DIGR for Codex · 0.17.0
+
+0.17将模型策略直接落实[Allot](codex/ALLOT.md)：6.1 Sol/max、6.2 Sol/max为智力主力；明确大批量非智力受控重复劳动才降effort，具体Max不足或真实任务反馈才升级实际模型。`DO：`/`DO:`直接补充当前任务，不重开前置、不重置pin或授权。五档责任、根Stable和旧pin保留。[本版设计](codex/DESIGN_0_17.md)。
 
 0.16把Claude研究成员与正式顾问身份分开：同一原生议会的独立初议、内嵌子议会、屏障与原生再议具有可恢复状态；实际调用使用每exchange锁与共享钱包短事务。新增任务用量返回、原生薄Allot与可导出的Chat同源短/深指令。[确定设计](codex/DESIGN_0_16.md)。单/双冒号、X和旧pin保持各自版本语义。
 

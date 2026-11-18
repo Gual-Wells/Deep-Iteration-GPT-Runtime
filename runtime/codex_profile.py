@@ -19,7 +19,7 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v13'
+PROFILE_PROTOCOL = 'digr-codex-native-v14'
 PROFILE_CORE = (
     'codex/FOUNDATION.md',
     'codex/CHARACTER.md', 'codex/PARAMETERS.md',
@@ -66,6 +66,7 @@ CAPABILITY_NAMES = (
 )
 _DELIVERY_TOKEN = re.compile(r'(?<![A-Za-z0-9_])X(?![A-Za-z0-9_])')
 _DELIVERY_TARGET = re.compile(r'[A-Za-z][A-Za-z0-9_-]{0,63}')
+_PROFILE_PIN = re.compile(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}')
 
 
 class EventKind(str, Enum):
@@ -171,6 +172,18 @@ def _invocation_parameters(prelude: str) -> tuple[str, dict[str, Any]]:
     return execution, selection
 
 
+def parse_do_supplement(message: str, *, p_run: str | None = None) -> dict[str, str] | None:
+    """Recognize a DO marker in the current user message without interpreting its body."""
+    text = message.lstrip()
+    if not text.startswith(('DO:', 'DO：')):
+        return None
+    if p_run is not None:
+        version = _PROFILE_PIN.fullmatch(p_run)
+        if not version or tuple(map(int, version.groups())) < (0, 17, 0):
+            return None
+    return {'kind': 'DO', 'prefix': text[:3], 'text': text[3:]}
+
+
 def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, Any]:
     """Classify the versioned call surface AFTER live pinned startup acquisition.
 
@@ -197,6 +210,9 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
             'action_scope': 'INTERPRET_SEPARATELY',
             'live_acquisition_performed': False, 'run_started': False}
     if key is None:
+        supplement = parse_do_supplement(message, p_run=p_run)
+        if supplement is not None:
+            return {**base, 'supplement': supplement, 'reason': 'explicit same-task supplement'}
         return {**base, 'reason': 'no exact leading candidate prefix'}
     tail = text[len(invocation_key):]
     if tail.strip() == '/help':
@@ -255,13 +271,15 @@ def decide_boundary(
     active: ActiveContext | None = None,
     expected_turn_id: str | None = None,
     goal_changed: bool = False,
+    p_run: str | None = None,
 ) -> BoundaryDecision:
     """Preview a supplied host event without inferring intent or executing it.
 
     Host turn names do not end an unfinished DEEP task. The caller supplies its
     actual lifecycle status and goal_changed after interpretation; neither a
-    turn id nor this preview certifies those facts. Every candidate message
-    still requires real acquisition, without replacing the frozen run pin.
+    turn id nor this preview certifies those facts. Supply the frozen pin for
+    version-specific continuation. Every candidate message still requires real
+    acquisition, without replacing the frozen run pin.
     """
     event = EventKind(event)
     if not isinstance(message, str):
@@ -308,6 +326,11 @@ def decide_boundary(
             'ROUTE_PENDING', 'ACQUIRE_LIVE_PIN_FIRST', True, preserve,
             continuation, key, after_route,
         )
+    if parse_do_supplement(message, p_run=p_run) is not None:
+        if not unfinished_deep:
+            return BoundaryDecision('LIGHT', 'SUPPLEMENT_NEEDS_TASK', False, False, None)
+        if after_route == 'CONTINUE':
+            after_route = 'HANDLE_SUPPLEMENT'
     if continuing:
         assert active is not None
         return BoundaryDecision(

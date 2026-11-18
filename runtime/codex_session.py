@@ -826,6 +826,17 @@ def line_packet(root: Path, line_id: str, *, topic: str | None = None,
                 '对旧开放段使用recover，再以真实边界开启新活动。')
     parts += ['## 本线已记录的活动事实', json.dumps(timing, ensure_ascii=False, indent=2),
               '开放尾段不计有效时间。中断恢复先核对产物、在途工具与未处理返回；' + recovery]
+    # Allot exposes only shared policy and execution metadata. Full selection
+    # evidence may contain another researcher's private work and is not part
+    # of a line's recovery context.
+    from .codex_allot import context_summary
+    allot = context_summary(root)
+    if allot.get('policy') is not None or allot.get('selections'):
+        parts += ['## 当前Allot政策与原生执行概况',
+                  json.dumps(allot, ensure_ascii=False, indent=2, allow_nan=False),
+                  '选择记录待宿主应用的配置，观察记录实际取得的模型与effort；'
+                  '未观察的选择不能当作已经执行。当前政策须由宿主真实应用，'
+                  '本摘要不能证明Main已经切换；过时选择的历史观察不授权继续执行。']
     # Keep the current shared material after old work/candidate/state so its
     # actual contents, rather than an obsolete NEXT section, frame re-entry.
     # Include the source once: duplicating a long decision file wastes context
