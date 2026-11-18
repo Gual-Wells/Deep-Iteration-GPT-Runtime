@@ -17,6 +17,43 @@ ROUTINE = frozenset({
 EXPLICIT = frozenset({'purchase', 'message_external', 'irreversible_bulk_delete'})
 
 
+def assess_restriction(value: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Admit a proposed workflow blocker, never grant permission to act.
+
+    This checks a reviewable source/applicability declaration. It does not
+    authenticate the quote or replace lifecycle, wallet, platform or pin checks.
+    Failure to admit an added gate leaves the underlying real boundaries intact.
+    """
+    value = value if isinstance(value, Mapping) else {}
+    reasons = []
+    if value.get('origin') not in {'user', 'platform', 'pinned_rule'}:
+        reasons.append('a model plan, collaborator suggestion or old checklist has no independent blocking authority')
+    for key in ('source_ref', 'source_quote', 'scope', 'condition', 'why_blocking'):
+        if not isinstance(value.get(key), str) or not value[key].strip():
+            reasons.append('missing actual ' + key)
+    for key in ('applies_now', 'necessary_now', 'existing_authorization_checked'):
+        if value.get(key) is not True:
+            reasons.append(key + ' is not established')
+    if value.get('already_satisfied') is not False:
+        reasons.append('an unsatisfied condition has not been established')
+    if value.get('alternative_allows_progress') is not False:
+        reasons.append('a safe continuation has not been ruled out for this affected scope')
+    if (value.get('purpose') == 'analysis'
+            and value.get('evidence_kind') in {'experiment', 'future_feedback', 'full_measurement'}
+            and not (value.get('origin') == 'user' and value.get('explicit_user_requirement') is True)):
+        reasons.append('analysis does not acquire validity through an added empirical prerequisite')
+    unaffected = value.get('unaffected_work')
+    if not isinstance(unaffected, list) or any(not isinstance(item, str) or not item.strip() for item in unaffected):
+        reasons.append('identify work that can continue; an empty list requires the stated scope to be truly indivisible')
+        unaffected = []
+    return {'blocking_admitted': not reasons,
+            'next_action': 'APPLY_TO_AFFECTED_SCOPE' if not reasons else 'CONTINUE_WITHOUT_ADDED_GATE',
+            'scope': value.get('scope'), 'unaffected_work': unaffected,
+            'reasons': reasons, 'basis': dict(value),
+            'authority_granted': False, 'underlying_boundaries_changed': False,
+            'evidence_scope': 'operator-declared source and applicability; not semantic or authorization certification'}
+
+
 def assess_operation(
     context: Mapping[str, Any], operation: str, *, within_task: bool,
     capability: str = 'UNKNOWN', estimated_cost: float | None = None,

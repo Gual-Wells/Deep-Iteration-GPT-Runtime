@@ -15,9 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from runtime.codex_permissions import assess_operation
+from runtime.codex_permissions import assess_operation, assess_restriction
 from runtime.codex_foundation import (
-    answer_foundation, confirm_foundation, foundation_packet, propose_foundation, revoke_foundation,
+    adopt_commission, answer_foundation, bind_guidance, confirm_foundation, foundation_packet, propose_foundation, revoke_foundation,
 )
 from runtime.codex_session import (
     ACTIVITY_STATES, activity, create_line, create_session, line_packet,
@@ -140,10 +140,15 @@ def main(argv: list[str] | None = None) -> int:
     recover.add_argument('--reason', required=True)
     foundation = sub.add_parser('foundation', help='research-authored task brief, dialogue and execution decision')
     fs = foundation.add_subparsers(dest='action', required=True)
-    for action in ('propose', 'show', 'answer', 'confirm', 'revoke'):
+    for action in ('propose', 'show', 'answer', 'confirm', 'revoke', 'commission', 'guidance'):
         command = fs.add_parser(action)
         command.add_argument('--root', required=True, type=Path)
-        if action == 'propose':
+        if action in ('commission', 'guidance'):
+            command.add_argument('--input', required=True, type=Path,
+                                 help=('current confirmed revision and actual public source; source rebind only'
+                                       if action == 'guidance' else
+                                       'source-bound original execution delegation and real public guidance; not a fee reply'))
+        elif action == 'propose':
             command.add_argument('--input', required=True, type=Path)
             command.add_argument('--reason', required=True)
             command.add_argument('--change-kind', choices=('material', 'non_material'), default='material')
@@ -216,6 +221,10 @@ def main(argv: list[str] | None = None) -> int:
                 result['receipt'] = acquired.export(args.out).as_posix()
         elif args.command == 'permissions':
             supplied = read_object(args.input)
+            if 'restriction' in supplied:
+                result = assess_restriction(supplied['restriction'])
+                print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
+                return 0
             result = assess_operation(supplied['context'], supplied['operation'],
                 within_task=supplied['within_task'], capability=supplied.get('capability', 'UNKNOWN'),
                 estimated_cost=supplied.get('estimated_cost'))
@@ -257,6 +266,10 @@ def main(argv: list[str] | None = None) -> int:
             if args.action == 'propose':
                 result = propose_foundation(args.root, read_object(args.input),
                     reason=args.reason, change_kind=args.change_kind)
+            elif args.action == 'commission':
+                result = adopt_commission(args.root, read_object(args.input))
+            elif args.action == 'guidance':
+                result = bind_guidance(args.root, read_object(args.input))
             elif args.action == 'answer':
                 result = answer_foundation(args.root, args.id,
                     revision=args.revision, user_text=read_message(args.reply_file),

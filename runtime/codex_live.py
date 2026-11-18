@@ -232,24 +232,39 @@ def pending(root: Path, *, reader: str, exchange_id: str | None = None, max_char
     segments, displays, left = [], [], max_chars
     while index < len(items) and left > 128:
         item = items[index]
-        full = _public_text(item)
-        if offset > len(full):
-            raise ValueError('partial public history changed')
+        public_original = item.get('event') == 'public_delta'
         label = (ICONS[item['kind']] + ' **' + item['actor'] + ' · ' + item['kind'] + item['unit']
                  + ('｜' + item['topic'] if item.get('topic') else '') + '**\n**' + STAGES[item['stage']] + '**'
                  if 'kind' in item else '**外部协作者 / ' + (item.get('member_id') or item.get('exchange_id') or 'Consult') + model_label + '**'
-                 if item['event'] == 'public_delta' else '**宿主状态**')
+                 if public_original else '**宿主状态**')
         label += '（续）' if offset else ''
-        take = min(len(full) - offset, max(1, left - len(label) - 8))
-        text = full[offset:offset + take]
-        segments.append({'index': index, 'offset': offset, 'text': text,
-                         'public_original': item.get('event') == 'public_delta',
+        start_index, start_offset = index, offset
+        budget = max(1, left - len(label) - 8)
+        pieces = []
+        while index < len(items) and budget:
+            current = items[index]
+            if index != start_index and not (
+                public_original and current.get('event') == 'public_delta'
+                and current.get('exchange_id') == item.get('exchange_id')
+                and current.get('member_id') == item.get('member_id')
+            ):
+                break
+            full = _public_text(current)
+            if offset > len(full):
+                raise ValueError('partial public history changed')
+            take = min(len(full) - offset, budget)
+            pieces.append(full[offset:offset + take])
+            budget -= take
+            offset += take
+            if offset < len(full):
+                break
+            index, offset = index + 1, 0
+        text = ''.join(pieces)
+        segments.append({'index': start_index, 'offset': start_offset, 'end_index': index,
+                         'end_offset': offset, 'text': text, 'public_original': public_original,
                          'source_ref': item.get('source_ref'), 'actor': item.get('actor'), 'stage': item.get('stage')})
         displays.append(label + '\n\n' + text)
         left -= len(label) + len(text) + 8
-        offset += take
-        if offset == len(full):
-            index, offset = index + 1, 0
     to = {'index': index, 'offset': offset, 'prefix_sha256': sha256(_bytes(items[:index])).hexdigest(),
           'partial_sha256': sha256(_bytes(items[index])).hexdigest() if offset else None}
     result = {'reader': reader, 'source': source, 'from': cursor, 'to': to, 'segments': segments,

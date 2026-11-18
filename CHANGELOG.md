@@ -1,5 +1,13 @@
 # Changelog
 
+## Codex 0.18.0 — logic-first allocation and justified restrictions
+
+- Pin a single Allot default, GPT-6.2 Sol/max, while preserving explicit 6.1 selection and every older pin's policy shape and hash. Keep native responsibility depth separate from model effort; controlled labor and substantive feedback retain their actual boundaries.
+- Raise the admission standard for proposed blocking constraints: current source, affected scope, unmet necessary dependency, existing authority and available continuation. New foundation questions are advisory unless an explicit blocker passes this declaration check. Suggestions and absent empirical evidence do not create authority or override real lifecycle, budget or platform gates.
+- Bind early formal Claude guidance to the actual task UUID, request, role and public return. Reuse source-bound direct decisions and applicable guidance without inventing fresh approvals; preserve legacy requests and explicit adoption evidence.
+- Attribute delayed usage to its thread and turn, retain uncovered totals and leave unsupported fields unknown. Coalesce adjacent public deltas without changing original cursors; compact acknowledgement output is opt-in and keeps full receipts.
+- Keep root stable, old immutable distributions and global host settings unchanged. Implementation checks verify these paths; model-ranking experiments do not qualify logical design decisions.
+
 ## Codex 0.15.0 — execution tasks and mandatory Claude guidance for subjective work
 
 - `DIGR:` / `DIGR：` assigns specified execution and engineering to Codex without Claude or unsolicited subjective creation. `DIGR::` / `DIGR：：` requires consulting Claude for substantive subjective content choices and implementing applicable guidance; equivalent engineering and factual checks stay local.

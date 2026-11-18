@@ -33,6 +33,9 @@ PROXY_RATES = {
 }
 _NATIVE_TYPES = {'session_meta', 'turn_context', 'token_usage_record', 'event_msg'}
 _METHODS = {'thread/tokenUsage/updated', 'account/rateLimits/updated', 'model/rerouted'}
+_LABELS = {'model': ('model',), 'effort': ('effort', 'reasoning_effort', 'reasoningEffort'),
+           'speed': ('speed', 'service_tier', 'serviceTier')}
+_LABEL_SCOPE = 'thread_and_turn'
 _TOKENS = ('input_tokens', 'cached_input_tokens', 'cache_write_input_tokens',
            'output_tokens', 'reasoning_output_tokens', 'total_tokens')
 _PREFIX = r'^\s*\{(?:(?:\s*"timestamp"\s*:\s*"[^"]*"|\s*"ordinal"\s*:\s*\d+|\s*"jsonrpc"\s*:\s*"[^"]*")\s*,)*'
@@ -204,7 +207,7 @@ def _safe_lines(path: Path):
             method = _METHOD.match(line)
             if top and top[1] in _NATIVE_TYPES:
                 if top[1] == 'event_msg' and not re.search(
-                    r'"payload"\s*:\s*\{\s*"type"\s*:\s*"token_count"', line):
+                    r'"payload"\s*:\s*\{\s*"type"\s*:\s*"(?:token_count|token_usage_record)"', line):
                     continue
             elif not (method and method[1] in _METHODS):
                 continue
@@ -241,15 +244,27 @@ def _left_ranges(start: int, end: int, covered: list[tuple[int, int]]) -> list[t
     return remaining
 
 
-def _metadata(payload: Mapping[str, Any], context: Mapping[str, Any], *,
-              model: str | None, effort: str | None, speed: str | None) -> tuple[dict, dict]:
+def _native_id(payload: Mapping[str, Any], field: str) -> str | None:
+    return _text(payload.get(field + '_id')) or _text(payload.get(field + 'Id'))
+
+
+def _labels(payload: Mapping[str, Any]) -> dict:
+    return {key: next((payload[name] for name in aliases if _text(payload.get(name))), None)
+            for key, aliases in _LABELS.items()}
+
+
+def _metadata(payload: Mapping[str, Any], context: Mapping[str, Any],
+              caller: Mapping[str, str | None]) -> tuple[dict, dict]:
+    actual = _labels(payload)
     result, sources = {}, {}
-    for key, supplied in (('model', model), ('effort', effort), ('speed', speed)):
-        actual = _text(payload.get(key, payload.get('service_tier') if key == 'speed' else None))
-        contextual = _text(context.get(key))
-        result[key] = actual or contextual or supplied
-        sources[key] = {'rank': 3 if actual else context.get('metadata_sources', {}).get(key, {}).get('rank', 2) if contextual else 1 if supplied else 0,
-                        'basis': 'response_payload' if actual else 'turn_context' if contextual else 'caller_fill' if supplied else 'unavailable'}
+    for key in _LABELS:
+        if actual[key] is not None:
+            result[key], sources[key] = actual[key], {'rank': 4, 'basis': 'response_payload'}
+        elif context.get(key) is not None:
+            result[key], sources[key] = context[key], context['metadata_sources'][key]
+        else:
+            result[key] = caller[key]
+            sources[key] = {'rank': 1, 'basis': 'caller_fill'} if caller[key] else {'rank': 0, 'basis': 'unavailable'}
     return result, sources
 
 
@@ -257,41 +272,63 @@ def _limits(value: Any) -> list[str] | None:
     return sorted(set(value)) if isinstance(value, list) and all(isinstance(item, str) and item for item in value) else None
 
 
+def _metadata_candidates(row: dict, key: str) -> list[dict]:
+    prior = row.get('metadata_candidates', {}).get(key)
+    if prior is not None:
+        return prior
+    value = row.get(key)
+    source = row.get('metadata_sources', {}).get(key, {})
+    return ([{'value': value, 'rank': source.get('rank', 2),
+              'basis': source.get('basis', 'legacy_attribution')}] if value is not None else [])
+
+
 def _merge_observation(old: dict | None, row: dict, notices: list[str]) -> dict:
     if old is None:
         ids = row.get('metered_limit_ids')
-        row['metered_limit_candidates'] = ([{'ids': ids,
-            'rank': row.get('metered_limit_source', {}).get('rank', 2)}] if ids is not None else [])
+        row.setdefault('metered_limit_candidates', ([{'ids': ids,
+            'rank': row.get('metered_limit_source', {}).get('rank', 2)}] if ids is not None else []))
         return row
     if old['tokens'] != row['tokens']:
         raise ValueError('conflicting usage for one native aggregate; investigate instead of double counting')
     merged = {**old, **row}
     merged['actors'] = sorted(set(old.get('actors', [old['actor']]) + row.get('actors', [row['actor']])))
-    candidates = dict(old.get('metadata_candidates', {}))
-    for key in ('model', 'effort', 'speed', 'account'):
-        values = list(candidates.get(key, []))
-        for source in (old, row):
-            value = source.get(key)
-            rank = source.get('metadata_sources', {}).get(key, {}).get('rank', 2 if value else 0)
-            item = {'value': value, 'rank': rank}
-            if value is not None and item not in values:
+    merged['metadata_sources'] = dict(row['metadata_sources'])
+    candidates, conflicts = {}, []
+    scoped_reimport = old.get('label_scope') != _LABEL_SCOPE and row.get('label_scope') == _LABEL_SCOPE
+    for key in (*_LABELS, 'account'):
+        values = list(_metadata_candidates(old, key))
+        if scoped_reimport and key in _LABELS:
+            # The legacy rolling context could attach another turn's labels.
+            # Keep only an identifiable payload value; recover any other
+            # evidence by replaying the original, selected native records.
+            prior_source = old.get('metadata_sources', {}).get(key, {})
+            values = ([{'value': old[key], 'rank': 4, 'basis': 'response_payload'}]
+                      if prior_source.get('basis') == 'response_payload' and old.get(key) is not None else [])
+        for item in _metadata_candidates(row, key):
+            if item not in values:
                 values.append(item)
         candidates[key] = values
         if values:
-            strongest = max(item['rank'] for item in values)
-            actual = {item['value'] for item in values if item['rank'] == strongest}
+            rank = max(item['rank'] for item in values)
+            strongest = [item for item in values if item['rank'] == rank]
+            actual = {item['value'] for item in strongest}
             merged[key] = next(iter(actual)) if len(actual) == 1 else None
+            merged['metadata_sources'][key] = {'rank': rank, 'basis':
+                strongest[-1].get('basis', 'legacy_attribution') if len(actual) == 1 else 'conflicting_observations'}
             if old.get(key) != merged[key]:
                 notices.append('later metadata corrected or suspended an earlier ' + key + ' attribution')
             if len(actual) != 1:
-                merged.setdefault('metadata_conflicts', []).append(key)
+                conflicts.append(key)
                 notices.append('contradictory equally strong ' + key + ' metadata; attribution is unknown')
     merged['metadata_candidates'] = candidates
+    merged['metadata_conflicts'] = conflicts
     eligibility = list(old.get('metered_limit_candidates', []))
     for source in (old, row):
         ids = source.get('metered_limit_ids')
-        if ids is not None:
-            candidate = {'ids': ids, 'rank': source.get('metered_limit_source', {}).get('rank', 2)}
+        source_candidates = source.get('metered_limit_candidates', [])
+        if not source_candidates and ids is not None:
+            source_candidates = [{'ids': ids, 'rank': source.get('metered_limit_source', {}).get('rank', 2)}]
+        for candidate in source_candidates:
             if candidate not in eligibility:
                 eligibility.append(candidate)
     merged['metered_limit_candidates'] = eligibility
@@ -368,11 +405,16 @@ def _reconcile_observations(observations: list[dict]) -> tuple[dict, list[str]]:
                                     reasoning_in_output=True, cached_in_input=True)
                 selected = {**row, 'event_id': 'residual:' + _key([row['event_id'], remaining]),
                             'basis': 'native_cumulative_residual', 'tokens': residual,
-                            'coverage_ranges': remaining}
-                for key in ('model', 'effort', 'speed'):
-                    if row.get('metadata_coverage', {}).get(key) is not True:
+                            'coverage_ranges': remaining, 'metadata_sources': dict(row['metadata_sources'])}
+                for key in _LABELS:
+                    if row.get('metadata_coverage', {}).get(key) is not True or any(
+                        item.get(key) is not None and item[key] != row.get(key)
+                        and item['counter_start'] < end and start < item['counter_end']
+                        for item in accepted
+                    ):
                         selected[key] = None
-                if any(selected[key] is None and row.get(key) is not None for key in ('model', 'effort', 'speed')):
+                        selected['metadata_sources'][key] = {'rank': 0, 'basis': 'interval_identity_unresolved'}
+                if any(selected[key] is None and row.get(key) is not None for key in _LABELS):
                     notices.append('residual model/effort/speed identity lacks whole-interval evidence; affected fields are unknown')
                 notices.append('partial exact coverage reconciled; unmatched cumulative residual retained')
             result[selected['event_id']] = selected
@@ -400,30 +442,50 @@ def collect_usage(root: Path, rollout: Path, *, actor: str, start: str | None = 
         raise ValueError('usage end precedes start')
     wanted = set(turn_ids or [])
     thread = None
-    context = {'model': model, 'effort': effort, 'speed': speed, 'turn_id': None,
-               'metadata_sources': {key: {'rank': 1 if value else 0} for key, value in
-                                    (('model', model), ('effort', effort), ('speed', speed))}}
+    caller = {'model': model, 'effort': effort, 'speed': speed}
+    active_turns, contexts, turn_epochs = {}, {}, {}
     native, fallback, rates, notices, selected_times, gaps = [], [], [], [], [], []
     source_id = _key(str(Path(rollout).resolve()))
     baseline_raw = token_baseline.get('total_token_usage', token_baseline) if token_baseline else None
     baseline_tokens = normalize_tokens(baseline_raw) if baseline_raw else None
     baseline_total = baseline_tokens['total_tokens'] if baseline_tokens else None
-    previous_by_thread = {}
+    previous_by_thread, previous_by_turn = {}, {}
     counters = {}
-    metadata_revisions = {'model': 0, 'effort': 0, 'speed': 0}
+    unbound_responses = {}
+    revisions_by_thread = defaultdict(lambda: dict.fromkeys(_LABELS, 0))
+    revisions_by_turn = defaultdict(lambda: dict.fromkeys(_LABELS, 0))
     derived_start = None
-    def counter_epoch(thread_id, aggregate, observed_at):
+
+    def counter_epoch(scope, aggregate, late):
+        thread_id, turn_id = scope
+        if late:
+            # A delayed old-turn alias is still in that turn's coverage
+            # epoch. It cannot reset the live thread's cumulative counter.
+            return turn_epochs[scope]
         total = aggregate.get('total_tokens', aggregate.get('totalTokens')) if isinstance(aggregate, Mapping) else None
         prior = counters.get(thread_id)
-        epoch = prior[2] if prior else 0
+        epoch = prior[1] if prior else 0
         if type(total) is int:
             if prior and total < prior[0]:
                 epoch += 1
                 notices.append('native cumulative counter decreased; a separate coverage epoch was opened')
-            counters[thread_id] = (total, observed_at, epoch)
+            counters[thread_id] = (total, epoch)
+            if turn_id:
+                turn_epochs[scope] = epoch
         return epoch
+
     safe_events = sorted(_safe_lines(Path(rollout)), key=lambda item:
                          item.get('timestamp', item.get('params', {}).get('timestamp', '')))
+    # In a single-thread export, legacy context and count rows often omit
+    # thread_id. An export with several explicit threads cannot fill it this way.
+    threads = set()
+    for event in safe_events:
+        payload = event.get('payload', event.get('params', {}))
+        if isinstance(payload, Mapping):
+            explicit = _text(payload.get('id')) if event.get('type') == 'session_meta' else _native_id(payload, 'thread')
+            if explicit:
+                threads.add(explicit)
+    inferred_thread = next(iter(threads)) if len(threads) == 1 else None
     for event in safe_events:
         kind = event.get('type', event.get('method'))
         payload = event.get('payload', event.get('params', {}))
@@ -437,64 +499,81 @@ def collect_usage(root: Path, rollout: Path, *, actor: str, start: str | None = 
             notices.append('undated native notification skipped; attach an observed timestamp before importing')
             continue
         at = _time(at)
+        active_thread = _native_id(payload, 'thread') or thread or inferred_thread
+        active_turn = active_turns.get(active_thread)
+        explicit_turn = _native_id(payload, 'turn')
+        thread_revisions = revisions_by_thread[active_thread]
         if kind == 'turn_context':
-            actual_context = {key: _text(payload.get(key, payload.get('reasoning_effort') if key == 'effort'
-                                                      else payload.get('service_tier') if key == 'speed' else None))
-                              for key in ('model', 'effort', 'speed')}
-            revised = {'model': _text(payload.get('model')) or model,
-                       'effort': _text(payload.get('effort', payload.get('reasoning_effort'))) or effort,
-                       'speed': _text(payload.get('speed', payload.get('service_tier'))) or speed,
-                       'turn_id': _text(payload.get('turn_id')),
-                       'metadata_sources': {key: {'rank': 2 if value else 1 if supplied else 0}
-                                            for (key, value), supplied in zip(actual_context.items(), (model, effort, speed))}}
-            for key in ('model', 'effort', 'speed'):
-                if revised[key] != context[key]:
-                    metadata_revisions[key] += 1
-            context = revised
-            if context['turn_id'] in wanted and derived_start is None:
-                derived_start = at
+            revised = _labels(payload) if explicit_turn else dict.fromkeys(_LABELS)
+            prior_context = contexts.get((active_thread, active_turn), {})
+            for key in _LABELS:
+                if revised[key] != prior_context.get(key):
+                    thread_revisions[key] += 1
+            active_turns[active_thread] = explicit_turn
+            if explicit_turn:
+                scope = active_thread, explicit_turn
+                prior_turn_context = contexts.get(scope, {})
+                for key in _LABELS:
+                    if revised[key] != prior_turn_context.get(key):
+                        revisions_by_turn[scope][key] += 1
+                contexts[scope] = {**revised, 'metadata_sources': {
+                    key: {'rank': 2, 'basis': 'turn_context'} for key in _LABELS}}
+                turn_epochs.setdefault(scope, counters.get(active_thread, (None, 0))[1])
+                if explicit_turn in wanted and derived_start is None:
+                    derived_start = at
             continue
-        active_thread = _text(payload.get('thread_id', payload.get('threadId'))) or thread
-        turn = _text(payload.get('turn_id', payload.get('turnId'))) or context['turn_id']
+        turn = explicit_turn or active_turn
+        scope = active_thread, turn
+        context = contexts.get(scope, {})
+        late = bool(explicit_turn and active_turn and turn != active_turn and scope in turn_epochs)
+        turn_revisions = revisions_by_turn[scope]
         selected = (not start or at >= start) and (not end or at <= end) and (not wanted or turn in wanted)
         if selected:
             selected_times.append(at)
         if kind == 'model/rerouted':
-            actual_model = _text(payload.get('toModel')) or context['model']
-            if actual_model != context['model']:
-                metadata_revisions['model'] += 1
-            context['model'] = actual_model
-            context['metadata_sources']['model'] = {'rank': 3, 'basis': 'service_reroute'}
+            actual_model = _text(payload.get('toModel')) or _text(payload.get('to_model'))
+            if turn and actual_model:
+                if actual_model != context.get('model'):
+                    turn_revisions['model'] += 1
+                    if not late:
+                        thread_revisions['model'] += 1
+                contexts[scope] = {**context, 'model': actual_model, 'metadata_sources': {
+                    **context.get('metadata_sources', {}), 'model': {'rank': 3, 'basis': 'service_reroute'}}}
             continue
+        if kind == 'event_msg' and payload.get('type') == 'token_usage_record':
+            kind = 'token_usage_record'
         if kind == 'token_usage_record':
             cumulative = payload.get('thread_token_usage')
-            epoch = counter_epoch(active_thread, cumulative, at)
+            epoch = counter_epoch(scope, cumulative, late)
             if baseline_total is not None:
-                cumulative = payload.get('thread_token_usage', {})
-                count = cumulative.get('total_tokens') if isinstance(cumulative, Mapping) else None
+                count = cumulative.get('total_tokens', cumulative.get('totalTokens')) if isinstance(cumulative, Mapping) else None
                 if type(count) is not int or count <= baseline_total:
                     selected = False
-            if not selected:
-                continue
             try:
                 tokens = normalize_tokens(payload.get('usage', {}))
             except ValueError:
                 notices.append('a contradictory or incomplete native token record was excluded')
                 continue
-            response = _text(payload.get('response_id'))
+            metadata, metadata_sources = _metadata(payload, context, caller)
+            for key in _LABELS:
+                if metadata_sources[key]['basis'] == 'response_payload' and metadata[key] != context.get(key):
+                    turn_revisions[key] += 1
+                    if not late:
+                        thread_revisions[key] += 1
+            if not selected:
+                continue
+            response = _native_id(payload, 'response')
             identity = [active_thread, response] if response else [active_thread, turn, at, tokens]
-            metadata, metadata_sources = _metadata(payload, context, model=model, effort=effort, speed=speed)
-            for key in ('model', 'effort', 'speed'):
-                if metadata_sources[key]['basis'] == 'response_payload' and metadata[key] != context[key]:
-                    metadata_revisions[key] += 1
             low, high = _counter_range(cumulative, tokens)
             row = {'event_id': 'response:' + _key(identity), 'at': at,
                    'thread_id': active_thread, 'turn_id': turn, 'actor': actor,
-                   **metadata, 'metadata_sources': metadata_sources,
+                   **metadata, 'metadata_sources': metadata_sources, 'label_scope': _LABEL_SCOPE,
                    'counter_start': low, 'counter_end': high, 'counter_epoch': epoch,
                    'metered_limit_ids': _limits(payload.get('metered_limit_ids', payload.get('meteredLimitIds'))),
                    'metered_limit_source': {'rank': 3, 'basis': 'response_payload'},
                    'tokens': tokens, 'basis': 'native_response_aggregate'}
+            if inferred_thread and active_thread == inferred_thread:
+                unbound_responses[row['event_id']] = 'response:' + _key([None, *identity[1:]])
             native.append(row)
         elif kind in ('event_msg', 'thread/tokenUsage/updated'):
             info = payload.get('info', payload.get('tokenUsage', payload.get('token_usage')))
@@ -503,12 +582,13 @@ def collect_usage(root: Path, rollout: Path, *, actor: str, start: str | None = 
             cumulative_raw = info.get('total_token_usage', info.get('total'))
             last_raw = info.get('last_token_usage', info.get('last'))
             current = None
-            epoch = counter_epoch(active_thread, cumulative_raw, at)
-            previous_info = previous_by_thread.get(active_thread)
+            epoch = counter_epoch(scope, cumulative_raw, late)
+            previous_info = previous_by_turn.get(scope) if late else previous_by_thread.get(active_thread)
             previous = previous_info['tokens'] if previous_info and previous_info['epoch'] == epoch else baseline_tokens
             if previous_info and previous_info['epoch'] != epoch:
                 previous_info = None
                 previous = None
+            context_labels, context_sources = _metadata({}, context, caller)
             try:
                 if isinstance(cumulative_raw, Mapping):
                     current = normalize_tokens(cumulative_raw)
@@ -546,20 +626,25 @@ def collect_usage(root: Path, rollout: Path, *, actor: str, start: str | None = 
                     basis = 'native_last_aggregate'
                 if selected and delta and delta['total_tokens']:
                     low, high = _counter_range(cumulative_raw, delta)
-                    metadata, metadata_sources = _metadata({}, context, model=model, effort=effort, speed=speed)
+                    metadata, metadata_sources = dict(context_labels), dict(context_sources)
+                    # Same-turn coverage follows only that turn's observations.
+                    # Cross-turn coverage also needs a stable active thread span.
+                    revision_key = 'turn_revisions' if turn and previous_info and previous_info['turn_id'] == turn else 'thread_revisions'
+                    revisions = turn_revisions if revision_key == 'turn_revisions' else thread_revisions
                     metadata_coverage = {key: bool(previous_info and metadata[key] is not None
-                        and previous_info.get('metadata_revisions', {}).get(key) == metadata_revisions[key])
-                        for key in ('model', 'effort', 'speed')}
+                        and previous_info['labels'][key] == metadata[key]
+                        and previous_info[revision_key][key] == revisions[key])
+                        for key in _LABELS}
                     if basis == 'native_cumulative_difference':
-                        for key in ('model', 'effort', 'speed'):
+                        for key in _LABELS:
                             if not metadata_coverage[key]:
                                 metadata[key] = None
                                 metadata_sources[key] = {'rank': 0, 'basis': 'interval_identity_unresolved'}
-                        if any(not metadata_coverage[key] and context[key] is not None for key in ('model', 'effort', 'speed')):
+                        if any(not metadata_coverage[key] and context.get(key) is not None for key in _LABELS):
                             notices.append('cumulative interval crosses or lacks metadata coverage; affected model/effort/speed attribution is unknown')
                     fallback.append({'event_id': 'cumulative:' + _key([active_thread, epoch, low, high, basis]) if cumulative_raw else 'last:' + _key([active_thread, turn, at, delta]),
                         'at': at, 'thread_id': active_thread, 'turn_id': turn,
-                        'actor': actor, **metadata, 'metadata_sources': metadata_sources,
+                        'actor': actor, **metadata, 'metadata_sources': metadata_sources, 'label_scope': _LABEL_SCOPE,
                         'metadata_coverage': metadata_coverage,
                         'counter_start': low, 'counter_end': high, 'counter_epoch': epoch,
                         'interval_start_at': previous_info['at'] if previous_info else None,
@@ -567,8 +652,13 @@ def collect_usage(root: Path, rollout: Path, *, actor: str, start: str | None = 
             except ValueError:
                 notices.append('an invalid native cumulative token record was excluded')
             if current and (baseline_total is None or current['total_tokens'] >= baseline_total):
-                previous_by_thread[active_thread] = {'tokens': current, 'at': at,
-                    'turn_id': turn, 'epoch': epoch, 'metadata_revisions': dict(metadata_revisions)}
+                info = {'tokens': current, 'at': at, 'turn_id': turn, 'epoch': epoch,
+                        'labels': context_labels, 'turn_revisions': dict(turn_revisions),
+                        'thread_revisions': dict(thread_revisions)}
+                if not late or not previous or current['total_tokens'] >= previous['total_tokens']:
+                    previous_by_turn[scope] = info
+                if not late:
+                    previous_by_thread[active_thread] = info
             if payload.get('rate_limits') is not None:
                 rates.extend(_rate_rows(payload['rate_limits'], at, account=account))
         elif kind == 'account/rateLimits/updated':
@@ -588,10 +678,8 @@ def collect_usage(root: Path, rollout: Path, *, actor: str, start: str | None = 
                 prior[(row['account'], row['limit_id'], row['window_minutes'])] = row
         for row in prior.values():
             selected_rates.append({**row, 'boundary': 'sampled_before_task'})
-    known_threads = {row['thread_id'] for row in native if row['thread_id']}
-    inferred_thread = thread or (next(iter(known_threads)) if len(known_threads) == 1 else None)
     for row in native + fallback:
-        row['thread_id'] = row['thread_id'] or inferred_thread or 'source:' + source_id
+        row['thread_id'] = row['thread_id'] or 'source:' + source_id
         row['source_id'] = source_id
         row['account'] = account
         row['metadata_sources']['account'] = {'rank': 1 if account == 'current-account' else 2, 'basis': 'caller_account_scope'}
@@ -605,7 +693,7 @@ def collect_usage(root: Path, rollout: Path, *, actor: str, start: str | None = 
     for gap in gaps:
         high, amount = gap.get('counter_end'), gap.get('included_last_tokens')
         exact_ranges = [(row['counter_start'], row['counter_end']) for row in native
-                        if row['thread_id'] == (gap['thread_id'] or inferred_thread)
+                        if row['thread_id'] == (gap['thread_id'] or 'source:' + source_id)
                         and row.get('counter_epoch') == gap['counter_epoch']
                         and row.get('counter_start') is not None and row['turn_id'] in wanted]
         proven = wanted and amount is not None and high is not None and not _left_ranges(high - amount, high, exact_ranges)
@@ -629,10 +717,17 @@ def collect_usage(root: Path, rollout: Path, *, actor: str, start: str | None = 
                                   and not (row.get('source_id') == source_id and 'selection_id' not in row)}
         for row in projected:
             row['selection_id'] = selection_id
+            unbound_id = unbound_responses.get(row['event_id'])
+            unbound = ledger['observations'].get(unbound_id)
+            if (unbound and unbound.get('source_id') == source_id
+                    and unbound['thread_id'] in {'source:' + source_id, row['thread_id']}):
+                # An append may disclose the export's thread for the first
+                # time. Give the previously unbound response the same identity.
+                row = _merge_observation(ledger['observations'].pop(unbound_id), row, notices)
             ledger['observations'][row['event_id']] = _merge_observation(ledger['observations'].get(row['event_id']), row, notices)
         if inferred_thread:
             for row in ledger['observations'].values():
-                if row.get('source_id') == source_id and str(row['thread_id']).startswith('source:'):
+                if row.get('source_id') == source_id and row['thread_id'] == 'source:' + source_id:
                     row['thread_id'] = inferred_thread
         ledger['events'], reconciliation_notices = _reconcile_observations(list(ledger['observations'].values()))
         notices.extend(reconciliation_notices)
@@ -678,6 +773,8 @@ def _weight(event: dict, calibration: Mapping[str, Any] | None) -> tuple[float |
     if cached is None:
         return None, ['cached-input aggregate unavailable; measured total-token share remains usable']
     speed = event.get('speed')
+    if 'speed' in event.get('metadata_conflicts', []):
+        return None, ['actual speed metadata conflicts; measured total-token share remains usable']
     # Credit speed is only a proxy for this relative allocation. Public included
     # multipliers can differ, so it is never called subscription consumption.
     multiplier = {'standard': 1, 'default': 1, 'fast': 2, 'ultrafast': 6}.get(speed, 1)

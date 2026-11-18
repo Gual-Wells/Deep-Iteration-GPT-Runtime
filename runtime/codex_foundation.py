@@ -63,12 +63,15 @@ def load_foundation(root: Path) -> dict[str, Any]:
     value = _read_json(root / 'foundation.json')
     if value.get('format') != FORMAT or value.get('request_sha256') != session['request_sha256']:
         raise ValueError('task brief is not bound to this original request')
+    from .codex_guidance import enabled
+    if enabled(session['P_run']) and value.get('task_uuid') != session.get('task_uuid'):
+        raise ValueError('task brief belongs to a different task UUID')
     if value.get('brief_sha256') != _digest(value['brief']):
         raise ValueError('task brief changed outside the revision command')
     return value
 
 
-def _questions(items: Any) -> list[dict[str, Any]]:
+def _questions(items: Any, *, restriction_admission: bool = False) -> list[dict[str, Any]]:
     if not isinstance(items, list):
         raise ValueError('questions must be a list; an empty list still needs explicit overall confirmation')
     result, seen = [], set()
@@ -79,9 +82,14 @@ def _questions(items: Any) -> list[dict[str, Any]]:
         if item['id'] in seen:
             raise ValueError('question IDs must be unique')
         seen.add(item['id'])
-        item['blocking'] = supplied.get('blocking', True)
+        item['blocking'] = supplied.get('blocking', not restriction_admission)
         if type(item['blocking']) is not bool:
             raise ValueError('question blocking must be a boolean')
+        if restriction_admission and item['blocking']:
+            from .codex_permissions import assess_restriction
+            item['blocking_assessment'] = assess_restriction(supplied.get('blocking_basis'))
+            item['proposed_blocking'] = True
+            item['blocking'] = item['blocking_assessment']['blocking_admitted']
         options = supplied.get('options', [])
         if not isinstance(options, list) or any(not isinstance(o, str) or not o.strip() for o in options):
             raise ValueError('options must be nonempty strings; free text is always allowed')
@@ -103,8 +111,15 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
     if not isinstance(brief, Mapping) or any(not brief.get(key) for key in BRIEF_FIELDS):
         raise ValueError('brief needs goal/results/scope/granularity/basis/dependencies/approach/resources/completion; use explicit unknowns')
     brief = json.loads(json.dumps(brief, ensure_ascii=False, allow_nan=False))
-    questions = _questions(proposal.get('questions', []))
+    from .codex_guidance import enabled
+    questions = _questions(proposal.get('questions', []), restriction_admission=enabled(session['P_run']))
     previous = load_foundation(root) if (root / 'foundation.json').exists() else None
+    from .codex_guidance import covered_revision, enabled, for_proposal
+    if proposal.get('covered_change') is not None and change_kind != 'material':
+        raise ValueError('covered_change is a material brief revision; it is not a non_material escape')
+    covered_change = covered_revision(root, session, proposal.get('covered_change'), previous=previous, brief=brief)
+    guidance = for_proposal(root, session, proposal.get('guidance'), previous=previous,
+                            material=change_kind == 'material', covered_change=covered_change)
     if previous and change_kind == 'non_material':
         changed = [key for key in DECISION_FIELDS if previous['brief'].get(key) != brief.get(key)]
         if changed:
@@ -134,14 +149,22 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
     if previous:
         history.append({'revision': previous['revision'], 'brief_sha256': previous['brief_sha256'],
                         'confirmation': previous['confirmation'], 'change_to_next': reason,
-                        'change_kind': change_kind})
-        if change_kind == 'non_material' and previous['status'] == 'CONFIRMED':
+                        'change_kind': change_kind,
+                        'guidance': deepcopy(previous.get('guidance')),
+                        'covered_change': deepcopy(previous.get('covered_change'))})
+        if (change_kind == 'non_material' or covered_change is not None) and previous['status'] == 'CONFIRMED':
             if any(q['blocking'] and not q.get('answer') for q in questions):
                 raise ValueError('new unresolved decisions cannot carry an earlier confirmation')
             confirmation = deepcopy(previous['confirmation'])
             confirmation['applies_to_revision'] = revision
             confirmation['applies_to_brief_sha256'] = _digest(brief)
-            confirmation.setdefault('carry_reasons', []).append(reason)
+            if covered_change is None:
+                confirmation.setdefault('carry_reasons', []).append(reason)
+            else:
+                confirmation.setdefault('covered_changes', []).append(deepcopy(covered_change))
+                accepted = {'revision': revision, 'brief': deepcopy(brief),
+                            'brief_sha256': _digest(brief), 'confirmation': deepcopy(confirmation),
+                            'guidance': deepcopy(guidance)}
     value = {'format': FORMAT, 'request_sha256': session['request_sha256'],
              'revision': revision, 'brief': brief, 'brief_sha256': _digest(brief),
              'questions': questions, 'confirmation': confirmation, 'history': history,
@@ -150,6 +173,117 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
              'status': 'CONFIRMED' if confirmation else 'AWAITING_USER',
              'updated_wall_ns': time.time_ns(),
              'record_basis': 'model-authored interpretation; user replies recorded by operator, not authenticated by helper'}
+    if guidance is not None:
+        value['guidance'] = guidance
+    if enabled(session['P_run']):
+        value['task_uuid'] = session['task_uuid']
+    if covered_change is not None:
+        value['covered_change'] = covered_change
+    _write_json(root / 'foundation.json', value)
+    return value
+
+
+def adopt_commission(root: Path, supplied: Mapping[str, Any]) -> dict[str, Any]:
+    """Record an already explicit commission without forging a new plan approval.
+
+    This explicit operation is for an initial delegated task with no unanswered
+    user choice. It does not parse intent, consume an old message as new, turn a
+    budget reply into consent, or revive a withdrawn decision. The operator owns
+    the source-grounded claim that the original commission actually delegates
+    the execution; the guidance author settles the task's prior choices.
+    """
+    from .codex_guidance import enabled, input_ref, public_receipt
+    from .codex_lifecycle import require_active
+    from .codex_session import _write_json
+    root, session = _context(root)
+    lifecycle = require_active(root)
+    value = load_foundation(root)
+    if supplied.get('revision') != value['revision']:
+        raise ValueError('commission adoption must identify the current brief')
+    accepted = value.get('accepted')
+    continuing = supplied.get('continue_existing_commission') is True
+    if value['status'] in {'REVOKED', 'REVISION_REQUIRED'}:
+        raise ValueError('standing commission cannot override a withdrawn decision')
+    if accepted:
+        prior = value['history'][-1].get('confirmation') if value['history'] else None
+        if (not enabled(session['P_run']) or not continuing or value['status'] != 'AWAITING_USER'
+                or not prior or prior.get('kind') != 'STANDING_COMMISSION_WITH_CLAUDE_GUIDANCE'
+                or accepted['confirmation'].get('kind') != 'STANDING_COMMISSION_WITH_CLAUDE_GUIDANCE'):
+            raise ValueError('a prior accepted decision needs its actual current decision; no automatic commission revival')
+    elif continuing:
+        raise ValueError('no existing standing commission to continue')
+    if any(q['blocking'] and not q.get('answer') for q in value['questions']):
+        raise ValueError('standing commission cannot answer an unresolved user choice')
+    if (supplied.get('explicit_execution_commission') is not True
+            or supplied.get('no_new_user_choice') is not True):
+        raise ValueError('record the actual explicit delegation and absence of a new user choice')
+    if (supplied.get('commission_source') != session['request_origin']
+            or supplied.get('commission_sha256') != session['request_sha256']):
+        raise ValueError('authority must be the frozen original commission, not a later fee reply')
+    reason = require_nonempty_text('actual standing authority and consequence', supplied.get('reason'))
+    guidance = public_receipt(root, supplied.get('guidance'), current=True)
+    no_choice_quote = None
+    if continuing:
+        no_choice_quote = require_nonempty_text('actual current guidance on no new user choice',
+                                               supplied.get('guidance_no_new_choice_quote'))
+        public = root / 'consult' / 'exchanges' / guidance['exchange_id'] / 'public.md'
+        commission_quote = require_nonempty_text('actual unchanged commission scope', supplied.get('commission_scope_quote'))
+        original_text = (root / 'REQUEST.txt').read_text(encoding='utf-8-sig')
+        if (guidance['exchange_id'] == (accepted.get('guidance') or {}).get('exchange_id')
+                or no_choice_quote not in public.read_text(encoding='utf-8')):
+            raise ValueError('continuing commission requires a new current complete guidance source and its actual no-new-choice statement')
+        if (supplied.get('commission_scope_unchanged') is not True
+                or supplied.get('input_ref') != input_ref(lifecycle)
+                or commission_quote not in original_text
+                or accepted['confirmation'].get('source') != session['request_origin']):
+            raise ValueError('continuing commission must bind unchanged actual original scope and the current input; guidance cannot expand user authority')
+    confirmation = {'kind': 'STANDING_COMMISSION_WITH_CLAUDE_GUIDANCE',
+        'user_confirmed_revision': None,
+        'applies_to_revision': value['revision'], 'brief_sha256': value['brief_sha256'],
+        'applies_to_brief_sha256': value['brief_sha256'],
+        'user_text': (root / 'REQUEST.txt').read_text(encoding='utf-8-sig'),
+        'source': session['request_origin'], 'source_message_id': 0,
+        'user_saw_this_plan': False, 'reason': reason,
+        'current_input_id': lifecycle['current_message']['id'],
+        'basis': 'operator records an unchanged explicit execution commission; the later resource reply is not plan confirmation'}
+    if continuing:
+        confirmation.update(continued_from_revision=accepted['revision'],
+            guidance_no_new_choice_quote=no_choice_quote,
+            continued_commission={'scope_unchanged': True, 'quote': commission_quote,
+                'source': session['request_origin'], 'request_sha256': session['request_sha256'],
+                'previous_brief_sha256': accepted['brief_sha256'],
+                'brief_sha256': value['brief_sha256'], 'input_ref': input_ref(lifecycle),
+                'basis': 'operator declares existing user scope; actual public quote cannot grant additional authority'})
+    value.update(status='CONFIRMED', confirmation=confirmation, guidance=guidance,
+                 unaffected_lines={}, updated_wall_ns=time.time_ns())
+    value['accepted'] = {'revision': value['revision'], 'brief': deepcopy(value['brief']),
+                        'brief_sha256': value['brief_sha256'], 'confirmation': deepcopy(confirmation),
+                        'guidance': deepcopy(guidance)}
+    _write_json(root / 'foundation.json', value)
+    return value
+
+
+def bind_guidance(root: Path, supplied: Mapping[str, Any]) -> dict[str, Any]:
+    """Rebind source evidence only; never alter or manufacture a task decision.
+
+    An old source needs explicit pre-call wallet adoption. This records which
+    evidence is now verified; it cannot retrospectively attest prior timing.
+    """
+    from .codex_guidance import public_receipt
+    from .codex_lifecycle import require_active
+    from .codex_session import _write_json
+    root, _ = _context(root)
+    require_active(root)
+    value = load_foundation(root)
+    if supplied.get('revision') != value['revision'] or value['status'] != 'CONFIRMED':
+        raise ValueError('guidance binding requires the current confirmed brief; it cannot revive a decision')
+    receipt = public_receipt(root, supplied.get('guidance'), current=True)
+    value['guidance'] = receipt
+    if value.get('accepted') and value['accepted']['revision'] == value['revision']:
+        value['accepted']['guidance'] = deepcopy(receipt)
+    value['guidance_binding'] = {'recorded_wall_ns': time.time_ns(),
+        'basis': 'explicit source rebind only; no new user consent or retrospective order attestation'}
+    value['updated_wall_ns'] = time.time_ns()
     _write_json(root / 'foundation.json', value)
     return value
 
@@ -214,7 +348,8 @@ def confirm_foundation(root: Path, *, revision: int, user_text: str,
     value['status'] = 'CONFIRMED'
     value['accepted'] = {'revision': revision, 'brief': deepcopy(value['brief']),
                          'brief_sha256': value['brief_sha256'],
-                         'confirmation': deepcopy(value['confirmation'])}
+                         'confirmation': deepcopy(value['confirmation']),
+                         'guidance': deepcopy(value.get('guidance'))}
     value['unaffected_lines'] = {}
     value['updated_wall_ns'] = time.time_ns()
     _write_json(root / 'foundation.json', value)
@@ -248,12 +383,24 @@ def revoke_foundation(root: Path, *, user_text: str, source: str, reason: str) -
 
 
 def require_foundation_ready(root: Path, *, owner: str | None = None) -> dict[str, Any]:
+    from .codex_guidance import enabled, public_receipt
+    from .codex_lifecycle import require_active
+    session = _context(root)[1]
+    if enabled(session['P_run']):
+        lifecycle = require_active(root)
+    else:
+        from .codex_lifecycle import load_lifecycle
+        lifecycle = load_lifecycle(root)
     value = load_foundation(root)
     confirmation = value.get('confirmation')
     if value['status'] == 'REVOKED':
         raise ValueError('task decision was revoked; old accepted scope cannot restart execution')
     if confirmation and confirmation.get('applies_to_brief_sha256') != value['brief_sha256']:
         raise ValueError('confirmation is not bound to the current brief; use its pinned toolchain or establish a current decision')
+    policy = lifecycle.get('claude_policy', {}).get('mode')
+    if policy != 'DENY' and (confirmation and confirmation.get('kind') == 'STANDING_COMMISSION_WITH_CLAUDE_GUIDANCE'
+            or enabled(session['P_run']) and policy == 'ALLOW'):
+        public_receipt(root, value.get('guidance'), current=False)
     if value['status'] != 'CONFIRMED' or not confirmation or confirmation.get('applies_to_revision') != value['revision']:
         accepted = value.get('accepted')
         reason = value.get('unaffected_lines', {}).get(owner)
@@ -305,11 +452,21 @@ def foundation_packet(root: Path) -> str:
                      else '暂无逐项待决分歧；当前整体说明仍待明确执行决定。')
     confirmation = value['confirmation']
     if confirmation:
-        decision = (f"用户明确决定（原接受 v{confirmation['user_confirmed_revision']}，"
-                    f"当前适用 v{confirmation['applies_to_revision']}）：\n{confirmation['user_text']}\n"
-                    f"来源：{confirmation['source']}")
+        if confirmation.get('kind') == 'STANDING_COMMISSION_WITH_CLAUDE_GUIDANCE':
+            decision = ('沿用原始明确执行委托；方案由实际Claude公开指导确定，'
+                        '不冒称用户看过本版方案或将费用答复算作全面确认。\n'
+                        + confirmation['user_text'] + '\n来源：' + confirmation['source']
+                        + '\n适用理由：' + confirmation['reason'])
+        else:
+            decision = (f"用户明确决定（原接受 v{confirmation['user_confirmed_revision']}，"
+                        f"当前适用 v{confirmation['applies_to_revision']}）：\n{confirmation['user_text']}\n"
+                        f"来源：{confirmation['source']}")
         if confirmation.get('carry_reasons'):
             decision += '\n非实质维护：' + '；'.join(confirmation['carry_reasons'])
+        for covered in confirmation.get('covered_changes', []):
+            decision += ('\n已定变化（' + covered['kind'] + '，当前消息'
+                         + str(covered['input_ref']['message_id']) + '）：' + covered['reason']
+                         + '\n适用原指导：' + covered['guidance_quote'])
     else:
         decision = '尚未获得对当前变化/完整说明的明确执行决定；先处理问答，不全面执行待决范围。'
     parts += ['## 当前决定', decision,
