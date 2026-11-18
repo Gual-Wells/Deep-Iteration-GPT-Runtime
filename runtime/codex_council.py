@@ -18,7 +18,8 @@ import time
 from typing import Any, Callable, Mapping, Sequence
 import uuid
 
-from . import codex_io
+from . import codex_collaboration, codex_io
+from .codex_lifecycle import content_message
 
 FORMAT = 'digr-native-council-1'
 TERMINAL = frozenset({'COMPLETE', 'PARTIAL', 'FAILED', 'BUDGET_STOPPED', 'TIMEOUT',
@@ -89,7 +90,7 @@ def _task(root: Path, *, active: bool = False) -> tuple[Path, dict, dict]:
 
 
 def _input_ref(lifecycle: Mapping[str, Any]) -> dict:
-    message = lifecycle['current_message']
+    message = content_message(lifecycle)
     return {'message_id': message['id'], 'sha256': message['source']['sha256'],
             'source_ref': message['source']['source_ref']}
 
@@ -181,11 +182,6 @@ def _save_packet(directory: Path, state: dict, sources: list[dict], lifecycle: d
     state['input_version'] = version
 
 
-def _allow(lifecycle: Mapping[str, Any]) -> None:
-    if lifecycle.get('claude_policy', {}).get('mode') != 'ALLOW':
-        raise ValueError('Claude council members are disabled by the current task choice; native council remains usable')
-
-
 def _cycle(state: dict) -> dict:
     return state['cycles'][state['cycle_id'] - 1]
 
@@ -226,7 +222,7 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
                    facts_path: Path | None = None, materials: Sequence[Path] = (),
                    enable_claude: bool = False, member_count: int = 2,
                    deadline_seconds: int = 300) -> dict:
-    """Create a real native work object. A single colon never enables Claude."""
+    """Create a native work object with only the channels allowed by its pin."""
     root, session, lifecycle = _task(root, active=True)
     _id('council_id', council_id)
     actors = list(native_actors)
@@ -239,13 +235,13 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
     if type(deadline_seconds) is not int or deadline_seconds < 1:
         raise ValueError('deadline_seconds must be a positive integer')
     if enable_claude:
-        _allow(lifecycle)
+        codex_collaboration.require_council_permission(lifecycle)
     directory = _directory(root, council_id)
     with _writer(directory):
         if (directory / 'council.json').exists():
             raise ValueError('Council already exists; resume its research line or choose a new identity')
         sources = [_snapshot(root / 'REQUEST.txt', 'HISTORICAL_TASK_ORIGIN'),
-                   {'kind': 'CURRENT_USER_INPUT', **dict(lifecycle['current_message']['source'])}]
+                   {'kind': 'CURRENT_USER_INPUT', **dict(content_message(lifecycle)['source'])}]
         if facts_path is not None:
             sources.append(_snapshot(facts_path, 'ACCEPTED_FACTS_AND_CONSTRAINTS'))
         sources.extend(_snapshot(path, 'SOURCE_MATERIAL') for path in materials)
@@ -336,7 +332,7 @@ def submit_native_initial(root: Path, council_id: str, *, actor: str, output_pat
 
 
 def require_member_scope(root: Path, scope: Mapping[str, Any], *, active: bool = True,
-                         exchange_id: str | None = None) -> dict:
+                         exchange_id: str | None = None, dispatch: bool = False) -> dict:
     """Validate an exact member/line/cycle/packet/round binding for Consult."""
     if not isinstance(scope, Mapping) or set(scope) != _SCOPE_KEYS:
         raise ValueError('Council member scope has an invalid schema')
@@ -362,11 +358,16 @@ def require_member_scope(root: Path, scope: Mapping[str, Any], *, active: bool =
         raise ValueError('Council member exchange is not the one registered for this round')
     _packet(directory, state, scope['input_version'])
     if active:
-        _allow(lifecycle)
+        codex_collaboration.require_council_permission(lifecycle)
         if (state['cycle_id'] != scope['cycle_id'] or state['input_version'] != scope['input_version']
                 or state['phase'] != 'INITIAL' or round_record['status'] not in {'PREPARING', 'PREPARED', 'RUNNING'}
                 or state['packets'][-1]['input_ref'] != _input_ref(lifecycle)):
             raise ValueError('Council member request is stale, sealed or needs a current-input reentry')
+        if (codex_collaboration.layered_policy(state['P_run'])
+                and _cycle(state)['members'][scope['member_id']]['status'] in TERMINAL):
+            raise ValueError('The council member is sealed for this cycle')
+        if dispatch and round_record['status'] != 'RUNNING':
+            raise ValueError('The registered council round is not dispatching its members')
         if datetime.now(timezone.utc) >= datetime.fromisoformat(_cycle(state)['deadline_at']):
             raise ValueError('Council deadline reached; seal known work without starting another paid request')
     return dict(scope)
@@ -424,7 +425,7 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
         raise ValueError('Unknown council round kind')
     with _writer(directory):
         _, state, lifecycle = _load(root, council_id, active=True)
-        _allow(lifecycle)
+        codex_collaboration.require_council_permission(lifecycle)
         cycle = _cycle(state)
         if not state['claude_enabled'] or state['phase'] != 'INITIAL':
             raise ValueError('This council has no active Claude member work')
@@ -517,7 +518,7 @@ def run_round(root: Path, council_id: str, *, round_id: int,
     from . import codex_consult as consult
     directory, _, _ = _load(root, council_id, active=True)
     with _writer(directory):
-        _, state, _ = _load(root, council_id, active=True)
+        _, state, lifecycle = _load(root, council_id, active=True)
         if type(round_id) is not int or round_id < 1 or round_id > len(state['rounds']):
             raise ValueError('Unknown council round')
         record = state['rounds'][round_id - 1]
@@ -528,6 +529,17 @@ def run_round(root: Path, council_id: str, *, round_id: int,
             require_member_scope(root, record['jobs'][member_id]['scope'])
             if not isinstance(jobs[member_id], Mapping) or not {'facts', 'ceiling_usd', 'split_path'} <= set(jobs[member_id]):
                 raise ValueError('Every member needs current facts, ceiling_usd and its actual Split plan')
+        if codex_collaboration.layered_policy(state['P_run']):
+            from . import codex_consult_budget
+            _, session, _ = _task(root, active=True)
+            for member_id in sorted(ready):
+                job = jobs[member_id]
+                exchange = record['jobs'][member_id]['exchange_id']
+                _, attempt, request = consult._load(root, exchange)
+                config, _ = consult._config(Path(job['config_path']) if job.get('config_path') else None)
+                authorized = codex_consult_budget.resolve(root, session, lifecycle, attempt, job['facts'],
+                    config.get('wallet_id'))
+                consult._budget(authorized, request, (), job['ceiling_usd'], canonical_wallet=True, wallet_only=True)
         record['status'] = 'RUNNING'
         record['started_at'] = _now()
         _write(directory / 'council.json', state)
@@ -541,7 +553,7 @@ def run_round(root: Path, council_id: str, *, round_id: int,
             consult.call_once(root, exchange_id, facts=job['facts'], ceiling_usd=job['ceiling_usd'],
                 split_path=Path(job['split_path']),
                 config_path=Path(job['config_path']) if job.get('config_path') else None,
-                on_public_event=emit)
+                on_public_event=emit, _council_round=(council_id, round_id))
             attempt, _ = _exchange_public(root, exchange_id)
             status = ('COMPLETE' if attempt['public_status'] == 'COMPLETE' else
                       'PARTIAL' if attempt['public_status'] == 'PARTIAL' else
@@ -568,9 +580,11 @@ def run_round(root: Path, council_id: str, *, round_id: int,
             if body is not None and outcome['exchange_id'] not in member['exchanges']:
                 member['exchanges'].append(outcome['exchange_id'])
                 member['last_researched_input_version'] = round_record['input_version']
-            if (round_record['cycle_id'] == current['cycle_id']
+            side = _cycle(current)['members'].get(member_id)
+            participates = (not codex_collaboration.layered_policy(current['P_run'])
+                            or side is not None and side['status'] not in TERMINAL)
+            if (participates and round_record['cycle_id'] == current['cycle_id']
                     and _cycle(current)['barrier'] is None and current['phase'] == 'INITIAL'):
-                side = _cycle(current)['members'][member_id]
                 side['exchange_id'] = outcome['exchange_id']
                 # A first complete response is not a completed research line.
                 if round_record['kind'] == 'FINAL' or outcome['status'] != 'COMPLETE':
@@ -632,6 +646,14 @@ def seal_member(root: Path, council_id: str, *, member_id: str, status: str,
             raise ValueError('Complete member research needs an actual observed public exchange')
         side['status'] = status
         side['sealed_at'] = _now()
+        if codex_collaboration.layered_policy(state['P_run']):
+            for record in state['rounds']:
+                job = record['jobs'].get(member_id)
+                if (record['cycle_id'] == state['cycle_id'] and record['status'] == 'PREPARED'
+                        and job and job['status'] == 'PREPARED'):
+                    job.update(status=status, transport_status='PREPARED', billing_status='NOT_ATTEMPTED')
+                    if all(other['status'] != 'PREPARED' for other in record['jobs'].values()):
+                        record.update(status='FINISHED', finished_at=_now())
         if research_path is not None:
             # A host-selected public research record is resumable evidence, not
             # a claim that the member authored a host summary.
@@ -792,7 +814,7 @@ def publish_event(root: Path, council_id: str, *, input_path: Path, kind: str,
             raise ValueError('Select actual affected member lines')
         prior = _packet(directory, state, state['input_version'])
         sources = [item for item in prior['sources'] if item['kind'] != 'CURRENT_USER_INPUT']
-        sources += [{'kind': 'CURRENT_USER_INPUT', **dict(lifecycle['current_message']['source'])}, source]
+        sources += [{'kind': 'CURRENT_USER_INPUT', **dict(content_message(lifecycle)['source'])}, source]
         _save_packet(directory, state, sources, lifecycle)
         event_id = len(state['events']) + 1
         state['events'].append({'id': event_id, 'kind': kind, 'source_sha256': source['sha256'],

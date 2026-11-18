@@ -54,6 +54,22 @@ def main(argv=None):
     split.add_argument('--exchange-id', required=True)
     split.add_argument('--input', type=Path, help='actual unbound native decision; no generated research text')
     split.add_argument('--out', type=Path, help='write a new bound plan; use together with --input')
+    preview = commands.add_parser('budget-preview', help='calculate a safe task fee proposal from current prepared requests')
+    preview.add_argument('--root', type=Path, required=True)
+    preview.add_argument('--input', type=Path, required=True,
+                         help='jobs, task_ceiling_usd, scope and configured wallet_id')
+    preview.add_argument('--out', type=Path, required=True, help='write a new proposal before asking the user')
+    approve = commands.add_parser('budget-approve', help='record the actual handled fee approval for a shown proposal')
+    approve.add_argument('--root', type=Path, required=True)
+    approve.add_argument('--preview', type=Path, required=True)
+    limit = commands.add_parser('budget-limit', help='record an actual narrower task spending limit, even across layer changes')
+    limit.add_argument('--root', type=Path, required=True)
+    for command in (approve, limit):
+        command.add_argument('--reply-file', type=Path, required=True)
+        command.add_argument('--source', required=True)
+        command.add_argument('--quote', required=True)
+    approve.add_argument('--task-ceiling-usd', type=float, help='actual lower amount selected by the user, if any')
+    limit.add_argument('--task-ceiling-usd', type=float, required=True)
     view = commands.add_parser('inspect', help='read public source/output facts and all task exchange costs; no network or credentials')
     view.add_argument('--root', type=Path, required=True)
     view.add_argument('--exchange-id')
@@ -82,8 +98,9 @@ def main(argv=None):
             compact = tuple(map(int, session['P_run'].split('@')[0].split('.'))) >= (0, 16, 0) and not args.raw_events
             relay = None
             if live and compact:
-                from runtime.codex_live import ParagraphRelay
-                relay = ParagraphRelay(emit)
+                from runtime.codex_live import ParagraphRelay, stable_live
+                stable = stable_live(session['P_run'])
+                relay = ParagraphRelay(emit, stable=stable)
                 requested_model = read(args.root / 'consult/exchanges' / args.exchange_id / 'request.json')['model']
                 emit = lambda event: relay.feed({**event, 'requested_model': requested_model})
             result = consult.call_once(args.root, args.exchange_id, facts=read(args.facts),
@@ -98,7 +115,8 @@ def main(argv=None):
                         'public_path': result.get('public_path'), 'public_status': attempt.get('public_status'),
                         'billing_status': attempt.get('billing_status'), 'known_cost_usd': attempt.get('known_cost_usd'),
                         'identity': result.get('sonnet_model_identity'),
-                        'recovery': 'live read --reader commentary --exchange-id ' + args.exchange_id,
+                        'recovery': 'live read --reader commentary --exchange-id ' + args.exchange_id
+                                    + (' --format commentary' if stable else ''),
                         'visibility': 'stdout is not user-visible commentary; host must relay actual text'},
                         ensure_ascii=False, allow_nan=False), flush=True)
                 else:
@@ -109,6 +127,19 @@ def main(argv=None):
                 raise ValueError('split --input and --out must be used together')
             result = (consult.bind_split_decision(args.root, args.exchange_id,
                 input_path=args.input, output=args.out) if args.input else consult.split_brief(args.root, args.exchange_id))
+        elif args.command in {'budget-preview', 'budget-approve', 'budget-limit'}:
+            from runtime import codex_consult_budget
+            if args.command == 'budget-preview':
+                supplied = read(args.input)
+                result = codex_consult_budget.preview(args.root, jobs=supplied['jobs'],
+                    task_ceiling_usd=supplied['task_ceiling_usd'], scope=supplied['scope'], wallet_id=supplied['wallet_id'])
+                consult._write(args.out, result, new=True)
+            else:
+                text = args.reply_file.read_bytes().decode('utf-8-sig')
+                decide = {'user_text': text, 'source': args.source, 'quote': args.quote,
+                          'task_ceiling_usd': args.task_ceiling_usd}
+                result = (codex_consult_budget.approve(args.root, preview_path=args.preview, **decide)
+                          if args.command == 'budget-approve' else codex_consult_budget.record_limit(args.root, **decide))
         elif args.command == 'inspect':
             result = consult.inspect_exchange(args.root, args.exchange_id)
         elif args.command == 'recover-preflight':

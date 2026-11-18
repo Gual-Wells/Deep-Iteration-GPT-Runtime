@@ -61,7 +61,7 @@ class ClaudeSelectionTests(unittest.TestCase):
                     self.assertEqual(value['parameter_text'], '(Less)(X)')
                     self.assertEqual(value['depth_defaults']['preset'], 'Less')
                     self.assertEqual(value['delivery_selection']['target'], 'gmail')
-                    self.assertEqual(value['claude_selection'], 'ALLOW' if len(separator) == 2 else 'DENY')
+                    self.assertEqual(value['claude_selection'], 'ALLOW' if len(separator) == 2 else 'COUNCIL_ONLY')
         for raw in ('DIGR:: ', 'DIGR：：', 'DIGR:::task', 'DIGR：:：task'):
             self.assertEqual(classify_invocation(raw)['classification'], 'INVALID')
 
@@ -69,7 +69,7 @@ class ClaudeSelectionTests(unittest.TestCase):
         for raw in ('“DIGR：：任务”是历史引文', '请解释DIGR：：的区别', 'digr::task', 'Digr::task',
                     'DIGR现在的入口:::是讨论内容'):
             self.assertEqual(classify_invocation(raw)['classification'], 'NATIVE')
-        self.assertEqual(classify_invocation('DIGR：正文提及DIGR：：')['claude_selection'], 'DENY')
+        self.assertEqual(classify_invocation('DIGR：正文提及DIGR：：')['claude_selection'], 'COUNCIL_ONLY')
         self.assertEqual(self.server.post_calls, [])
         self.assertFalse((self.root / 'consult').exists())
 

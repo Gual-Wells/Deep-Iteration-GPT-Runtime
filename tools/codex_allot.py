@@ -1,4 +1,4 @@
-"""Select native-host effort per meaningful work block; never calls a model."""
+"""Run the historical Allot tool for frozen task pins through 0.18."""
 from pathlib import Path
 import argparse
 import json

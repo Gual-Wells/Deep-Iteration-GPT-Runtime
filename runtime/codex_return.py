@@ -65,7 +65,7 @@ def _tool_paths() -> set[Path]:
     files.update({runtime.parent / 'tools' / name for name in ('codex.py', 'codex_return.py')})
     files.update(path for path in (runtime / 'assets').glob('codex_timeline*') if path.is_file())
     for name in ('codex_usage', 'codex_council', 'codex_allot', 'codex_wallet', 'codex_live', 'codex_io',
-                 'codex_guidance', 'codex_consult', 'codex_permissions'):
+                 'codex_guidance', 'codex_consult', 'codex_permissions', 'codex_consult_budget'):
         path = runtime / (name + '.py')
         if path.is_file():
             files.add(path)
@@ -89,13 +89,19 @@ def _native_state(root: Path) -> dict[str, Any]:
     if metadata.get('decisions'):
         files.add(_path(root, metadata['decisions']))
     if _resources_enabled(metadata):
+        from .codex_collaboration import layered_policy
         from .codex_usage import usage_dependency_paths
         files.update(usage_dependency_paths(root))
-        for folder in ('allot', 'councils', 'live'):
+        layered = layered_policy(metadata['P_run'])
+        folders = ('councils', 'live') if layered else ('allot', 'councils', 'live')
+        for folder in folders:
             location = root / folder
             if location.is_dir():
                 files.update(path for path in location.rglob('*')
                              if path.is_file() and path.suffix in {'.json', '.jsonl', '.md', '.txt'})
+        if layered:
+            files.update(path for name in ('budget-approval.json', 'budget-limit.json')
+                         if (path := root / 'consult' / name).is_file())
     exchanges = root / 'consult' / 'exchanges'
     if exchanges.is_dir():
         for exchange in exchanges.iterdir():

@@ -1,24 +1,18 @@
-# DIGR for Codex · 0.18.0
+# DIGR for Codex · Stable 1.0.0
 
-0.18以逻辑论证决定档位适配和方案选择，不把测试或未来反馈变成结论资格。提高限制的阻断准入要求，FOUNDATION不再默认将每个问题设为blocking；模型/顾问建议不能自行升级为硬前置。Allot默认固定为6.2 Sol/max，显式6.1保留，旧pin政策及哈希不迁移；同时修正早期Claude同任务来源绑定、迟到用量归属与公开正文续读。[本版设计](codex/DESIGN_0_18.md)。
+稳定版的执行入口见 [PROTOCOL](codex/PROTOCOL.md)，原有功能的接续见[兼容范围](docs/CODEX_STABLE_COMPATIBILITY.md)。
 
-0.17将模型策略直接落实[Allot](codex/ALLOT.md)：6.1 Sol/max、6.2 Sol/max为智力主力；明确大批量非智力受控重复劳动才降effort，具体Max不足或真实任务反馈才升级实际模型。`DO：`/`DO:`直接补充当前任务，不重开前置、不重置pin或授权。五档责任、根Stable和旧pin保留。[本版设计](codex/DESIGN_0_17.md)。
+`DIGR：任务` 可在真实共享钱包可用范围内邀请 Claude 作第一层子议会成员，引入外部证据和替代解释。原生初议与子议会独立推进，由原生议会取得真实原文后再议。`DIGR：：任务` 可同时采用两层，先向用户说明实际范围和保守费用上界，取得决定后再调用。第二层按实际委托让 Claude 指导内容取舍或出稿。每次提交前完成本机 Split，Codex 负责必要原件、核对与工程。详见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
 
-0.16把Claude研究成员与正式顾问身份分开：同一原生议会的独立初议、内嵌子议会、屏障与原生再议具有可恢复状态；实际调用使用每exchange锁与共享钱包短事务。新增任务用量返回、原生薄Allot与可导出的Chat同源短/深指令。[确定设计](codex/DESIGN_0_16.md)。单/双冒号、X和旧pin保持各自版本语义。
+Codex 按当前模型和推理设置工作。五档决定研究责任。预见超巨量批任务时，可依据材料、分批收益和验收条件设计多档协作。明确的任务更新用 `DO：` 接入现有任务，费用答复只取得相应费用许可。冻结旧任务按完整原 pin 与工具恢复。历史变更见 [CHANGELOG](CHANGELOG.md)。
 
-`DIGR：任务`表示由Codex按既定规格完成执行和工程、不调用Claude、不擅加主观创作；`DIGR：：任务`中凡有实质主观内容判断，都必须请教Claude并落实其有效意见。取材、事实核验、文件组装、工具操作和验证由Codex承担。既有适用指导可直接实现，不为机械步骤制造调用；咨询义务不新增预算。ASCII `:` / `::`等价，五档和X栏仍可置于分隔符前。无前缀补充继承选择，真实用户切换保留原任务；旧pin不静默迁移。[使用说明](codex/HELP.md)。
+概念、机制、协议和方案分析以逻辑论证完成。真实检验用于核对明确事实与实际工程，限制只约束实际受影响的决定或行动。已有明确委托和适用的局部工作继续处理。[共同分析方法](docs/LOGIC_FIRST_ANALYSIS.md)。
 
-0.13起的逐提交Split现统一进入DIGR，所有实际Claude通路在每次提交前采用[本机原生Split](codex/SPLIT.md)：Codex研究任务分工、完成必要本机工作，给Claude最小充分的原件和内容问题；工具逐次绑定请求与实际成果，缺少或过期计划不能发送。`consult split --input … --out …`机械附加当前绑定，`call --split-plan …`提交前本机检查。保留Claude内容判断、0.12.1公开增量转播及文本优先取材，旧pin按原版本接续；[完整合成示例](codex/examples/split/README.md)。
-
-0.12起，概念、机制、协议和方案分析以逻辑论证为默认判断基础，论证充分即可直接给结论与完成任务；不把效果实验或后续试用设成默认资格。新版返回第四段采用“论证与适用范围”，保留旧输入兼容。[共同方法](docs/LOGIC_FIRST_ANALYSIS.md)同步进入stable、Codex及本机日常约定。
-
-0.14统一使用`DIGR`：实际采用Sonnet即触发内容协作与相应工程要求，真实整篇论文对象自然接入论文内容驱动。旧C/P拼写兼容，旧pin保留原语义。Light／Less／Default／More／Max控制原生投入，沿实际授权调用外部模型。[协作约定](codex/CONSULT.md)。
-
-本次把当前理解关系、现稿纠正与历史案例证据的方法放进共同核心，并按用途更新论文、知识接续、个人材料、ESP和Voice技能。[全族适用范围](docs/CODEX_FAMILY_UPGRADE_0_11_1.md)区分共同方法与Consult专属权限。五档投入不暗降模型能力或扩张费用授权；裸调用仍为Default=N12/R4/D3/V3/L3/M1。
+共同核心承接当前理解关系、现稿纠正与历史案例证据，论文、知识接续、个人材料、ESP 和 Voice 按各自用途使用这些方法。[全族适用范围](docs/CODEX_FAMILY_UPGRADE_0_11_1.md)区分共同方法与Consult专属权限。五档投入不暗降模型能力或扩张费用授权；裸调用仍为Default=N12/R4/D3/V3/L3/M1。
 
 0.9.0把[X文件交付](codex/DELIVERY.md)接入DIGR、DIGRP：无`X`在当前聊天返回文件；`DIGR(X):…`、`DIGRP(X):…`和`(X=Gmail)`均发送到本机配置的本人Gmail。常规投入参数后可另接一个X栏，例如`DIGRP(N=16,R=4)(X=Gmail):…`。X只控制任务约定的最终文件；没有文件时保留文字答复，不额外造文件。本版仅实现Gmail，个人目标在私有本机配置中，任务建立时解析并保存。
 
-[DIGR 论文0.6.0](paper/PROTOCOL.md)由Sonnet根据原论文和用户用途原生驱动内容与阅读路线，取消预设小m职责及其映射门槛。Codex自主取材、复算、制作和核验，每篇仍有完整M及一份[标准页桌面PDF](paper/PDF_DESIGN.md)。无X的完整论文可直接本地返回；有X时逐篇发送Gmail并读回，所有论文及公共工作完成后才结束父任务。交付工具在外发前保存发送状态，响应不明先对账；真实发送使用已有Gmail原生连接器。[操作技能](.agents/skills/digr-delivery/SKILL.md)随同一不可变pin提供。旧pin和既有Gmail/分卷历史保持原身份。
+[DIGR 论文0.6.1](paper/PROTOCOL.md)由Sonnet根据原论文和用户用途原生驱动内容与阅读路线，取消预设小m职责及其映射门槛。Codex自主取材、复算、制作和核验，每篇仍有完整M及一份[标准页桌面PDF](paper/PDF_DESIGN.md)。无X的完整论文可直接本地返回；有X时逐篇发送Gmail并读回，所有论文及公共工作完成后才结束父任务。交付工具在外发前保存发送状态，响应不明先对账；真实发送使用已有Gmail原生连接器。[操作技能](.agents/skills/digr-delivery/SKILL.md)随同一不可变pin提供。旧pin和既有Gmail/分卷历史保持原身份。
 
 0.8.3接入社区 Anti-Defensive Writing：有据主张先行，删除重复辩护、叠加保留和自我贬低，必要限定准确落在相关主张。核心规则进入必读PROTOCOL、RETURN及普通任务轻量约定；中英双语完整技能连同不可变来源和MIT许可随分发提供。[来源与接入说明](docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md)。
 
@@ -34,7 +28,7 @@
 
 DIGR 是一套由模型承担研究、判断与制作的工作协议。它鼓励深入真实材料，发展有内容的候选，认真重开整条路线，并让独立研究产生实际后果。目标是用户能拿来使用的结果：一份有依据的研究、一件完整作品，或经过真实路径验证的修复。
 
-本分支提供 **Codex 0.12.0 实验通道**与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
+本分支提供 Codex 候选通道与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
 
 [附属项目入口](addons/README.md)列出 Voice Companion、Paper Knowledge、[English-Spoken-Preprint](spoken-preprint/README.md) 与 [Personal Context](personal-context/README.md)。ESP 0.2 以目标领域中的困难处理为选材中心，提供原场景与独立双语学习听稿；个人资料附属可提供有来源的最小人物视图，保持可选关系。项目回原数据接续，不互相强绑；独立的[真人参与实训](research/codex-participation/README.md)目前只作设计探索。附属各自版本化，不改根 stable 语义。
 
@@ -43,7 +37,7 @@ DIGR 是一套由模型承担研究、判断与制作的工作协议。它鼓励
 | 你现在要做什么 | 从哪里开始 |
 | --- | --- |
 | 在普通任务中采用这些交付偏好 | 将 [轻量工作约定](codex/AGENTS.light.md) 合并到适用的 AGENTS 指令；照常提问，不建立 DIGR 参数与计时。 |
-| 明确让 Codex 为一个任务投入深研究与独立协作 | 按下节启用 [实验路由](codex/ROUTER.experimental.txt)，再发送显式任务。当前协议入口为 [codex/manifest.json](codex/manifest.json)。 |
+| 明确让 Codex 为一个任务投入深研究与独立协作 | 按下节启用 [Codex 路由](codex/ROUTER.experimental.txt)，再发送显式任务。当前协议入口为 [codex/manifest.json](codex/manifest.json)。 |
 | 只想取回材料、整理正在进行的工作或接续一个任务 | 使用下方的本地工具。工作台可直接用于普通任务。 |
 | 在英语语音里需要伙伴帮忙接话、构思或共同创作 | 使用独立的 [Voice Companion](voice/README.md)：短常驻核待命，完整技能按需；附可直接上传的自足文件，不启动 DIGR 参数。 |
 | 继续使用既有 stable 通道 | 使用根 [manifest.json](manifest.json)、[启动协议](entry/STARTUP.md) 与 [帮助](entry/HELP.md)。根版本保持 **5.0.0-alpha.5**。 |
@@ -52,7 +46,7 @@ Codex 与根 stable 分别版本化。选择 Codex 时，按 `codex/` 解释参�
 
 ## 在 Codex 中开始
 
-1. 明确选用本实验通道后，将 [ROUTER.experimental.txt](codex/ROUTER.experimental.txt) 放入适用的宿主 AGENTS 指令，**替换已有 DIGR 路由段**，日常偏好独立保留。一个入口只保留一个通道。可用 `python -B tools/codex.py profile export codex-agents --out D:/task/AGENTS-codex.txt` 一次导出薄路由与轻量块，合并时保留其它个人约定；导出不自动安装。
+1. 明确选用本 Codex 通道后，将 [ROUTER.experimental.txt](codex/ROUTER.experimental.txt) 放入适用的宿主 AGENTS 指令，**替换已有 DIGR 路由段**，日常偏好独立保留。一个入口只保留一个通道。可用 `python -B tools/codex.py profile export codex-agents --out D:/task/AGENTS-codex.txt` 一次导出薄路由与轻量块，合并时保留其它个人约定；导出不自动安装。
 2. 在宿主实际加载该指令的新运行中发送 `DIGR/help`，查看当前仓库版本的调用说明。路由文件与 CLI 都不会自动安装或改写全局配置；已有运行也不能据此视为已经加载新指令。
 3. 发送一项真实任务，例如：
 
@@ -67,7 +61,7 @@ DIGR：比较这个项目的两种发布方案，实际验证关键路径，给�
 | 调用 | 含义 |
 | --- | --- |
 | `DIGR：任务` | 无参数深执行，从 N12/R4/D3/V3/L3/M1 补齐。 |
-| `DIGR：用Sonnet完整处理论文` | 按实际整篇对象自然接入论文内容驱动；一篇一份完整标准页PDF。 |
+| `DIGR：：用 Sonnet 完整处理论文` | 按第二层内容制作和已批准的费用范围接入论文增量，一篇一份完整标准页 PDF。 |
 | `DIGR(M(2))：任务` | 两条完整独立 Main，各自初始化、研究制作、承担本线责任并收敛，然后比较。 |
 | `DIGR(target=60min)：任务` | 软时间目标，模型仍按结果决定是否继续。 |
 | `DIGR(min=60min)：任务` | 有效工作硬下限，需要真实时间证据。 |
@@ -131,9 +125,9 @@ python -B tools/codex.py acquire --stage execution --continue-from D:/task/acqui
 
 `profile check` 校验 checkout 的版本、声明文件、哈希与聚合包，结果范围为 `LOCAL_FILE_INTEGRITY`。
 
-`acquire` 真正联网解析实验分支：直接 REST 同轮核对 Git-ref 与 Branches SHA，然后只读取该 SHA 的文件。成功后，新目录中的 `acquisition.json` 给出版本、SHA、取得的文件与请求观察，`codex/` 中保存实际原文。`startup` 只取得启动所需文件；后续是否读取 help 或完整执行正文由同 pin 启动协议决定。CLI 的 `help` / `execution` stage 是文件获取范围，不会调用模型。
+`acquire` 真正联网解析 Codex 分支：直接 REST 同轮核对 Git-ref 与 Branches SHA，然后只读取该 SHA 的文件。成功后，新目录中的 `acquisition.json` 给出版本、SHA、取得的文件与请求观察，`codex/` 中保存实际原文。`startup` 只取得启动所需文件；后续是否读取 help 或完整执行正文由同 pin 启动协议决定。CLI 的 `help` / `execution` stage 是文件获取范围，不会调用模型。
 
-获取失败就保留失败；本地检查不能替代当前仓库获取。不带continue-from的独立重跑会重新解析HEAD；同次获取用continue-from保持原pin。保存的接续目录不能代替一条新前缀消息要求的在线获取。宿主也可使用已经连接的真实 GitHub connector；传输规则见 [实验路由](codex/ROUTER.experimental.txt)。
+获取失败就保留失败；本地检查不能替代当前仓库获取。不带continue-from的独立重跑会重新解析HEAD；同次获取用continue-from保持原pin。保存的接续目录不能代替一条新前缀消息要求的在线获取。宿主也可使用已经连接的真实 GitHub connector；传输规则见 [Codex 路由](codex/ROUTER.experimental.txt)。
 
 ### 接续长任务与计时
 
@@ -153,7 +147,7 @@ python -B tools/codex.py acquire --stage execution --continue-from D:/task/acqui
 
 ## 协议原文与仓库维护
 
-Codex 的当前执行正文是 [PROTOCOL](codex/PROTOCOL.md)、[CHARACTER](codex/CHARACTER.md)、[PARAMETERS](codex/PARAMETERS.md)、[COLLABORATION](codex/COLLABORATION.md) 和 [PERMISSIONS](codex/PERMISSIONS.md)。执行时按同一不可变 pin 取得全部正文，也可验证后读取 manifest 声明的完整聚合包；[WORKBENCH](codex/WORKBENCH.md) 按需使用。
+Codex 的执行正文以 [PROTOCOL](codex/PROTOCOL.md) 为入口，按 [manifest](codex/manifest.json) 取得同一不可变 pin 的全部核心。也可读取通过完整性验证的聚合包。[WORKBENCH](codex/WORKBENCH.md) 提供操作说明。
 
 架构与迁移选择见 [Codex适配说明](docs/CODEX_ADAPTATION.md)。维护代码时，在安装 `requirements-test.txt` 的测试环境运行；修改Codex正文后先显式重建本地聚合包：
 
@@ -163,6 +157,6 @@ python -B -X utf8 -m unittest discover -s tests -p "test_*.py"
 python -B -X utf8 tests/validate_repo.py
 ```
 
-源码发布工具 [tools/build_release.py](tools/build_release.py) 同时生成Codex聚合包/散列和根stable分发材料，排除本机私有.cache与Git入口。测试、版本与哈希核查验证相应代码和分发行为；0.6.0 是否持续改善跨任务结果，仍需实际任务、成品与使用观察支持。
+源码发布工具 [tools/build_release.py](tools/build_release.py) 同时生成Codex聚合包/散列和根stable分发材料，排除本机私有.cache与Git入口。测试、版本与哈希核查验证相应代码和分发行为；实际发生的跨任务效果按所观察的范围陈述。
 
 Codex 0.12.1 默认流式读取并实时转播Claude公开正文；宿主先完成文本/Markdown、公式及必要图表裁取，避免以整页图批量转移前处理和视觉成本。旧pin维持旧传输；新论文增量为0.5.3。

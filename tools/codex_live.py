@@ -22,7 +22,10 @@ def main(argv=None):
     read.add_argument('--root', type=Path, required=True)
     read.add_argument('--reader', required=True)
     read.add_argument('--exchange-id')
-    read.add_argument('--max-chars', type=int, default=8000)
+    read.add_argument('--max-chars', type=int)
+    read.add_argument('--format', choices=('json', 'commentary'), default='json',
+                      help='commentary emits one metadata line followed by ready-to-post Markdown')
+    read.add_argument('--catch-up', action='store_true', help='label an actual recovery from the same source')
     ack = sub.add_parser('ack')
     ack.add_argument('--root', type=Path, required=True)
     ack.add_argument('--delivery-id', required=True)
@@ -34,7 +37,19 @@ def main(argv=None):
             value = json.loads(args.input.read_text('utf-8-sig'))
             result = live.emit_work(args.root, **value)
         elif args.action == 'read':
-            result = live.pending(args.root, reader=args.reader, exchange_id=args.exchange_id, max_chars=args.max_chars)
+            commentary = args.format == 'commentary'
+            max_chars = args.max_chars if args.max_chars is not None else (2000 if commentary else 8000)
+            result = live.pending(args.root, reader=args.reader, exchange_id=args.exchange_id,
+                                  max_chars=max_chars, catch_up=args.catch_up)
+            if commentary:
+                header = {key: result.get(key) for key in ('delivery_id', 'visibility', 'remaining')}
+                output = json.dumps(header, ensure_ascii=False) + '\n' + result['display_text']
+                # Preserve collaborator newlines exactly, including on Windows.
+                if hasattr(sys.stdout, 'buffer'):
+                    sys.stdout.buffer.write(output.encode('utf-8'))
+                else:
+                    sys.stdout.write(output)
+                return 0
         else:
             result = live.acknowledge(args.root, args.delivery_id, evidence_ref=args.evidence_ref)
             if args.compact:

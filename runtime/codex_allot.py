@@ -1,4 +1,4 @@
-"""Thin native-host effort selection, with observed execution kept separate.
+"""Historical native-host effort selection for pins through 0.18.
 
 No model calls or config rewrites. The host applies a returned payload through
 its native agent interface; only a subsequent observation records what ran.
@@ -26,10 +26,18 @@ def _write(path, value):
         stream.write(_json(value) + b'\n')
 
 
-def _task(root):
+def _legacy_task(root):
+    from .codex_collaboration import layered_policy
     from .codex_session import _session
-    from .codex_lifecycle import load_lifecycle, require_active
     root, session = _session(root)
+    if layered_policy(session['P_run']):
+        raise ValueError('Allot is retired for this pin; use the active Codex model settings')
+    return root, session
+
+
+def _task(root):
+    from .codex_lifecycle import load_lifecycle, require_active
+    root, session = _legacy_task(root)
     lifecycle = load_lifecycle(root)
     require_active(root)
     if session.get('foundation_required'):
@@ -150,8 +158,7 @@ def _policy_for_pin(p_run, *, explicit=False):
 
 def current_policy(root: Path) -> dict:
     """Read the immutable task pin or an explicit, source-bound task override."""
-    from .codex_session import _session
-    root, session = _session(root)
+    root, session = _legacy_task(root)
     p_run = session['P_run']
     path = root / 'allot' / 'policy.json'
     if path.exists():
@@ -416,9 +423,8 @@ def ready(root: Path, block_id: str, capabilities: Mapping) -> dict:
 def observe(root: Path, block_id: str, observation: Mapping) -> dict:
     # New-policy observations record already performed facts, even if a DO,
     # pause or close has superseded permission to dispatch the old selection.
-    from .codex_session import _session
     from .codex_lifecycle import load_lifecycle
-    root, session = _session(root)
+    root, session = _legacy_task(root)
     lifecycle = load_lifecycle(root)
     if not _ID.fullmatch(block_id):
         raise ValueError('invalid block id')
@@ -471,10 +477,9 @@ def observe(root: Path, block_id: str, observation: Mapping) -> dict:
 
 
 def record_feedback(root: Path, block_id: str, value: Mapping) -> dict:
-    from .codex_session import _session
     from .codex_lifecycle import load_lifecycle
     from .codex_allot_labor import record_feedback as save_feedback
-    root, _ = _session(root)
+    root, _ = _legacy_task(root)
     if not _ID.fullmatch(block_id):
         raise ValueError('invalid source block id')
     selected = json.loads((root / 'allot' / block_id / 'selection.json').read_text(encoding='utf-8'))
@@ -565,8 +570,7 @@ def context_summary(root: Path, *, limit: int = 16) -> dict:
 
 
 def inspect(root: Path) -> dict:
-    from .codex_session import _session
-    root, session = _session(root)
+    root, session = _legacy_task(root)
     rows = []
     for path in sorted((root / 'allot').glob('*/selection.json')):
         row = json.loads(path.read_text(encoding='utf-8'))

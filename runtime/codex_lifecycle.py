@@ -19,7 +19,7 @@ from .validation import require_nonempty_text
 FORMAT = 'digr-codex-lifecycle-1'
 TERMINAL = frozenset({'CLOSED', 'STOPPED', 'CANCELLED'})
 STATUSES = frozenset({'ACTIVE', 'PAUSED', 'ORDINARY', *TERMINAL})
-MESSAGE_ACTIONS = frozenset({'continue', 'ordinary', 'revise', 'pause', 'resume', 'stop', 'cancel'})
+MESSAGE_ACTIONS = frozenset({'continue', 'ordinary', 'revise', 'pause', 'resume', 'stop', 'cancel', 'budget'})
 RECENT_LIMIT = 8
 _PIN = re.compile(r'[^@\s]+@[0-9a-f]{40}')
 
@@ -67,14 +67,14 @@ def _apply_claude_selection(value: dict, metadata: Mapping[str, Any], message: M
     is a caller's interpretation of this selected user message, not a grant
     inferred from credentials, task materials or another model's response.
     """
-    from .codex_collaboration import delimiter_policy
+    from .codex_collaboration import allowed_selections, delimiter_policy, layered_policy
     from .codex_profile import classify_invocation
     if not delimiter_policy(metadata['P_run']):
         if selection is not None:
             raise ValueError('Claude delimiter selection requires a 0.15+ task; old pins retain their rules')
         return
-    if selection not in {None, 'ALLOW', 'DENY'}:
-        raise ValueError('Claude selection must be ALLOW or DENY')
+    if selection is not None and selection not in allowed_selections(metadata['P_run']):
+        raise ValueError('Claude selection is unavailable under this frozen task pin')
     surface = classify_invocation(message['source']['text'], p_run=metadata['P_run'])
     if surface['classification'] in {'HELP', 'INVALID'} and selection is not None:
         raise ValueError('help/malformed source cannot change Claude selection')
@@ -84,17 +84,40 @@ def _apply_claude_selection(value: dict, metadata: Mapping[str, Any], message: M
             raise ValueError('Claude choice conflicts with the current user separator')
         selection = incoming
     if selection is not None:
+        layered = layered_policy(metadata['P_run'])
+        previous_mode = value.get('claude_policy', {}).get('mode')
         value['claude_policy'] = {'mode': selection, 'message_id': message['id'],
-            'work_profile': 'CLAUDE_GUIDED' if selection == 'ALLOW' else 'EXECUTION',
             'source': dict(message['source']),
             'basis': 'INVOCATION_SEPARATOR' if incoming is not None else 'CURRENT_USER_DECISION',
             'scope': 'current selected user choice; not authentication or fee authorization'}
+        if not layered:
+            value['claude_policy']['work_profile'] = 'CLAUDE_GUIDED' if selection == 'ALLOW' else 'EXECUTION'
+        if layered and (selection == 'DENY' or previous_mode == 'ALLOW' and selection != 'ALLOW'):
+            value['latest_claude_revocation_message_id'] = message['id']
+        if layered and selection == 'COUNCIL_ONLY':
+            value['claude_policy']['scope'] = 'Claude council roles within the existing wallet and effective limits'
 
 
 def _input_ref(message: Mapping[str, Any]) -> dict[str, Any]:
     """A stable task input anchor; ordinary post-return chat does not replace it."""
     return {'message_id': message['id'], 'source_sha256': message['source']['sha256'],
             'source_ref': message['source']['source_ref'], 'path': message['source']['path']}
+
+
+def content_message(lifecycle: Mapping[str, Any]) -> Mapping[str, Any]:
+    """Read the substantive work input separately from status and fee replies."""
+    from .codex_collaboration import layered_policy
+    if layered_policy(lifecycle['P_run']):
+        return lifecycle['task_input_message']
+    return lifecycle['current_message']
+
+
+def _set_task_input(value: dict) -> None:
+    from .codex_collaboration import layered_policy
+    current = value['current_message']
+    value['task_input_ref'] = _input_ref(current)
+    if layered_policy(value['P_run']):
+        value['task_input_message'] = {'id': current['id'], 'source': dict(current['source'])}
 
 
 def _message_surface(text: str, lifecycle: Mapping[str, Any], *, route_pending: bool) -> dict[str, Any]:
@@ -143,7 +166,7 @@ def initialize_lifecycle(root: Path, metadata: Mapping[str, Any]) -> dict[str, A
              'scope': 'managed continuation only; not host interception or authenticated consent'}
     value['current_message'].update({key: surface[key] for key in
         ('invocation_key', 'addon_hint', 'addon_selection') if key in surface})
-    value['task_input_ref'] = _input_ref(value['current_message'])
+    _set_task_input(value)
     _apply_claude_selection(value, metadata, value['current_message'])
     if metadata.get('delivery_contract') == 'x-files-v1':
         value['delivery_selection'] = metadata['delivery_selection']
@@ -180,13 +203,14 @@ def load_lifecycle(root: Path) -> dict[str, Any]:
     supplement = parse_do_supplement(current['source']['text'], p_run=metadata['P_run'])
     if current.get('supplement') != supplement:
         raise ValueError('DO supplement does not match the selected user source')
-    from .codex_collaboration import delimiter_policy
+    from .codex_collaboration import allowed_selections, delimiter_policy, layered_policy
     if delimiter_policy(metadata['P_run']):
         policy = value.get('claude_policy', {})
-        if policy.get('mode') not in {'ALLOW', 'DENY'} or policy.get('basis') not in {
+        if policy.get('mode') not in allowed_selections(metadata['P_run']) or policy.get('basis') not in {
                 'INVOCATION_SEPARATOR', 'CURRENT_USER_DECISION'}:
             raise ValueError('missing/invalid current Claude choice')
-        if policy.get('work_profile') != ('CLAUDE_GUIDED' if policy['mode'] == 'ALLOW' else 'EXECUTION'):
+        if (not layered_policy(metadata['P_run'])
+                and policy.get('work_profile') != ('CLAUDE_GUIDED' if policy['mode'] == 'ALLOW' else 'EXECUTION')):
             raise ValueError('Claude work profile differs from its current choice')
         _validate_snapshot(policy['source'])
         observed = value['seen_source_refs'].get(policy['source']['source_ref'], {})
@@ -198,6 +222,18 @@ def load_lifecycle(root: Path) -> dict[str, Any]:
             selected = classify_invocation(policy['source']['text'], p_run=metadata['P_run'])
             if selected.get('claude_selection') != policy['mode']:
                 raise ValueError('Claude choice differs from its user separator')
+    if layered_policy(metadata['P_run']):
+        work = content_message(value)
+        _validate_snapshot(work['source'])
+        observed = value['seen_source_refs'].get(work['source']['source_ref'], {})
+        if (type(work['id']) is not int or work['id'] > value['handled_message_id']
+                or observed != {'sha256': work['source']['sha256'], 'message_id': work['id']}
+                or value['task_input_ref'] != _input_ref(work)):
+            raise ValueError('current work input is not bound to an actual handled user source')
+        for key in ('latest_budget_message_id', 'latest_claude_revocation_message_id', 'latest_revision_message_id'):
+            decision = value.get(key)
+            if decision is not None and (type(decision) is not int or not 0 < decision <= value['handled_message_id']):
+                raise ValueError('decision references must identify a handled user input')
     if value['status'] in TERMINAL and not value.get('closure'):
         raise ValueError('terminal lifecycle lacks its actual close record')
     value['managed'] = True
@@ -281,7 +317,7 @@ def consume_decision_message(root: Path, *, message_id: int, user_text: str,
     from .codex_session import _session
     _apply_claude_selection(value, _session(root)[1], value['current_message'])
     value['handled_message_id'] = message_id
-    value['task_input_ref'] = _input_ref(value['current_message'])
+    _set_task_input(value)
     root = Path(root).resolve()
     _save(root, value)
     if kind in {'answer', 'revoke'}:
@@ -447,7 +483,15 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
     if action == 'continue' and value['status'] == 'PAUSED':
         raise ValueError('paused task needs an actual resume decision, not implicit continuation')
     from .codex_session import _session, read_delivery_registry
+    from .codex_collaboration import layered_policy
     metadata = _session(root)[1]
+    layered = layered_policy(metadata['P_run'])
+    if action == 'budget':
+        if (not layered or value['status'] != 'ACTIVE'
+                or message['surface'] != 'NATIVE' or message['route_required']
+                or claude_selection is not None or delivery_selection is not None or destinations is not None):
+            raise ValueError('Budget handling is for a standalone fee-only reply on an active Stable task')
+        value['latest_budget_message_id'] = message_id
     if action not in {'stop', 'cancel'} and value['status'] not in TERMINAL:
         _apply_claude_selection(value, metadata, message, claude_selection)
     elif claude_selection is not None:
@@ -489,9 +533,15 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
     elif delivery_selection is not None or destinations is not None:
         raise ValueError('delivery changes require an active 0.9+ task source and an applicable message action')
     if action == 'revise':
-        # The input fence is still pending if this fails. Do not consume it
-        # before the actual current foundation decision has been invalidated.
-        _revoke_if_present(root, message, reason)
+        # Keep the input fence closed until the stale decision is invalidated.
+        if layered and (root / 'foundation.json').exists():
+            from .codex_foundation import revise_foundation
+            revise_foundation(root, user_text=message['source']['text'],
+                              source=message['source']['source_ref'], reason=reason)
+        elif not layered:
+            _revoke_if_present(root, message, reason)
+        if layered:
+            value['latest_revision_message_id'] = message_id
     cleanup = action in {'revise', 'pause', 'stop', 'cancel'}
     if action in {'continue', 'resume'}:
         value['status'] = 'ACTIVE'
@@ -504,8 +554,8 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
                             'task_input_ref': dict(value['task_input_ref']),
                             'wall_ns': time.time_ns(), 'scope': 'lifecycle termination; no quality claim'}
     if (action in {'continue', 'resume', 'revise'}
-            or action == 'ordinary' and value['status'] not in TERMINAL):
-        value['task_input_ref'] = _input_ref(message)
+            or action == 'ordinary' and not layered and value['status'] not in TERMINAL):
+        _set_task_input(value)
     message['handling'] = {'action': action, 'reason': reason, 'wall_ns': time.time_ns()}
     value['handled_message_id'] = message_id
     # Persist the fence/terminal status first. Failure in optional cleanup or

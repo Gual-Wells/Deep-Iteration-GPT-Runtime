@@ -1,4 +1,4 @@
-"""Live, commit-pinned transport for the Codex experimental profile.
+"""Live, commit-pinned transport for the Codex profile.
 
 Acquisition does not classify an invocation or start a DIGR run. The model
 reads the pinned startup slice first and selects a subsequent stage. The

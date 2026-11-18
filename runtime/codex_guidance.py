@@ -15,7 +15,11 @@ def enabled(p_run: str) -> bool:
 
 
 def input_ref(lifecycle: Mapping) -> dict:
-    source = lifecycle['current_message']
+    from .codex_lifecycle import content_message
+    return _message_ref(content_message(lifecycle))
+
+
+def _message_ref(source: Mapping) -> dict:
     return {'message_id': source['id'], 'sha256': source['source']['sha256'],
             'source_ref': source['source']['source_ref']}
 
@@ -119,6 +123,7 @@ def covered_revision(root: Path, session: Mapping, supplied: Mapping | None,
     if supplied is None:
         return None
     from .codex_foundation import BRIEF_FIELDS, _digest
+    from .codex_collaboration import layered_policy
     from .codex_lifecycle import require_active
     if not enabled(session['P_run']):
         raise ValueError('covered revisions require the new task pin; old pins are not migrated')
@@ -136,14 +141,22 @@ def covered_revision(root: Path, session: Mapping, supplied: Mapping | None,
         raise ValueError('covered revision must bind all actual changed fields, the preceding brief, and current input')
     if supplied.get('no_new_substantive_prior') is not True or supplied.get('no_new_user_choice') is not True:
         raise ValueError('new substantive priors or user choices require their actual current guidance/decision')
+    message = lifecycle['current_message']
+    if (layered_policy(session['P_run']) and kind == 'DIRECT_USER_DECISION'
+            and (message.get('handling') or {}).get('action') == 'budget' and changed != ['resources']):
+        raise ValueError('a budget-only reply can cover resource limits only')
     reason = supplied.get('reason')
     if not isinstance(reason, str) or not reason.strip():
         raise ValueError('covered revision needs the actual applicability reason')
-    receipt = public_receipt(root, previous.get('guidance'), current=False)
-    directory = root / 'consult' / 'exchanges' / receipt['exchange_id']
+    receipt = None
     quote = supplied.get('guidance_quote')
-    if not isinstance(quote, str) or not quote.strip() or quote not in (directory / 'public.md').read_text(encoding='utf-8'):
-        raise ValueError('covered revision must quote the actual complete guidance rule it applies')
+    if not layered_policy(session['P_run']) or previous.get('guidance_required'):
+        receipt = public_receipt(root, previous.get('guidance'), current=False)
+        directory = root / 'consult' / 'exchanges' / receipt['exchange_id']
+        if not isinstance(quote, str) or not quote.strip() or quote not in (directory / 'public.md').read_text(encoding='utf-8'):
+            raise ValueError('covered revision must quote the actual complete guidance rule it applies')
+    elif quote is not None:
+        raise ValueError('the prior decision has no formal guidance to quote')
     sources = supplied.get('sources')
     if not isinstance(sources, list) or not sources:
         raise ValueError('covered revision needs its actual decision/fact sources')
@@ -155,9 +168,9 @@ def covered_revision(root: Path, session: Mapping, supplied: Mapping | None,
         if not isinstance(source_quote, str) or not source_quote.strip():
             raise ValueError('coverage source needs an exact relevant quote')
         if kind == 'DIRECT_USER_DECISION':
-            if source.get('kind') != 'CURRENT_USER_INPUT' or source_quote not in lifecycle['current_message']['source']['text']:
+            if source.get('kind') != 'CURRENT_USER_INPUT' or source_quote not in message['source']['text']:
                 raise ValueError('direct user decision must quote the actual current user input')
-            selected.append({'kind': 'CURRENT_USER_INPUT', 'input_ref': input_ref(lifecycle), 'quote': source_quote})
+            selected.append({'kind': 'CURRENT_USER_INPUT', 'input_ref': _message_ref(message), 'quote': source_quote})
         else:
             if source.get('kind') != 'ACTUAL_ARTIFACT' or not isinstance(source.get('path'), str) or not source['path'].strip():
                 raise ValueError('established fact/locked execution needs an actual selected artifact')
@@ -176,11 +189,37 @@ def covered_revision(root: Path, session: Mapping, supplied: Mapping | None,
 
 def for_proposal(root: Path, session: Mapping, supplied: Mapping | None,
                  *, previous: Mapping | None, material: bool,
-                 covered_change: Mapping | None = None) -> dict | None:
+                 covered_change: Mapping | None = None,
+                 guidance_required: bool = False) -> dict | None:
+    from .codex_collaboration import layered_policy
     from .codex_lifecycle import load_lifecycle
     if not enabled(session['P_run']):
         return None  # Immutable old pins retain their original entry semantics.
     lifecycle = load_lifecycle(root)
+    if layered_policy(session['P_run']):
+        if not guidance_required:
+            return None
+        if covered_change is not None:
+            return covered_change['guidance']
+        if supplied is None:
+            # A draft may identify the concrete dependency before the source
+            # has arrived. This never approves the dependent scope.
+            retained = (previous or {}).get('guidance') if not material else None
+            return public_receipt(root, retained, current=False) if retained else None
+        if lifecycle.get('claude_policy', {}).get('mode') != 'ALLOW':
+            raise ValueError('current task choice does not allow a new formal content-guidance decision')
+        existing = (previous or {}).get('guidance')
+        if previous and not material and (not existing or not isinstance(supplied, Mapping)
+                or supplied.get('exchange_id') != existing['exchange_id']
+                or supplied.get('public_sha256') != existing['public_sha256']):
+            raise ValueError('changing the selected formal guidance needs a material revision')
+        receipt = public_receipt(root, supplied, current=material or previous is None)
+        if material and previous:
+            versions = [previous, previous.get('accepted') or {}, *previous['history']]
+            if any((revision.get('guidance') or {}).get('exchange_id') == receipt['exchange_id']
+                   for revision in versions):
+                raise ValueError('a new substantive prior needs new current guidance or a source-bound covered revision')
+        return receipt
     if lifecycle.get('claude_policy', {}).get('mode') != 'ALLOW':
         return None
     if covered_change is not None:

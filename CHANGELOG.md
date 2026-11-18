@@ -1,5 +1,16 @@
 # Changelog
 
+## Codex Stable 1.0.0 / paper 0.6.1 — unified Codex contract
+
+- Allow first-layer Claude research through the native council on single-colon tasks, with a shared-wallet reservation. For double-colon tasks, bind the user’s approval to an explained cost bound and the applicable role, model, and wallet scope.
+- Use the second layer for substantive content guidance and production. Bind formal receipts to actual content dependencies in Foundation. Apply the prepared-request Split and public-stream contracts to both layers.
+- Use the current Codex model and reasoning settings for new tasks. Consider model-tier collaboration only when planning an exceptionally large batch. Keep historical Allot records and policies available to their pinned tasks.
+- Align startup, help, core, workbench, Chat exports, and paper entry points with the same collaboration contract. Restore existing tasks with their frozen distribution.
+
+- Consolidate task alignment, evidence, public publication and delivery around a single Stable entry. Preserve old exact pins and separate role selection, spending and completion.
+- Route real role/stage returns and lossless public output through the same recoverable presentation contract.
+- Use the latest explicit U0 source for material changes and keep unrelated work, budget replies and progress questions separate.
+
 ## Codex 0.18.0 — logic-first allocation and justified restrictions
 
 - Pin a single Allot default, GPT-6.2 Sol/max, while preserving explicit 6.1 selection and every older pin's policy shape and hash. Keep native responsibility depth separate from model effort; controlled labor and substantive feedback retain their actual boundaries.

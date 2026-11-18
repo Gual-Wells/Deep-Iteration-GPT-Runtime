@@ -6,7 +6,7 @@ fact. A reservation survives a crash before an attempt record is committed.
 """
 from __future__ import annotations
 
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from datetime import datetime, timezone
 from hashlib import sha256
 import os
@@ -100,10 +100,93 @@ def _totals(rows) -> dict:
                                      if row['state'] in {'RESERVED', 'COMMITTED'}]}
 
 
+def _has_table(db, name: str) -> bool:
+    return db is not None and db.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone() is not None
+
+
+def _availability(db, task_rows, wallet_rows, wallet_id: str, budget: Mapping[str, Any], *,
+                  save_snapshot: bool) -> dict:
+    task_totals, wallet_totals = _totals(task_rows), _totals(wallet_rows)
+    total = budget['budget_total_usd']
+    task_available = (None if total is None else total - budget['outside_spent_usd']
+                      - budget['outside_reserved_usd'] - task_totals['known_cost_usd']
+                      - task_totals['unresolved_reserved_usd'])
+    snapshot = budget.get('wallet_snapshot')
+    covered = {}
+    if snapshot is not None:
+        if (not isinstance(snapshot, Mapping) or set(snapshot) != {'snapshot_id', 'wallet_id', 'covered_claims'}
+                or not isinstance(snapshot['snapshot_id'], str) or not snapshot['snapshot_id'].strip()
+                or snapshot['wallet_id'] != wallet_id or not isinstance(snapshot['covered_claims'], Mapping)):
+            raise ValueError('Wallet snapshot needs its ID, matching wallet_id and confirmed covered claim revisions')
+        normalized = {'wallet_remaining_usd': budget['wallet_remaining_usd'], **dict(snapshot)}
+        body = json.dumps(normalized, sort_keys=True, separators=(',', ':'), allow_nan=False)
+        previous = db.execute('SELECT body FROM snapshots WHERE wallet_id=? AND snapshot_id=?',
+                              (wallet_id, snapshot['snapshot_id'])).fetchone() if _has_table(db, 'snapshots') else None
+        if previous and previous['body'] != body:
+            raise ValueError('An immutable wallet snapshot cannot change balance or confirmed coverage')
+        current_claims = {row['claim_id']: row for row in wallet_rows}
+        has_events = _has_table(db, 'cost_events')
+        for identity_key, entry in snapshot['covered_claims'].items():
+            if not isinstance(entry, Mapping) or set(entry) != {'cost_revision', 'covered_cost_usd'}:
+                raise ValueError('Snapshot coverage must identify a cost revision and its confirmed covered amount')
+            revision, amount = entry['cost_revision'], entry['covered_cost_usd']
+            if (type(revision) is not int or revision < 1 or type(amount) not in (int, float)
+                    or not math.isfinite(amount) or amount < 0 or identity_key not in current_claims):
+                raise ValueError('Invalid wallet snapshot claim coverage')
+            event = db.execute('SELECT known_cost_usd FROM cost_events WHERE claim_id=? AND revision=?',
+                               (identity_key, revision)).fetchone() if has_events else None
+            if event is None or amount > event['known_cost_usd'] + 1e-12:
+                raise ValueError('Snapshot coverage is not bound to an actual observed cost revision')
+            covered[identity_key] = float(amount)
+        if save_snapshot and previous is None:
+            db.execute('INSERT INTO snapshots VALUES (?,?,?,?)', (wallet_id, snapshot['snapshot_id'], body, _now()))
+    # Recency is separate from coverage. Deduct unresolved holds and any cost
+    # or revision delta not explicitly confirmed in the provider balance.
+    uncovered = sum(max(row['known_cost_usd'] - covered.get(row['claim_id'], 0.0), 0.0)
+                    for row in wallet_rows if row['state'] == 'KNOWN')
+    available = (budget['wallet_remaining_usd'] - uncovered
+                 - wallet_totals['unresolved_reserved_usd'] - budget['outside_reserved_usd'])
+    account_available = None
+    if 'account_budget_total_usd' in budget:
+        account_ref = budget.get('account_authorization_ref')
+        totals = _totals(row for row in wallet_rows if row['account_authorization_ref'] == account_ref)
+        account_available = (budget['account_budget_total_usd'] - budget.get('account_outside_spent_usd', 0)
+                             - budget.get('account_outside_reserved_usd', 0)
+                             - totals['known_cost_usd'] - totals['unresolved_reserved_usd'])
+    return {'task_available_before_usd': task_available, 'wallet_available_before_usd': available,
+            'account_available_before_usd': account_available,
+            'wallet_snapshot_id': snapshot['snapshot_id'] if snapshot is not None else None,
+            'known_uncovered_usd': uncovered,
+            'coverage_basis': 'explicit confirmed cost revisions' if snapshot is not None else 'no confirmed coverage; covered amount zero'}
+
+
+def review_capacity(root: Path, session: Mapping[str, Any], *, wallet_id: str,
+                    budgets: list[Mapping[str, Any]]) -> list[dict]:
+    """Price preview reads one consistent ledger view without creating claims or schema."""
+    path, task = ledger_path(), task_id(root, session)
+    if not path.is_file():
+        return [_availability(None, [], [], wallet_id, budget, save_snapshot=False) for budget in budgets]
+    try:
+        with closing(sqlite3.connect(path.as_uri() + '?mode=ro', uri=True, timeout=15)) as db:
+            db.row_factory = sqlite3.Row
+            db.execute('BEGIN')
+            has_claims = _has_table(db, 'claims')
+            task_rows = list(db.execute('SELECT * FROM claims WHERE task_id=?', (task,))) if has_claims else []
+            wallet_rows = list(db.execute('SELECT * FROM claims WHERE wallet_id=?', (wallet_id,))) if has_claims else []
+            return [_availability(db, task_rows, wallet_rows, wallet_id, budget, save_snapshot=False)
+                    for budget in budgets]
+    except sqlite3.Error as error:
+        raise ValueError('Shared wallet read failed: ' + type(error).__name__ + '; no local budget fallback') from None
+
+
 def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request_sha256: str,
             wallet_id: str, budget: Mapping[str, Any]) -> dict:
+    from .codex_collaboration import layered_policy
     if not isinstance(wallet_id, str) or not wallet_id.strip():
         raise ValueError('New DIGR submissions require an explicit shared wallet_id in the private config')
+    if budget['budget_total_usd'] is None and not layered_policy(session['P_run']):
+        raise ValueError('Wallet-only accounting requires the Stable task policy')
     path, task = ledger_path(), task_id(root, session)
     identity = claim_id(root, session, exchange_id)
     with _transaction(path) as db:
@@ -111,56 +194,11 @@ def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request
             raise ValueError('Shared wallet already claimed this exchange; inspect/recover without repeating inference')
         task_rows = list(db.execute('SELECT * FROM claims WHERE task_id=?', (task,)))
         wallet_rows = list(db.execute('SELECT * FROM claims WHERE wallet_id=?', (wallet_id,)))
-        task_totals, wallet_totals = _totals(task_rows), _totals(wallet_rows)
-        task_available = (budget['budget_total_usd'] - budget['outside_spent_usd']
-                          - budget['outside_reserved_usd'] - task_totals['known_cost_usd']
-                          - task_totals['unresolved_reserved_usd'])
-        snapshot = budget.get('wallet_snapshot')
-        covered = {}
-        if snapshot is not None:
-            if (not isinstance(snapshot, Mapping) or set(snapshot) != {'snapshot_id', 'wallet_id', 'covered_claims'}
-                    or not isinstance(snapshot['snapshot_id'], str) or not snapshot['snapshot_id'].strip()
-                    or snapshot['wallet_id'] != wallet_id or not isinstance(snapshot['covered_claims'], Mapping)):
-                raise ValueError('Wallet snapshot needs its ID, matching wallet_id and confirmed covered claim revisions')
-            normalized = {'wallet_remaining_usd': budget['wallet_remaining_usd'], **dict(snapshot)}
-            body = json.dumps(normalized, sort_keys=True, separators=(',', ':'), allow_nan=False)
-            previous = db.execute('SELECT body FROM snapshots WHERE wallet_id=? AND snapshot_id=?',
-                                  (wallet_id, snapshot['snapshot_id'])).fetchone()
-            if previous and previous['body'] != body:
-                raise ValueError('An immutable wallet snapshot cannot change balance or confirmed coverage')
-            current_claims = {row['claim_id']: row for row in wallet_rows}
-            for identity_key, entry in snapshot['covered_claims'].items():
-                if not isinstance(entry, Mapping) or set(entry) != {'cost_revision', 'covered_cost_usd'}:
-                    raise ValueError('Snapshot coverage must identify a cost revision and its confirmed covered amount')
-                revision, amount = entry['cost_revision'], entry['covered_cost_usd']
-                if (type(revision) is not int or revision < 1 or type(amount) not in (int, float)
-                        or not math.isfinite(amount) or amount < 0 or identity_key not in current_claims):
-                    raise ValueError('Invalid wallet snapshot claim coverage')
-                event = db.execute('SELECT known_cost_usd FROM cost_events WHERE claim_id=? AND revision=?',
-                                   (identity_key, revision)).fetchone()
-                if event is None or amount > event['known_cost_usd'] + 1e-12:
-                    raise ValueError('Snapshot coverage is not bound to an actual observed cost revision')
-                covered[identity_key] = float(amount)
-            if previous is None:
-                db.execute('INSERT INTO snapshots VALUES (?,?,?,?)',
-                           (wallet_id, snapshot['snapshot_id'], body, _now()))
-        # checked_at validates freshness, not provider billing coverage. Only
-        # explicit confirmed claim/revision amounts may be subtracted from the
-        # known cost; without coverage we conservatively treat it as zero.
-        uncovered = sum(max(row['known_cost_usd'] - covered.get(row['claim_id'], 0.0), 0.0)
-                        for row in wallet_rows if row['state'] == 'KNOWN')
-        available = (budget['wallet_remaining_usd'] - uncovered
-                     - wallet_totals['unresolved_reserved_usd'] - budget['outside_reserved_usd'])
+        availability = _availability(db, task_rows, wallet_rows, wallet_id, budget, save_snapshot=True)
         account_ref = budget.get('account_authorization_ref')
-        account_available = None
-        if 'account_budget_total_usd' in budget:
-            rows = [row for row in wallet_rows if row['account_authorization_ref'] == account_ref]
-            totals = _totals(rows)
-            account_available = (budget['account_budget_total_usd'] - budget.get('account_outside_spent_usd', 0)
-                                 - budget.get('account_outside_reserved_usd', 0)
-                                 - totals['known_cost_usd'] - totals['unresolved_reserved_usd'])
         ceiling = budget['ceiling_usd']
-        limits = [task_available, available] + ([account_available] if account_available is not None else [])
+        limits = [availability[key] for key in ('task_available_before_usd', 'wallet_available_before_usd',
+                                                'account_available_before_usd') if availability[key] is not None]
         if ceiling > min(limits) + 1e-12:
             raise ValueError('Shared wallet reservation exceeds remaining task/account/wallet budget')
         db.execute('''INSERT INTO claims
@@ -169,11 +207,7 @@ def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request
             (identity, task, wallet_id, exchange_id, request_sha256, ceiling, _now(), account_ref))
     return {'format': FORMAT, 'claim_id': identity, 'ledger_path': path.as_posix(),
             'wallet_id': wallet_id, 'request_sha256': request_sha256,
-            'task_available_before_usd': task_available, 'wallet_available_before_usd': available,
-            'account_available_before_usd': account_available,
-            'wallet_snapshot_id': snapshot['snapshot_id'] if snapshot is not None else None,
-            'known_uncovered_usd': uncovered,
-            'coverage_basis': 'explicit confirmed cost revisions' if snapshot is not None else 'no confirmed coverage; covered amount zero',
+            **availability,
             'scope': 'atomic participating local clients; external wallet and authorization facts supplied separately'}
 
 

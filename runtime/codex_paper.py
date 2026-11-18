@@ -18,7 +18,12 @@ import re
 import time
 from typing import Any
 
-VERSION = '0.6.0'
+VERSION = '0.6.1'
+CORE_MINIMUMS = {
+    '0.3.0': (0, 9, 0), '0.4.0': (0, 10, 0), '0.5.0': (0, 11, 0),
+    '0.5.1': (0, 11, 1), '0.5.2': (0, 12, 0), '0.5.3': (0, 12, 1),
+    '0.5.4': (0, 13, 0), '0.6.0': (0, 14, 0), VERSION: (1, 0, 0),
+}
 SINGLE_PDF_CONTRACT = 'single-pdf-one-message'
 X_PDF_CONTRACT = 'single-pdf-x-files'
 LEGACY_CONTRACT = 'legacy-multiple-volumes'
@@ -112,16 +117,12 @@ def initialize(root, *, p_run, authorization, source_ref, recipient=None, task_r
     if not re.fullmatch(r'[^@\s]+@[0-9a-f]{40}', p_run):
         raise ValueError('p_run needs a version and full immutable SHA')
     version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@.+', p_run)
-    uses_x = bool(version and tuple(map(int, version.groups())) >= (0, 9, 0))
-    uses_consult = bool(version and tuple(map(int, version.groups())) >= (0, 10, 0))
-    uses_native = bool(version and tuple(map(int, version.groups())) >= (0, 11, 0))
-    addon_version = (VERSION if version and tuple(map(int, version.groups())) >= (0, 14, 0)
-                     else '0.5.4' if version and tuple(map(int, version.groups())) >= (0, 13, 0)
-                     else '0.5.3' if version and tuple(map(int, version.groups())) >= (0, 12, 1)
-                     else '0.5.2' if version and tuple(map(int, version.groups())) >= (0, 12, 0)
-                     else '0.5.1' if version and tuple(map(int, version.groups())) >= (0, 11, 1)
-                     else '0.5.0' if uses_native else '0.4.0' if uses_consult
-                     else '0.3.0' if uses_x else '0.2.0')
+    core_version = tuple(map(int, version.groups())) if version else ()
+    uses_x = core_version >= CORE_MINIMUMS['0.3.0']
+    uses_consult = core_version >= CORE_MINIMUMS['0.4.0']
+    uses_native = core_version >= CORE_MINIMUMS['0.5.0']
+    addon_version = next((addon for addon, minimum in reversed(CORE_MINIMUMS.items())
+                          if core_version >= minimum), '0.2.0')
     policy = None
     if uses_x:
         from .codex_session import _session, task_delivery_policy

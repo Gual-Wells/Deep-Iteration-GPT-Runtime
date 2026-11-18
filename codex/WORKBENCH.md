@@ -1,20 +1,20 @@
 # 工作工具：取回问题、继续制作、保留真实后果
 
-长任务从已有笔记开始，必要时再使用这些标准库工具。统一入口是 `python -B tools/codex.py`；Claude提交的原生分工及`consult split`／`call --split-plan`见必读[SPLIT](SPLIT.md)。旧的 codex_profile.py、codex_workbench.py、codex_experience.py 继续可用。它们不调用模型、不派代理，不把本地状态变成思想或交付质量评分。
+长任务从已有笔记开始，必要时再使用这些标准库工具。统一入口是 `python -B tools/codex.py`；Claude提交的原生分工及`consult split`／`call --split-plan`见必读[SPLIT](SPLIT.md)。工作台、版本和访时工具保存实际事实。外部推理仅从满足角色、费用与 Split 条件的调用入口提交。
 
-核心0.15单冒号是指定执行与工程，双冒号凡有实质主观内容须请教Claude。新会话保留原分隔符与工作关系；完整单/双冒号补充在处理当前用户消息时直接改选，无前缀补充继承。普通话明确改选用`task handle --claude-selection ALLOW|DENY`绑定已选定的真实当前原话；该内部字段只记录调用许可，不把双冒号的主观咨询义务降为可选，也不生成预算。`task lifecycle/report`读当前`claude_policy`，原始session字段保留初始选择。
+按 [PROTOCOL](PROTOCOL.md) 解释任务冻结版本和用户当前选择。Stable 的 `task lifecycle/report` 给出当前 `claude_policy`。单冒号为 `COUNCIL_ONLY`，双冒号为 `ALLOW`。普通话明确更改时用 `task handle --claude-selection COUNCIL_ONLY|ALLOW|DENY` 绑定真实当前原话。已有任务按原 pin 的枚举及费用契约恢复。`profile classify --pin <版本@完整SHA>` 可离线预览对应语义，省略 pin 时预览当前分发，真实获取仍走 `acquire`。
 
 论文辅学另有可选的[知识池技能](../.agents/skills/digr-paper-knowledge/SKILL.md)与 `python -B tools/codex.py knowledge --help`。原生 Codex 读论文、分层批量问询和教学，工具保存冻结问项、论文局部用法、真实选择、有范围证据及接续位置。个人数据与原件放在独立私有项目，不进入本公共库；可从私有项目的相对路径入口接续，本机定位缓存仅用于发现。它不替代本轮在线 DIGR 协议获取，也不需要阅读器或付费模型接口。普通读取只用标准库，摄入 PDF 另需所选 Python 环境中的 `pypdf`。具体数据与命令见技能的按需引用。
 
-统一DIGR实际采用Sonnet处理整篇解构/导读对象时，自然应用同SHA声明的[论文协议](../paper/PROTOCOL.md)、[技能](../.agents/skills/digr-paper/SKILL.md)与 `python -B tools/codex.py paper --help`。它保存每篇的来源/导读映射、候选和Gmail读回事实；不替知识池写学习证据，单篇返回也不关闭当前DIGR任务。
+统一 DIGR 第二层实际委托 Sonnet 制作整篇解构、导读或完整读物时，应用同 SHA 声明的[论文协议](../paper/PROTOCOL.md)、[技能](../.agents/skills/digr-paper/SKILL.md)与 `python -B tools/codex.py paper --help`。它保存每篇的来源/导读映射、候选和Gmail读回事实；不替知识池写学习证据，单篇返回也不关闭当前DIGR任务。
 
-必读[RETURN](RETURN.md)要求最终response正文固定五段：结果、关键变化、工作过程、核验与限制、参数。过程用正文时间／工作表，不能由文件、内嵌页或截图替代；真实任务产物仍可链接。`return seal/status/body/close`保存选定正文并收口；body输出待发送Markdown，不证明宿主已发送。历史timeline是按需工具，不再是默认报告。
+必读[RETURN](RETURN.md)要求最终response正文固定五段：结果、关键变化、工作过程、论证与适用范围、参数。过程用正文时间／工作表，不能由文件、内嵌页或截图替代；真实任务产物仍可链接。`return seal/status/body/close`保存选定正文并收口；body输出待发送Markdown，不证明宿主已发送。历史timeline是按需工具，不再是默认报告。
 
 ## 0. 在其它项目找到工具，及时开始记录
 
 本机经验证的工具可安装在D盘的独立版本目录；定位文件为 `CODEX_HOME/digr-codex/toolchain.json`。其中version、root、cli与source_commit只说明已安装工具身份，不是新消息的仓库HEAD、执行授权或完成证明。没有安装时可用实际已知的仓库绝对入口；不要求为了执行一个任务先安装服务。
 
-已有任务先取其冻结的完整`P_run=version@SHA`，选择定位表的`installed_distributions[P_run]`。只有顶层`version + '@' + source_commit`与P_run完全相同时，才可直接使用顶层root/cli；没有精确分发时取得相应版本，不能只凭数字版本、相同论文0.6.0或最新路由HEAD选工具。下例顶层入口适用于与其完整身份匹配的任务或新获取的同版本；接续旧任务要改用上述精确分发。
+已有任务先取其冻结的完整 `P_run=version@SHA`，使用 `installed_distributions[P_run]` 中的工具。只有顶层 `version + '@' + source_commit` 与 P_run 相同时才使用顶层 root/cli。没有精确分发时取得相应发布版本。
 
 PowerShell跨项目调用示例：
 
@@ -35,13 +35,31 @@ python -B tools/codex.py acquire --stage startup --out D:/task/acquired-startup
 python -B tools/codex.py acquire --stage execution --continue-from D:/task/acquired-startup --out D:/task/acquired-execution
 ```
 
-第一条实际读取实验分支HEAD，以同SHA取得manifest/VERSION/启动切片。模型读启动切片完成表面分类，只有EXECUTING才取第二条；HELP把stage换成help。第二条明确续读原pin，不重新解析HEAD。接续目录核对保存字节，但不是一次新消息所要求的在线获取替代；每条精确前缀新消息仍按ROUTER重新获取，既有执行P_run保持冻结。
+第一条实际读取 Codex 分支 HEAD，以同 SHA 取得 manifest、VERSION 和启动切片。按启动语义分类，EXECUTING 才取第二条，HELP 把 stage 换成 help。第二条续读原 pin。新消息的获取按真实入口发生，既有执行 P_run 保持冻结。
 
 薄路由与轻量偏好可用 profile export codex-agents --out D:/task/AGENTS-codex.txt 一次导出；仅创建新文件，不安装、不覆盖全局约定，也不复制深执行语义。
 
 CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。宿主已有GitHub connector时，可由模型直接使用连接器取得真实分支HEAD和同pin原文；代码集成也可给 `CodexRepositoryTransport(fetch)` 传入真实连接器fetch，调用 `acquire(connector=True)`。该响应必须是live_direct、github_connector，不能拿搜索结果或以前保存的JSON当新HEAD。直接API在某台机器返回504，不证明连接器也不可用。
 
 执行可从manifest声明的聚合包一次取得完整正文，校验成员顺序、字节、版本及manifest散列；不是只看摘要。实际声明路径失败则说明获取失败，不用旧协议补。`profile check`只看本地分发；开发者明确修改源文件后用 `profile refresh`重建聚合包和hash。后者是源维护操作，不是修改后再假称旧pin未变。
+
+### 可见流
+
+按 [LIVE](LIVE.md) 直接在 commentary 发布实际工作身份、阶段和结果。Claude 请求运行时持续读当前公开流。使用持久游标时，`live read --format commentary` 输出供宿主直接发布的正文，实际发布后才 ACK。已收到的独立返回另显示 Main 的实际取舍。
+
+### 两层 Claude 的费用依据
+
+单冒号中，`council create --claude` 与实际成员轮次按 [COUNCIL](COUNCIL.md) 运行。发送时提供当前价格、完整请求输入量上界、钱包余额与本次费用上界。共享钱包把本次上界和其它已预留费用一起核对，实际已有的用户任务限额一并适用。依据来自当前单冒号的第一层许可。
+
+双冒号在首次相关发送前，用 `consult budget-preview --root TASK --input INPUT.json --out PREVIEW.json` 估算安全范围。输入 `wallet_id`、`task_ceiling_usd`、`scope` 和 `jobs`。每项给当前费用 `facts`、`ceiling_usd` 及已准备的 `exchange_id`。为在议会开始前估算，也可用 `planned_council_member` 代替 `exchange_id`，写明真实用途 `purpose`、型号 `model` 和保守的合计输出上限 `max_tokens`。向用户展示拟采用的角色、模型、范围和任务总费用上界。预算预览本身不启动议会、发送或预留余额，实际发送仍核对具体请求和 Split。
+
+摄入真实预算答复。答复只决定费用时，以 `task handle --action budget` 处理，保存其来源并沿用当前工作输入。答复同时改变实质工作范围时，按工作更改处理，更新受影响的请求、Split 与费率估算。实际费用答复须与当时展示的范围对应。用下列命令记录用户实际批准的范围。
+
+```text
+python -B tools/codex.py consult budget-approve --root TASK --preview PREVIEW.json --reply-file RAW.txt --source ACTUAL_REF --quote ACTUAL_EXACT_WORDS
+```
+
+用户从预览中批准较低数额时，在 `budget-approve` 上用 `--task-ceiling-usd` 记录实际上限。用户主动设置新的任务费用限额时，摄入实际费用答复后用 `consult budget-limit --root TASK --reply-file RAW.txt --source ACTUAL_REF --quote ACTUAL_EXACT_WORDS --task-ceiling-usd LIMIT` 记录。限额也适用于切换入口后的请求。在有效任务范围内复用这条决定。扩大上限、钱包、角色或型号范围时，先说明变化再取得真实决定。发送前两个参与层都重新核对当前余额、价格、已承诺额和准备请求，按 [SPLIT](SPLIT.md) 执行每次本机检查。费用答复只确立付费授权，内容决定分别由任务原话或实际内容答复支持。
 
 ## 2. 一份普通笔记与按需材料
 
@@ -50,7 +68,7 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 0.7起的新会话默认要求前置任务说明；0.8起另有当前任务生命周期与消息来源闸门。旧pin仍保留其真实状态，不静默升级。模型先研究实际材料与原话，再提供proposal；脚本不自动识别意图。
 
 ```text
-python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run 0.8.3@<实际SHA> --visits D:/shared/digr-visits.jsonl --run-id <本任务唯一分组> --require-foundation
+python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run <真实版本@完整SHA> --visits D:/shared/digr-visits.jsonl --run-id <本任务唯一分组> --require-foundation
 python -B tools/codex.py visits begin --root D:/task/session --actor Main --line COMMON --phase FOUNDATION --category SOURCE
 python -B tools/codex.py foundation propose --root D:/task/session --input D:/task/proposal.json --reason "原件调查后的完整候选"
 python -B tools/codex.py foundation show --root D:/task/session
@@ -154,7 +172,7 @@ python -B tools/codex.py workbench focus --work D:/task/WORK.md --experience D:/
 模型在同pin下理解任务、真实初始化完整参数后，可把状态保存在任务数据盘：
 
 ```text
-python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run 0.6.0@<实际40位SHA> --decisions D:/task/decisions.md --m 2
+python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run <实际版本@完整SHA> --decisions D:/task/decisions.md --m 2
 python -B tools/codex.py line create --root D:/task/session --id M01 --parameters D:/task/M01-parameters.json --owner <真实执行者> --work D:/task/M01-WORK.md
 python -B tools/codex.py line packet --root D:/task/session --id M01
 python -B tools/codex.py line update --root D:/task/session --id M01 --input D:/task/M01-status.json
