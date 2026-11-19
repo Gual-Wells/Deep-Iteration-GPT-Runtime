@@ -9,7 +9,7 @@
 先根据本次原生研究准备 `claude-task.txt`、`original-excerpt.md`、必要图像；这些是实际发出的材料，不是本机索引。若本次实际对象为整篇论文导读，统一DIGR内部用真实`--paper-root`绑定，不需要另一种用户入口。
 
 ```text
-python -B tools/codex.py consult prepare --root D:/work/task --input D:/work/claude-task.txt --material D:/work/original-excerpt.md --exchange-id explain-stability
+python -B tools/codex.py consult prepare --root D:/work/task --guidance --input D:/work/claude-task.txt --material D:/work/original-excerpt.md --exchange-id explain-stability
 python -B tools/codex.py consult split --root D:/work/task --exchange-id explain-stability
 ```
 

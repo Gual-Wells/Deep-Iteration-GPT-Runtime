@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from hashlib import sha256
 import json
 from pathlib import Path
+import re
 from typing import Any, Callable
 
 from .execution_protocol import verify_execution_bundle
@@ -55,6 +56,12 @@ def profile_layout(manifest: dict, version: str) -> dict[str, Any]:
             raise ValueError(f'duplicate Codex {key} path')
     for key in ('entrypoint', 'help', 'light_instructions', 'experimental_router', 'workbench_guide'):
         paths[key] = _profile_path(manifest.get(key))
+    numbers = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)', version)
+    if numbers and tuple(map(int, numbers.groups())) >= (1, 1, 0):
+        constitution = 'codex/CONSTITUTION.md'
+        contract = manifest.get('host_contract')
+        if not isinstance(contract, dict) or contract.get('constitution') != constitution or constitution not in paths['core']:
+            raise ValueError('Stable 1.1+ requires its immutable constitution in the execution core')
     required = {VERSION, *paths['startup_slice'], *paths['core'],
                 *(paths[key] for key in ('entrypoint', 'help', 'light_instructions',
                                         'experimental_router', 'workbench_guide'))}

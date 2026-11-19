@@ -65,7 +65,7 @@ def _tool_paths() -> set[Path]:
     files.update({runtime.parent / 'tools' / name for name in ('codex.py', 'codex_return.py')})
     files.update(path for path in (runtime / 'assets').glob('codex_timeline*') if path.is_file())
     for name in ('codex_usage', 'codex_council', 'codex_allot', 'codex_wallet', 'codex_live', 'codex_io',
-                 'codex_guidance', 'codex_consult', 'codex_permissions', 'codex_consult_budget'):
+                 'codex_guidance', 'codex_consult', 'codex_permissions', 'codex_consult_budget', 'codex_production'):
         path = runtime / (name + '.py')
         if path.is_file():
             files.add(path)
@@ -102,6 +102,16 @@ def _native_state(root: Path) -> dict[str, Any]:
         if layered:
             files.update(path for name in ('budget-approval.json', 'budget-limit.json')
                          if (path := root / 'consult' / name).is_file())
+        from . import codex_production
+        if codex_production.enabled(metadata['P_run']):
+            files.update((root / 'productions').glob('*/production.json'))
+            for item in codex_production.completion_status(root)['productions']:
+                if item['applied'] is None:
+                    continue
+                output = item['applied']['output']
+                files.add(Path(output['snapshot_path']))
+                if item['current_output_matches'] is True:
+                    files.add(Path(output['path']))
     exchanges = root / 'consult' / 'exchanges'
     if exchanges.is_dir():
         for exchange in exchanges.iterdir():
@@ -396,6 +406,15 @@ def return_status(root: Path, *, refresh_entry: bool = False) -> dict[str, Any]:
         result['council_completion'] = councils
         if not councils['complete']:
             result['cannot_close'].append('active or unresolved native council obligations remain; preserve actual partial/exceptional scope before closing')
+        from . import codex_production
+        if codex_production.enabled(metadata['P_run']):
+            try:
+                productions = codex_production.completion_status(root)
+            except (OSError, ValueError, KeyError, TypeError) as error:
+                productions = {'complete': False, 'issues': [str(error)]}
+            result['production_completion'] = productions
+            if not productions['complete']:
+                result['cannot_close'].append('assigned dual production still awaits a valid Claude arbitration and applied output')
     if result['current_receipt'] not in {'READY_UNCLOSED', 'CLOSED'}:
         result['cannot_close'].append('a current sealed return is required before normal task closure')
     result['can_close'] = result['current_receipt'] == 'READY_UNCLOSED' and not result['cannot_close']

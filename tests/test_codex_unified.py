@@ -108,10 +108,29 @@ class UnifiedDIGRTests(unittest.TestCase):
         self.root = self.folder / 'stable-paper-task'
         self.original = self.file('stable-paper-user.txt', 'DIGR:: Prepare this complete paper guide.')
         create_session(self.root, request=self.original, p_run=self.pin)
-        scope = self.paper_scope(version=paper.VERSION)
+        scope = self.paper_scope(version='0.6.1')
         result = self.prepare('stable-paper', paper_root=scope)
         self.assertEqual(result['exchange']['authoring_scope']['addon_version'], '0.6.1')
         self.assertEqual(result['collaboration']['claude_layer'], 'CONTENT')
+        self.assertEqual(self.server.post_calls, [])
+
+    def test_new_formal_paper_candidate_requires_its_exact_dual_production_scope(self):
+        from runtime import codex_production
+        self.pin = '1.1.0@' + 'e' * 40
+        self.root = self.folder / 'stable-production-paper'
+        self.original = self.file('production-paper-user.txt', 'DIGR:: Produce this same complete paper guide.')
+        create_session(self.root, request=self.original, p_run=self.pin)
+        paper_root = self.paper_scope(version=paper.VERSION)
+        with self.assertRaisesRegex(ValueError, 'Formal paper authoring requires'):
+            self.prepare('paper-guidance', paper_root=paper_root, guidance=True)
+        assignment = self.file('shared-paper.md', 'A source-bound guide to exactly this paper.')
+        codex_production.start(self.root, 'paper', scope_path=assignment, actor='native-test',
+                               dispatch_ref='synthetic host dispatch', paper_root=paper_root)
+        with self.assertRaisesRegex(ValueError, 'registered paper'):
+            self.prepare('missing-paper', production_id='paper')
+        prepared = self.prepare('matched-paper', paper_root=paper_root, production_id='paper')
+        self.assertEqual(prepared['exchange']['authoring_scope'], prepared['exchange']['production']['authoring_scope'])
+        self.assertEqual(prepared['exchange']['authoring_scope']['addon_version'], '0.6.2')
         self.assertEqual(self.server.post_calls, [])
 
     def test_plain_entry_paper_and_later_generic_work_keep_separate_scopes(self):
