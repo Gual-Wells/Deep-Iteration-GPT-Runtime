@@ -22,7 +22,7 @@ from runtime.codex_foundation import (
 )
 from runtime.codex_session import (
     ACTIVITY_STATES, activity, create_line, create_session, line_packet,
-    session_report, set_clock_anchor, set_line_parameters, update_line,
+    session_report, set_clock_anchor, set_line_parameters, set_main_target, update_line,
 )
 from runtime.codex_transport import CodexRepositoryTransport, load_acquisition
 from runtime.codex_lifecycle import (
@@ -76,6 +76,10 @@ def main(argv: list[str] | None = None) -> int:
     create.add_argument('--destinations', type=Path, help='private X target registry, resolved once for this new task')
     create.add_argument('--require-foundation', action='store_true', default=None,
                         help='prepare research first; managed execution waits for the current user decision')
+    main_target = ts.add_parser('main-target', help='record the Main count inferred from the task')
+    main_target.add_argument('--root', required=True, type=Path)
+    main_target.add_argument('--m', required=True, type=int)
+    main_target.add_argument('--reason', required=True)
     report = ts.add_parser('report')
     report.add_argument('--root', required=True, type=Path)
     message = ts.add_parser('message', help='snapshot an actual user input; fence managed execution until handled')
@@ -202,6 +206,8 @@ def main(argv: list[str] | None = None) -> int:
                     explicit_parameters=read_object(args.explicit) if args.explicit else None,
                     anchor_pid=args.anchor_pid, m_target=args.m, require_foundation=args.require_foundation,
                     visits_path=args.visits, run_id=args.run_id, destinations=args.destinations)
+            elif args.action == 'main-target':
+                result = set_main_target(args.root, count=args.m, reason=args.reason)
             elif args.action == 'message':
                 result = ingest_message(args.root, source=args.source_file,
                     source_ref=args.source_ref, route_pin=args.route_pin)

@@ -59,7 +59,7 @@ class ClaudeSelectionTests(unittest.TestCase):
                     self.assertEqual(value['classification'], 'EXECUTING')
                     self.assertEqual(value['task'], raw_task)
                     self.assertEqual(value['parameter_text'], '(Less)(X)')
-                    self.assertEqual(value['depth_defaults']['preset'], 'Less')
+                    self.assertEqual(value['depth_preferences']['preset'], 'Less')
                     self.assertEqual(value['delivery_selection']['target'], 'gmail')
                     self.assertEqual(value['claude_selection'], 'ALLOW' if len(separator) == 2 else 'COUNCIL_ONLY')
         for raw in ('DIGR:: ', 'DIGR：：', 'DIGR:::task', 'DIGR：:：task'):

@@ -912,6 +912,7 @@ tests/test_codex_consult_paper.py
 tests/test_codex_consult_parallel.py
 tests/test_codex_council.py
 tests/test_codex_delivery.py
+tests/test_codex_depth_calibration.py
 tests/test_codex_do_supplement.py
 tests/test_codex_experience.py
 tests/test_codex_foundation.py

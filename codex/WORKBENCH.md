@@ -147,7 +147,7 @@ python -B tools/codex.py return close --root D:/task/session --reason "约定结
 
 CURRENT_RETURN.md仅是保存入口；schema2只保存RETURN.md正文副本和机器记录，不生成HTML/互动图报告。把body直接贴回最终response，链接副本不能代交付。相关任务事实或产物变动使其STALE，其他run追加及相同事件重放不会；READY不是语义批准或UI发送认证。close才终结生命周期，澄清/等待不close，P_run不随当前工具升级而重写。
 
-确认后补齐正式参数，line create只是准备文件。`visits --root ... begin`核对本任务生命周期及正式前置；直接`--file/--run-id`是低层事实登记，不做任务许可判定或拦截外部代理。task report分开foundation_timing和timing。正常结束前End；缺End可据可见记录近似修复，未补缺口不使其它配对失效或强制阻止报告收口。
+确认后按 [PARAMETERS](PARAMETERS.md) 推断正式配置。`line create` 保存本线配置，宿主按 [LIVE](LIVE.md) 实际显示 INIT。`visits --root ... begin` 核对本任务生命周期及正式前置。直接 `--file/--run-id` 用于低层事实登记。`task report` 分开 `foundation_timing` 和 `timing`。正常结束前 End。缺 End 可据可见记录近似修复，未补缺口按原口径参与报告收口。
 
 这些命令只检查被管理的入口和记录一致性，不拦截宿主所有工具，也不认证用户真实同意或解释质量。真语义及新纠正仍由模型依据会话处理。短任务可直接对话完成前置，不强制落这些文件。
 
@@ -199,23 +199,36 @@ python -B tools/codex.py workbench focus --work D:/task/WORK.md --experience D:/
 
 ## 5. 多主进度的可接续工作包
 
-模型在同pin下理解任务、真实初始化完整参数后，可把状态保存在任务数据盘：
+在正式 INIT 前，Main 依据同 pin 的任务原文和前置判断推断配置。`profile presets` 给出档位目录。`profile parameters --text '(Less,N=8)'` 展示档位来源 `preset`/`preset_explicit`、`preference_baseline`、`explicit_overrides` 和待解释的 `unparsed_tokens`。Main 按原话解释位置参数、来源和时间控制。新会话的 `session.json` 中，`parameter_selection` 保存初始调用预览，`explicit_parameters` 只保存创建时取得的真实用户参数声明。`task create --explicit` 用于补记已从实际原话确认的值。最新纠正以当前消息和相应决定为据。按已取得的 P_run 解释并恢复旧会话。
+
+若创建会话时已确定 M 目标，使用 `task create --m` 记录。以下示例在创建时已确定两条完整独立路线。
 
 ```text
 python -B tools/codex.py task create --out D:/task/session --request D:/task/request.txt --p-run <实际版本@完整SHA> --decisions D:/task/decisions.md --m 2
+```
+
+若创建会话时尚未确定 M，U0 后用 `task main-target` 保存实际推断和理由，然后按对应 M 目标初始化各线。它写入独立记录，`task report`、恢复包和返回核对读取同一生效值。已委托范围内可直接记录，用户显式的 M 和实际限制按原意生效。前置研究发现两条值得独立推进的完整路线时可这样登记。
+
+```text
+python -B tools/codex.py task main-target --root D:/task/session --m 2 --reason "原件恢复与直接组合各有独立材料及完整交付路线"
+```
+
+在实际执行决定及 M 目标明确后，为各线保存生效配置。`line create --reasons` 可随配置保存推断依据。各线生效配置记录在对应 `line.json` 的 `parameters`。
+
+```text
 python -B tools/codex.py line create --root D:/task/session --id M01 --parameters D:/task/M01-parameters.json --owner <真实执行者> --work D:/task/M01-WORK.md
 python -B tools/codex.py line packet --root D:/task/session --id M01
 python -B tools/codex.py line update --root D:/task/session --id M01 --input D:/task/M01-status.json
 python -B tools/codex.py task report --root D:/task/session
 ```
 
-角括号是待替换的真实信息。每M参数文件完整给N/T/R/B/S(n,t,r,b)/D/V/L；例如：
+角括号是待替换的真实信息。每条 M 的参数文件完整给 N/T/R/B/S(n,t,r,b)/D/V/L。
 
 ```json
 {"N":12,"T":"90min","R":4,"B":0,"S":{"n":3,"t":"40min","r":1,"b":0},"D":3,"V":3,"L":3}
 ```
 
-这是格式示例，不是所有任务都用这组时间。数值T/t API字段单位是秒；字符串显式带单位，不解析用户含糊调用。可选task create --explicit保留用户显式参数原值；工具显示每线差异，不认证差异已获允许。
+示例展示文件格式，参数取值由当前任务决定。T/t 在该接口中可以用秒数或带明确单位的字符串。用户原话中的歧义由 Main 处理。每线记录会列出实际显式值与生效配置的差异，Main 依协议和实际用户决定判断这些差异。
 
 status示例：
 
@@ -225,7 +238,7 @@ status示例：
 
 相对candidate以status文件目录为基准。产物可为文本、PDF或目录；恢复按真实文件类型打开，目录仅指入口。REQUEST.txt冻结原字节；decisions引用当前共同材料。恢复包标记本线旧记录可滞后，带回最新共同要求并区分用户决定与模型提案。一个包不必读其它线私有历史或依赖其计时日志。已有笔记使用自由纠正标题时，line create可加重复的 --corrections-topic，按需案例加 --experience；这些明确选择保存在本线包，后续packet不需再猜。packet也可临时附加两项选择，不自动扫描历史或替换原始U0。
 
-自主调参用 `line parameters --parameters ... --reasons ...`；N/R/D/V不自动降值。真实用户修订可加 `--user-revision "原话或明确引用"`，保留到变更记录，不由脚本认证。所有状态为作者声明；registered_line_count不是effective_M_count。实际作者、原生分工、议会和最终内容综合仍由模型做，不由文件目录代替。
+INIT 后用 `line parameters --parameters ... --reasons ...` 保存实际变更。已经生效的 N/R/D/V 承诺只可自主上调。真实用户修订可加 `--user-revision "原话或明确引用"`，保留到变更记录。各线初始推断、已生效的承诺和之后的用户决定均按实际来源解释。完成 M 的数量依据真实工作，`registered_line_count` 为登记数。实际作者、原生分工、议会和最终内容综合仍由模型做。
 
 ## 6. 共用Begin/End访时
 

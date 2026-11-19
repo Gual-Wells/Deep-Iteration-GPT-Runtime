@@ -29,6 +29,7 @@ from typing import Any, Iterable, Mapping
 import uuid
 
 from .codex_workbench import context_packet, create_workbench
+from .codex_presets import merge_explicit_parameters
 from .duration import parse_canonical_duration_seconds
 from .validation import require_binary, require_nonempty_text, require_nonnegative_int
 
@@ -229,22 +230,26 @@ def create_session(root: Path, *, request: Path, p_run: str,
             raise ValueError('new managed session requires an EXECUTING original request; ordinary correction/help cannot create it')
         if invocation['invocation_key'] == 'DIGRC' and not profile_uses_consult:
             raise ValueError('DIGRC requires an acquired 0.10+ pin; old task semantics are unchanged')
-    selection = invocation.get('depth_defaults') if invocation and profile_uses_consult else None
-    if selection:
-        # Named defaults fill missing declarations; actual named user overrides
-        # take priority. The caller still chooses T/t and source work per task.
-        chosen = dict(selection['parameters']) if selection['preset_explicit'] else {}
-        parsed = selection['parsed_overrides']
-        for key, value in parsed.items():
-            if key in explicit and explicit[key] != value:
-                raise ValueError('explicit parameter record conflicts with original header: ' + key)
-        for values in (parsed, explicit):
-            for key, value in values.items():
-                if key == 'S' and isinstance(value, Mapping):
-                    chosen.setdefault('S', {}).update(value)
-                else:
-                    chosen[key] = value
-        explicit = chosen
+    parameter_selection = None
+    if invocation and profile_uses_consult:
+        preferences = invocation.get('depth_preferences')
+        parameter_selection = preferences or invocation['depth_defaults']
+        if preferences is not None:
+            explicit = merge_explicit_parameters(preferences['explicit_overrides'], explicit)
+        else:
+            # Historical pins recorded an explicitly named tier as declarations.
+            chosen = dict(parameter_selection['parameters']) if parameter_selection['preset_explicit'] else {}
+            parsed = parameter_selection['parsed_overrides']
+            for key, value in parsed.items():
+                if key in explicit and explicit[key] != value:
+                    raise ValueError('explicit parameter record conflicts with original header: ' + key)
+            for values in (parsed, explicit):
+                for key, value in values.items():
+                    if key == 'S' and isinstance(value, Mapping):
+                        chosen.setdefault('S', {}).update(value)
+                    else:
+                        chosen[key] = value
+            explicit = chosen
     if require_foundation is None:
         require_foundation = profile_requires_foundation
     if type(require_foundation) is not bool:
@@ -253,6 +258,8 @@ def create_session(root: Path, *, request: Path, p_run: str,
         raise ValueError('Codex 0.7+ sessions require the task foundation; old sessions retain their actual state')
     explicit = json.loads(json.dumps(explicit, ensure_ascii=False, allow_nan=False))
     target = explicit.get('M', 1) if m_target is None else m_target
+    if parameter_selection and 'preference_baseline' in parameter_selection and 'M' in explicit and target != explicit['M']:
+        raise ValueError('M target conflicts with explicit parameter record')
     require_nonnegative_int('M target', target)
     if target < 1:
         raise ValueError('M target must be at least 1')
@@ -292,7 +299,7 @@ def create_session(root: Path, *, request: Path, p_run: str,
             metadata['execution_profile'].update(
                 paper_authoring_contract='sonnet-native-v1',
                 consult_role='Sonnet-native content driving for the selected paper')
-        metadata['parameter_selection'] = selection
+        metadata['parameter_selection'] = parameter_selection
         from .codex_collaboration import layered_policy, unified
         if unified(p_run):
             metadata['execution_profile'] = {
@@ -341,6 +348,35 @@ def create_session(root: Path, *, request: Path, p_run: str,
     if profile_requires_lifecycle:
         from .codex_lifecycle import initialize_lifecycle
         initialize_lifecycle(root, metadata)
+    return metadata
+
+
+def set_main_target(root: Path, *, count: int, reason: str) -> dict[str, Any]:
+    """Record the Main count inferred from the task after foundation work."""
+    root, metadata = _session(root)
+    if 'preference_baseline' not in (metadata.get('parameter_selection') or {}):
+        raise ValueError('main-target requires the task-inference profile; use the original pin for older tasks')
+    from .codex_lifecycle import require_active
+    require_active(root)
+    require_nonnegative_int('M target', count)
+    if count < 1:
+        raise ValueError('M target must be at least 1')
+    if 'M' in metadata['explicit_parameters'] and count != metadata['explicit_parameters']['M']:
+        raise ValueError('M target conflicts with explicit parameter record')
+    reason = require_nonempty_text('Main target reason', reason)
+    decision = {'M_target': count, 'M_target_reason': reason}
+    # Paper registration and clock updates own fields in session.json.
+    _write_json(root / 'main-target.json', decision)
+    return {**metadata, **decision}
+
+
+def _effective_main_target(root: Path, metadata: dict[str, Any]) -> dict[str, Any]:
+    if 'preference_baseline' in (metadata.get('parameter_selection') or {}):
+        path = root / 'main-target.json'
+        if path.is_file():
+            decision = _read_json(path)
+            return {**metadata, 'M_target': decision['M_target'],
+                    'M_target_reason': decision['M_target_reason']}
     return metadata
 
 
@@ -400,6 +436,12 @@ def create_line(root: Path, line_id: str, *, parameters: Mapping[str, Any], owne
                'next_action': '本线自行选择实际问题、方法与生产路线。', 'parameter_changes': [],
                'context_selection': {'corrections_topics': topics, 'experiences': cases},
                'updated_wall_ns': time.time_ns()}
+    selection = session.get('parameter_selection') or {}
+    if 'preference_baseline' in selection:
+        package['parameter_inference'] = {
+            'basis': 'MAIN_SUPPLIED_INITIAL_PARAMETERS',
+            'reasons': dict(parameter_reasons or {}),
+        }
     line.mkdir(exist_ok=False)
     if not work.exists():
         work.parent.mkdir(parents=True, exist_ok=True)
@@ -669,6 +711,7 @@ def session_report(root: Path) -> dict[str, Any]:
     union and whole-task domain comparability stay unknown.
     """
     root, metadata = _session(root)
+    metadata = _effective_main_target(root, metadata)
     if metadata.get('visit_clock'):
         return _visit_session_report(root, metadata)
     streams, packages, issues = {}, {}, []
@@ -775,11 +818,20 @@ def line_packet(root: Path, line_id: str, *, topic: str | None = None,
                 experiences: Iterable[str | Path] = ()) -> str:
     """Retrieve U0, live shared corrections, own work and actual artifact entry."""
     root, metadata = _session(root)
+    metadata = _effective_main_target(root, metadata)
     package = _read_json(_line_dir(root, line_id) / 'line.json')
     parts = [f'# {line_id} 可继续工作包', f"P_run={metadata['P_run']}",
              '本线完整参数与作者记录如下。旧计划、下一步和状态可因新要求失效；'
              '文件准备与状态声明不证明原生代理已启动或责任完成。',
              json.dumps(package, ensure_ascii=False, indent=2, allow_nan=False)]
+    initial = metadata.get('parameter_selection') or {}
+    if 'preference_baseline' in initial:
+        parts += ['## 初始档位偏好与显式参数',
+                  json.dumps({'parameter_selection': initial,
+                              'explicit_parameters': metadata['explicit_parameters'],
+                              'M_target': metadata['M_target'],
+                              'M_target_reason': metadata.get('M_target_reason')},
+                             ensure_ascii=False, indent=2, allow_nan=False)]
     consultation = _consult_snapshot(root, metadata)
     if consultation is not None:
         parts += ['## 当前Consult公开交换与费用事实',

@@ -17,7 +17,7 @@ from typing import Any, Mapping
 import uuid
 
 from .codex_session import (
-    _read_activity, _read_json, _session, _write_json, derive_activity, session_report,
+    _effective_main_target, _read_activity, _read_json, _session, _write_json, derive_activity, session_report,
 )
 from .codex_timeline import fragment, render_svg, validate as validate_timeline
 from .codex_response import render_response, validate_response
@@ -83,6 +83,7 @@ def _native_state(root: Path) -> dict[str, Any]:
     session contract. Return actual deliverable files explicitly to bind bytes.
     """
     root, metadata = _session(root)
+    metadata = _effective_main_target(root, metadata)
     files = {root / 'REQUEST.txt'}
     if (root / 'foundation.json').exists():
         files.add(root / 'foundation.json')
@@ -156,6 +157,8 @@ def _native_state(root: Path) -> dict[str, Any]:
             'task_input_ref': lifecycle.get('task_input_ref'),
             'files': _fingerprints(files), 'directory_candidates': candidates,
             'open_activity': active, 'unreadable_activity': unknown}
+    if 'M_target_reason' in metadata:
+        state['task']['M_target_reason'] = metadata['M_target_reason']
     if _resources_enabled(metadata):
         from .codex_usage import usage_live_state
         state['task_usage_live_state'] = usage_live_state(root)

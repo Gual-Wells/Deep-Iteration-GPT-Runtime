@@ -6,14 +6,15 @@
 | `DIGR：：请 Claude 就这份稿件的结构给建议` | 第二层指导。Main 落实有效建议。 |
 | `DIGR：：让 Claude 制作一份可用的解释` | 第二层正式产出。原生 L3 和 Claude 独立完成同范围候选，Claude 对两份成品终裁，Main 落实并交付。 |
 | `DIGR：：用 Sonnet 完整讲通这篇论文` | 对完整论文读物执行双边产出与裁决，接入同 pin 的[论文增量](../paper/PROTOCOL.md)。 |
-| `DIGR(Less)(X)：任务` | Less 研究投入，最终文件按配置交付至本人 Gmail。 |
+| `DIGR(Less)(X)：任务` | 参考 Less 投入偏好推断各项参数，最终文件按配置交付至本人 Gmail。 |
+| `DIGR(More,N=20)：任务` | 参考 More 投入偏好，按显式 N 声明和实际任务推断完整配置。 |
 | `DIGR/help` | 只读帮助。 |
 
 一处原生议会负责初议和再议，Claude 第一层是其内部研究成员。两层每次提交均有本机 Split、费用预留和公开原文转播。双冒号按实际角色、范围和保守费用上界取得真实批准。同一正式产出的预算可同时覆盖候选与终裁。详见 [PROTOCOL](PROTOCOL.md)、[COUNCIL](COUNCIL.md)、[CONSULT](CONSULT.md)、[SPLIT](SPLIT.md)。
 
 ASCII `:` / `::` 与全角等价。真实获取 Codex 分支、固定同 SHA 协议后解析，双冒号整体消费。三枚以上分隔冒号和空任务无效。完整只读/询问调用也可深执行，操作范围按实际委托。讨论和引用有原来的含义。DIGRC、DIGRP 兼容拼写沿相同角色和费用条件。
 
-Light/Less/Default/More/Max共用投入预设；默认N12/R4/D3/V3/L3/M1。时间与来源按实际问题补齐，参数为实质责任，不是角色名、命令数或费用额度。Codex 沿当前的模型和推理设置工作。只有预见超巨量批任务才按实际收益考虑多档协作。两层 Claude 的研究与内容工作均另记来源，原生 N/R/D/V/L/M 仍由 Codex 承担。详见[PARAMETERS](PARAMETERS.md)。
+Light、Less、Default、More、Max 是五档投入偏好基准，`standard` 兼容为 Light。裸调用以 Default 为参考（N12/R4/D3/V3/L3/M1）。Main 在正式 INIT 前结合任务推断生效配置，推断值可以越过 Light 或 Max 的参考值。用户逐项声明的值按其适用范围生效。Codex 沿当前模型和推理设置工作。只有预见超巨量批任务才按实际收益考虑多档协作。两层 Claude 的研究与内容工作均另记来源，原生 N/R/D/V/L/M 仍由 Codex 承担。详见 [PARAMETERS](PARAMETERS.md)。
 
 任务以[FOUNDATION](FOUNDATION.md)对齐真实对象与已有决定；明确更改直接落实，常规任务内操作沿既有授权。未按RETURN结束或被明令停止前，后续消息沿当前任务，任务按原 P_run 接续。精确 `DO：` 或 `DO:` 把本条原话接入当前任务。新完整单／双冒号与用户明确更改更新相应许可，其他补充沿用仍适用的决定。暂停与停止按实际范围生效。
 

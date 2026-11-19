@@ -1,5 +1,10 @@
 # Changelog
 
+## Codex Stable 1.1.1
+
+- Treat named depth presets as preferences for Main's initial task inference. Allow unassigned parameters above, below, or at the baseline.
+- Keep the preference, actual explicit declarations, and per-line effective configuration distinct in invocation previews and recovery. Retain exact-version behavior for earlier pins.
+
 ## Codex Stable 1.1.0 / paper 0.6.2
 
 - Bind formal Claude production to a real native assignment, two complete same-scope candidates, and a Claude arbitration whose applied output is required for completion.

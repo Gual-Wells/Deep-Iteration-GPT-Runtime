@@ -1,4 +1,4 @@
-"""Named Codex depth defaults; no workload scheduler or semantic certification."""
+"""Parse named depth preferences and explicit declarations."""
 from __future__ import annotations
 from copy import deepcopy
 import re
@@ -55,12 +55,24 @@ def _merge(base: dict, values: Mapping[str, Any]) -> dict:
     return result
 
 
-def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | None = None) -> dict:
-    """Read named defaults/overrides while preserving unknown/positional text.
+def merge_explicit_parameters(header: dict, additional: Mapping[str, Any]) -> dict:
+    """Collect compatible explicit declarations without promoting the tier."""
+    for key, value in header.items():
+        if key not in additional:
+            continue
+        supplied = additional[key]
+        if key == "S" and isinstance(value, Mapping) and isinstance(supplied, Mapping):
+            for item, expected in value.items():
+                if item in supplied and (type(supplied[item]) is not type(expected) or supplied[item] != expected):
+                    raise ValueError("explicit parameter record conflicts with original header: S." + item)
+        elif type(supplied) is not type(value) or supplied != value:
+            raise ValueError("explicit parameter record conflicts with original header: " + key)
+    return _merge(header, additional)
 
-    T/t and source work are chosen for the actual task. This preview does not
-    authorize work or replace the model's interpretation of unparsed fields.
-    """
+
+def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | None = None,
+                     *, preference_only: bool = False) -> dict:
+    """Read the input for the native interpreter, retaining the old pinned preview."""
     if not isinstance(parameter_text, str):
         raise TypeError("parameter text must be str")
     text = parameter_text.translate(_PUNCTUATION).strip()
@@ -85,7 +97,10 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
                     nested["t"] = entry[1]
                 else:
                     unparsed.append("S." + part)
-            parsed["S"] = nested
+            if preference_only and nested:
+                parsed = merge_explicit_parameters(parsed, {"S": nested})
+            elif not preference_only:
+                parsed["S"] = nested
         elif pair and pair[0] in ("N", "R", "D", "V", "L", "M", "B") and re.fullmatch(r"[0-9]+", pair[1]):
             parsed[pair[0]] = int(pair[1])
         elif pair and pair[0] == "T":
@@ -98,15 +113,17 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
     if len(selected) > 1:
         raise ValueError("select exactly one depth preset")
     chosen = selected[0] if selected else "Default"
-    values = _merge(PRESETS[chosen], parsed)
+    baseline = deepcopy(PRESETS[chosen])
+    baseline["B"] = 0
     if chosen == "Light":
-        values = _merge({"T": 0, "B": 0, "S": {"n": 0, "t": 0, "r": 0, "b": 0}}, values)
-    else:
-        values.setdefault("B", 0)
+        baseline.update(T=0, S={"n": 0, "t": 0, "r": 0, "b": 0})
+    explicit = parsed
     if overrides is not None:
         if not isinstance(overrides, Mapping):
             raise TypeError("overrides must be a mapping")
-        values = _merge(values, overrides)
+        explicit = (merge_explicit_parameters(parsed, overrides) if preference_only
+                    else _merge(parsed, overrides))
+    values = _merge(baseline, explicit)
     for key in ("N", "R", "D", "V", "L", "M", "B"):
         value = values[key]
         if type(value) is not int or value < 0:
@@ -115,6 +132,12 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
         raise ValueError("Codex requires real native L3 at every preset")
     if values["M"] < 1 or values["B"] not in (0, 1):
         raise ValueError("M must be positive and B binary")
+    if preference_only:
+        return {"preset": chosen, "preset_explicit": bool(selected),
+                "preference_baseline": baseline, "explicit_overrides": explicit,
+                "unparsed_tokens": unparsed, "source_default": "AUTO" if chosen == "Light" else "REQUIRED",
+                "time_default": "TASK_DERIVED_SOFT",
+                "scope": "Preference and explicit input only; Main supplies the initial effective parameters"}
     return {"preset": chosen, "preset_explicit": bool(selected), "parameters": values,
             "parsed_overrides": parsed, "unparsed_tokens": unparsed,
             "source_default": "AUTO" if chosen == "Light" else "REQUIRED",
@@ -125,5 +148,6 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
 def preset_catalog() -> dict:
     return {"default": "Default", "presets": deepcopy(PRESETS),
             "aliases": {"standard": "Light"}, "L": "native L3 in every preset",
-            "time": "T/t task-derived soft targets; Light/standard zero lower bound",
+            "scope": "Preference baselines for native task inference before INIT",
+            "time": "T/t task-derived soft targets unless explicitly specified",
             "budget": "separate real authorization; no automatic paid allocation"}
