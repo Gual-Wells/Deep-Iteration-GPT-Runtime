@@ -508,6 +508,17 @@ def _task_policy(root, policy, *, active=True, production=False):
             'foundation_sha256': sha256((Path(root) / 'foundation.json').read_bytes()).hexdigest() if production else None}
 
 
+def _production_evidence(root, production_id, files):
+    from .codex_production import require_applied
+    applied = require_applied(Path(root), production_id)
+    output = applied['output']
+    if not any((Path(root) / item['path']).resolve() == Path(output['path'])
+               and item['sha256'] == output['sha256'] for item in files):
+        raise ValueError('X delivery does not include the exact applied dual-production output')
+    return {'production_id': production_id, 'arbitration_exchange': applied['arbitration']['exchange_id'],
+            'output_sha256': output['sha256']}
+
+
 def prepare(root, payload, **revision):
     """Freeze exact candidate/files/target; this function never grants a send."""
     policy = validate_policy(payload.get('policy'))
@@ -522,9 +533,13 @@ def prepare(root, payload, **revision):
     effect = _effect_key(candidate, policy, files)
     frozen = {'candidate_id': candidate, 'policy': policy, 'files': files,
               'authorization_source_ref': authorization}
+    if payload.get('production_id') is not None:
+        frozen['production'] = _production_evidence(root, payload['production_id'], files)
     def update(value):
         for delivery in value['deliveries'].values():
             if delivery['effect_key'] == effect:
+                if delivery.get('production') != frozen.get('production'):
+                    raise ValueError('Existing delivery has different dual-production evidence')
                 return {'delivery_id': delivery['id'], 'status': delivery['status'],
                         'send_allowed': False, 'existing_delivery': True}
         _reject_overlap(value, candidate, policy, files)
@@ -623,6 +638,9 @@ def mark_sending(root, payload, **revision):
         policy = validate_policy(delivery['policy'])
         authority['policy'] = policy
         authority['snapshot'] = _task_policy(root, policy, production=True)
+        if delivery.get('production') is not None:
+            authority['production'] = delivery['production']
+            authority['files'] = delivery['files']
         if policy.get('evidence_adapter') != 'gmail-api':
             raise ValueError('selected evidence adapter is unavailable; no native send grant')
         _reject_overlap(value, delivery['candidate_id'], policy, delivery['files'], exclude=delivery['id'])
@@ -646,6 +664,9 @@ def mark_sending(root, payload, **revision):
     def guard():
         if _task_policy(root, authority['policy'], production=True) != authority['snapshot']:
             raise ValueError('task delivery authority changed before returning the send reservation')
+        if 'production' in authority and _production_evidence(
+                root, authority['production']['production_id'], authority['files']) != authority['production']:
+            raise ValueError('Applied dual-production evidence changed before sending')
         snapshot_files(root, [observed, *source_evidence.values()])
     return _mutate(root, 'mark-sending', frozen, update, guard=guard, **revision)
 

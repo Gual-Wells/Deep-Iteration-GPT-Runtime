@@ -53,6 +53,8 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 
 双冒号在首次相关发送前，用 `consult budget-preview --root TASK --input INPUT.json --out PREVIEW.json` 估算安全范围。输入 `wallet_id`、`task_ceiling_usd`、`scope` 和 `jobs`。每项给当前费用 `facts`、`ceiling_usd` 及已准备的 `exchange_id`。为在议会开始前估算，也可用 `planned_council_member` 代替 `exchange_id`，写明真实用途 `purpose`、型号 `model` 和保守的合计输出上限 `max_tokens`。向用户展示拟采用的角色、模型、范围和任务总费用上界。预算预览本身不启动议会、发送或预留余额，实际发送仍核对具体请求和 Split。
 
+正式产出可在同一预览内为候选与裁决分别估算。未准备的某阶段用 `planned_production` 代替 `exchange_id`，对象内提供已登记的 `production_id`、`stage`（`candidate` 或 `arbitration`）、`model`、`max_tokens` 和真实 `purpose`。该项同时给当前 `facts` 与 `ceiling_usd`。同一对象两阶段用同一 Claude 型号。两份实际候选、其他必要材料及公开历史计入裁决的输入上界。批准覆盖同一对象、版本和具体阶段。发送时以当前事实复算，在该阶段的输出与预留上界及任务总额度内核对实际请求。原生执行可在等待费用决定时继续。
+
 摄入真实预算答复。答复只决定费用时，以 `task handle --action budget` 处理，保存其来源并沿用当前工作输入。答复同时改变实质工作范围时，按工作更改处理，更新受影响的请求、Split 与费率估算。实际费用答复须与当时展示的范围对应。用下列命令记录用户实际批准的范围。
 
 ```text
@@ -60,6 +62,34 @@ python -B tools/codex.py consult budget-approve --root TASK --preview PREVIEW.js
 ```
 
 用户从预览中批准较低数额时，在 `budget-approve` 上用 `--task-ceiling-usd` 记录实际上限。用户主动设置新的任务费用限额时，摄入实际费用答复后用 `consult budget-limit --root TASK --reply-file RAW.txt --source ACTUAL_REF --quote ACTUAL_EXACT_WORDS --task-ceiling-usd LIMIT` 记录。限额也适用于切换入口后的请求。在有效任务范围内复用这条决定。扩大上限、钱包、角色或型号范围时，先说明变化再取得真实决定。发送前两个参与层都重新核对当前余额、价格、已承诺额和准备请求，按 [SPLIT](SPLIT.md) 执行每次本机检查。费用答复只确立付费授权，内容决定分别由任务原话或实际内容答复支持。
+
+### 第二层准备、两份成品与实际落实
+
+固定在 1.1 的任务按 [CONSULT](CONSULT.md) 判断实际目的。仅委托意见的请求用 `consult prepare --root TASK --input GUIDANCE.txt --exchange-id G --guidance`。委托实际成品时，把当前用户要求、交付范围和验收条件写入 UTF-8 的 `SCOPE.md`，向实际原生 L3 派发该工作。用真实代理身份和本次派发出处登记，再准备 Claude 候选请求。制作所选论文读物时，下列两条命令分别加上同一个 `--paper-root PAPER`。
+
+```text
+python -B tools/codex.py production start --root TASK --production-id F --scope SCOPE.md --actor NATIVE_ACTOR --dispatch-ref ACTUAL_DISPATCH
+python -B tools/codex.py consult prepare --root TASK --input CANDIDATE_TASK.md --exchange-id C --production-id F --production-stage candidate
+```
+
+每次准备可选择必要原文与图。准备后按 [SPLIT](SPLIT.md) 绑定该请求的计划，按当前已批准阶段与费用事实实际发送。调用中的公开正文按 [LIVE](LIVE.md) 转播。原生完成后登记同范围真实候选的完整 UTF-8 正文与返回出处。取得两份同版本可用成品后，准备终裁请求。
+
+```text
+python -B tools/codex.py production submit-native --root TASK --production-id F --actor NATIVE_ACTOR --output NATIVE.md --return-ref ACTUAL_RETURN
+python -B tools/codex.py consult inspect --root TASK --exchange-id C
+python -B tools/codex.py consult prepare --root TASK --input ARBITRATION_TASK.md --exchange-id A --production-id F --production-stage arbitration --candidate-exchange C
+```
+
+终裁准备复用实际 Claude 候选交换，按原样回放其公开正文，在当前提交加入共同作用域及原生候选全文。按真实对象加所需原件和图，让 Claude 能判断两份作品。两轮 `prepare` 使用同一个实际型号，选择非默认型号时两轮均明确传入 `--model`。终裁另做当前 Split、费用核对和发送。`consult inspect` 查看实际交换，`production inspect` 查看原生派发、实际稿件及当前应用状态。
+
+Main 实际采纳裁决后，将交付的文件或完整答复正文与裁决绑定。记录具体作品变化，交付按 [RETURN](RETURN.md) 和 [DELIVERY](DELIVERY.md) 进行。
+
+```text
+python -B tools/codex.py production record-applied --root TASK --production-id F --arbitration-exchange A --output FINAL --effect ACTUAL_EFFECT
+python -B tools/codex.py production inspect --root TASK --production-id F
+```
+
+受到实质纠正时，旧稿、公开交换和费用仍按来源保存，新的正式产出用当前范围登记。用户明确接受单侧降级结果时，用 `production release --root TASK --production-id F --disposition fallback --source ACTUAL_REF --quote ACTUAL_EXACT_WORDS --effect ACTUAL_EFFECT` 保存其真实选择。已有替代对象时，`release --disposition superseded --replacement-production-id CURRENT_F` 保存原对象与替代的关系，仍需实际决定的来源及原话。等待和失败按实际状态保留，未知传输先读回并对账。
 
 ## 2. 一份普通笔记与按需材料
 

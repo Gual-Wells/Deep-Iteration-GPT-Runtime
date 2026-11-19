@@ -1,6 +1,8 @@
-# DIGR for Codex · Stable 1.0.0
+# DIGR for Codex · Stable 1.1.0
 
 稳定版的执行入口见 [PROTOCOL](codex/PROTOCOL.md)，原有功能的接续见[兼容范围](docs/CODEX_STABLE_COMPATIBILITY.md)。
+
+[原语宪法](codex/CONSTITUTION.md)适用于整个当前 Codex 协议。正式内容委托按 [CONSULT](codex/CONSULT.md) 发起同题双边产出、Claude 裁决及 Main 落实。
 
 `DIGR：任务` 可在真实共享钱包可用范围内邀请 Claude 作第一层子议会成员，引入外部证据和替代解释。原生初议与子议会独立推进，由原生议会取得真实原文后再议。`DIGR：：任务` 可同时采用两层，先向用户说明实际范围和保守费用上界，取得决定后再调用。第二层按实际委托让 Claude 指导内容取舍或出稿。每次提交前完成本机 Split，Codex 负责必要原件、核对与工程。详见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
 
@@ -12,7 +14,7 @@ Codex 按当前模型和推理设置工作。五档决定研究责任。预见�
 
 0.9.0把[X文件交付](codex/DELIVERY.md)接入DIGR、DIGRP：无`X`在当前聊天返回文件；`DIGR(X):…`、`DIGRP(X):…`和`(X=Gmail)`均发送到本机配置的本人Gmail。常规投入参数后可另接一个X栏，例如`DIGRP(N=16,R=4)(X=Gmail):…`。X只控制任务约定的最终文件；没有文件时保留文字答复，不额外造文件。本版仅实现Gmail，个人目标在私有本机配置中，任务建立时解析并保存。
 
-[DIGR 论文0.6.1](paper/PROTOCOL.md)由Sonnet根据原论文和用户用途原生驱动内容与阅读路线，取消预设小m职责及其映射门槛。Codex自主取材、复算、制作和核验，每篇仍有完整M及一份[标准页桌面PDF](paper/PDF_DESIGN.md)。无X的完整论文可直接本地返回；有X时逐篇发送Gmail并读回，所有论文及公共工作完成后才结束父任务。交付工具在外发前保存发送状态，响应不明先对账；真实发送使用已有Gmail原生连接器。[操作技能](.agents/skills/digr-delivery/SKILL.md)随同一不可变pin提供。旧pin和既有Gmail/分卷历史保持原身份。
+[DIGR 论文0.6.2](paper/PROTOCOL.md)以同一论文和用户用途组织原生与 Sonnet 两份候选，Sonnet 裁决后由 Codex 落实。每篇有完整 M 和一份[标准页桌面 PDF](paper/PDF_DESIGN.md)。无 X 在聊天交付，有 X 时逐篇发送本人 Gmail 并读回。确切来源、发送意图与旧 pin 均按原契约保存。[交付操作](.agents/skills/digr-delivery/SKILL.md)随同一不可变 pin 提供。
 
 0.8.3接入社区 Anti-Defensive Writing：有据主张先行，删除重复辩护、叠加保留和自我贬低，必要限定准确落在相关主张。核心规则进入必读PROTOCOL、RETURN及普通任务轻量约定；中英双语完整技能连同不可变来源和MIT许可随分发提供。[来源与接入说明](docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md)。
 

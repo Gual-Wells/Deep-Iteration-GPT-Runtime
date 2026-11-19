@@ -34,6 +34,7 @@ codex/CHAT.md
 codex/CHAT_DEEP.md
 codex/CHAT_LIGHT.md
 codex/COLLABORATION.md
+codex/CONSTITUTION.md
 codex/CONSULT.md
 codex/COUNCIL.md
 codex/DELIVERY.md
@@ -477,6 +478,7 @@ runtime/codex_preprint_learning.py
 runtime/codex_preprint_sources.py
 runtime/codex_preprint_study.py
 runtime/codex_presets.py
+runtime/codex_production.py
 runtime/codex_profile.py
 runtime/codex_public_stream.py
 runtime/codex_response.py
@@ -934,6 +936,8 @@ tests/test_codex_preprint_learning.py
 tests/test_codex_preprint_sources.py
 tests/test_codex_preprint_study.py
 tests/test_codex_presets.py
+tests/test_codex_production.py
+tests/test_codex_production_interop.py
 tests/test_codex_profile.py
 tests/test_codex_public_stream.py
 tests/test_codex_resource_return.py
@@ -997,6 +1001,7 @@ tools/codex_live.py
 tools/codex_paper.py
 tools/codex_personal.py
 tools/codex_preprint.py
+tools/codex_production.py
 tools/codex_profile.py
 tools/codex_return.py
 tools/codex_timeline.py

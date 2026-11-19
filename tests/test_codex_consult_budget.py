@@ -7,11 +7,12 @@ import unittest
 from unittest.mock import patch
 
 from runtime import codex_consult as consult, codex_consult_budget as authority, codex_wallet as wallet
-from runtime import codex_council as council
+from runtime import codex_council as council, codex_production as production
 from runtime.codex_lifecycle import handle_message, ingest_message, load_lifecycle
 from runtime.codex_session import create_session
 
 PIN = '1.0.0@' + 'e' * 40
+PRODUCTION_PIN = '1.1.0@' + 'f' * 40
 WALLET = 'local-offline-wallet'
 
 
@@ -37,9 +38,9 @@ class LayeredBudgetTests(unittest.TestCase):
         path.write_text(text, encoding='utf-8')
         return path
 
-    def task(self, label, request):
+    def task(self, label, request, *, pin=PIN):
         root = self.folder / label
-        return root, create_session(root, request=self.file(label + '.txt', request), p_run=PIN)
+        return root, create_session(root, request=self.file(label + '.txt', request), p_run=pin)
 
     def message(self, label, user_text, *, action='budget', selection=None, root=None):
         root = root or self.root
@@ -173,6 +174,106 @@ class LayeredBudgetTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'combined task envelope'):
             self.view(['guide', member], total=.3)
         self.assertAlmostEqual(self.view(['guide', member], total=.4)['available_to_reserve_usd'], 1.)
+
+    def production_scopes(self, *production_ids):
+        self.root, self.session = self.task('formal', 'DIGR:: Produce a fixture result', pin=PRODUCTION_PIN)
+        return {name: production.start(self.root, name, actor='D01', dispatch_ref='fixture-dispatch-' + name,
+                    scope_path=self.file(name + '-scope.txt', 'Produce the ' + name + ' artifact.'))
+                for name in production_ids}
+
+    def formal_attempt(self, record, stage, *, model=consult.DEFAULT_MODEL):
+        binding = {key: record[key] for key in ('production_id', 'scope_sha256', 'input_ref')}
+        return {'input_ref': record['input_ref'], 'participation_role': 'consult_guidance',
+                'transport_status': 'PREPARED', 'request_sha256': '8' * 64,
+                'collaboration_contract': {'requested_model': model}, 'production': {**binding, 'stage': stage}}
+
+    def planned_stage(self, production_id, stage, *, max_tokens=100, model=consult.DEFAULT_MODEL):
+        return {'planned_production': {'production_id': production_id, 'stage': stage, 'model': model,
+                                       'max_tokens': max_tokens, 'purpose': 'Compare two complete fixture drafts'},
+                'facts': self.facts(model=model), 'ceiling_usd': .2}
+
+    def resolve_formal(self, attempt, *, ceiling=.2, max_tokens=100, wallet_id=WALLET):
+        model = attempt['collaboration_contract']['requested_model']
+        return authority.resolve(self.root, self.session, load_lifecycle(self.root), attempt, self.facts(model=model),
+                                 wallet_id, ceiling_usd=ceiling, max_tokens=max_tokens)
+
+    def test_formal_candidate_and_projected_arbitration_share_one_approved_envelope(self):
+        scope = self.production_scopes('draft')['draft']
+        consult.prepare_request(self.root, input_path=self.work, exchange_id='first-draft', max_tokens=100,
+                                production_id='draft', production_stage='candidate')
+        candidate = self.selected('first-draft')
+        arbitration = self.formal_attempt(scope, 'arbitration')
+        jobs = [{'exchange_id': 'first-draft', 'facts': self.facts(), 'ceiling_usd': .2},
+                self.planned_stage('draft', 'arbitration')]
+        parameters = {'scope': 'Produce and arbitrate the fixture draft', 'wallet_id': WALLET}
+        view = authority.preview(self.root, jobs=jobs, task_ceiling_usd=.5, **parameters)
+        with self.assertRaisesRegex(ValueError, 'combined task envelope'):
+            authority.preview(self.root, jobs=jobs, task_ceiling_usd=.3, **parameters)
+        with self.assertRaisesRegex(ValueError, 'counts each formal production stage only once'):
+            duplicate = jobs + [self.planned_stage('draft', 'candidate')]
+            authority.preview(self.root, jobs=duplicate, task_ceiling_usd=.7, **parameters)
+        self.assertEqual([row['request_basis'] for row in view['requests']], ['PREPARED_EXCHANGE', 'PLANNED_PRODUCTION'])
+        self.assertEqual([row['production'] for row in view['requests']],
+                         [self.formal_attempt(scope, 'candidate')['production'], arbitration['production']])
+        self.assertAlmostEqual(view['prepared_reservation_upper_usd'], .4)
+        reply = self.message('formal-approval', 'Approve $0.45 for these two named stages.')
+        decision = authority.approve(self.root, preview_path=self.save_preview(view), task_ceiling_usd=.45, **reply)
+        for attempt, quote in zip((candidate, arbitration), view['requests']):
+            facts = self.resolve_formal(attempt)
+            self.assertEqual(facts['budget_total_usd'], .45)
+            self.assertEqual(facts['authorization_evidence']['decision_id'], decision['decision_id'])
+            self.assertEqual(facts['authorization_evidence']['production'], quote['production'])
+        self.assertFalse(self.ledger.exists(), 'pricing, approval and budget resolution make no reservation')
+
+    def test_plain_guidance_and_candidate_approvals_do_not_cover_other_production_stages(self):
+        scopes = self.production_scopes('draft', 'other')
+        candidate = self.formal_attempt(scopes['draft'], 'candidate')
+        arbitration = self.formal_attempt(scopes['draft'], 'arbitration')
+        consult.prepare_request(self.root, input_path=self.work, exchange_id='guide', max_tokens=100, guidance=True)
+        guide_offer = self.save_preview(self.view(['guide']))
+        reply = self.message('guidance-approval', 'Approve the cost of this guidance.')
+        authority.approve(self.root, preview_path=guide_offer, **reply)
+        self.assertEqual(self.resolve('guide')['budget_total_usd'], .5)
+        for attempt in (candidate, arbitration):
+            with self.assertRaisesRegex(ValueError, 'production stage.*outside the approved budget scope'):
+                self.resolve_formal(attempt)
+
+        view = authority.preview(self.root, jobs=[self.planned_stage('draft', 'candidate')], task_ceiling_usd=.5,
+                                 scope='Draft the fixture result', wallet_id=WALLET)
+        reply = self.message('candidate-approval', 'Approve the draft cost.')
+        authority.approve(self.root, preview_path=self.save_preview(view), **reply)
+        self.assertEqual(self.resolve_formal(candidate)['budget_total_usd'], .5)
+        for attempt in (arbitration, self.formal_attempt(scopes['other'], 'candidate')):
+            with self.assertRaisesRegex(ValueError, 'production stage.*outside the approved budget scope'):
+                self.resolve_formal(attempt)
+        with self.assertRaisesRegex(ValueError, 'outside the approved budget scope'):
+            self.resolve('guide')
+
+    def test_formal_arbitration_checks_current_scope_wallet_model_and_quoted_bounds(self):
+        scope = self.production_scopes('draft')['draft']
+        arbitration = self.formal_attempt(scope, 'arbitration')
+        view = authority.preview(self.root, jobs=[self.planned_stage('draft', 'arbitration')], task_ceiling_usd=.5,
+                                 scope='Arbitrate the fixture drafts', wallet_id=WALLET)
+        reply = self.message('arbitration-approval', 'Approve the arbitration cost.')
+        authority.approve(self.root, preview_path=self.save_preview(view), **reply)
+        self.assertEqual(self.resolve_formal(arbitration, ceiling=.1, max_tokens=80)['budget_total_usd'], .5)
+        with self.assertRaisesRegex(ValueError, 'outside the approved budget scope'):
+            self.resolve_formal(arbitration, wallet_id='unapproved-wallet')
+        other_model = self.formal_attempt(scope, 'arbitration', model='anthropic/claude-opus-4.8')
+        with self.assertRaisesRegex(ValueError, 'outside the approved budget scope'):
+            self.resolve_formal(other_model)
+        for options in ({'ceiling': .21}, {'max_tokens': 101}):
+            with self.assertRaisesRegex(ValueError, 'exceeds the approved formal production stage quote'):
+                self.resolve_formal(arbitration, **options)
+        changed = self.formal_attempt({**scope, 'scope_sha256': '9' * 64}, 'arbitration')
+        with self.assertRaisesRegex(ValueError, 'does not match the current production scope'):
+            self.resolve_formal(changed)
+        self.message('new-current-input', 'DO: Include the newly requested section.', action='continue')
+        with self.assertRaisesRegex(ValueError, 'must use a current production scope'):
+            self.resolve_formal(arbitration)
+        self.message('revised-u0', 'DO: Replace the artifact with a new one.', action='revise')
+        with self.assertRaisesRegex(ValueError, 'material task revision'):
+            self.resolve_formal(arbitration)
 
 
 if __name__ == '__main__':

@@ -916,7 +916,7 @@ def _claude_costs(root: Path) -> dict:
         contract = value.get('collaboration_contract')
         contract = contract if isinstance(contract, Mapping) else {}
         # No request messages or public/hidden model content are read here.
-        rows.append({'exchange_id': value.get('exchange_id', path.parent.name),
+        row = {'exchange_id': value.get('exchange_id', path.parent.name),
             'participation_role': value.get('participation_role', 'consult_guidance'),
             'member_id': scope.get('member_id'), 'cycle_id': scope.get('cycle_id'),
             'round_id': scope.get('round_id'),
@@ -925,7 +925,11 @@ def _claude_costs(root: Path) -> dict:
             'settled_usd': known if value.get('reconciled_at') else None,
             'observed_usd': known if not value.get('reconciled_at') else None,
             'estimated_usd': estimate, 'estimate_basis': estimate_basis, 'unresolved_reserved_usd': reserve,
-            'generation_id': value.get('generation_id')})
+            'generation_id': value.get('generation_id')}
+        production = value.get('production')
+        if isinstance(production, Mapping):
+            row.update(production_id=production.get('production_id'), production_stage=production.get('stage'))
+        rows.append(row)
     wallet = {'status': 'UNAVAILABLE', 'claims': []}
     try:
         from .codex_wallet import inspect_task

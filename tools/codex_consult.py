@@ -40,6 +40,10 @@ def main(argv=None):
     prepare.add_argument('--input-revision', help='optional public source/handoff revision label')
     prepare.add_argument('--participation-role', choices=('consult_guidance', 'council_member'), default='consult_guidance')
     prepare.add_argument('--council-scope', type=Path, help='actual registered council member scope; not a role authorization')
+    prepare.add_argument('--guidance', action='store_true', help='advice on a decision, without an assigned production result')
+    prepare.add_argument('--production-id', help='the actual shared production and native dispatch')
+    prepare.add_argument('--production-stage', choices=('candidate', 'arbitration'))
+    prepare.add_argument('--candidate-exchange', help='the complete Claude candidate to compare with the native result')
     call = commands.add_parser('call', help='one physical inference POST with task-wide budget reservations')
     call.add_argument('--root', type=Path, required=True)
     call.add_argument('--exchange-id', required=True)
@@ -90,7 +94,9 @@ def main(argv=None):
                 images=args.image, continue_from=args.continue_from, exchange_id=args.exchange_id,
                 model=args.model, effort=args.effort, max_tokens=args.max_tokens, input_revision=args.input_revision,
                 paper_root=args.paper_root, participation_role=args.participation_role,
-                council_scope=read(args.council_scope) if args.council_scope else None)
+                council_scope=read(args.council_scope) if args.council_scope else None,
+                guidance=args.guidance, production_id=args.production_id, production_stage=args.production_stage,
+                candidate_exchange=args.candidate_exchange)
         elif args.command == 'call':
             session = read(args.root / 'session.json')
             live = consult.streams_public(session['P_run'])
@@ -101,8 +107,11 @@ def main(argv=None):
                 from runtime.codex_live import ParagraphRelay, stable_live
                 stable = stable_live(session['P_run'])
                 relay = ParagraphRelay(emit, stable=stable)
-                requested_model = read(args.root / 'consult/exchanges' / args.exchange_id / 'request.json')['model']
-                emit = lambda event: relay.feed({**event, 'requested_model': requested_model})
+                exchange = args.root / 'consult/exchanges' / args.exchange_id
+                requested_model = read(exchange / 'request.json')['model']
+                production_stage = (read(exchange / 'attempt.json').get('production') or {}).get('stage') if stable else None
+                emit = lambda event: relay.feed({**event, 'requested_model': requested_model,
+                                                 'production_stage': production_stage})
             result = consult.call_once(args.root, args.exchange_id, facts=read(args.facts),
                                        ceiling_usd=args.ceiling_usd, config_path=args.config,
                                        split_path=args.split_plan, on_public_event=emit)

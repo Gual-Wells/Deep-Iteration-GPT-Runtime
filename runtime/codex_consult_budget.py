@@ -50,9 +50,49 @@ def read_decision(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str
     return value
 
 
+def _production_stage(root: Path, session: Mapping[str, Any], input_ref: Mapping[str, Any], *,
+                      production_id: Any, stage: Any, model: str) -> dict:
+    from . import codex_production
+    from .codex_consult import _text
+    if not codex_production.enabled(session['P_run']):
+        raise ValueError('Formal production quotes require Stable 1.1 or later')
+    if stage not in ('candidate', 'arbitration'):
+        raise ValueError('A formal production quote needs the candidate or arbitration stage')
+    if not codex_production.claude_model(model):
+        raise ValueError('A formal production quote needs a canonical Anthropic Claude model')
+    production_id = _text('production_id', production_id)
+    record = codex_production.inspect(root, production_id)
+    if (record.get('current') is not True or record.get('resolved') is not False
+            or record.get('production_id') != production_id or record.get('task_uuid') != session['task_uuid']
+            or record.get('P_run') != session['P_run'] or record.get('task_request_sha256') != session['request_sha256']
+            or record.get('input_ref') != input_ref):
+        raise ValueError('A formal production quote must use a current production scope in this task')
+    return {'production_id': production_id, 'stage': stage, 'input_ref': dict(input_ref),
+            'scope_sha256': record['scope_sha256']}
+
+
+def _attempt_production(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any],
+                        attempt: Mapping[str, Any], model: str) -> dict | None:
+    binding = attempt.get('production')
+    if binding is None:
+        return None
+    from . import codex_production
+    from .codex_consult import _input_ref
+    if not codex_production.enabled(session['P_run']):
+        return None
+    if not isinstance(binding, Mapping) or attempt.get('participation_role') != 'consult_guidance':
+        raise ValueError('Only formal Consult can use a production budget scope')
+    input_ref = _input_ref(lifecycle)
+    stage = _production_stage(root, session, input_ref, production_id=binding.get('production_id'),
+                              stage=binding.get('stage'), model=model)
+    if attempt.get('input_ref') != input_ref or any(binding.get(key) != item for key, item in stage.items()):
+        raise ValueError('The prepared formal Consult does not match the current production scope')
+    return stage
+
+
 def preview(root: Path, *, jobs: Sequence[Mapping[str, Any]], task_ceiling_usd: float,
             scope: str, wallet_id: str) -> dict:
-    """Price prepared requests or a projected member before its council starts."""
+    """Price prepared requests and projected Council or formal production work."""
     from . import codex_consult as consult
     root, session, lifecycle = consult._task(root, active=True)
     if not codex_collaboration.layered_policy(session['P_run']) or _policy_mode(lifecycle) != 'ALLOW':
@@ -68,10 +108,27 @@ def preview(root: Path, *, jobs: Sequence[Mapping[str, Any]], task_ceiling_usd: 
 
     input_ref = consult._input_ref(lifecycle)
     rows, budgets, seen = [], [], set()
+    seen_stages, production_models = set(), {}
     for job in jobs:
         if not isinstance(job, Mapping) or not isinstance(job.get('facts'), Mapping):
             raise ValueError('Every budget preview job needs current pricing and wallet facts')
-        if 'planned_council_member' in job:
+        production = None
+        if 'planned_production' in job:
+            planned = job['planned_production']
+            if ('exchange_id' in job or 'planned_council_member' in job or not isinstance(planned, Mapping)
+                    or set(planned) != {'production_id', 'stage', 'model', 'max_tokens', 'purpose'}):
+                raise ValueError('A planned formal production request needs its ID, stage, model, output bound and purpose')
+            model = consult._text('planned production model', planned['model'])
+            max_tokens = planned['max_tokens']
+            if type(max_tokens) is not int or max_tokens < 1:
+                raise ValueError('A planned production stage needs a positive output-token bound')
+            production = _production_stage(root, session, input_ref, production_id=planned['production_id'],
+                                           stage=planned['stage'], model=model)
+            request = {'model': model, 'max_tokens': max_tokens}
+            role = 'consult_guidance'
+            origin = {'request_basis': 'PLANNED_PRODUCTION',
+                      'purpose': consult._text('planned production purpose', planned['purpose'])}
+        elif 'planned_council_member' in job:
             planned = job['planned_council_member']
             if ('exchange_id' in job or not isinstance(planned, Mapping)
                     or set(planned) != {'model', 'max_tokens', 'purpose'}):
@@ -97,6 +154,15 @@ def preview(root: Path, *, jobs: Sequence[Mapping[str, Any]], task_ceiling_usd: 
                 raise ValueError('Budget preview needs a prepared Consult or Council role')
             origin = {'request_basis': 'PREPARED_EXCHANGE', 'exchange_id': exchange,
                       'request_sha256': attempt['request_sha256']}
+            production = _attempt_production(root, session, lifecycle, attempt, request['model'])
+        if production is not None:
+            production_id, stage = production['production_id'], production['stage']
+            if (production_id, stage) in seen_stages:
+                raise ValueError('Budget preview counts each formal production stage only once')
+            if production_models.setdefault(production_id, request['model']) != request['model']:
+                raise ValueError('A production candidate and its arbitration must quote the same Claude model')
+            seen_stages.add((production_id, stage))
+            origin['production'] = production
         codex_collaboration.require_claude_permission(session['P_run'], request['model'], lifecycle,
             participation_role=role)
         facts = {**job['facts'], 'authorization_ref': 'PREVIEW_ONLY', 'budget_total_usd': total}
@@ -203,7 +269,8 @@ def record_limit(root: Path, *, user_text: str, source: str, quote: str, task_ce
 
 
 def resolve(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any],
-            attempt: Mapping[str, Any], facts: Mapping[str, Any], wallet_id: str) -> dict:
+            attempt: Mapping[str, Any], facts: Mapping[str, Any], wallet_id: str, *,
+            ceiling_usd: float | None = None, max_tokens: int | None = None) -> dict:
     """Derive canonical authority. Caller-supplied facts can only narrow the charge."""
     from .codex_consult import _hash, _json_bytes, _number, _text
     if not codex_collaboration.layered_policy(session['P_run']):
@@ -238,13 +305,24 @@ def resolve(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any]
         approved = approval['preview']
         if approved['scope_revision_message_id'] != lifecycle.get('latest_revision_message_id', 0):
             raise ValueError('The material task revision requires a fresh scoped cost preview and user approval')
-        if (approved['wallet_id'] != wallet_id or not any(item['role'] == role and item['model'] == model
-                for item in approved['requests'])):
+        production = _attempt_production(root, session, lifecycle, attempt, model)
+        covered = [item for item in approved['requests'] if item['role'] == role and item['model'] == model
+                   and item.get('production') == production]
+        if approved['wallet_id'] != wallet_id or not covered:
+            if production is not None:
+                raise ValueError('The formal production stage, scope, model or wallet falls outside the approved budget scope')
             raise ValueError('The requested role, model or wallet falls outside the approved budget scope')
         authority = {'kind': 'EXPLICIT_TASK_APPROVAL', 'scope': approved['scope'],
                      'message_id': approval['reply']['message_id'], 'decision_id': approval['decision_id'],
                      'preview_id': approved['preview_id'], 'source_ref': approval['reply']['source']['source_ref'],
                      'source_sha256': approval['reply']['source']['sha256']}
+        if production is not None:
+            quoted = covered[0]
+            actual_ceiling = _number('actual formal production reservation ceiling', ceiling_usd, positive=True)
+            if (type(max_tokens) is not int or not 1 <= max_tokens <= quoted['max_output_tokens']
+                    or actual_ceiling > quoted['reservation_ceiling_usd'] + 1e-12):
+                raise ValueError('The actual output or reservation bound exceeds the approved formal production stage quote')
+            authority['production'] = production
     else:
         raise ValueError('Current task has no valid layered Claude choice')
     ceiling = min(caps) if caps else None

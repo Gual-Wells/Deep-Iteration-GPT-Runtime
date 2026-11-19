@@ -23,7 +23,7 @@ from urllib.parse import urlencode, urlsplit, urlunsplit
 from urllib.request import HTTPRedirectHandler, HTTPHandler, HTTPSHandler, ProxyHandler, Request, build_opener
 import uuid
 
-from . import codex_split, codex_collaboration, codex_wallet, codex_io, codex_paper
+from . import codex_split, codex_collaboration, codex_wallet, codex_io, codex_paper, codex_production
 from .codex_lifecycle import content_message
 
 FORMAT = 'digr-codex-consult-1'
@@ -168,14 +168,17 @@ def task_bound(p_run: str) -> bool:
 
 
 def _task_binding(session: Mapping[str, Any], role: str, authoring_scope=None,
-                  council_scope=None) -> dict:
+                  council_scope=None, *, purpose=None, production=None) -> dict:
     identity = session.get('task_uuid')
     if not isinstance(identity, str) or not re.fullmatch(r'[0-9a-f]{32}', identity):
         raise ValueError('Task-bound Consult requires the frozen session task UUID')
-    return {'format': 'digr-consult-task-binding-1', 'task_uuid': identity,
-            'P_run': session['P_run'], 'task_request_sha256': session['request_sha256'],
-            'participation_role': role, 'authoring_scope': authoring_scope,
-            'council_scope': council_scope}
+    binding = {'format': 'digr-consult-task-binding-1', 'task_uuid': identity,
+               'P_run': session['P_run'], 'task_request_sha256': session['request_sha256'],
+               'participation_role': role, 'authoring_scope': authoring_scope,
+               'council_scope': council_scope}
+    if purpose is not None:
+        binding.update(purpose=purpose, production=production)
+    return binding
 
 
 def _binding_user(binding: Mapping[str, Any]) -> str:
@@ -271,7 +274,8 @@ def _paper_scopes(root: Path, session: Mapping[str, Any]) -> list[dict]:
         minimum = codex_paper.CORE_MINIMUMS.get(addon_version, ()) if isinstance(addon_version, str) else ()
         if minimum < (0, 10, 0) or core_version < minimum:
             continue
-        if codex_collaboration.layered_policy(session['P_run']) and addon_version != codex_paper.VERSION:
+        if (codex_collaboration.layered_policy(session['P_run'])
+                and addon_version != codex_paper.addon_version_for(core_version)):
             continue
         try:
             batch_root = Path(_text('paper batch path', scope.get('batch')))
@@ -509,9 +513,22 @@ def _load(root: Path, exchange_id: str, *, verify_public: bool = True) -> tuple[
     request = json.loads(request_raw)
     if not isinstance(request, dict) or not isinstance(request.get('messages'), list):
         raise ValueError('Consult request has no public messages')
+    role = attempt.get('participation_role')
+    purpose, production = attempt.get('consult_purpose'), attempt.get('production')
+    if codex_production.enabled(session['P_run']) and role == 'consult_guidance':
+        if purpose == 'guidance' and (production is not None or attempt.get('authoring_scope') is not None):
+            raise ValueError('Guidance cannot carry a production or formal paper assignment')
+        if purpose not in {'guidance', 'production'} or (
+            purpose == 'production' and not isinstance(production, Mapping)
+        ):
+            raise ValueError('Stable formal Consult must bind guidance or actual production')
+        if production is not None and production.get('authoring_scope') != attempt.get('authoring_scope'):
+            raise ValueError('Production authoring scope differs from the actual exchange')
+    elif purpose is not None or production is not None:
+        raise ValueError('This pin and role do not carry a formal production purpose')
     if task_bound(session['P_run']):
         expected_binding = _task_binding(session, attempt.get('participation_role'),
-            attempt.get('authoring_scope'), attempt.get('council_scope'))
+            attempt.get('authoring_scope'), attempt.get('council_scope'), purpose=purpose, production=production)
         if (attempt.get('task_binding') != expected_binding
                 or request.get('user') != _binding_user(expected_binding)):
             raise ValueError('Consult exchange/request belongs to a different task UUID or scope')
@@ -667,6 +684,30 @@ def _generic_context(root: Path, lifecycle: Mapping[str, Any],
     return sources, parts
 
 
+def _production_exchange(root: Path, p_run: str, role: str, *, guidance: bool,
+                         production_id: str | None, stage: str | None,
+                         candidate_exchange: str | None) -> tuple[str | None, dict | None, list[Path]]:
+    selected = any(value is not None for value in (production_id, stage, candidate_exchange))
+    if not codex_production.enabled(p_run) or role != 'consult_guidance':
+        if selected or guidance:
+            raise ValueError('Formal production or guidance selection requires the new Stable formal role')
+        return None, None, []
+    if guidance:
+        if selected:
+            raise ValueError('Guide a decision or prepare a stage of the assigned production')
+        return 'guidance', None, []
+    if production_id is None:
+        raise ValueError('Select guidance or register real native and Claude production before preparation')
+    stage = stage or 'candidate'
+    if stage not in {'candidate', 'arbitration'} or (stage == 'arbitration') != (candidate_exchange is not None):
+        raise ValueError('Arbitration needs the selected Claude candidate exchange')
+    binding, sources = codex_production.bind_exchange(root, production_id, stage=stage,
+                                                       candidate_exchange=candidate_exchange)
+    # Consult continuation carries the exact Claude candidate as an assistant
+    # message. Only the shared assignment and native result need material blocks.
+    return 'production', binding, sources[:2]
+
+
 def prepare_request(
     root: Path, *, input_path: Path, materials: Sequence[Path] = (), images: Sequence[Path] = (),
     continue_from: str | None = None, exchange_id: str | None = None,
@@ -674,6 +715,8 @@ def prepare_request(
     max_tokens: int = DEFAULT_MAX_TOKENS, input_revision: str | None = None,
     paper_root: Path | None = None,
     participation_role: str = 'consult_guidance', council_scope: Mapping[str, Any] | None = None,
+    guidance: bool = False, production_id: str | None = None, production_stage: str | None = None,
+    candidate_exchange: str | None = None,
 ) -> dict[str, Any]:
     """Build the exact public messages, expanding only explicitly selected files.
 
@@ -687,6 +730,13 @@ def prepare_request(
         participation_role=participation_role)
     codex_collaboration.requirements(session['P_run'], model, None,
         participation_role=participation_role, council_scope=council_scope)
+    purpose, production, sources_for_production = _production_exchange(
+        root, session['P_run'], participation_role, guidance=guidance, production_id=production_id,
+        stage=production_stage, candidate_exchange=candidate_exchange)
+    if production and production['stage'] == 'arbitration':
+        if continue_from not in {None, candidate_exchange}:
+            raise ValueError('Arbitration continues the selected Claude candidate')
+        continue_from = candidate_exchange
     if participation_role == 'council_member':
         if paper_root is not None:
             raise ValueError('Council member work is distinct from formal paper authoring')
@@ -712,6 +762,12 @@ def prepare_request(
             old = parent['council_scope']
             if any(old.get(key) != council_scope.get(key) for key in ('council_id', 'member_id', 'line_id')):
                 raise ValueError('Cannot continue another council member research history')
+        prior_production = parent.get('production')
+        if prior_production is not None and (
+            production is None or prior_production['production_id'] != production['production_id']
+            or prior_production['stage'] != 'candidate'
+        ):
+            raise ValueError('Continue production only from a candidate for the same assigned result')
         if not parent.get('public_sha256'):
             raise ValueError('Prior exchange has no observed public answer to continue')
         messages = previous['messages'] + [{'role': 'assistant', 'content': (parent_dir / 'public.md').read_bytes().decode('utf-8')}]
@@ -737,6 +793,10 @@ def prepare_request(
                             and any(scope['version'] in {'0.5.0', '0.5.1', '0.5.2', '0.5.3', '0.5.4'} for scope in _paper_scopes(root, session)))
         if not codex_collaboration.unified(session['P_run']) and (new_paper_invocation or new_native_addon):
             raise ValueError('Paper authoring requires an explicit --paper-root for its first exchange')
+    if purpose == 'guidance' and authoring_scope is not None:
+        raise ValueError('Formal paper authoring requires a registered native and Claude production')
+    if production is not None and production.get('authoring_scope') != authoring_scope:
+        raise ValueError('Production must retain the registered paper or generic authoring scope')
     if codex_collaboration.unified(session['P_run']) and authoring_scope is None:
         actual_system = {'role': 'system', 'content': _model_system(session['P_run'], model, participation_role)}
         if messages[0] != actual_system:
@@ -762,11 +822,27 @@ def prepare_request(
         parts.append(_source_text(info, current, label='HOST WORKING INPUT - CURRENT QUESTIONS AND FINDINGS'))
     else:
         sources, parts = [info], [current]
+    for path, kind, label in zip(sources_for_production, ('PRODUCTION_SCOPE', 'NATIVE_CANDIDATE'),
+                                 (codex_production.SCOPE_LABEL, codex_production.NATIVE_LABEL)):
+        info, raw = _source(path, kind)
+        sources.append(info)
+        parts.append(_source_text(info, raw.decode('utf-8-sig'), label=label))
     for path in materials:
         info, raw = _source(path, 'TEXT_MATERIAL')
         text = raw.decode('utf-8-sig')
         sources.append(info)
         parts.append(_source_text(info, text))
+    if production:
+        if production['stage'] == 'candidate':
+            parts.append('Produce an independently usable candidate for the exact shared assignment supplied. '
+                         'The native candidate will be supplied separately at arbitration.')
+        else:
+            parts.append('Arbitrate the two actual candidates under the same user requirements and evidence. '
+                         'Your preceding public answer is the Claude candidate. The material labeled as the '
+                         'native candidate is the independent Codex result. Consider both on equal terms. '
+                         'Select the native candidate, select the Claude candidate, or produce a synthesis. '
+                         'Give the actual final content or precise decisions that Main must apply. '
+                         'If a decisive requirement cannot be settled, explain the remaining issue rather than declaring it complete.')
     content: Any = '\n'.join(parts)
     if images:
         content = [{'type': 'text', 'text': content}]
@@ -795,8 +871,11 @@ def prepare_request(
         request['user'] = 'digr-council-' + _hash(_json_bytes(council_scope))
     binding = None
     if task_bound(session['P_run']):
-        binding = _task_binding(session, participation_role, authoring_scope, council_scope)
+        binding = _task_binding(session, participation_role, authoring_scope, council_scope,
+                                purpose=purpose, production=production)
         request['user'] = _binding_user(binding)
+    if production:
+        codex_production.require_current(root, production, request=request)
     attempt = {'format': FORMAT, 'exchange_id': exchange_id, 'P_run': session['P_run'],
                'task_request_sha256': session['request_sha256'], 'created_at': _now(),
                'input_ref': _input_ref(lifecycle), 'input_revision': input_revision,
@@ -809,6 +888,10 @@ def prepare_request(
                'evidence_scope': 'selected actual public bytes; no semantic or authorization certification'}
     if binding is not None:
         attempt['task_binding'] = binding
+    if purpose is not None:
+        attempt['consult_purpose'] = purpose
+        if production is not None:
+            attempt['production'] = production
     if authoring_scope is not None:
         attempt['authoring_scope'] = authoring_scope
         attempt['authoring_scope_sha256'] = _hash(_json_bytes(authoring_scope))
@@ -1159,6 +1242,9 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
             if any(claim['claim_id'] == identity for claim in codex_wallet.inspect_task(root, session)['claims']):
                 raise ValueError('Shared wallet already claimed this exchange; inspect/recover without repeating inference')
         _require_current_authoring(root, session, lifecycle, attempt)
+        production = attempt.get('production')
+        if production is not None:
+            codex_production.require_current(root, production, request=request)
         split_record = None
         if codex_split.required(session['P_run']) or split_path is not None:
             split_record = codex_split.Split(split_path,
@@ -1166,7 +1252,8 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
         if layered:
             from . import codex_consult_budget
             config, secret = _config(config_path)
-            authorized = codex_consult_budget.resolve(root, session, lifecycle, attempt, facts, config.get('wallet_id'))
+            authorized = codex_consult_budget.resolve(root, session, lifecycle, attempt, facts, config.get('wallet_id'),
+                                                     ceiling_usd=ceiling_usd, max_tokens=request['max_tokens'])
             budget = _budget(authorized, request, (), ceiling_usd, canonical_wallet=True, wallet_only=True)
         else:
             budget = _budget(facts, request, _all_attempts(root), ceiling_usd, canonical_wallet=parallel)
@@ -1225,13 +1312,15 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
                 participation_role=role)
             if not reserved or layered:
                 _require_current_authoring(root, current_session, current_lifecycle, attempt)
+            if production is not None:
+                codex_production.require_current(root, production, request=request)
             if role == 'council_member':
                 _member_scope(root, attempt['council_scope'], active=True, exchange_id=exchange_id, dispatch=layered)
             if split_record is not None and split_record['binding']['input_ref'] != _input_ref(current_lifecycle):
                 raise ValueError('New user input supersedes this Split; prepare the current task')
             if layered:
                 refreshed = codex_consult_budget.resolve(root, current_session, current_lifecycle, attempt,
-                    facts, config['wallet_id'])
+                    facts, config['wallet_id'], ceiling_usd=ceiling_usd, max_tokens=request['max_tokens'])
                 if (refreshed['authorization_ref'] != budget['authorization_ref']
                         or refreshed['budget_total_usd'] != budget['budget_total_usd']):
                     raise ValueError('Budget authority changed before sending; verify the new scope and bound')

@@ -1,4 +1,4 @@
-# DIGR Codex Stable 1.0 兼容范围
+# DIGR Codex Stable 兼容范围
 
 Codex 路由仍读取 `codex/codex-host-adaptation`，现行语义由发布 SHA 下的 codex/manifest.json、VERSION 与同 pin 执行束定义。历史会话继续使用创建时的 `version@SHA`，版本号相同也不跨 SHA 读写。这里只说明继任关系。
 
@@ -10,6 +10,7 @@ Codex 路由仍读取 `codex/codex-host-adaptation`，现行语义由发布 SHA 
 | 结果、过程透明、时间与状态 | LIVE、RETURN、共享 visits；独立来源、真实发布与当前文件。历史时间图按明确用途调用 |
 | 事实边界、逻辑分析、实验授权、写作表达 | METHOD、PERMISSIONS；分析可凭充分论证完成，必要工程检查独立作用 |
 | 外部研究、正式内容、公开流、成本与预算 | COUNCIL、CONSULT、逐次 SPLIT、USAGE；按角色与实际来源 |
+| Stable 1.1 的正式产出与全局约束 | 同范围的原生及 Claude 候选、Claude 终裁和实际落实；原语宪法约束发布与整个新 pin |
 | 论文阅读、翻译区分、同篇指导与每篇标准 PDF | 论文增量、`paper`；整篇第二层按实际委托，历史篇次按原契约 |
 | 文件交付 | DELIVERY 与 `delivery`；`(X)` 或 `(X=Gmail)` 送当前本人 Gmail，确定文件后按事实读回 |
 | 经验与知识、个人材料、英语 Voice 与 ESP | `experience`、`knowledge`、`personal`、`voice`、`preprint`；独立产品或按需入口 |

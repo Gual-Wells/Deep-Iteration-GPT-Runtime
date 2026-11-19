@@ -31,7 +31,7 @@ from runtime.codex_lifecycle import (
 
 TOOL_GROUPS = ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice',
                'return', 'preprint', 'personal', 'visits', 'paper', 'delivery',
-               'consult', 'council', 'usage', 'allot', 'live')
+               'consult', 'council', 'production', 'usage', 'allot', 'live')
 
 
 def read_object(path: Path) -> dict:

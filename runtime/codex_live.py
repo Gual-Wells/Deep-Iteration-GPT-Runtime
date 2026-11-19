@@ -74,10 +74,13 @@ def _lines(path, *, locked=False):
     return rows
 
 
-def _external_label(item, *, member=None, model_label=''):
+def _external_label(item, *, member=None, model_label='', production_stage=None):
     exchange = item.get('exchange_id')
     member = item.get('member_id') or member
     identity = ' / '.join(dict.fromkeys(name for name in (member, exchange) if name)) or 'Consult'
+    if production_stage in ('candidate', 'arbitration'):
+        label = 'Claude 候选' if production_stage == 'candidate' else 'Claude 终裁'
+        identity = label + ' / ' + identity
     if item['event'] in {'public_delta', 'public_text'}:
         return '**外部协作者 / ' + identity + model_label + '｜公开正文片段**'
     stage = '**▶ 已连接**' if item['event'] == 'connected' else '**■ 交换状态**'
@@ -128,7 +131,8 @@ class ParagraphRelay:
                  'text': text, 'first_sequence': state['first'], 'last_sequence': state['last'],
                  'public_status': 'PARTIAL',
                  'source': 'actual external public text; requested model identity is not yet confirmation'}
-        label = (_external_label(event, model_label=_model_label(state.get('model'))) if self.stable else
+        label = (_external_label(event, model_label=_model_label(state.get('model')),
+                                 production_stage=state.get('production_stage')) if self.stable else
                  '**外部协作者 / ' + (key[1] or key[0] or 'Consult')
                  + (' / 请求 ' + state['model'] + '（身份待核）' if state.get('model') else '')
                  + '｜正文增量（尚未收齐）**')
@@ -149,6 +153,7 @@ class ParagraphRelay:
                     'first': event.get('sequence'), 'last': event.get('sequence'), 'timer': None})
                 if isinstance(event.get('requested_model'), str):
                     state['model'] = event['requested_model']
+                state['production_stage'] = event.get('production_stage')
                 state['last'] = event.get('sequence')
                 state['text'] += text
                 while state['text']:
@@ -178,7 +183,8 @@ class ParagraphRelay:
                     'at', 'http_status', 'transport_status', 'public_status', 'billing_status', 'known_cost_usd')
                 status = {field: event[field] for field in fields if field in event and field != 'text'}
                 if self.stable:
-                    status['display_text'] = _external_label(status) + '\n\n' + _external_status(status)
+                    status['display_text'] = _external_label(
+                        status, production_stage=event.get('production_stage')) + '\n\n' + _external_status(status)
                 else:
                     status['display_text'] = '**宿主状态｜' + str(event.get('event')) + '**\n\n' + json.dumps(status, ensure_ascii=False)
                 self.emit(status)
@@ -343,7 +349,7 @@ def pending(root: Path, *, reader: str, exchange_id: str | None = None,
     cursor_path = root / 'live/cursors' / (reader + '.' + source + '.json')
     cursor = _cursor(cursor_path)
     items = _items(root, exchange_id)
-    model_label, member = '', None
+    model_label, member, production_stage = '', None, None
     if exchange_id is not None:
         request_path = root / 'consult/exchanges' / exchange_id / 'request.json'
         attempt_path = request_path.with_name('attempt.json')
@@ -353,6 +359,7 @@ def pending(root: Path, *, reader: str, exchange_id: str | None = None,
         if stable:
             model_label = _model_label(requested, observed)
             member = (attempt.get('council_scope') or {}).get('member_id')
+            production_stage = (attempt.get('production') or {}).get('stage')
         else:
             model_label = (' / 服务标识 ' + observed if isinstance(observed, str) else
                            ' / 请求 ' + requested + '（身份待核）' if isinstance(requested, str) else '')
@@ -373,7 +380,7 @@ def pending(root: Path, *, reader: str, exchange_id: str | None = None,
         if 'kind' in item:
             label = _work_label(item, stable)
         elif stable:
-            label = _external_label(item, member=member, model_label=model_label)
+            label = _external_label(item, member=member, model_label=model_label, production_stage=production_stage)
         else:
             label = ('**外部协作者 / ' + (item.get('member_id') or item.get('exchange_id') or 'Consult')
                      + model_label + '**' if public_original else '**宿主状态**')

@@ -76,6 +76,8 @@ def public_receipt(root: Path, supplied: Mapping, *, current: bool = True) -> di
     if not isinstance(exchange_id, str) or not exchange_id:
         raise ValueError('guidance must identify a real exchange')
     directory, attempt, request = _load(root, exchange_id)
+    if attempt.get('production', {}).get('stage') == 'candidate':
+        raise ValueError('A production candidate is not the scoped arbitration decision')
     legacy = None
     if enabled(session['P_run']):
         identity = {'kind': 'HASHED_REQUEST_TASK_UUID', 'task_uuid': session['task_uuid']}

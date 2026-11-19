@@ -1,5 +1,11 @@
 # Changelog
 
+## Codex Stable 1.1.0 / paper 0.6.2
+
+- Bind formal Claude production to a real native assignment, two complete same-scope candidates, and a Claude arbitration whose applied output is required for completion.
+- Keep candidate and arbitration within the existing Split, public stream and wallet. A combined budget proposal identifies each paid phase.
+- Add a pinned constitution for evidence, authority, exact-version compatibility, and complete fulfillment of new requirements. Preserve the native council and exact historical distributions.
+
 ## Codex Stable 1.0.0 / paper 0.6.1 — unified Codex contract
 
 - Allow first-layer Claude research through the native council on single-colon tasks, with a shared-wallet reservation. For double-colon tasks, bind the user’s approval to an explained cost bound and the applicable role, model, and wallet scope.
