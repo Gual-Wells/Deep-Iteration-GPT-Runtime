@@ -23,9 +23,9 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest='command', required=True)
     sub.add_parser('check', help='verify local instruction identity and bytes')
     sub.add_parser('refresh', help='explicitly regenerate local bundle and profile hashes')
-    sub.add_parser('depth', help='show user-selected depth and unit-responsibility references')
-    sub.add_parser('presets', help='list five named depth defaults; no execution or budget')
-    parameters = sub.add_parser('parameters', help='preview named defaults and overrides; native interpretation remains required')
+    sub.add_parser('depth', help='show depth preferences and unit-responsibility references')
+    sub.add_parser('presets', help='list five preference baselines; no execution or budget')
+    parameters = sub.add_parser('parameters', help='show the preference baseline and explicit overrides')
     parameters.add_argument('--text', default='', help='execution parameter group, without X')
     parameters.add_argument('--overrides', type=Path, help='explicit structured overrides JSON')
     ins = sub.add_parser('instructions', help='print a layer; never install it')
@@ -52,7 +52,8 @@ def main(argv: list[str] | None = None) -> int:
             result = preset_catalog()
         elif args.command == 'parameters':
             result = resolve_defaults(args.text,
-                json.loads(args.overrides.read_text(encoding='utf-8-sig')) if args.overrides else None)
+                json.loads(args.overrides.read_text(encoding='utf-8-sig')) if args.overrides else None,
+                preference_only=True)
         elif args.command == 'classify':
             result = classify_invocation(args.message_file.read_bytes().decode('utf-8-sig'), p_run=args.pin)
         elif args.command == 'instructions':

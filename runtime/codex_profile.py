@@ -19,7 +19,7 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v17'
+PROFILE_PROTOCOL = 'digr-codex-native-v18'
 PROFILE_CORE = (
     'codex/CONSTITUTION.md',
     'codex/FOUNDATION.md',
@@ -202,11 +202,14 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
     invocation_key = next((alias for alias in ('DIGRC', 'DIGRP')
                            if text.startswith(alias)), key)
     addon_hint = 'paper' if invocation_key == 'DIGRP' else None
+    pin = _PROFILE_PIN.fullmatch(p_run) if p_run is not None else None
+    preference_only = p_run is None or bool(pin and tuple(map(int, pin.groups())) >= (1, 1, 1))
+    depth_key = 'depth_preferences' if preference_only else 'depth_defaults'
     base = {'classification': 'NATIVE', 'route_key': key, 'task': None,
             'invocation_key': invocation_key, 'addon_hint': addon_hint,
             'addon_selection': None,
             'parameter_text': None, 'execution_parameter_text': None,
-            'consult_selection': False, 'depth_defaults': None,
+            'consult_selection': False, depth_key: None,
             'delivery_selection': {'mode': 'local', 'target': None, 'explicit': False},
             'action_scope': 'INTERPRET_SEPARATELY',
             'live_acquisition_performed': False, 'run_started': False}
@@ -251,7 +254,7 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
         return {**base, 'classification': 'INVALID', 'reason': 'empty task'}
     try:
         execution_parameters, delivery = _invocation_parameters(prelude)
-        defaults = resolve_defaults(execution_parameters)
+        depth = resolve_defaults(execution_parameters, preference_only=preference_only)
     except ValueError as exc:
         return {**base, 'classification': 'INVALID', 'reason': str(exc)}
     layered = p_run is None or layered_policy(p_run)
@@ -267,7 +270,7 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
             'parameter_text': prelude, 'execution_parameter_text': execution_parameters,
             'delivery_selection': delivery, 'addon_selection': addon_hint,
             'consult_selection': invocation_key in ('DIGRC', 'DIGRP'),
-            'depth_defaults': defaults,
+            depth_key: depth,
             'reason': 'explicit complete ' + invocation_key + ' invocation; question/read-only scope does not change mode'}
 
 
@@ -462,7 +465,7 @@ def instruction_text(root: Path, layer: str) -> str:
 
 
 def depth_preferences(root: Path) -> dict[str, Any]:
-    """Return the user's declared investment policy, not a workload scheduler."""
+    """Return the versioned preference baselines and task-inference policy."""
     verify_distribution(root)
     manifest = json.loads((Path(root) / 'codex/manifest.json').read_text(encoding='utf-8'))
     return manifest['depth_preferences']

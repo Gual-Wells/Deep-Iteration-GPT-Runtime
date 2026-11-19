@@ -14,7 +14,7 @@
 
 ## 组织原生研究与生产
 
-确认委托后按 [PARAMETERS](PARAMETERS.md) 完成正式初始化。五档规定研究责任，默认 N12/R4/D3/V3/L3/M1。Main 对事实、执行与整体交付负责。按 [COLLABORATION](COLLABORATION.md) 组织真实分开的 D/V、必要的再入和多条完整 Main。保留中心主张、理由与实际后果；工具和代理数量只证明各自发生的行为。
+确认委托后，Main 按 [PARAMETERS](PARAMETERS.md) 参考所选档位与实际工作，在正式 INIT 前推断各线完整的生效配置。未选档位时参考 Default。用户显式声明的参数与实际限制按其范围生效。Main 说明参数取舍并对事实、执行与整体交付负责。按 [COLLABORATION](COLLABORATION.md) 组织真实分开的 D/V、必要的再入和多条完整 Main。保留中心主张、理由与实际后果。工具和代理数量只证明各自发生的行为。
 
 [METHOD](METHOD.md) 定义分析成立、实验使用和工程检查的条件。[CHARACTER](CHARACTER.md) 展开研究、制作与解释的质量要求。按用户用途研究有竞争力的完整候选，让有力的反例和实际原件改变判断及制作。
 

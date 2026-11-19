@@ -16,9 +16,9 @@ class CodexPresetModeTests(unittest.TestCase):
         self.assertEqual(result["task"], "保留：原任务\n")
         self.assertEqual(result["invocation_key"], "DIGRC")
         self.assertTrue(result["consult_selection"])
-        depth = result["depth_defaults"]
-        self.assertEqual((depth["parameters"]["N"], depth["parameters"]["R"]), (8, 2))
-        self.assertEqual(depth["parameters"]["S"], {"n": 3, "t": "20min"})
+        depth = result["depth_preferences"]
+        self.assertEqual((depth["preference_baseline"]["N"], depth["preference_baseline"]["R"]), (6, 2))
+        self.assertEqual(depth["explicit_overrides"], {"N": 8, "S": {"n": 3, "t": "20min"}})
         self.assertEqual(result["delivery_selection"]["mode"], "external")
 
     def test_light_is_managed_and_never_reduces_native_isolation(self):
@@ -42,7 +42,7 @@ class CodexPresetModeTests(unittest.TestCase):
             self.assertEqual(classify_invocation(text)["classification"], "NATIVE")
         self.assertEqual(classify_invocation("DIGRC/help")["classification"], "HELP")
 
-    def test_new_sessions_freeze_mode_and_explicit_tier_but_old_paper_stays_native(self):
+    def test_historical_sessions_freeze_mode_and_explicit_tier_but_old_paper_stays_native(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             request = root / "request.txt"
