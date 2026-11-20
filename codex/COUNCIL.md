@@ -12,13 +12,23 @@ Claude 成员具有独立 `participation_role=council_member`，按 `council_id/
 
 本实现的隔离为 **HOST_LEVEL**：宿主及用户会看到公开流，共享磁盘可读；不会声称 OS 保密或 Main 未受影响。`packet --actor ... --stage INITIAL` 只提供共同输入，不返回任一侧观点。再议 packet 只对配置中的原生 actor 在屏障释放后开放。宿主应将它实际交给相应独立上下文；actor 参数是宿主声明，不是身份认证。成员初轮不接收原生初议；后续子议会交流也不注入本轮原生初议。恢复中的成员保留此前公开历史，不能重新宣称从未受旧观点影响。
 
+## 单冒号的独立首发
+
+Main 按 [PROTOCOL](PROTOCOL.md#单冒号任务的独立首发) 在仍能改变交付的决定形成前安排一次首发。给 Claude 一个真实、尚待解决的取舍，保留它自行选择支配议题或改划问题的空间。公开正文先交付站得住的具体立场，理由可在同次正文的后续段落展开。原生初议者独立研究同一任务，收到可用原文再审视观点、依据和替代方案。
+
+新任务当前为单冒号时，`council create --first-opinion` 登记这一对象。一名 Claude 成员只进行一个 `INDEPENDENT` 轮。同一任务恢复时沿用原议会和实际尝试记录。默认 Sonnet 5.5、`high`、16,000 总输出 token，推理与公开正文共用容量。问题已经具体收敛时可在 `prepare-round` 显式选 `--effort medium`。实际请求使用当前单冒号钱包许可与用户更窄限额，单次费用预留最多 0.20 美元。
+
+带有完整公开正文的成功首轮自动封存该成员。已经提交的首发，包括空答，均占用本任务的一次机会。费用、空答、部分正文和传输未明各保留自身事实。Main 按 [LIVE](LIVE.md) 及时原文转播，并在屏障释放后把原文和实际状态交给原生 actor。再议返回处理正文中有依据的立场，说明哪些取舍受影响，随后由 Main 落实。
+
+等待限于本次取舍，默认期限 300 秒，可按真实决定窗口设置。只有局部前提无法满足时，原生工作依可用材料继续。已登记而无法发送时，按实际原因处置成员和当前议会。首发议会的后续再入只交原生参与者，并可转交较晚出现的真实原文。后续另有实质研究问题时，按当前权限启动普通议会。首发的正文和费用沿原交换读取、转播和对账。
+
 ## 成员研究和通信
 
 成员先进入材料探索，再发现值得争夺的支配前提、突破口或更强的整体路线；没有成熟旗帜时可以继续侦察，不必唱反调。强替代需要研究、比较、论证或实际试作，讲清替代什么、依据和适用条件。探索后协商形成有语义距离的领域，自主发展材料、问题、方法和成果，允许重新划分原问题。它们继承 D/V 的研究性质，不冒称已经履行完整原生 D/V/M 或 L3。
 
 内部通信只转交实际公开消息。`CROSS`、`FINAL` 和 `REENTRY` 请求保留自己的公开链，并传入各成员已观察到的公开原稿及来源和状态；不以 Main 摘要定调，不机械截断。成员本人压缩终稿；正文过长时，再议包按字符顺序分块，块的拼接精确恢复全文，保留完整散列和来源。取得 JSON/本地路径不等于相应代理已经阅读，宿主须真实转交可读正文。
 
-默认资源起点是两个成员，独立探索、公开交流、作者收束三种工作。它不是强制九宫格或最低付费次数：人数、输出额度、轮次和 deadline 随真实研究、许可和预算确定；可以省交流轮，但不能宣称已发生对应交流。首轮传输完整后仍待研究封存，不能把 API stop 当成 V 研究已完成。已有研究足够时用 `seal-member` 封存，无需再买一份短终稿。单次错误和额度不足不自动重发。
+普通议会的资源起点是两个成员，按需要开展独立探索、公开交流和作者收束。人数、输出额度、轮次和 deadline 随真实研究、许可和预算确定。普通议会首轮传输完整后仍待研究封存，V 研究须按实际责任判断。已有研究足够时用 `seal-member` 封存。单次错误和额度不足均按本次事实结束相应尝试。
 
 ## 两阶段、异常与迟到
 
@@ -42,7 +52,45 @@ Stable 的实际成员发送统一从已登记的 `council run-round` 进入，�
 
 ## 本机可运行路径
 
-按真实对象开议会。可用纯原生参与，也可通过 `--claude` 加入第一层。当前选择须允许该角色。单冒号按真实共享钱包可用余额使用，双冒号先取得已说明范围的预算决定。实际发送对每个成员和请求分别核对 Split、费用和当前任务输入。识别模式和费用来源见 [PROTOCOL](PROTOCOL.md) 与 [WORKBENCH](WORKBENCH.md)。
+首发命令随实际待定取舍、原件与原生 actor 填写。`--facts` 读取共同事实与约束的文本文件。发送计划另给当前价格和钱包的费用事实。
+
+```text
+python -B tools/codex.py council create --root TASK --council-id c-first --native-actor REAL --first-opinion "导读先讲任务切分还是成本上界，哪种顺序能让初读者独立复述机制？" --facts FACTS.md
+python -B tools/codex.py council packet --root TASK --council-id c-first --actor REAL --stage INITIAL
+python -B tools/codex.py council prepare-round --root TASK --council-id c-first --kind INDEPENDENT
+```
+
+把初议包交给真实原生 actor。按 [SPLIT](SPLIT.md) 给已准备的首发 exchange 绑定实际本机分工。已准备的纯文本首发使用 OpenRouter 官方接口、且同一配置能查询模型价格与账户真实余额时，可直接用已绑定的 Split 文件运行。程序通过 `/credits` 核对共享钱包，按完整请求估算并核对用户限额和 0.20 美元上限后提交单次请求。`/key` 返回的密钥用量和额度属于另一项数据。需要指定私有配置时带 `--config CONFIG.json`。
+
+```text
+python -B tools/codex.py council run-round --root TASK --council-id c-first --round-id 1 --split-plan SPLIT.json
+```
+
+无法由当前配置读取实际钱包，或采用其他提供商时，可用实际费用事实运行同一已准备请求。以下是 `FIRST.json` 的单成员结构。费用文件和 Split 路径换成本次真实记录，费用预留填适用限额内的实际保守上界。需要指定凭据时，在成员项内填 `config_path`。
+
+```json
+{"members": {
+  "member-1": {"facts": "wallet-facts.json", "ceiling_usd": 0.20,
+    "split_path": "first-split.json"}
+}}
+```
+
+```text
+python -B tools/codex.py council run-round --root TASK --council-id c-first --round-id 1 --plan FIRST.json
+```
+
+发送期间按 [LIVE](LIVE.md) 发布本 exchange 的源文字。以下是原生初议与再议的登记路径，`--input-version` 使用实际材料版本。
+
+```text
+python -B tools/codex.py council native-return --root TASK --council-id c-first --actor REAL --input INITIAL.txt --input-version 1
+python -B tools/codex.py council barrier --root TASK --council-id c-first
+python -B tools/codex.py council packet --root TASK --council-id c-first --actor REAL --stage REDELIBERATION
+python -B tools/codex.py council redeliberation-return --root TASK --council-id c-first --actor REAL --input RECONSIDERATION.txt --input-version 1
+```
+
+两侧达到终态后实际转交再议包并存下原生返回。发生预检或网络异常时，读回该交换与议会的实际状态，必要时用 `seal-member` 登记可证实的异常，或按已确定范围 `close --reason ...`。已提交或传输结果未明时沿同一交换读回正文和账目。仅在确认请求尚未提交且仍处于有效窗口时，才可从当前有效准备状态提交。
+
+普通议会可用纯原生参与，也可通过 `--claude` 加入第一层。单冒号按真实共享钱包可用余额使用，双冒号先取得已说明范围的预算决定。实际发送对每个成员和请求分别核对 Split、费用和当前任务输入。识别模式和费用来源见 [PROTOCOL](PROTOCOL.md) 与 [WORKBENCH](WORKBENCH.md)。
 
 ```text
 python -B tools/codex.py council create --root D:/task/session --council-id c1 --native-actor <实际原生代理id>

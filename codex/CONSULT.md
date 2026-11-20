@@ -77,7 +77,9 @@ Codex先完成来源定位、下载、PDF/OCR提取、正文去页眉和接栏�
 
 采用实际可用配置及既有凭据机制。模型、effort、provider、价格和当前钱包沿真实选择；high等模型能力不因选择低投入档位而暗降。成本通过问题范围、必要原件、有效往返及可测缓存控制，不把工程管理转成外部调用。
 
-通过匹配本次 pin 的 `tools/codex.py consult --help` 操作公开交换：`prepare` 展开所选文字/图片且不发出，`split`提供当前绑定供Codex记录原生分工结果，`call --split-plan`在本机运行Split后使用当前费用事实作一次有界调用，`inspect` 读回，`reconcile-cost` 仅对账。私有 locator 依次来自 `--config`、`DIGR_CONSULT_CONFIG`、`CODEX_HOME/digr-codex/consult.json`，可引用原有密钥文件/字段或环境变量，不在任务中复制密钥；需要现有代理时显式配置 `proxy_url`。当前实现默认 Sonnet 5.5 / high / 128000 输出额度，切换模型须核对其真实能力与价格。小样可按实际预算显式选择较小额度并披露，不把它变成低档默认能力。费用事实须在调用前十分钟内核对共享钱包和适用价格，并覆盖本次全部公开历史、文字和图片；不只估算最新问题。
+通过匹配本次 pin 的 `tools/codex.py consult --help` 操作公开交换。`prepare` 展开所选文字和图片，`split` 提供当前绑定供 Codex 记录原生分工结果，`call --split-plan` 在本机运行 Split 后使用当前费用事实作一次有界调用。`inspect` 可读回实际交换，`reconcile-cost` 负责对账。按 `--config`、`DIGR_CONSULT_CONFIG`、`CODEX_HOME/digr-codex/consult.json` 的顺序定位私有配置。配置可引用原有密钥文件、字段或环境变量，密钥留在原位置。已有代理可通过 `proxy_url` 指定。
+
+普通 Consult 请求默认 Sonnet 5.5／high／128,000 总输出 token。单冒号独立首发走 [COUNCIL](COUNCIL.md#单冒号的独立首发) 的专用入口，并采用该入口的 16,000 总输出 token 和费用上限。切换模型须核对实际能力与价格。按任务真实预算为小样选择更小额度时，说明实际配置。调用前十分钟内核对共享钱包与适用价格，费用事实覆盖本次全部公开历史、文字和图片。
 
 工具仅保存真实请求、发送前尝试、公开原稿和必要服务事实；不替模型判定指导质量或 N/R/D/V。一次推理不自动重试。公开内容可用性与费用对账状态分开：完整指导可能暂缺cost，失败也可能收费；未知费用保留预留，不当零。费用读回不等于能恢复丢失正文，不为补救自动开启云端正文记录。
 

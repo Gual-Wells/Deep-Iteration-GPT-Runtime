@@ -915,6 +915,7 @@ tests/test_codex_delivery.py
 tests/test_codex_depth_calibration.py
 tests/test_codex_do_supplement.py
 tests/test_codex_experience.py
+tests/test_codex_first_opinion_wallet.py
 tests/test_codex_foundation.py
 tests/test_codex_frozen_input.py
 tests/test_codex_guidance_binding.py

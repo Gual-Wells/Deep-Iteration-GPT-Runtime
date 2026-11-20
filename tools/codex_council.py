@@ -27,12 +27,14 @@ def main(argv=None):
         item.add_argument('--council-id', required=True)
         return item
 
-    create = command('create', 'create one native council; Claude is explicitly opt-in')
+    create = command('create', 'create a native council or open the task first-opinion opportunity')
     create.add_argument('--native-actor', action='append', required=True)
     create.add_argument('--facts', type=Path)
     create.add_argument('--material', type=Path, action='append', default=[])
     create.add_argument('--claude', action='store_true')
-    create.add_argument('--member-count', type=int, default=2)
+    create.add_argument('--first-opinion', metavar='OPEN_DECISION',
+                        help='open one independent Claude opinion before this still-open decision')
+    create.add_argument('--member-count', type=int)
     create.add_argument('--deadline-seconds', type=int, default=300)
     command('inspect', 'read statuses and identity metadata without opinion bodies')
     packet = command('packet', 'read complete actor-controlled initial or post-barrier packets')
@@ -53,8 +55,12 @@ def main(argv=None):
     run = command('run-round', 'send one explicitly prepared batch concurrently, never retry automatically')
     run.add_argument('--round-id', type=int, required=True)
     run.add_argument('--raw-events', action='store_true', help='diagnostic raw token deltas instead of readable source-labelled paragraphs')
-    run.add_argument('--plan', type=Path, required=True,
+    plan_options = run.add_mutually_exclusive_group(required=True)
+    plan_options.add_argument('--plan', type=Path,
         help='JSON members object: each member has facts (object or file), ceiling_usd, split_path, optional config_path')
+    plan_options.add_argument('--split-plan', type=Path,
+        help='first opinion only: obtain its price and wallet facts using the existing OpenRouter configuration')
+    run.add_argument('--config', type=Path, help='private billing configuration for --split-plan')
     seal = command('seal-member', 'seal actual existing member work without a further paid synthesis')
     seal.add_argument('--member', required=True)
     seal.add_argument('--status', choices=sorted(council.TERMINAL), required=True)
@@ -79,7 +85,8 @@ def main(argv=None):
         if args.command == 'create':
             result = council.create_council(args.root, council_id=args.council_id,
                 native_actors=args.native_actor, facts_path=args.facts, materials=args.material,
-                enable_claude=args.claude, member_count=args.member_count, deadline_seconds=args.deadline_seconds)
+                enable_claude=args.claude, member_count=args.member_count, deadline_seconds=args.deadline_seconds,
+                first_opinion=args.first_opinion)
         elif args.command == 'inspect':
             result = council.inspect_council(args.root, args.council_id)
         elif args.command == 'packet':
@@ -92,17 +99,25 @@ def main(argv=None):
             result = council.prepare_round(args.root, args.council_id, kind=args.kind,
                 members=args.member, model=args.model, effort=args.effort, max_tokens=args.max_tokens)
         elif args.command == 'run-round':
-            plan = read(args.plan)
-            jobs = plan['members']
-            base = args.plan.resolve().parent
-            for member, job in jobs.items():
-                if isinstance(job['facts'], str):
-                    path = Path(job['facts'])
-                    job['facts'] = read(path if path.is_absolute() else base / path)
-                for key in ('split_path', 'config_path'):
-                    if job.get(key):
-                        path = Path(job[key])
-                        job[key] = str(path if path.is_absolute() else base / path)
+            if args.split_plan is not None:
+                jobs = council.first_opinion_plan(args.root, args.council_id, round_id=args.round_id,
+                    split_path=args.split_plan, config_path=args.config)
+                quote = next(iter(jobs.values()))
+                print(json.dumps({'event': 'first_opinion_quote', 'ceiling_usd': quote['ceiling_usd'],
+                                  'model': quote['facts']['model']}, allow_nan=False), flush=True)
+            else:
+                if args.config is not None:
+                    raise ValueError('--config applies to --split-plan; put config_path in an explicit plan')
+                jobs = read(args.plan)['members']
+                base = args.plan.resolve().parent
+                for job in jobs.values():
+                    if isinstance(job['facts'], str):
+                        path = Path(job['facts'])
+                        job['facts'] = read(path if path.is_absolute() else base / path)
+                    for key in ('split_path', 'config_path'):
+                        if job.get(key):
+                            path = Path(job[key])
+                            job[key] = str(path if path.is_absolute() else base / path)
             emit = lambda event: print(json.dumps(event, ensure_ascii=False, allow_nan=False), flush=True)
             relay = None
             if not args.raw_events:

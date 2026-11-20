@@ -1,14 +1,108 @@
 """Use task input as authority and the shared ledger as spending evidence."""
 from __future__ import annotations
 
+from decimal import Decimal, DecimalException, ROUND_CEILING
+from http.client import HTTPException
+import json
 from pathlib import Path
 from typing import Any, Mapping, Sequence
+from urllib.error import HTTPError
+from urllib.parse import urlsplit
+from urllib.request import Request
 
 from . import codex_collaboration, codex_wallet
 
 PREVIEW_FORMAT = 'digr-consult-budget-preview-1'
 DECISION_FORMAT = 'digr-consult-budget-decision-1'
 ROLES = {'council_member', 'consult_guidance'}
+_QUOTE_PLAN = 'Use an explicit --plan with current price and wallet facts.'
+
+
+def _quote_amount(value: Any) -> Decimal:
+    amount = Decimal(str(value))
+    if not amount.is_finite() or amount < 0:
+        raise ValueError('A quoted amount must be finite and nonnegative')
+    return amount
+
+
+def _quote_data(opener, resource: str, *, timeout: float, credential: str | None = None) -> Any:
+    headers = {'Accept': 'application/json'}
+    if credential is not None:
+        headers['Authorization'] = 'Bearer ' + credential
+    request = Request('https://openrouter.ai/api/v1/' + resource, headers=headers, method='GET')
+    try:
+        with opener.open(request, timeout=timeout) as response:
+            result = json.load(response, parse_float=Decimal)
+    except HTTPError as error:
+        error.close()
+        raise ValueError(f'OpenRouter {resource} read returned HTTP {error.code}. {_QUOTE_PLAN}') from None
+    except (OSError, HTTPException, DecimalException, ValueError) as error:
+        raise ValueError(f'OpenRouter {resource} read failed ({type(error).__name__}). {_QUOTE_PLAN}') from None
+    return result.get('data') if isinstance(result, Mapping) else None
+
+
+def first_opinion_quote(request: Mapping[str, Any], *, config_path: Path | None = None) -> dict:
+    """Quote a local prepared request whose first-opinion scope the caller has validated.
+
+    The existing send path checks current authority and reserves against the quoted facts.
+    """
+    from . import codex_consult as consult
+
+    model, messages, max_tokens = (request.get(key) for key in ('model', 'messages', 'max_tokens'))
+    if (not isinstance(model, str) or not isinstance(messages, list) or not messages
+            or any(not isinstance(message, Mapping) or not isinstance(message.get('content'), str)
+                   for message in messages)
+            or type(max_tokens) is not int or max_tokens < 1):
+        raise ValueError(f'Automatic pricing requires a prepared text-only first opinion. {_QUOTE_PLAN}')
+    try:
+        config, credential = consult._config(config_path)
+        wallet_id = consult._text('shared wallet_id in the private config', config.get('wallet_id'))
+    except (OSError, ValueError, TypeError) as error:
+        raise ValueError(f'OpenRouter quote needs the current Consult wallet configuration '
+                         f'({type(error).__name__}). {_QUOTE_PLAN}') from None
+    endpoint = urlsplit(config['endpoint'])
+    if (endpoint.scheme != 'https' or endpoint.netloc.lower() not in {'openrouter.ai', 'openrouter.ai:443'}
+            or endpoint.path != '/api/v1/chat/completions' or endpoint.query or endpoint.fragment):
+        raise ValueError(f'Automatic pricing requires the official OpenRouter HTTPS chat endpoint. {_QUOTE_PLAN}')
+    opener = consult._opener(config)
+    timeout = min(config['timeout_seconds'], 15)
+    checked_at = consult._now()
+    models = _quote_data(opener, 'models', timeout=timeout)
+    catalog = models if isinstance(models, list) else []
+    matches = [item.get('pricing') for item in catalog if isinstance(item, Mapping) and item.get('id') == model]
+    if len(matches) != 1 or not isinstance(matches[0], Mapping):
+        raise ValueError(f'OpenRouter did not list one current price for the prepared model. {_QUOTE_PLAN}')
+    pricing = matches[0]
+    try:
+        prompt = _quote_amount(pricing['prompt'])
+        completion = max(_quote_amount(pricing['completion']), _quote_amount(pricing.get('internal_reasoning', 0)))
+        # The public model listing omits the optional fee when it is absent.
+        request_fee = _quote_amount(pricing.get('request', 0))
+        prices = {'prompt': float(prompt * 1_000_000), 'completion': float(completion * 1_000_000),
+                  'request': float(request_fee)}
+        sized_request = {**request, 'provider': {**request['provider'], 'max_price': prices}}
+        # The UTF-8 bound covers the entire priced request. The extra tokens
+        # allow for provider framing and the roles of every text message.
+        input_tokens = len(consult._json_bytes(sized_request)) + 256 + 32 * len(messages)
+        cost_bound = prompt * input_tokens + completion * max_tokens + request_fee
+    except (KeyError, DecimalException, TypeError, ValueError):
+        raise ValueError(f'OpenRouter did not supply usable pricing for the prepared request. {_QUOTE_PLAN}') from None
+    if cost_bound > Decimal(str(codex_collaboration.FIRST_OPINION_CEILING_USD)):
+        raise ValueError(f'The prepared first opinion exceeds its USD 0.20 ceiling at current prices. {_QUOTE_PLAN}')
+    precision = Decimal('0.000001')
+    ceiling = float(max(precision, cost_bound.quantize(precision, rounding=ROUND_CEILING)))
+    credits = _quote_data(opener, 'credits', timeout=timeout, credential=credential)
+    try:
+        remaining = max(Decimal(0), _quote_amount(credits['total_credits']) - _quote_amount(credits['total_usage']))
+        wallet_remaining = consult._number('remaining OpenRouter credits', float(remaining))
+    except (KeyError, DecimalException, TypeError, ValueError):
+        raise ValueError(f'OpenRouter did not supply a usable current credit balance. {_QUOTE_PLAN}') from None
+    return {'facts': {'model': model, 'checked_at': checked_at, 'pricing_ref': 'OpenRouter GET /api/v1/models',
+                      'input_bound_basis': 'Complete text-only UTF-8 request bytes with provider framing allowance',
+                      'wallet_id': wallet_id, 'wallet_remaining_usd': wallet_remaining, 'outside_spent_usd': 0,
+                      'prompt_usd_per_million': prices['prompt'], 'completion_usd_per_million': prices['completion'],
+                      'request_usd': prices['request'], 'input_tokens_upper_bound': input_tokens},
+            'ceiling_usd': ceiling}
 
 
 def _task_binding(session: Mapping[str, Any]) -> dict:
@@ -283,6 +377,11 @@ def resolve(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any]
     model = attempt.get('collaboration_contract', {}).get('requested_model', '')
     if mode == 'DENY' or role not in ROLES:
         raise ValueError('The current task choice does not authorize this paid Claude role')
+    scope = attempt.get('council_scope')
+    first_opinion = (codex_collaboration.first_opinion_policy(session['P_run']) and isinstance(scope, Mapping)
+                     and scope.get('purpose') == codex_collaboration.FIRST_OPINION_PURPOSE)
+    if first_opinion:
+        codex_collaboration.require_first_opinion_permission(lifecycle)
     approval = read_decision(root, session, lifecycle, 'approval')
     limit = read_decision(root, session, lifecycle, 'limit')
     decisions = [item for item in (approval, limit) if item is not None]
@@ -299,6 +398,15 @@ def resolve(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any]
         policy = lifecycle['claude_policy']
         authority = {'kind': 'SINGLE_COLON_WALLET_ONLY', 'message_id': policy['message_id'],
                      'source_ref': policy['source']['source_ref'], 'source_sha256': policy['source']['sha256']}
+        if first_opinion:
+            if facts.get('wallet_id', wallet_id) != wallet_id:
+                raise ValueError('The first-opinion balance was quoted for a different wallet configuration')
+            reservation = _number('first-opinion reservation ceiling', ceiling_usd, positive=True)
+            if reservation > codex_collaboration.FIRST_OPINION_CEILING_USD:
+                raise ValueError('The first-opinion reservation exceeds its USD 0.20 ceiling')
+            if caps and reservation > min(caps) + 1e-12:
+                raise ValueError('The first-opinion reservation exceeds the current task budget ceiling')
+            authority['purpose'] = codex_collaboration.FIRST_OPINION_PURPOSE
     elif mode == 'ALLOW':
         if (approval is None or approval['reply']['message_id'] <= lifecycle.get('latest_claude_revocation_message_id', -1)):
             raise ValueError('Double-colon use needs a scoped cost preview and recorded user budget approval')

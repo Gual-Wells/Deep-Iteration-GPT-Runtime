@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone, timedelta
 from hashlib import sha256
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -17,7 +18,10 @@ import unittest
 from unittest.mock import patch
 
 from runtime import codex_consult as consult
+from runtime import codex_consult_budget as authority
+from runtime import codex_council as council
 from runtime import codex_paper as paper
+from runtime import codex_wallet as wallet
 from runtime.codex_lifecycle import handle_message, ingest_message, terminate_message
 from runtime.codex_session import create_session
 from tools.codex_consult import main as consult_cli
@@ -52,21 +56,31 @@ class ConsultFaultHandler(BaseHTTPRequestHandler):
             self.send_header('Location', '/redirect-target')
             self.end_headers()
             return
-        if label in {'streaming', 'stream-truncated'}:
+        if label in {'streaming', 'stream-truncated', 'stream-whitespace-only',
+                     'stream-whitespace-prefix', 'stream-first-opinion-reentry'}:
             self.send_response(200)
             self.send_header('Content-Type', 'text/event-stream')
             self.send_header('X-Generation-Id', 'gen-local-' + label)
             self.end_headers()
             frame = lambda value: ('data: ' + json.dumps(value, ensure_ascii=False) + '\n\n').encode('utf-8')
+            if label == 'stream-first-opinion-reentry':
+                first_delta = '\ufeff \t\r\n'
+            else:
+                first_delta = ' \t\r\n' if label.startswith('stream-whitespace-') else '第一段。\n\n'
             self.wfile.write(frame({'id': 'gen-local-' + label, 'model': consult.DEFAULT_MODEL,
-                'choices': [{'index': 0, 'delta': {'content': '第一段。\n\n', 'reasoning': HIDDEN}}]}))
+                'choices': [{'index': 0, 'delta': {'content': first_delta, 'reasoning': HIDDEN}}]}))
             self.wfile.flush()
             if hasattr(self.server, 'public_forwarded'):
                 self.server.forwarded_before_finish = self.server.public_forwarded.wait(1)
+            if hasattr(self.server, 'finish_stream'):
+                self.server.finish_stream.wait(3)
             if label == 'stream-truncated':
                 return
-            self.wfile.write(frame({'choices': [{'index': 0, 'delta': {'content': '第二段。'}, 'finish_reason': 'stop'}]}))
-            self.wfile.write(frame({'choices': [{'index': 0, 'delta': {}, 'finish_reason': 'stop'}],
+            whitespace_only = label == 'stream-whitespace-only'
+            last_delta = '\n ' if whitespace_only else '第二段。'
+            finish = 'length' if whitespace_only else 'stop'
+            self.wfile.write(frame({'choices': [{'index': 0, 'delta': {'content': last_delta}, 'finish_reason': finish}]}))
+            self.wfile.write(frame({'choices': [{'index': 0, 'delta': {}, 'finish_reason': finish}],
                 'usage': {'cost': .03, 'completion_tokens': 10, 'private': HIDDEN}}))
             self.wfile.write(b'data: [DONE]\n\n')
             self.wfile.flush()
@@ -147,10 +161,12 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
         path.write_text(text, encoding='utf-8', newline='')
         return path
 
-    def config(self, label):
-        return self.file('private-' + label + '.json', json.dumps({
-            'endpoint': f'http://127.0.0.1:{self.server.server_port}/' + label,
-            'api_key_env': 'DIGR_TEST_CONSULT_KEY', 'timeout_seconds': 2}))
+    def config(self, label, *, wallet_id=None):
+        config = {'endpoint': f'http://127.0.0.1:{self.server.server_port}/' + label,
+                  'api_key_env': 'DIGR_TEST_CONSULT_KEY', 'timeout_seconds': 2}
+        if wallet_id is not None:
+            config['wallet_id'] = wallet_id
+        return self.file('private-' + label + '.json', json.dumps(config))
 
     def facts(self, *, total=1, wallet=10, **kw):
         result = {'authorization_ref': 'Constructed localhost-only test; no real paid API scope',
@@ -591,6 +607,181 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
         self.assertEqual(result['exchange']['reserved_usd'], .2)
         self.assertEqual(Path(result['public_path']).read_text('utf-8'), '第一段。\n\n')
         self.assertEqual(len(self.server.post_calls), 1)
+
+    def bind_stream_test_split(self, task, exchange):
+        decision = self.file('stream-split-decision.json', json.dumps({
+            'decision': 'Compare actual local streaming outcomes',
+            'local_work': [{'task': 'Read the fixture', 'result': 'Public deltas form the opinion'}],
+            'claude_value': 'A public response can inform the open decision',
+            'context_decision': 'Include the prepared prompt and material',
+        }))
+        split = task / (exchange + '-split.json')
+        consult.bind_split_decision(task, exchange, input_path=decision, output=split)
+        return split
+
+    def test_stable_guidance_relay_ignores_whitespace_only_and_preserves_real_text_bytes(self):
+        charter = self.file('stable-charter.txt', 'DIGR:: Examine the two local response envelopes.')
+        wallet_id = 'synthetic-blank-stream-wallet'
+        labels = ('stream-whitespace-only', 'stream-whitespace-prefix')
+        ledger = self.folder / 'wallet.sqlite3'
+        for version in ('1.1.1', '1.2.0'):
+            with self.subTest(version=version), patch.object(wallet, 'ledger_path', return_value=ledger):
+                task = self.folder / ('stable-public-' + version)
+                create_session(task, request=charter, p_run=version + '@' + 'f' * 40)
+                for label in labels:
+                    consult.prepare_request(task, input_path=self.input, exchange_id=label,
+                                            max_tokens=100, guidance=True)
+                preview = authority.preview(task,
+                    jobs=[{'exchange_id': label, 'facts': self.facts(), 'ceiling_usd': .2} for label in labels],
+                    task_ceiling_usd=.4, scope='Exercise the prepared guidance exchanges', wallet_id=wallet_id)
+                quote = 'I approve $0.40 for these two prepared exchanges.'
+                source = self.file('approve-' + version + '.txt', quote)
+                reply = ingest_message(task, source=source, source_ref=source.name)
+                handle_message(task, message_id=reply['message_id'], action='budget', reason='Fixture approval')
+                authority.approve(task, preview_path=self.file('preview-' + version + '.json', json.dumps(preview)),
+                                  user_text=quote, source=source.name, quote=quote)
+
+                for label, expected in zip(labels, (' \t\r\n\n ', ' \t\r\n第二段。')):
+                    events = []
+                    split = self.bind_stream_test_split(task, label)
+                    with patch.dict(os.environ, {'DIGR_TEST_CONSULT_KEY': SECRET}):
+                        result = consult.call_once(task, label, facts=self.facts(), ceiling_usd=.2,
+                                                   config_path=self.config(label, wallet_id=wallet_id),
+                                                   split_path=split, on_public_event=events.append)
+                    exchange = result['exchange']
+                    self.assertEqual((exchange['transport_status'], exchange['billing_status'],
+                                      exchange['known_cost_usd']), ('RESPONDED', 'KNOWN', .03))
+                    self.assertEqual(events[-1]['public_status'], exchange['public_status'])
+                    deltas = [event['text'] for event in events if event['event'] == 'public_delta']
+                    if not expected.strip() and version == '1.2.0':
+                        self.assertEqual(exchange['public_status'], 'ABSENT')
+                        self.assertEqual(exchange['finish_reason'], 'length')
+                        self.assertIsNone(result['public_path'])
+                        self.assertEqual(deltas, [])
+                    else:
+                        self.assertEqual(exchange['public_status'], 'COMPLETE' if expected.strip() else 'PARTIAL')
+                        self.assertEqual(''.join(deltas), expected)
+                        self.assertEqual(Path(result['public_path']).read_bytes(), expected.encode('utf-8'))
+
+    def prepare_first_opinion(self, task, council_id, config):
+        council.create_council(task, council_id=council_id, native_actors=['native-1'],
+                               first_opinion='Which assumption matters most in this fixture?')
+        result = council.prepare_round(task, council_id)
+        record = result['rounds'][-1]['jobs']['member-1']
+        self.assertEqual(record['status'], 'PREPARED', result['rounds'][-1].get('prepare_errors'))
+        exchange = record['exchange_id']
+        jobs = {'member-1': {'facts': self.facts(), 'ceiling_usd': .2, 'config_path': config,
+                             'split_path': self.bind_stream_test_split(task, exchange)}}
+        return exchange, jobs
+
+    def test_first_opinion_commit_survives_failure_to_write_attempted_intent(self):
+        task = self.folder / 'stable-first-opinion'
+        charter = self.file('first-opinion-charter.txt', 'DIGR: Compare an open decision in this fixture.')
+        session = create_session(task, request=charter, p_run='1.2.0@' + 'f' * 40)
+        config = self.config('streaming', wallet_id='synthetic-first-opinion-wallet')
+        ledger = self.folder / 'wallet.sqlite3'
+        with (patch.object(wallet, 'ledger_path', return_value=ledger),
+              patch.dict(os.environ, {'DIGR_TEST_CONSULT_KEY': SECRET})):
+            exchange, jobs = self.prepare_first_opinion(task, 'first', config)
+            other, other_jobs = self.prepare_first_opinion(task, 'parallel-line', config)
+            attempt_path = task / 'consult' / 'exchanges' / exchange / 'attempt.json'
+            write_original = consult._write
+
+            def fail_intent_write(path, value, **options):
+                if path == attempt_path and value['transport_status'] == 'ATTEMPTED':
+                    claim = wallet.inspect_task(task, session)['first_opinion_claim']
+                    self.assertEqual(claim['state'], 'COMMITTED')
+                    raise OSError('Simulated failure to persist the local send intent')
+                return write_original(path, value, **options)
+
+            with patch.object(consult, '_write', side_effect=fail_intent_write):
+                first = council.run_round(task, 'first', round_id=1, jobs=jobs)
+            self.assertEqual(first['rounds'][0]['jobs']['member-1']['status'], 'FAILED')
+            self.assertEqual(consult.inspect_exchange(task, exchange)['exchange']['transport_status'], 'PREPARED')
+            with self.assertRaisesRegex(ValueError, 'unsent reservation'):
+                consult.recover_preflight(task, exchange)
+            council.run_round(task, 'parallel-line', round_id=1, jobs=other_jobs)
+            self.assertEqual(consult.inspect_exchange(task, other)['exchange']['transport_status'], 'PREPARED')
+            shared = wallet.inspect_task(task, session)
+            self.assertEqual(len(shared['claims']), 1)
+            self.assertEqual(shared['first_opinion_claim']['exchange_id'], exchange)
+            self.assertEqual(shared['first_opinion_claim']['state'], 'COMMITTED')
+            self.assertAlmostEqual(shared['totals']['unresolved_reserved_usd'], .2)
+            self.assertEqual(self.server.post_calls, [])
+
+    def test_stable_first_opinion_and_late_reentry_preserve_public_bytes_and_finish_natively(self):
+        charter = self.file('first-opinion-reentry.txt', 'DIGR: Compare a real choice in this fixture.')
+        native = self.file('native-opinion.txt', 'A distinct native initial opinion.')
+        revised = self.file('native-reconsideration.txt', 'Use the public evidence in the native reconsideration.')
+        config = self.config('stream-first-opinion-reentry', wallet_id='synthetic-late-first-opinion')
+        expected = '\ufeff \t\r\n第二段。'.encode('utf-8')
+        checksum = sha256(expected).hexdigest()
+        self.server.finish_stream = threading.Event()
+        self.server.finish_stream.set()
+        ledger = self.folder / 'wallet.sqlite3'
+        for late in (False, True):
+            with (self.subTest(late=late), patch.object(wallet, 'ledger_path', return_value=ledger),
+                  patch.dict(os.environ, {'DIGR_TEST_CONSULT_KEY': SECRET})):
+                task = self.folder / ('first-opinion-late' if late else 'first-opinion-in-time')
+                create_session(task, request=charter, p_run='1.2.0@' + 'f' * 40)
+                exchange, jobs = self.prepare_first_opinion(task, 'decision', config)
+                council.submit_native_initial(task, 'decision', actor='native-1', output_path=native,
+                                              input_version=1)
+                before = len(self.server.post_calls)
+                if late:
+                    connected = threading.Event()
+                    self.server.finish_stream.clear()
+
+                    def observe(event):
+                        if event['event'] == 'connected':
+                            connected.set()
+
+                    with ThreadPoolExecutor(max_workers=1) as pool:
+                        run = pool.submit(council.run_round, task, 'decision', round_id=1, jobs=jobs,
+                                          on_public_event=observe)
+                        try:
+                            self.assertTrue(connected.wait(2))
+                            council.advance_barrier(task, 'decision',
+                                                    now=datetime.now(timezone.utc) + timedelta(seconds=600))
+                            frozen = council.read_packet(task, 'decision', actor='native-1', stage='REDELIBERATION')
+                        finally:
+                            self.server.finish_stream.set()
+                        first = run.result(timeout=4)
+                    self.assertEqual(first['cycle']['members']['member-1']['status'], 'TIMEOUT')
+                    self.assertEqual(frozen, council.read_packet(task, 'decision', actor='native-1',
+                                                                  stage='REDELIBERATION'))
+                    reentered = council.reenter_late_result(task, 'decision', exchange_id=exchange)
+                    self.assertEqual(reentered['cycle']['members'], {})
+                    self.assertEqual(reentered['input_version'], 2)
+                    council.submit_native_initial(task, 'decision', actor='native-1', output_path=native,
+                                                  input_version=2)
+                    version = 2
+                else:
+                    first = council.run_round(task, 'decision', round_id=1, jobs=jobs)
+                    self.assertEqual(first['cycle']['members']['member-1']['status'], 'COMPLETE')
+                    self.assertEqual(first['phase'], 'REDELIBERATION')
+                    version = 1
+
+                packet = council.read_packet(task, 'decision', actor='native-1', stage='REDELIBERATION')
+                works = [item for item in packet['public_work'] if item.get('exchange_id') == exchange]
+                if late:
+                    sources = [item for item in packet['common_input']['sources']
+                               if item['kind'] == 'RELEVANT_EVENT_LATE_MEMBER_RESULT']
+                    self.assertEqual(len(sources), 1)
+                    self.assertEqual(sources[0]['text'].encode('utf-8'), expected)
+                    self.assertEqual(sources[0]['sha256'], checksum)
+                else:
+                    self.assertEqual(len(works), 1)
+                for work in works:
+                    body = ''.join(chunk['text'] for chunk in work['chunks']).encode('utf-8')
+                    self.assertEqual(body, expected)
+                    self.assertEqual(work['sha256'], checksum)
+                council.submit_redeliberation(task, 'decision', actor='native-1', output_path=revised,
+                                              input_version=version)
+                self.assertTrue(council.completion_status(task)['complete'])
+                settled = consult.inspect_exchange(task, exchange)['exchange']
+                self.assertEqual((settled['known_cost_usd'], settled['public_sha256']), (.03, checksum))
+                self.assertEqual(len(self.server.post_calls), before + 1)
 
     def test_new_generic_request_carries_logic_basis_without_changing_legacy_prompt(self):
         request = self.file('logic-request.txt', 'DIGRC：分析这个设计。\n')

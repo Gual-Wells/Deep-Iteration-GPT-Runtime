@@ -34,7 +34,8 @@ class LocalAtomicIOTests(unittest.TestCase):
                            wintypes.LPVOID, wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE)
         create.restype = wintypes.HANDLE
         kernel.CloseHandle.argtypes, kernel.CloseHandle.restype = (wintypes.HANDLE,), wintypes.BOOL
-        handle = create(str(path), 0x80000000, 0x1 | 0x2, None, 3, 0x80, None)
+        flags = 0x02000000 if path.is_dir() else 0x80
+        handle = create(str(path), 0x80000000, 0x1 | 0x2, None, 3, flags, None)
         if handle == ctypes.c_void_p(-1).value:
             raise ctypes.WinError(ctypes.get_last_error())
         return kernel, handle
@@ -108,6 +109,44 @@ class LocalAtomicIOTests(unittest.TestCase):
             kernel.CloseHandle(handle)
         self.assertEqual(self.target.read_bytes(), b'old visible state')
         self.assertEqual(self.source.read_bytes(), b'new durable state')
+
+    @unittest.skipUnless(os.name == 'nt', 'real Windows directory sharing denial')
+    def test_directory_publication_recovers_from_sharing_denial_and_respects_a_new_target(self):
+        rename = Path.rename
+        for conflict in (False, True):
+            with self.subTest(conflict=conflict):
+                staging = self.folder / ('staging-' + str(conflict))
+                destination = self.folder / ('exchange-' + str(conflict))
+                staging.mkdir()
+                (staging / 'attempt.json').write_bytes(b'prepared bytes')
+                denied = threading.Event()
+                kernel, handle = self.hold_without_delete_share(staging)
+
+                def observed(source, target):
+                    try:
+                        return rename(source, target)
+                    except PermissionError as error:
+                        self.assertIn(error.winerror, {5, 32, 33})
+                        denied.set()
+                        raise
+
+                with ThreadPoolExecutor(1) as pool, patch.object(Path, 'rename', observed):
+                    publish = pool.submit(codex_io.publish_directory, staging, destination)
+                    try:
+                        self.assertTrue(denied.wait(1), 'fixture must reach Windows sharing denial')
+                        if conflict:
+                            destination.mkdir()
+                    finally:
+                        kernel.CloseHandle(handle)
+                    if conflict:
+                        with self.assertRaises(FileExistsError):
+                            publish.result(2)
+                        self.assertEqual(list(destination.iterdir()), [])
+                        self.assertEqual((staging / 'attempt.json').read_bytes(), b'prepared bytes')
+                    else:
+                        publish.result(2)
+                        self.assertFalse(staging.exists())
+                        self.assertEqual((destination / 'attempt.json').read_bytes(), b'prepared bytes')
 
     def test_unrelated_permission_error_is_not_retried_or_suppressed(self):
         failure = PermissionError('synthetic unrelated access failure')

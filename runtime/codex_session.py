@@ -300,8 +300,8 @@ def create_session(root: Path, *, request: Path, p_run: str,
                 paper_authoring_contract='sonnet-native-v1',
                 consult_role='Sonnet-native content driving for the selected paper')
         metadata['parameter_selection'] = parameter_selection
-        from .codex_collaboration import layered_policy, unified
-        if unified(p_run):
+        from . import codex_collaboration
+        if codex_collaboration.unified(p_run):
             metadata['execution_profile'] = {
                 'mode': 'DIGR', 'native_responsibilities': 'N/R/D/V/L/M remain Codex-owned',
                 'collaboration_selection': 'ACTUAL_REQUEST_MODEL_AND_SCOPE',
@@ -314,11 +314,20 @@ def create_session(root: Path, *, request: Path, p_run: str,
                 metadata['execution_profile']['claude_selection'] = invocation['claude_selection']
             if 'work_profile' in invocation:
                 metadata['execution_profile']['work_profile'] = invocation['work_profile']
-            if layered_policy(p_run):
+            if codex_collaboration.layered_policy(p_run):
                 metadata['execution_profile']['native_model_selection'] = 'ACTIVE_CODEX_SETTINGS'
                 metadata['execution_profile'].pop('fee_authorization', None)
                 metadata['execution_profile']['initial_fee_basis'] = (
                     'COUNCIL_WALLET_ONLY' if invocation['claude_selection'] == 'COUNCIL_ONLY' else 'USER_BUDGET_DECISION')
+                if (codex_collaboration.first_opinion_policy(p_run)
+                        and invocation['claude_selection'] == codex_collaboration.COUNCIL_ONLY):
+                    metadata['execution_profile']['first_opinion'] = {
+                        'when': 'BEFORE_AN_OPEN_MATERIAL_DECISION',
+                        'purpose': codex_collaboration.FIRST_OPINION_PURPOSE,
+                        'max_reservations_in_use_per_task': 1,
+                        'ceiling_usd': codex_collaboration.FIRST_OPINION_CEILING_USD,
+                        'scope': 'host evaluates the opportunity; current lifecycle and wallet govern sending',
+                    }
     if profile_uses_delivery:
         from .codex_delivery import resolve_policy
         selection = invocation['delivery_selection']

@@ -900,6 +900,8 @@ def _claude_estimate(value: Mapping[str, Any]) -> tuple[float | None, str | None
 
 
 def _claude_costs(root: Path) -> dict:
+    from . import codex_collaboration
+
     rows, notices = [], []
     for path in sorted((root / 'consult' / 'exchanges').glob('*/attempt.json')):
         try:
@@ -926,14 +928,18 @@ def _claude_costs(root: Path) -> dict:
             'observed_usd': known if not value.get('reconciled_at') else None,
             'estimated_usd': estimate, 'estimate_basis': estimate_basis, 'unresolved_reserved_usd': reserve,
             'generation_id': value.get('generation_id')}
+        if scope.get('purpose') == codex_collaboration.FIRST_OPINION_PURPOSE:
+            row.update(purpose=scope['purpose'], public_status=value.get('public_status'))
         production = value.get('production')
         if isinstance(production, Mapping):
             row.update(production_id=production.get('production_id'), production_stage=production.get('stage'))
         rows.append(row)
     wallet = {'status': 'UNAVAILABLE', 'claims': []}
+    session = {}
     try:
         from .codex_wallet import inspect_task
-        wallet = inspect_task(root, _read(root / 'session.json'))
+        session = _read(root / 'session.json')
+        wallet = inspect_task(root, session)
     except (ImportError, OSError, ValueError, KeyError, sqlite3.Error):
         notices.append('shared-wallet read unavailable; unresolved reservation coverage may be incomplete')
     indexed = {row['exchange_id']: row for row in rows}
@@ -973,7 +979,7 @@ def _claude_costs(root: Path) -> dict:
             row['unresolved_reserved_usd'] = 0.0
             if row['billing_status'] != 'KNOWN':
                 row['billing_status'] = 'NOT_ATTEMPTED'
-    return {'attempts': rows,
+    report = {'attempts': rows,
             'settled_usd': sum(row['settled_usd'] or 0 for row in rows),
             'observed_usd': sum(row['observed_usd'] or 0 for row in rows),
             'estimated_usd': sum(row['estimated_usd'] or 0 for row in rows),
@@ -984,6 +990,28 @@ def _claude_costs(root: Path) -> dict:
             'shared_wallet_status': wallet.get('status'),
             'notices': notices,
             'scope': 'current task Consult attempts only; reservations are not incurred bills'}
+    if codex_collaboration.first_opinion_policy(session.get('P_run', '')):
+        claim = wallet.get('first_opinion_claim')
+        initial = session.get('initial_invocation') or {}
+        lifecycle_path = root / 'lifecycle.json'
+        selection = initial.get('claude_selection')
+        if lifecycle_path.is_file():
+            try:
+                selection = _read(lifecycle_path)['claude_policy']['mode']
+            except (OSError, ValueError, KeyError):
+                selection = None
+        if claim is not None:
+            reply = indexed[claim['exchange_id']]
+            report['first_opinion'] = {
+                'state': 'RESERVED' if claim['state'] == 'RESERVED' else 'CONSUMED',
+                'exchange_id': claim['exchange_id'], 'wallet_status': claim['state'],
+                'transport_status': reply['transport_status'], 'public_status': reply.get('public_status'),
+                'billing_status': reply['billing_status'], 'settled_usd': reply['settled_usd'],
+                'observed_usd': reply['observed_usd'], 'unresolved_reserved_usd': reply['unresolved_reserved_usd']}
+        elif selection == codex_collaboration.COUNCIL_ONLY:
+            report['first_opinion'] = {
+                'state': 'UNUSED' if wallet.get('status') in {'READ', 'ABSENT'} else 'UNCONFIRMED'}
+    return report
 
 
 def usage_dependency_paths(root: Path) -> set[Path]:
@@ -1042,6 +1070,16 @@ def render_usage_markdown(report: Mapping[str, Any]) -> str:
         lines[-1] += '本任务无已登记Claude尝试。'
     if claude.get('unknown_unbounded_attempts'):
         lines[-1] += '另有' + str(claude['unknown_unbounded_attempts']) + '项未决金额无可用预留上界。'
+    opinion = claude.get('first_opinion')
+    if opinion:
+        use = {'UNUSED': '额度未使用', 'UNCONFIRMED': '额度使用状态待核对',
+               'RESERVED': '已预留，发送意图待确认', 'CONSUMED': '一次额度已占用'}[opinion['state']]
+        public = {'COMPLETE': '公开正文完整', 'PARTIAL': '已有部分公开正文',
+                  'ABSENT': '当前没有公开正文'}.get(opinion.get('public_status'), '正文状态待核对')
+        if opinion.get('exchange_id'):
+            lines += ['', '首议 ' + opinion['exchange_id'] + '，' + use + '，' + public + '。']
+        else:
+            lines += ['', '本任务首议' + use + '。']
     lines += ['', '| Codex实际模型 / effort / speed | 已导入tokens占比 | 加权用量代理占比 |',
               '| --- | --- | --- |']
     for group in native['groups']:

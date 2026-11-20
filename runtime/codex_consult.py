@@ -469,8 +469,8 @@ def _load(root: Path, exchange_id: str, *, verify_public: bool = True) -> tuple[
     if codex_collaboration.council_enabled(session['P_run']):
         # An attempt and its price-finalized request are separate atomic files.
         # Fence the bytes instead of holding the long-lived exchange/network
-        # lock. A concurrent state publication only repeats these local reads.
-        end = time.monotonic() + 1.0
+        # lock. Start the bounded reread window when a mismatch is observed.
+        retry_until = None
         while True:
             attempt_raw = codex_io.read_bytes(directory / 'attempt.json')
             attempt = json.loads(attempt_raw.decode('utf-8-sig'))
@@ -487,7 +487,10 @@ def _load(root: Path, exchange_id: str, *, verify_public: bool = True) -> tuple[
                               and attempt.get('transport_status') == 'ATTEMPTED')
             if unchanged and not public_pending:
                 break
-            if time.monotonic() >= end:
+            now = time.monotonic()
+            if retry_until is None:
+                retry_until = now + 1.0
+            elif now >= retry_until:
                 raise ValueError('Consult local state kept changing; inspect again without repeating inference')
             time.sleep(.001)
     else:
@@ -915,7 +918,7 @@ def prepare_request(
         try:
             _write(staging / 'request.json', request, new=True)
             _write(staging / 'attempt.json', attempt, new=True)
-            staging.replace(directory)
+            codex_io.publish_directory(staging, directory)
         finally:
             if staging.exists():
                 for name in ('request.json', 'attempt.json'):
@@ -1226,6 +1229,7 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
     root, session, lifecycle = _task(root, active=True)
     parallel = codex_collaboration.council_enabled(session['P_run'])
     layered = codex_collaboration.layered_policy(session['P_run'])
+    stable_public = codex_collaboration.first_opinion_policy(session['P_run'])
     with (_exchange_writer(root, exchange_id) if parallel else _writer(root)):
         directory, attempt, request = _load(root, exchange_id)
         role = attempt.get('participation_role', 'consult_guidance')
@@ -1258,6 +1262,8 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
         else:
             budget = _budget(facts, request, _all_attempts(root), ceiling_usd, canonical_wallet=parallel)
             config, secret = _config(config_path)
+        purpose = budget.get('authorization_evidence', {}).get('purpose') if stable_public else None
+        first_opinion = purpose == codex_collaboration.FIRST_OPINION_PURPOSE
         if parallel:
             _text('shared wallet_id in the private config', config.get('wallet_id'))
         deadline, read_deadline = None, None
@@ -1328,11 +1334,10 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
         # Finish constructing the transport before this managed send fence.
         check_current_send()
         if parallel:
-            # The durable reservation precedes the file-based send intent. If
-            # this process dies between them, the claim stays unresolved and
-            # blocks replay; inspection can still find it by task/exchange ID.
+            reservation_scope = {'purpose': purpose} if first_opinion else {}
             attempt['wallet_claim'] = codex_wallet.reserve(root, session, exchange_id=exchange_id,
-                request_sha256=attempt['request_sha256'], wallet_id=config['wallet_id'], budget=budget)
+                request_sha256=attempt['request_sha256'], wallet_id=config['wallet_id'], budget=budget,
+                **reservation_scope)
             # A correction or revocation during reservation is still unsent.
             try:
                 check_current_send(reserved=True)
@@ -1342,12 +1347,17 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
                     # cleanup remains recoverable through the durable ledger.
                     codex_wallet.update(attempt['wallet_claim'], state='ABORTED')
                 raise
+            if first_opinion:
+                # Commit the task-wide opportunity before publishing the local
+                # intent. From this point a crash leaves a non-replayable hold.
+                codex_wallet.update(attempt['wallet_claim'], state='COMMITTED')
         _write(directory / 'attempt.json', attempt)
-        if parallel:
+        if parallel and not first_opinion:
             codex_wallet.update(attempt['wallet_claim'], state='COMMITTED')
         sequence = 0
         public_hash = sha256()
         public_bytes = 0
+        public_prefix: list[str] = []
 
         def relay(kind: str, **values):
             nonlocal sequence, public_bytes
@@ -1373,6 +1383,17 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
                     # An observer fault must not discard or repeat a paid answer.
                     attempt['observer_error_class'] = type(error).__name__
 
+        def relay_delta(text: str) -> None:
+            if stable_public and not public_bytes:
+                # Delay blank leading deltas until there is public content.
+                # Once there is, preserve the response's exact whitespace.
+                if not text.strip():
+                    public_prefix.append(text)
+                    return
+                text = ''.join(public_prefix) + text
+                public_prefix.clear()
+            relay('public_delta', text=text)
+
         try:
             if read_deadline is not None:
                 read_deadline.start()
@@ -1392,7 +1413,7 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
                     from .codex_public_stream import read_public_response
                     relay('connected', http_status=response.status)
                     data = read_public_response(response, secret=secret,
-                        on_delta=lambda text: relay('public_delta', text=text),
+                        on_delta=relay_delta,
                         **({'check_read': check_read} if deadline is not None else {}))
                     attempt.update(actual_streamed=data['actual_streamed'], stream_ended=data['stream_ended'])
                 else:
