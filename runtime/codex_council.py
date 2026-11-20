@@ -28,6 +28,7 @@ ROUND_KINDS = frozenset({'INDEPENDENT', 'CROSS', 'FINAL', 'REENTRY'})
 _ID = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,63}')
 _SCOPE_KEYS = frozenset({'council_id', 'member_id', 'line_id', 'cycle_id',
                           'input_version', 'packet_sha256', 'round_id', 'round_kind'})
+_FIRST_OPINION_SCOPE_KEYS = _SCOPE_KEYS | {'purpose'}
 
 
 def _now() -> str:
@@ -148,10 +149,10 @@ def _load(root: Path, council_id: str, *, active: bool = False) -> tuple[Path, d
     return directory, state, lifecycle
 
 
-def _snapshot(path: Path, kind: str) -> dict:
+def _snapshot(path: Path, kind: str, *, encoding: str = 'utf-8-sig') -> dict:
     path = Path(path).resolve()
     raw = path.read_bytes()
-    text = raw.decode('utf-8-sig')
+    text = raw.decode(encoding)
     _text('actual source', text)
     return {'kind': kind, 'name': path.name, 'path': path.as_posix(),
             'sha256': _hash(raw), 'byte_length': len(raw), 'text': text}
@@ -175,6 +176,8 @@ def _save_packet(directory: Path, state: dict, sources: list[dict], lifecycle: d
     packet = {'format': 'digr-council-common-input-1', 'council_id': state['council_id'],
               'input_version': version, 'input_ref': _input_ref(lifecycle), 'sources': sources,
               'scope': 'exact shared facts and constraints; host must exclude initial-side opinions'}
+    if 'first_opinion_decision' in state:
+        packet['open_decision'] = state['first_opinion_decision']
     name = 'packet-' + str(version) + '.json'
     _write(directory / name, packet, new=True)
     state['packets'].append({'path': name, 'sha256': _hash(_bytes(packet)),
@@ -220,8 +223,8 @@ def _new_cycle(state: dict, *, native_actors: Sequence[str], members: Sequence[s
 
 def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
                    facts_path: Path | None = None, materials: Sequence[Path] = (),
-                   enable_claude: bool = False, member_count: int = 2,
-                   deadline_seconds: int = 300) -> dict:
+                   enable_claude: bool = False, member_count: int | None = None,
+                   deadline_seconds: int = 300, first_opinion: str | None = None) -> dict:
     """Create a native work object with only the channels allowed by its pin."""
     root, session, lifecycle = _task(root, active=True)
     _id('council_id', council_id)
@@ -230,6 +233,15 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
         raise ValueError('Supply distinct actual native actor IDs')
     for actor in actors:
         _id('native actor', actor)
+    if first_opinion is not None:
+        codex_collaboration.require_first_opinion_permission(lifecycle)
+        first_opinion = _text('still-open first-opinion decision', first_opinion)
+        if member_count is not None and (type(member_count) is not int or member_count != 1):
+            raise ValueError('The first-opinion opportunity has exactly one Claude member')
+        enable_claude = True
+        member_count = 1
+    elif member_count is None:
+        member_count = 2
     if type(member_count) is not int or member_count < 1 or member_count > 16:
         raise ValueError('member_count must be 1 to 16; this is a resource bound, not a native V count')
     if type(deadline_seconds) is not int or deadline_seconds < 1:
@@ -254,6 +266,8 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
             'native_actors': actors, 'members': members, 'claude_enabled': enable_claude,
             'deadline_seconds': deadline_seconds, 'packets': [], 'cycles': [], 'rounds': [],
             'events': [], 'late_results': [], 'native_responsibility_credit': False}
+        if first_opinion is not None:
+            state['first_opinion_decision'] = first_opinion
         _save_packet(directory, state, sources, lifecycle)
         _new_cycle(state, native_actors=actors, members=list(members), deadline_seconds=deadline_seconds)
         _write(directory / 'council.json', state, new=True)
@@ -263,7 +277,7 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
 def inspect_council(root: Path, council_id: str) -> dict:
     """Metadata and statuses only; no cross-side opinion bodies leak here."""
     directory, state, lifecycle = _load(root, council_id)
-    return {'council_id': council_id, 'P_run': state['P_run'], 'phase': state['phase'],
+    summary = {'council_id': council_id, 'P_run': state['P_run'], 'phase': state['phase'],
             'cycle_id': state['cycle_id'], 'input_version': state['input_version'],
             'packet_sha256': state['packets'][-1]['sha256'], 'isolation': state['isolation'],
             'actor_authority': state['actor_authority'], 'native_actors': state['native_actors'],
@@ -278,6 +292,9 @@ def inspect_council(root: Path, council_id: str) -> dict:
             'late_results': state['late_results'],
             'current_input_changed': state['packets'][-1]['input_ref'] != _input_ref(lifecycle),
             'local_path': directory.as_posix(), 'native_responsibility_credit': False}
+    if 'first_opinion_decision' in state:
+        summary['first_opinion_decision'] = state['first_opinion_decision']
+    return summary
 
 
 def _artifact(directory: Path, path: Path, *, name: str, kind: str) -> dict:
@@ -334,9 +351,18 @@ def submit_native_initial(root: Path, council_id: str, *, actor: str, output_pat
 def require_member_scope(root: Path, scope: Mapping[str, Any], *, active: bool = True,
                          exchange_id: str | None = None, dispatch: bool = False) -> dict:
     """Validate an exact member/line/cycle/packet/round binding for Consult."""
-    if not isinstance(scope, Mapping) or set(scope) != _SCOPE_KEYS:
+    if not isinstance(scope, Mapping) or set(scope) not in (_SCOPE_KEYS, _FIRST_OPINION_SCOPE_KEYS):
         raise ValueError('Council member scope has an invalid schema')
     directory, state, lifecycle = _load(root, scope['council_id'], active=active)
+    first_opinion = 'first_opinion_decision' in state
+    if first_opinion:
+        if (not codex_collaboration.first_opinion_policy(state['P_run'])
+                or scope.get('purpose') != codex_collaboration.FIRST_OPINION_PURPOSE):
+            raise ValueError('Council member scope must carry the registered first-opinion purpose')
+        if active:
+            codex_collaboration.require_first_opinion_permission(lifecycle)
+    elif 'purpose' in scope:
+        raise ValueError('An ordinary council has no registered first-opinion purpose')
     member = state['members'].get(scope['member_id'])
     if member is None or member['line_id'] != scope['line_id']:
         raise ValueError('Unknown council member research line')
@@ -400,11 +426,27 @@ _MEMBER_PROMPT = (
     'conditions and objections. Do not expose hidden reasoning.'
 )
 
+_FIRST_OPINION_PROMPT = (
+    'Give one independent public research opinion as a first-layer council member. '
+    'Study the supplied sources before choosing. You may replace the proposed decision '
+    'with a higher-impact choice that is still open. Start with your own choice, an '
+    'actual source-based reason, and one concrete change to the result. Then explain '
+    'the strongest alternative, its tradeoff, and what could change your view. A '
+    'short, complete opinion is the work for this round. The native council will '
+    'make the decision. Do not invent source access or expose hidden reasoning.'
+)
+
 
 def _exchange_public(root: Path, exchange_id: str) -> tuple[dict, str | None]:
     from . import codex_consult as consult
     directory, attempt, _ = consult._load(Path(root).resolve(), exchange_id)
-    body = (directory / 'public.md').read_text(encoding='utf-8') if attempt.get('public_sha256') else None
+    body = None
+    if attempt.get('public_sha256'):
+        path = directory / 'public.md'
+        if codex_collaboration.first_opinion_policy(attempt['P_run']):
+            body = path.read_bytes().decode('utf-8')
+        else:
+            body = path.read_text(encoding='utf-8')
     return attempt, body
 
 
@@ -427,6 +469,15 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
         _, state, lifecycle = _load(root, council_id, active=True)
         codex_collaboration.require_council_permission(lifecycle)
         cycle = _cycle(state)
+        first_opinion = 'first_opinion_decision' in state
+        if first_opinion:
+            codex_collaboration.require_first_opinion_permission(lifecycle)
+            if state['rounds'] or state['cycle_id'] != 1 or kind != 'INDEPENDENT':
+                raise ValueError('A first-opinion council prepares only its one independent round')
+            if effort is None:
+                effort = 'high'
+            if max_tokens is None:
+                max_tokens = codex_collaboration.FIRST_OPINION_OUTPUT_TOKENS
         if not state['claude_enabled'] or state['phase'] != 'INITIAL':
             raise ValueError('This council has no active Claude member work')
         if state['packets'][-1]['input_ref'] != _input_ref(lifecycle):
@@ -451,6 +502,8 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
                 'line_id': state['members'][member_id]['line_id'], 'cycle_id': state['cycle_id'],
                 'input_version': state['input_version'], 'packet_sha256': state['packets'][-1]['sha256'],
                 'round_id': round_id, 'round_kind': kind}
+            if first_opinion:
+                scope['purpose'] = codex_collaboration.FIRST_OPINION_PURPOSE
             exchange_id = 'c-' + _hash(_bytes(scope))[:32]
             jobs[member_id] = {'scope': scope, 'exchange_id': exchange_id, 'status': 'PREPARING'}
         record = {'round_id': round_id, 'kind': kind, 'cycle_id': state['cycle_id'],
@@ -462,7 +515,8 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
         try:
             _, current, _ = _load(root, council_id, active=True)
             packet = _packet(directory, current, job['scope']['input_version'])
-            parts = [_MEMBER_PROMPT, '\nROUND: ' + kind,
+            prompt = _FIRST_OPINION_PROMPT if first_opinion else _MEMBER_PROMPT
+            parts = [prompt, '\nROUND: ' + kind,
                      '\nEXACT COMMON INPUT PACKET:\n' + json.dumps(packet, ensure_ascii=False, indent=2)]
             if kind in {'CROSS', 'FINAL', 'REENTRY'}:
                 parts.append('\nSOURCE-IDENTIFIED PUBLIC RESEARCH; absent replies are not positions:')
@@ -538,7 +592,7 @@ def run_round(root: Path, council_id: str, *, round_id: int,
                 _, attempt, request = consult._load(root, exchange)
                 config, _ = consult._config(Path(job['config_path']) if job.get('config_path') else None)
                 authorized = codex_consult_budget.resolve(root, session, lifecycle, attempt, job['facts'],
-                    config.get('wallet_id'))
+                    config.get('wallet_id'), ceiling_usd=job['ceiling_usd'], max_tokens=request['max_tokens'])
                 consult._budget(authorized, request, (), job['ceiling_usd'], canonical_wallet=True, wallet_only=True)
         record['status'] = 'RUNNING'
         record['started_at'] = _now()
@@ -587,8 +641,11 @@ def run_round(root: Path, council_id: str, *, round_id: int,
                     and _cycle(current)['barrier'] is None and current['phase'] == 'INITIAL'):
                 side['exchange_id'] = outcome['exchange_id']
                 # A first complete response is not a completed research line.
-                if round_record['kind'] == 'FINAL' or outcome['status'] != 'COMPLETE':
+                if ('first_opinion_decision' in current or round_record['kind'] == 'FINAL'
+                        or outcome['status'] != 'COMPLETE'):
                     side['status'] = outcome['status']
+                    if 'first_opinion_decision' in current:
+                        side['sealed_at'] = _now()
                 for event in current['events']:
                     if event['id'] in _cycle(current)['event_ids'] and member_id in event['members'] and body is not None:
                         event.setdefault('member_reentries', {})[member_id] = {
@@ -695,6 +752,34 @@ def advance_barrier(root: Path, council_id: str, *, now: datetime | None = None)
     return inspect_council(root, council_id)
 
 
+def first_opinion_plan(root: Path, council_id: str, *, round_id: int,
+                       split_path: Path, config_path: Path | None = None) -> dict:
+    """Read a provider quote for one prepared first opinion; never send inference."""
+    from . import codex_consult, codex_consult_budget, codex_wallet
+
+    _, state, lifecycle = _load(root, council_id, active=True)
+    codex_collaboration.require_first_opinion_permission(lifecycle)
+    if ('first_opinion_decision' not in state or round_id != 1
+            or len(state['rounds']) != 1 or state['rounds'][0]['status'] != 'PREPARED'):
+        raise ValueError('Automatic quote requires the prepared first-opinion round')
+    jobs = state['rounds'][0]['jobs']
+    if len(jobs) != 1:
+        raise ValueError('Automatic quote requires exactly one prepared Claude member')
+    member_id, job = next(iter(jobs.items()))
+    if job['status'] != 'PREPARED':
+        raise ValueError('Automatic quote requires exactly one prepared Claude member')
+    exchange_id = job['exchange_id']
+    require_member_scope(root, job['scope'], exchange_id=exchange_id)
+    _, session, _ = _task(root, active=True)
+    existing = codex_wallet.inspect_task(root, session).get('first_opinion_claim')
+    if existing:
+        raise ValueError('The task already holds its first opinion at exchange ' + existing['exchange_id']
+                         + '; inspect or relay that exchange')
+    _, _, request = codex_consult._load(root, exchange_id)
+    quote = codex_consult_budget.first_opinion_quote(request, config_path=config_path)
+    return {member_id: {**quote, 'split_path': split_path, 'config_path': config_path}}
+
+
 def _chunks(text: str, size: int) -> list[dict]:
     if type(size) is not int or size < 1:
         raise ValueError('chunk_chars must be a positive integer')
@@ -782,8 +867,9 @@ def reenter_late_result(root: Path, council_id: str, *, exchange_id: str) -> dic
     if late is None:
         raise ValueError('No pending late public result with this exchange identity')
     exchange_dir, _, _ = consult._load(Path(root).resolve(), exchange_id)
-    result = publish_event(root, council_id, input_path=exchange_dir / 'public.md',
-                           kind='LATE_MEMBER_RESULT', members=[late['member_id']])
+    members = [] if 'first_opinion_decision' in state else [late['member_id']]
+    publish_event(root, council_id, input_path=exchange_dir / 'public.md',
+                  kind='LATE_MEMBER_RESULT', members=members)
     with _writer(directory):
         _, state, _ = _load(root, council_id)
         for item in state['late_results']:
@@ -801,12 +887,17 @@ def publish_event(root: Path, council_id: str, *, input_path: Path, kind: str,
     This creates work to do; it does not claim reentry has already occurred or
     send a request. Old results and redeliberations keep their old identities.
     """
-    directory, _, _ = _load(root, council_id, active=True)
+    directory, current, _ = _load(root, council_id, active=True)
     _text('event kind', kind)
-    source = _snapshot(input_path, 'RELEVANT_EVENT_' + kind)
+    encoding = 'utf-8' if (kind == 'LATE_MEMBER_RESULT'
+                            and codex_collaboration.first_opinion_policy(current['P_run'])) else 'utf-8-sig'
+    source = _snapshot(input_path, 'RELEVANT_EVENT_' + kind, encoding=encoding)
     with _writer(directory):
         _, state, lifecycle = _load(root, council_id, active=True)
-        selected = list(members) if members is not None else list(state['members'])
+        first_opinion = 'first_opinion_decision' in state
+        if first_opinion and members:
+            raise ValueError('First-opinion reentry is native-only; reuse the saved public result')
+        selected = list(members) if members is not None else ([] if first_opinion else list(state['members']))
         actors = list(native_actors) if native_actors is not None else list(state['native_actors'])
         if not actors or len(actors) != len(set(actors)) or any(actor not in state['native_actors'] for actor in actors):
             raise ValueError('Select actual affected native actors')
@@ -829,6 +920,14 @@ def publish_event(root: Path, council_id: str, *, input_path: Path, kind: str,
                                              if event['status'] != 'PROCESSED')))
         migrations = []
         for prior_cycle in state['cycles']:
+            if first_opinion and not _valid_migration(state, prior_cycle):
+                in_flight = any(record['cycle_id'] == prior_cycle['cycle_id']
+                                and record['status'] in {'RUNNING', 'OUTCOME_PENDING'}
+                                for record in state['rounds'])
+                for side in prior_cycle['members'].values():
+                    if side['status'] not in TERMINAL:
+                        side.update(status='OUTCOME_UNKNOWN' if in_flight else 'CANCELLED',
+                                    sealed_at=_now())
             pending_native, pending_members = _obligations(prior_cycle)
             if (pending_native or pending_members) and not _valid_migration(state, prior_cycle):
                 # Selecting only the newly affected actor must not erase an old

@@ -7,6 +7,9 @@ FORMAT = 'digr-actual-collaboration-1'
 SONNET_MODEL = re.compile(r'anthropic/claude-(?:sonnet-[0-9]+(?:\.[0-9]+)*|[0-9]+(?:\.[0-9]+)*-sonnet)(?:-[0-9]{8})?')
 CLAUDE_MODEL = re.compile(r'(?:^|/)claude(?:[-/:]|$)', re.IGNORECASE)
 COUNCIL_ONLY = 'COUNCIL_ONLY'
+FIRST_OPINION_PURPOSE = 'first_opinion'
+FIRST_OPINION_CEILING_USD = 0.20
+FIRST_OPINION_OUTPUT_TOKENS = 16_000
 _PIN_VERSION = re.compile(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}')
 
 
@@ -25,6 +28,17 @@ def delimiter_policy(p_run: str) -> bool:
 
 def layered_policy(p_run: str) -> bool:
     return _since(p_run, (1, 0, 0))
+
+
+def first_opinion_policy(p_run: str) -> bool:
+    return _since(p_run, (1, 2, 0))
+
+
+def require_first_opinion_permission(lifecycle: Mapping[str, Any]) -> None:
+    if not first_opinion_policy(lifecycle['P_run']):
+        raise ValueError('The first-opinion opportunity requires a frozen Codex 1.2.0+ task')
+    if lifecycle.get('claude_policy', {}).get('mode') != COUNCIL_ONLY:
+        raise ValueError('The first-opinion opportunity requires the current single-colon choice')
 
 
 def allowed_selections(p_run: str) -> set[str]:

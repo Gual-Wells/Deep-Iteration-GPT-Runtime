@@ -1,10 +1,8 @@
-# DIGR for Codex · Stable 1.1.1
+# DIGR for Codex · Stable 1.2.0
 
-稳定版的执行入口见 [PROTOCOL](codex/PROTOCOL.md)，原有功能的接续见[兼容范围](docs/CODEX_STABLE_COMPATIBILITY.md)。
+`DIGR：任务` 默认在一项能影响成品的取舍定案前，安排 Claude 作一次独立首发。Claude 可以自行选择议题，原生议会取得原文后再议，Main 落实。它沿当前单冒号的共享钱包许可使用，单次预留上限为 0.20 美元，取舍已确定时可跳过。`DIGR：：任务` 可同时采用两层，先向用户说明实际范围和保守费用上界，取得决定后再调用。第二层按实际委托让 Claude 指导内容取舍或出稿。每次提交前完成本机 Split，Codex 负责必要原件、核对与工程。详见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
 
-[原语宪法](codex/CONSTITUTION.md)适用于整个当前 Codex 协议。正式内容委托按 [CONSULT](codex/CONSULT.md) 发起同题双边产出、Claude 裁决及 Main 落实。
-
-`DIGR：任务` 可在真实共享钱包可用范围内邀请 Claude 作第一层子议会成员，引入外部证据和替代解释。原生初议与子议会独立推进，由原生议会取得真实原文后再议。`DIGR：：任务` 可同时采用两层，先向用户说明实际范围和保守费用上界，取得决定后再调用。第二层按实际委托让 Claude 指导内容取舍或出稿。每次提交前完成本机 Split，Codex 负责必要原件、核对与工程。详见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
+[原语宪法](codex/CONSTITUTION.md)适用于整个当前 Codex 协议。正式内容委托按 [CONSULT](codex/CONSULT.md) 发起同题双边产出、Claude 裁决及 Main 落实。既有任务按原 pin 接续，适用关系见[兼容范围](docs/CODEX_STABLE_COMPATIBILITY.md)。
 
 Codex 按当前模型和推理设置工作。五档提供任务强度推断的偏好基准。预见超巨量批任务时，可依据材料、分批收益和验收条件设计多档协作。明确的任务更新用 `DO：` 接入现有任务，费用答复只取得相应费用许可。冻结旧任务按完整原 pin 与工具恢复。历史变更见 [CHANGELOG](CHANGELOG.md)。
 
@@ -62,7 +60,7 @@ DIGR：比较这个项目的两种发布方案，实际验证关键路径，给�
 
 | 调用 | 含义 |
 | --- | --- |
-| `DIGR：任务` | 以 Default 为偏好基准，根据实际任务推断初始投入。 |
+| `DIGR：任务` | 在能改变结果的取舍定案前安排一次独立首发。参考 Default，根据实际任务推断初始投入。 |
 | `DIGR：：用 Sonnet 完整处理论文` | 按第二层内容制作和已批准的费用范围接入论文增量，一篇一份完整标准页 PDF。 |
 | `DIGR(M(2))：任务` | 两条完整独立 Main，各自初始化、研究制作、承担本线责任并收敛，然后比较。 |
 | `DIGR(target=60min)：任务` | 软时间目标，模型仍按结果决定是否继续。 |
@@ -145,7 +143,13 @@ python -B tools/codex.py acquire --stage execution --continue-from D:/task/acqui
 | `python -B tools/codex.py experience --help` | 保存明确选入的经验片段及出处；后续查看来源位置是否变化。不会自动写入全局 Memory。 |
 | `python -B tools/codex.py permissions --help` | 根据实际供给的任务授权、能力与费用事实给行动建议；不执行操作或改变宿主权限。 |
 
-统一 CLI **不调用模型、不启动代理、不认证参数责任或作品质量**。原有 `tools/codex_profile.py`、`tools/codex_workbench.py` 和 `tools/codex_experience.py` 仍可用。
+统一 CLI 支持材料准备、事实记录，以及通过显式 `consult call` 或 `council run-round` 发送已授权的 Claude 请求。宿主负责启动原生代理、判断研究责任与验收作品。原有 `tools/codex_profile.py`、`tools/codex_workbench.py` 和 `tools/codex_experience.py` 仍可用。
+
+已为纯文本首发完成本机 Split，且同一 OpenRouter 官方接口配置可查询价格和账户实际余额时，可直接使用下面的运行命令。也可用 `--plan` 提供实际费用事实。完整流程见 [议会操作](codex/COUNCIL.md#本机可运行路径)。
+
+```text
+python -B tools/codex.py council run-round --root TASK --council-id ID --round-id 1 --split-plan SPLIT.json
+```
 
 ## 协议原文与仓库维护
 

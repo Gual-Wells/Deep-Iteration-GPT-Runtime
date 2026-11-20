@@ -16,6 +16,8 @@ from pathlib import Path
 import sqlite3
 from typing import Any, Mapping
 
+from . import codex_collaboration
+
 FORMAT = 'digr-shared-wallet-1'
 
 
@@ -67,9 +69,14 @@ def _transaction(path: Path):
             account_authorization_ref TEXT)''')
         columns = {row['name'] for row in db.execute('PRAGMA table_info(claims)')}
         for name, declaration in (('cost_revision', 'INTEGER NOT NULL DEFAULT 0'),
-                                  ('cost_first_observed_at', 'TEXT'), ('last_cost_checked_at', 'TEXT')):
+                                  ('cost_first_observed_at', 'TEXT'), ('last_cost_checked_at', 'TEXT'),
+                                  ('purpose', 'TEXT')):
             if name not in columns:
                 db.execute('ALTER TABLE claims ADD COLUMN ' + name + ' ' + declaration)
+        # Historical writes omit purpose. Only a proven-unsent release frees
+        # this task's first-opinion slot, regardless of exchange or wallet.
+        db.execute("""CREATE UNIQUE INDEX IF NOT EXISTS claims_first_opinion_task ON claims(task_id)
+            WHERE purpose='first_opinion' AND state<>'ABORTED'""")
         db.execute('''CREATE TABLE IF NOT EXISTS cost_events (
             claim_id TEXT NOT NULL, revision INTEGER NOT NULL, previous_cost_usd REAL NOT NULL,
             known_cost_usd REAL NOT NULL, delta_usd REAL NOT NULL, observed_at TEXT NOT NULL,
@@ -181,30 +188,37 @@ def review_capacity(root: Path, session: Mapping[str, Any], *, wallet_id: str,
 
 
 def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request_sha256: str,
-            wallet_id: str, budget: Mapping[str, Any]) -> dict:
-    from .codex_collaboration import layered_policy
+            wallet_id: str, budget: Mapping[str, Any], purpose: str | None = None) -> dict:
     if not isinstance(wallet_id, str) or not wallet_id.strip():
         raise ValueError('New DIGR submissions require an explicit shared wallet_id in the private config')
-    if budget['budget_total_usd'] is None and not layered_policy(session['P_run']):
+    if budget['budget_total_usd'] is None and not codex_collaboration.layered_policy(session['P_run']):
         raise ValueError('Wallet-only accounting requires the Stable task policy')
+    ceiling = budget['ceiling_usd']
+    if purpose is not None:
+        if (purpose != codex_collaboration.FIRST_OPINION_PURPOSE
+                or not codex_collaboration.first_opinion_policy(session['P_run'])):
+            raise ValueError('Unknown shared wallet reservation purpose for this task profile')
+        if type(ceiling) not in (int, float) or not 0 < ceiling <= codex_collaboration.FIRST_OPINION_CEILING_USD:
+            raise ValueError('First-opinion reservation exceeds its USD 0.20 ceiling or lacks a positive bound')
     path, task = ledger_path(), task_id(root, session)
     identity = claim_id(root, session, exchange_id)
     with _transaction(path) as db:
         if db.execute('SELECT 1 FROM claims WHERE claim_id=?', (identity,)).fetchone():
             raise ValueError('Shared wallet already claimed this exchange; inspect/recover without repeating inference')
         task_rows = list(db.execute('SELECT * FROM claims WHERE task_id=?', (task,)))
+        if purpose is not None and any(row['purpose'] == purpose and row['state'] != 'ABORTED' for row in task_rows):
+            raise ValueError('This task already claimed its first Claude opinion; inspect its existing reservation')
         wallet_rows = list(db.execute('SELECT * FROM claims WHERE wallet_id=?', (wallet_id,)))
         availability = _availability(db, task_rows, wallet_rows, wallet_id, budget, save_snapshot=True)
         account_ref = budget.get('account_authorization_ref')
-        ceiling = budget['ceiling_usd']
         limits = [availability[key] for key in ('task_available_before_usd', 'wallet_available_before_usd',
                                                 'account_available_before_usd') if availability[key] is not None]
         if ceiling > min(limits) + 1e-12:
             raise ValueError('Shared wallet reservation exceeds remaining task/account/wallet budget')
         db.execute('''INSERT INTO claims
-            (claim_id,task_id,wallet_id,exchange_id,request_sha256,state,ceiling_usd,reserved_at,account_authorization_ref)
-            VALUES (?,?,?,?,?,'RESERVED',?,?,?)''',
-            (identity, task, wallet_id, exchange_id, request_sha256, ceiling, _now(), account_ref))
+            (claim_id,task_id,wallet_id,exchange_id,request_sha256,state,ceiling_usd,reserved_at,account_authorization_ref,purpose)
+            VALUES (?,?,?,?,?,'RESERVED',?,?,?,?)''',
+            (identity, task, wallet_id, exchange_id, request_sha256, ceiling, _now(), account_ref, purpose))
     return {'format': FORMAT, 'claim_id': identity, 'ledger_path': path.as_posix(),
             'wallet_id': wallet_id, 'request_sha256': request_sha256,
             **availability,
@@ -289,6 +303,11 @@ def inspect_task(root: Path, session: Mapping[str, Any]) -> dict:
         db.close()
     claims = [{**dict(row), 'reserved_usd': row['ceiling_usd']
                if row['state'] in {'RESERVED', 'COMMITTED'} else 0.0} for row in rows]
-    return {'format': FORMAT, 'status': 'READ', 'ledger_path': path.as_posix(),
-            'claims': claims, 'cost_events': [dict(event) for event in events], 'totals': _totals(rows),
-            'scope': 'canonical reservations include crashes before ATTEMPTED; not an external provider invoice'}
+    result = {'format': FORMAT, 'status': 'READ', 'ledger_path': path.as_posix(),
+              'claims': claims, 'cost_events': [dict(event) for event in events], 'totals': _totals(rows),
+              'scope': 'canonical reservations include crashes before ATTEMPTED; not an external provider invoice'}
+    first_opinion = next((claim for claim in claims if claim.get('purpose') == codex_collaboration.FIRST_OPINION_PURPOSE
+                          and claim['state'] != 'ABORTED'), None)
+    if first_opinion is not None:
+        result['first_opinion_claim'] = first_opinion
+    return result

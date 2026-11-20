@@ -1,2 +1,3 @@
-# Test-only dependency. The runtime and Codex profile use the standard library.
+# Dependencies for the repository validation and paper delivery fixtures.
 jsonschema>=4.18,<5
+pypdf>=5,<8

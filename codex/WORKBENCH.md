@@ -49,7 +49,11 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 
 ### 两层 Claude 的费用依据
 
-单冒号中，`council create --claude` 与实际成员轮次按 [COUNCIL](COUNCIL.md) 运行。发送时提供当前价格、完整请求输入量上界、钱包余额与本次费用上界。共享钱包把本次上界和其它已预留费用一起核对，实际已有的用户任务限额一并适用。依据来自当前单冒号的第一层许可。
+在本版新单冒号任务中，用 `council create --first-opinion "仍然开放的具体取舍" --facts FACTS.md` 加所用任务根、议会 ID 和真实原生 actor，进入 [COUNCIL](COUNCIL.md#单冒号的独立首发) 的单成员首发。宿主判断真实决定窗口，按需以 `--deadline-seconds` 调整默认 300 秒。用 `prepare-round` 准备 exchange，为该 exchange 实际完成 Split。默认 Sonnet 5.5／high／16,000 总输出 token，单次费用预留最多 0.20 美元。收敛问题可显式用 medium。
+
+纯文本首发走 OpenRouter 官方接口，且同一配置能查询模型价格及账户实际余额时，用 `council run-round --root TASK --council-id ID --round-id 1 --split-plan SPLIT.json`。价格与余额取该配置实际响应，预留仍受共享钱包和用户限额约束。密钥用量或密钥额度单列。采用其他提供商或无账户余额查询权限时，用 `--plan PLAN.json` 提供同一实际账户的费用事实。已提交的首发含空答均只沿原 exchange 读回和对账，再入由原生议会完成。
+
+单冒号的首发和普通议会成员都沿当前第一层许可。发送时提供当前价格、完整请求输入量上界、真实钱包余额与保守费用上界。共享钱包把本次上界和其他已预留费用一起核对，沿用用户实际任务限额。普通议会的 `council create --claude` 用于实际需要进一步研究的对象。对已尝试的首发，按同一 exchange 读回正文、终态与账目。
 
 双冒号在首次相关发送前，用 `consult budget-preview --root TASK --input INPUT.json --out PREVIEW.json` 估算安全范围。输入 `wallet_id`、`task_ceiling_usd`、`scope` 和 `jobs`。每项给当前费用 `facts`、`ceiling_usd` 及已准备的 `exchange_id`。为在议会开始前估算，也可用 `planned_council_member` 代替 `exchange_id`，写明真实用途 `purpose`、型号 `model` 和保守的合计输出上限 `max_tokens`。向用户展示拟采用的角色、模型、范围和任务总费用上界。预算预览本身不启动议会、发送或预留余额，实际发送仍核对具体请求和 Split。
 
@@ -65,7 +69,7 @@ python -B tools/codex.py consult budget-approve --root TASK --preview PREVIEW.js
 
 ### 第二层准备、两份成品与实际落实
 
-固定在 1.1 的任务按 [CONSULT](CONSULT.md) 判断实际目的。仅委托意见的请求用 `consult prepare --root TASK --input GUIDANCE.txt --exchange-id G --guidance`。委托实际成品时，把当前用户要求、交付范围和验收条件写入 UTF-8 的 `SCOPE.md`，向实际原生 L3 派发该工作。用真实代理身份和本次派发出处登记，再准备 Claude 候选请求。制作所选论文读物时，下列两条命令分别加上同一个 `--paper-root PAPER`。
+采用正式双边产出协议的任务按 [CONSULT](CONSULT.md) 判断实际目的。仅委托意见的请求用 `consult prepare --root TASK --input GUIDANCE.txt --exchange-id G --guidance`。委托实际成品时，把当前用户要求、交付范围和验收条件写入 UTF-8 的 `SCOPE.md`，向实际原生 L3 派发该工作。用真实代理身份和本次派发出处登记，再准备 Claude 候选请求。制作所选论文读物时，下列两条命令分别加上同一个 `--paper-root PAPER`。
 
 ```text
 python -B tools/codex.py production start --root TASK --production-id F --scope SCOPE.md --actor NATIVE_ACTOR --dispatch-ref ACTUAL_DISPATCH
