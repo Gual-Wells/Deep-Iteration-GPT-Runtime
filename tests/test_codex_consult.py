@@ -619,6 +619,48 @@ class ConsultPublicRuntimeTests(unittest.TestCase):
         consult.bind_split_decision(task, exchange, input_path=decision, output=split)
         return split
 
+    def test_standing_budget_sends_both_layers_through_normal_cli_without_approval(self):
+        from contextlib import redirect_stderr, redirect_stdout
+        from tools.codex import main as codex_cli
+
+        task = self.folder / 'standing-budget'
+        charter = self.file('standing-charter.txt', 'DIGR:: Explore and guide a local fixture.')
+        session = create_session(task, request=charter, p_run='1.3.0@' + 'f' * 40)
+        wallet_id = 'standing-cli-fixture-wallet'
+        config = self.config('streaming', wallet_id=wallet_id)
+        facts = self.facts(total=None, wallet_id=wallet_id)
+        facts.pop('authorization_ref')
+        facts_path = self.file('standing-facts.json', json.dumps(facts))
+        consult.prepare_request(task, input_path=self.input, exchange_id='guide', max_tokens=100, guidance=True)
+        guidance_split = self.bind_stream_test_split(task, 'guide')
+        council.create_council(task, council_id='review', native_actors=['native-1'], enable_claude=True, member_count=1)
+        record = council.prepare_round(task, 'review', max_tokens=100)['rounds'][0]['jobs']['member-1']
+        self.assertEqual(record['status'], 'PREPARED')
+        council_exchange = record['exchange_id']
+        council_plan = self.file('standing-council.json', json.dumps({'members': {'member-1': {
+            'config_path': str(config), 'facts': facts, 'ceiling_usd': .20,
+            'split_path': str(self.bind_stream_test_split(task, council_exchange)),
+        }}}))
+        output, errors = io.StringIO(), io.StringIO()
+        with (patch.object(wallet, 'ledger_path', return_value=self.folder / 'wallet.sqlite3'),
+              patch.dict(os.environ, {'DIGR_TEST_CONSULT_KEY': SECRET}),
+              redirect_stdout(output), redirect_stderr(errors)):
+            self.assertEqual(codex_cli(['council', 'run-round', '--root', str(task), '--council-id', 'review',
+                                       '--round-id', '1', '--plan', str(council_plan)]), 0, errors.getvalue())
+            self.assertEqual(codex_cli(['consult', 'call', '--root', str(task), '--exchange-id', 'guide',
+                                       '--facts', str(facts_path), '--ceiling-usd', '1.00', '--config', str(config),
+                                       '--split-plan', str(guidance_split)]), 0, errors.getvalue())
+            claims = wallet.inspect_task(task, session)['claims']
+        self.assertEqual(len(self.server.post_calls), 2)
+        self.assertFalse((task / 'consult' / 'budget-approval.json').exists())
+        self.assertEqual({claim['claude_layer']: claim['known_cost_usd'] for claim in claims},
+                         {'COUNCIL': .03, 'CONTENT': .03})
+        for exchange, layer, ceiling in ((council_exchange, 'COUNCIL', .20), ('guide', 'CONTENT', 1.00)):
+            attempt = consult.inspect_exchange(task, exchange)['exchange']
+            self.assertEqual((attempt['transport_status'], attempt['public_status']), ('RESPONDED', 'COMPLETE'))
+            evidence = attempt['budget_facts']['authorization_evidence']
+            self.assertEqual((evidence['layer'], evidence['layer_ceiling_usd']), (layer, ceiling))
+
     def test_stable_guidance_relay_ignores_whitespace_only_and_preserves_real_text_bytes(self):
         charter = self.file('stable-charter.txt', 'DIGR:: Examine the two local response envelopes.')
         wallet_id = 'synthetic-blank-stream-wallet'

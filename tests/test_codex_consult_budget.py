@@ -7,6 +7,7 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
+from runtime import codex_collaboration as collaboration
 from runtime import codex_consult as consult, codex_consult_budget as authority, codex_wallet as wallet
 from runtime import codex_council as council, codex_production as production
 from runtime.codex_lifecycle import handle_message, ingest_message, load_lifecycle
@@ -15,6 +16,7 @@ from runtime.codex_session import create_session
 PIN = '1.0.0@' + 'e' * 40
 PRODUCTION_PIN = '1.1.0@' + 'f' * 40
 LAYER_BUDGET_PIN = '1.2.1@' + 'a' * 40
+STANDING_PIN = '1.3.0@' + 'd' * 40
 WALLET = 'local-offline-wallet'
 
 
@@ -293,6 +295,104 @@ class LayeredBudgetTests(unittest.TestCase):
         view = self.view(['guide'], total=1.23, wallet_remaining_usd=2)
         self.assertEqual(view['layer_budgets']['COUNCIL']['remaining_usd'], 0)
         self.assertEqual(view['layer_budgets']['CONTENT']['remaining_usd'], 1)
+
+    def test_standing_authority_tracks_the_current_choice_wallet_and_scope(self):
+        self.root, self.session = self.task('standing', 'DIGR:: Guided work', pin=STANDING_PIN)
+        self.assertEqual(self.session['execution_profile']['initial_claude_layer_ceilings_usd'],
+                         {'COUNCIL': .2, 'CONTENT': 1.})
+        with self.assertRaisesRegex(ValueError, 'configured Anthropic Claude models'):
+            consult.prepare_request(self.root, input_path=self.work, exchange_id='other-provider',
+                                    model='openai/gpt-fixture', max_tokens=100, guidance=True)
+        consult.prepare_request(self.root, input_path=self.work, exchange_id='guide', max_tokens=100, guidance=True)
+        member = self.prepare_council()
+        for exchange, layer in (('guide', 'CONTENT'), (member, 'COUNCIL')):
+            result = self.resolve(exchange, authorization_ref='invented', authorization_evidence={'layer': 'other'})
+            evidence = result['authorization_evidence']
+            self.assertEqual((evidence['kind'], evidence['mode'], evidence['layer'], evidence['message_id']),
+                             ('STANDING_CLAUDE_LAYER_LIMIT', 'ALLOW', layer, 0))
+            self.assertEqual(evidence['source_sha256'], self.session['request_sha256'])
+            self.assertNotEqual(result['authorization_ref'], 'invented')
+        with self.assertRaisesRegex(ValueError, 'different wallet'):
+            authority.resolve(self.root, self.session, load_lifecycle(self.root), self.selected('guide'),
+                              self.facts(wallet_id='changed-wallet'), WALLET)
+        self.message('changed-input', 'Add the original measurement.', action='continue')
+        with self.assertRaisesRegex(ValueError, 'supersedes this paid Claude scope'):
+            self.resolve('guide')
+        self.message('single-layer', 'Keep only council work.', action='continue', selection='COUNCIL_ONLY')
+        with self.assertRaisesRegex(ValueError, 'current two-layer DIGR'):
+            self.resolve('guide')
+        self.message('revoke', 'Revoke Claude use.', action='continue', selection='DENY')
+        with self.assertRaisesRegex(ValueError, 'does not authorize'):
+            self.resolve(member)
+
+    def test_standing_task_limit_records_the_actual_initial_text_and_limits_both_layers(self):
+        request = 'DIGR:: Guided work. Spend a total of at most $0.10.'
+        self.root, self.session = self.task('limited', request, pin=STANDING_PIN)
+        record = authority.record_limit(self.root, user_text=request, source=self.session['request_origin'],
+                                        quote='Spend a total of at most $0.10.', task_ceiling_usd=.10)
+        self.assertEqual(record['reply']['message_id'], 0)
+        consult.prepare_request(self.root, input_path=self.work, exchange_id='guide', max_tokens=100, guidance=True)
+        member = self.prepare_council()
+        paid = self.resolve(member, budget_total_usd=99)
+        self.assertEqual(paid['budget_total_usd'], .10)
+        self.reservation(self.session, label='committed-member', ceiling=.08, total=paid['budget_total_usd'],
+                         authorization_evidence=paid['authorization_evidence'])
+        paid = self.resolve('guide')
+        with self.assertRaisesRegex(ValueError, 'remaining task/account/wallet budget'):
+            self.reservation(self.session, label='over-task-cap', ceiling=.03, total=paid['budget_total_usd'],
+                             authorization_evidence=paid['authorization_evidence'])
+        reply = self.message('stop-spend', 'Change this task’s limit to zero.')
+        with self.assertRaisesRegex(ValueError, 'latest fee-only decision'):
+            self.resolve('guide')
+        authority.record_limit(self.root, task_ceiling_usd=0, **reply)
+        self.assertEqual(self.resolve('guide')['budget_total_usd'], 0)
+
+    def test_standing_production_authority_checks_the_current_actual_stage(self):
+        scope = self.production_scopes('draft', pin=STANDING_PIN)['draft']
+        consult.prepare_request(self.root, input_path=self.work, exchange_id='draft', max_tokens=100,
+                                production_id='draft', production_stage='candidate')
+        evidence = self.resolve('draft')['authorization_evidence']
+        self.assertEqual(evidence['layer'], 'CONTENT')
+        self.assertEqual(evidence['production'], self.formal_attempt(scope, 'candidate')['production'])
+        wrong_scope = self.formal_attempt({**scope, 'scope_sha256': '9' * 64}, 'candidate')
+        with self.assertRaisesRegex(ValueError, 'does not match the current production scope'):
+            self.resolve_formal(wrong_scope)
+
+    def test_first_opinion_native_work_returns_share_the_standing_council_layer(self):
+        self.root, self.session = self.task('single-standing', 'DIGR: Get an early perspective', pin=STANDING_PIN)
+        self.assertEqual(self.session['execution_profile']['initial_claude_layer_ceilings_usd'], {'COUNCIL': .2})
+        council.create_council(self.root, council_id='first', native_actors=['V01'], first_opinion='Which route is better?')
+        first = council.prepare_round(self.root, 'first', max_tokens=100)['rounds'][0]['jobs']['member-1']['exchange_id']
+        initial = self.resolve(first)['authorization_evidence']
+        view = authority.preview(self.root, jobs=[{'exchange_id': first, 'facts': self.facts(wallet_remaining_usd=.15),
+                                                   'ceiling_usd': .14}], task_ceiling_usd=.2,
+                                 scope='Price the prepared first opinion', wallet_id=WALLET)
+        self.assertEqual(view['layer_budgets'], {
+            'COUNCIL': {'ceiling_usd': .20, 'remaining_usd': .20, 'proposed_reservation_usd': .14},
+        })
+        self.assertFalse(self.ledger.exists())
+        attempt = self.selected(first)
+        attempt['council_scope'] = {**attempt['council_scope'], 'purpose': collaboration.FIRST_OPINION_NATIVE_WORK_RETURN_PURPOSE,
+                                    'first_opinion_exchange_id': first}
+        continuation = authority.resolve(self.root, self.session, load_lifecycle(self.root), attempt,
+                                         self.facts(), WALLET)['authorization_evidence']
+        with self.assertRaisesRegex(ValueError, 'original sent first-opinion claim'):
+            self.reservation(self.session, ceiling=.07, authorization_evidence=continuation)
+        with self.assertRaisesRegex(ValueError, 'remaining task/account/wallet budget'):
+            self.reservation(self.session, label=first, ceiling=.14, wallet_remaining=.13,
+                             authorization_evidence=initial)
+        receipt = self.reservation(self.session, label=first, ceiling=.14, authorization_evidence=initial)
+        wallet.update(receipt, state='COMMITTED')
+        with self.assertRaisesRegex(ValueError, 'COUNCIL layer budget'):
+            self.reservation(self.session, ceiling=.07, authorization_evidence=continuation)
+        wallet.update(receipt, state='KNOWN', cost=.06, cost_observed_at=consult._now())
+        self.reservation(self.session, label='native-work-return', ceiling=.14, authorization_evidence=continuation)
+        view = wallet.inspect_task(self.root, self.session)
+        self.assertEqual(view['first_opinion_claim']['exchange_id'], first)
+        purposes = {claim['purpose'] for claim in view['claims']}
+        self.assertEqual(purposes, {collaboration.FIRST_OPINION_PURPOSE, collaboration.FIRST_OPINION_NATIVE_WORK_RETURN_PURPOSE})
+        with self.assertRaisesRegex(ValueError, 'already claimed its first Claude opinion'):
+            self.reservation(self.session, ceiling=.01, authorization_evidence=initial)
 
     def test_plain_guidance_and_candidate_approvals_do_not_cover_other_production_stages(self):
         scopes = self.production_scopes('draft', 'other')

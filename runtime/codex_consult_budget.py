@@ -42,7 +42,7 @@ def _quote_data(opener, resource: str, *, timeout: float, credential: str | None
 
 
 def first_opinion_quote(request: Mapping[str, Any], *, config_path: Path | None = None) -> dict:
-    """Quote a local prepared request whose first-opinion scope the caller has validated.
+    """Quote a prepared text-only exchange in a validated first-opinion line.
 
     The existing send path checks current authority and reserves against the quoted facts.
     """
@@ -189,8 +189,12 @@ def preview(root: Path, *, jobs: Sequence[Mapping[str, Any]], task_ceiling_usd: 
     """Price prepared requests and projected Council or formal production work."""
     from . import codex_consult as consult
     root, session, lifecycle = consult._task(root, active=True)
-    if not codex_collaboration.layered_policy(session['P_run']) or _policy_mode(lifecycle) != 'ALLOW':
-        raise ValueError('An approval preview is for a Stable double-colon task')
+    standing = codex_collaboration.standing_claude_budget_policy(session['P_run'])
+    mode = _policy_mode(lifecycle)
+    allowed_modes = ('ALLOW', codex_collaboration.COUNCIL_ONLY) if standing else ('ALLOW',)
+    if not codex_collaboration.layered_policy(session['P_run']) or mode not in allowed_modes:
+        raise ValueError('A budget preview requires a currently allowed Claude layer' if standing else
+                         'An approval preview is for a Stable double-colon task')
     wallet_id = consult._text('shared wallet alias', wallet_id)
     scope = consult._text('actual budget scope', scope)
     total = consult._number('task_ceiling_usd', task_ceiling_usd, positive=True)
@@ -259,6 +263,8 @@ def preview(root: Path, *, jobs: Sequence[Mapping[str, Any]], task_ceiling_usd: 
             origin['production'] = production
         codex_collaboration.require_claude_permission(session['P_run'], request['model'], lifecycle,
             participation_role=role)
+        if standing and job['facts'].get('wallet_id', wallet_id) != wallet_id:
+            raise ValueError('Budget facts name a different wallet configuration')
         facts = {**job['facts'], 'authorization_ref': 'PREVIEW_ONLY', 'budget_total_usd': total}
         budget = consult._budget(facts, request, (), job.get('ceiling_usd'), canonical_wallet=True)
         budgets.append(budget)
@@ -274,9 +280,10 @@ def preview(root: Path, *, jobs: Sequence[Mapping[str, Any]], task_ceiling_usd: 
                          for key in ('wallet_available_before_usd', 'account_available_before_usd')
                          if position[key] is not None)
     reserved_upper = sum(job['ceiling_usd'] for job in budgets)
-    # Both the prepared batch and the remaining envelope must fit. Per-request
-    # fit alone misses consecutive/parallel members spending the same balance.
-    if reserved_upper > remaining + 1e-12 or remaining > safe_available + 1e-12:
+    # An old approval preview offers a whole affordable envelope. A standing
+    # preview tests the requests actually planned against current wallet capacity.
+    wallet_check = reserved_upper if standing else remaining
+    if reserved_upper > remaining + 1e-12 or wallet_check > safe_available + 1e-12:
         raise ValueError('The combined task envelope exceeds current capacity after known costs and reservations')
     value = {'format': PREVIEW_FORMAT, 'task': _task_binding(session),
              'presented_after_message_id': lifecycle['message_id'], 'input_ref': input_ref,
@@ -290,6 +297,8 @@ def preview(root: Path, *, jobs: Sequence[Mapping[str, Any]], task_ceiling_usd: 
         # Layer availability comes from the same task rows for the whole preview.
         remaining_by_layer = positions[0]['layer_available_before_usd']
         for layer, ceiling in codex_collaboration.DOUBLE_COLON_LAYER_CEILINGS_USD.items():
+            if standing and mode == codex_collaboration.COUNCIL_ONLY and layer != 'COUNCIL':
+                continue
             proposed = sum(row['reservation_ceiling_usd'] for row in rows
                            if codex_collaboration.CLAUDE_LAYER_BY_ROLE[row['role']] == layer)
             available = remaining_by_layer[layer]
@@ -301,15 +310,22 @@ def preview(root: Path, *, jobs: Sequence[Mapping[str, Any]], task_ceiling_usd: 
     return {**value, 'preview_id': consult._hash(consult._json_bytes(value))}
 
 
-def _selected_reply(root: Path, *, user_text: str, source: str, quote: str) -> tuple[dict, dict, dict]:
+def _selected_reply(root: Path, *, user_text: str, source: str, quote: str,
+                    for_limit: bool = False) -> tuple[dict, dict, dict]:
     from .codex_consult import _task, _text
-    from .codex_lifecycle import require_open_decision
+    from .codex_lifecycle import content_message, require_open_decision
     root, session, lifecycle = _task(root, active=True)
     if not codex_collaboration.layered_policy(session['P_run']):
         raise ValueError('Recorded budget decisions require a frozen Stable task')
+    standing = codex_collaboration.standing_claude_budget_policy(session['P_run'])
+    if standing and not for_limit:
+        raise ValueError('The current choice provides standing layer authority; use budget-limit for an explicit task limit')
     require_open_decision(root, user_text=user_text, source=source)
     current = lifecycle['current_message']
-    if current.get('handling', {}).get('action') != 'budget':
+    action = current.get('handling', {}).get('action')
+    work_limit = (standing and for_limit and current['id'] == content_message(lifecycle)['id']
+                  and action in {'invoke', 'continue', 'revise', 'resume'})
+    if action != 'budget' and not work_limit:
         raise ValueError('Record the actual fee-only user reply with task handle --action budget first')
     quote = _text('exact quote of the user decision', quote)
     if quote not in current['source']['text']:
@@ -370,7 +386,8 @@ def record_limit(root: Path, *, user_text: str, source: str, quote: str, task_ce
     """Record an explicit task-wide ceiling, including zero. This grants no calls."""
     from .codex_consult import _number
     root = Path(root).resolve()
-    session, lifecycle, reply = _selected_reply(root, user_text=user_text, source=source, quote=quote)
+    session, lifecycle, reply = _selected_reply(root, user_text=user_text, source=source, quote=quote,
+                                                for_limit=True)
     return _record(root, session, lifecycle, kind='limit', reply=reply,
                    task_ceiling_usd=_number('explicit task limit', task_ceiling_usd))
 
@@ -379,7 +396,7 @@ def resolve(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any]
             attempt: Mapping[str, Any], facts: Mapping[str, Any], wallet_id: str, *,
             ceiling_usd: float | None = None, max_tokens: int | None = None) -> dict:
     """Derive canonical authority. Caller-supplied facts can only narrow the charge."""
-    from .codex_consult import _hash, _json_bytes, _number, _text
+    from .codex_consult import _hash, _input_ref, _json_bytes, _number, _text
     if not codex_collaboration.layered_policy(session['P_run']):
         return dict(facts)
     if not isinstance(facts, Mapping):
@@ -390,21 +407,48 @@ def resolve(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any]
     model = attempt.get('collaboration_contract', {}).get('requested_model', '')
     if mode == 'DENY' or role not in ROLES:
         raise ValueError('The current task choice does not authorize this paid Claude role')
+    standing = codex_collaboration.standing_claude_budget_policy(session['P_run'])
     scope = attempt.get('council_scope')
-    first_opinion = (codex_collaboration.first_opinion_policy(session['P_run']) and isinstance(scope, Mapping)
-                     and scope.get('purpose') == codex_collaboration.FIRST_OPINION_PURPOSE)
-    if first_opinion:
+    purpose = scope.get('purpose') if isinstance(scope, Mapping) else None
+    first_opinion = (codex_collaboration.first_opinion_policy(session['P_run'])
+                     and purpose == codex_collaboration.FIRST_OPINION_PURPOSE)
+    first_return = standing and purpose == codex_collaboration.FIRST_OPINION_NATIVE_WORK_RETURN_PURPOSE
+    if first_opinion or first_return:
         codex_collaboration.require_first_opinion_permission(lifecycle)
-    approval = read_decision(root, session, lifecycle, 'approval')
+    approval = None if standing else read_decision(root, session, lifecycle, 'approval')
     limit = read_decision(root, session, lifecycle, 'limit')
     decisions = [item for item in (approval, limit) if item is not None]
     fee_message = lifecycle.get('latest_budget_message_id')
-    if fee_message is not None and all(item['reply']['message_id'] != fee_message for item in decisions):
+    if fee_message is not None and not any(
+        item['reply']['message_id'] == fee_message or (standing and item['reply']['message_id'] > fee_message)
+        for item in decisions
+    ):
         raise ValueError('The latest fee-only decision is not yet recorded; resolve it before paid work')
     caps = [record['task_ceiling_usd'] for record in decisions]
     if facts.get('budget_total_usd') is not None:
         caps.append(_number('narrower caller-supplied task ceiling', facts['budget_total_usd']))
-    if mode == 'COUNCIL_ONLY':
+    if standing:
+        codex_collaboration.require_claude_permission(session['P_run'], model, lifecycle, participation_role=role)
+        if facts.get('wallet_id', wallet_id) != wallet_id:
+            raise ValueError('Budget facts name a different wallet configuration')
+        input_ref = _input_ref(lifecycle)
+        if attempt.get('input_ref') != input_ref:
+            raise ValueError('New user input supersedes this paid Claude scope; prepare a current exchange')
+        policy = lifecycle['claude_policy']
+        layer = codex_collaboration.CLAUDE_LAYER_BY_ROLE[role]
+        authority = {'kind': 'STANDING_CLAUDE_LAYER_LIMIT', 'mode': mode, 'message_id': policy['message_id'],
+                     'source_ref': policy['source']['source_ref'], 'source_sha256': policy['source']['sha256'],
+                     'input_ref': input_ref, 'layer': layer,
+                     'layer_ceiling_usd': codex_collaboration.DOUBLE_COLON_LAYER_CEILINGS_USD[layer]}
+        production = _attempt_production(root, session, lifecycle, attempt, model)
+        if production is not None:
+            authority['production'] = production
+        if first_opinion or first_return:
+            authority['purpose'] = purpose
+        if first_return:
+            authority['first_opinion_exchange_id'] = _text('the original first-opinion exchange',
+                                                           scope.get('first_opinion_exchange_id'))
+    elif mode == 'COUNCIL_ONLY':
         if (role != 'council_member' or not model.startswith('anthropic/')
                 or not codex_collaboration.CLAUDE_MODEL.search(model)):
             raise ValueError('Wallet-only authority is for Claude Council members under a single colon')

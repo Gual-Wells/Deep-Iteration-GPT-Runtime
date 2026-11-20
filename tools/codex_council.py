@@ -14,7 +14,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from runtime import codex_council as council
+from runtime import codex_council as council, codex_council_work
 
 
 def main(argv=None):
@@ -46,6 +46,14 @@ def main(argv=None):
     initial.add_argument('--input', type=Path)
     initial.add_argument('--status', choices=sorted(council.TERMINAL), default='COMPLETE')
     initial.add_argument('--input-version', type=int, required=True)
+    work = command('native-work', 'read current work requests from actual public Claude responses')
+    work.add_argument('--actor', default='Main', help='actual local Codex worker')
+    work_return = command('native-work-return', 'record actual local work for its requesting member without sending')
+    work_return.add_argument('--actor', default='Main', help='actual local Codex worker')
+    work_return.add_argument('--work-id', required=True)
+    work_return.add_argument('--input', type=Path, required=True, help='UTF-8 work output or explanation of unavailability')
+    work_return.add_argument('--source', action='append', type=Path, default=[], help='selected UTF-8 evidence window')
+    work_return.add_argument('--outcome', choices=sorted(codex_council_work.OUTCOMES), default='COMPLETE')
     prepare = command('prepare-round', 'prepare member requests without sending; bind actual Split per exchange next')
     prepare.add_argument('--kind', choices=sorted(council.ROUND_KINDS), default='INDEPENDENT')
     prepare.add_argument('--member', action='append')
@@ -59,7 +67,7 @@ def main(argv=None):
     plan_options.add_argument('--plan', type=Path,
         help='JSON members object: each member has facts (object or file), ceiling_usd, split_path, optional config_path')
     plan_options.add_argument('--split-plan', type=Path,
-        help='first opinion only: obtain its price and wallet facts using the existing OpenRouter configuration')
+        help='first opinion and its native work returns: read price and wallet facts using OpenRouter')
     run.add_argument('--config', type=Path, help='private billing configuration for --split-plan')
     seal = command('seal-member', 'seal actual existing member work without a further paid synthesis')
     seal.add_argument('--member', required=True)
@@ -95,6 +103,11 @@ def main(argv=None):
         elif args.command == 'native-return':
             result = council.submit_native_initial(args.root, args.council_id, actor=args.actor,
                 output_path=args.input, status=args.status, input_version=args.input_version)
+        elif args.command == 'native-work':
+            result = council.read_native_work(args.root, args.council_id, actor=args.actor)
+        elif args.command == 'native-work-return':
+            result = council.submit_native_work(args.root, args.council_id, actor=args.actor,
+                work_id=args.work_id, output_path=args.input, sources=args.source, outcome=args.outcome)
         elif args.command == 'prepare-round':
             result = council.prepare_round(args.root, args.council_id, kind=args.kind,
                 members=args.member, model=args.model, effort=args.effort, max_tokens=args.max_tokens)

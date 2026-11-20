@@ -459,6 +459,7 @@ runtime/codex_collaboration.py
 runtime/codex_consult.py
 runtime/codex_consult_budget.py
 runtime/codex_council.py
+runtime/codex_council_work.py
 runtime/codex_delivery.py
 runtime/codex_experience.py
 runtime/codex_foundation.py
@@ -911,6 +912,7 @@ tests/test_codex_consult_budget.py
 tests/test_codex_consult_paper.py
 tests/test_codex_consult_parallel.py
 tests/test_codex_council.py
+tests/test_codex_council_work.py
 tests/test_codex_delivery.py
 tests/test_codex_depth_calibration.py
 tests/test_codex_do_supplement.py

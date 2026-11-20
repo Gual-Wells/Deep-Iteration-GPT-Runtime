@@ -317,8 +317,16 @@ def create_session(root: Path, *, request: Path, p_run: str,
             if codex_collaboration.layered_policy(p_run):
                 metadata['execution_profile']['native_model_selection'] = 'ACTIVE_CODEX_SETTINGS'
                 metadata['execution_profile'].pop('fee_authorization', None)
-                metadata['execution_profile']['initial_fee_basis'] = (
-                    'COUNCIL_WALLET_ONLY' if invocation['claude_selection'] == 'COUNCIL_ONLY' else 'USER_BUDGET_DECISION')
+                if codex_collaboration.standing_claude_budget_policy(p_run):
+                    metadata['execution_profile']['initial_fee_basis'] = 'STANDING_CLAUDE_LAYER_LIMITS'
+                    metadata['execution_profile']['initial_claude_layer_ceilings_usd'] = {
+                        layer: ceiling for layer, ceiling in codex_collaboration.DOUBLE_COLON_LAYER_CEILINGS_USD.items()
+                        if invocation['claude_selection'] == 'ALLOW' or layer == 'COUNCIL'
+                    }
+                else:
+                    metadata['execution_profile']['initial_fee_basis'] = (
+                        'COUNCIL_WALLET_ONLY' if invocation['claude_selection'] == 'COUNCIL_ONLY'
+                        else 'USER_BUDGET_DECISION')
                 if (codex_collaboration.first_opinion_policy(p_run)
                         and invocation['claude_selection'] == codex_collaboration.COUNCIL_ONLY):
                     metadata['execution_profile']['first_opinion'] = {

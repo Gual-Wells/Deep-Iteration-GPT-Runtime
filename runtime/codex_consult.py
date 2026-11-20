@@ -134,6 +134,9 @@ def _model_system(p_run: str, model: str, participation_role: str = 'consult_gui
     if participation_role == 'council_member':
         if not codex_collaboration.council_enabled(p_run):
             raise ValueError('Council membership requires the current council profile')
+        if codex_collaboration.native_work_policy(p_run):
+            from .codex_council_work import MEMBER_INSTRUCTION
+            return _COUNCIL_MEMBER_SYSTEM + '\n\n' + MEMBER_INSTRUCTION
         return _COUNCIL_MEMBER_SYSTEM
     if codex_collaboration.unified(p_run) and not _SONNET_MODEL.fullmatch(model):
         return _ORDINARY_COLLAB_SYSTEM
@@ -546,6 +549,10 @@ def _load(root: Path, exchange_id: str, *, verify_public: bool = True) -> tuple[
             if (attempt.get('council_scope_sha256') != _hash(_json_bytes(scope))
                     or request.get('user') != _scope_user(attempt, 'council', scope)):
                 raise ValueError('Council member request/scope identity changed')
+            if codex_collaboration.native_work_policy(session['P_run']):
+                from .codex_council_work import RESEARCH_EFFORTS
+                if request.get('reasoning', {}).get('effort') not in RESEARCH_EFFORTS:
+                    raise ValueError('The current Claude council request must preserve high effort or higher')
         if attempt.get('collaboration_contract') != expected:
             raise ValueError('Actual collaboration model/scope contract changed; prepare a current DIGR request')
         if attempt.get('authoring_scope') is None and request['messages'][0] != {
@@ -740,12 +747,20 @@ def prepare_request(
         if continue_from not in {None, candidate_exchange}:
             raise ValueError('Arbitration continues the selected Claude candidate')
         continue_from = candidate_exchange
+    work_return = False
     if participation_role == 'council_member':
         if paper_root is not None:
             raise ValueError('Council member work is distinct from formal paper authoring')
         if exchange_id is None:
             raise ValueError('Council members require their registered job exchange_id; no untracked random exchange')
         council_scope = _member_scope(root, council_scope, active=True, exchange_id=exchange_id)
+        if codex_collaboration.native_work_policy(session['P_run']):
+            from .codex_council_work import RESEARCH_EFFORTS, ROUND_KIND
+            if effort not in RESEARCH_EFFORTS:
+                raise ValueError('The current Claude council uses high effort or higher; delegate local support work to Codex')
+            work_return = council_scope['round_kind'] == ROUND_KIND
+            if work_return and continue_from != council_scope['native_work_return_of']:
+                raise ValueError('Native work return must continue the public exchange that requested it')
     if effort not in {'low', 'medium', 'high', 'xhigh', 'max'}:
         raise ValueError('unsupported Consult effort')
     if type(max_tokens) is not int or max_tokens < 1:
@@ -765,6 +780,8 @@ def prepare_request(
             old = parent['council_scope']
             if any(old.get(key) != council_scope.get(key) for key in ('council_id', 'member_id', 'line_id')):
                 raise ValueError('Cannot continue another council member research history')
+            if work_return and previous['model'] != model:
+                raise ValueError('Native work return must use the requesting Claude member’s model')
         prior_production = parent.get('production')
         if prior_production is not None and (
             production is None or prior_production['production_id'] != production['production_id']
@@ -846,6 +863,11 @@ def prepare_request(
                          'Select the native candidate, select the Claude candidate, or produce a synthesis. '
                          'Give the actual final content or precise decisions that Main must apply. '
                          'If a decisive requirement cannot be settled, explain the remaining issue rather than declaring it complete.')
+    if work_return:
+        from .codex_council import native_work_context
+        returned_sources, returned_text = native_work_context(root, council_scope, exchange_id)
+        sources.extend(returned_sources)
+        parts.append(returned_text)
     content: Any = '\n'.join(parts)
     if images:
         content = [{'type': 'text', 'text': content}]
@@ -1322,6 +1344,15 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
                 codex_production.require_current(root, production, request=request)
             if role == 'council_member':
                 _member_scope(root, attempt['council_scope'], active=True, exchange_id=exchange_id, dispatch=layered)
+                from .codex_council_work import ROUND_KIND
+                if attempt['council_scope']['round_kind'] == ROUND_KIND:
+                    from .codex_council import native_work_context
+                    _, returned_text = native_work_context(root, attempt['council_scope'], exchange_id)
+                    final_content = request['messages'][-1]['content']
+                    if not isinstance(final_content, str):
+                        final_content = final_content[0]['text']
+                    if not final_content.endswith('\n' + returned_text):
+                        raise ValueError('Prepared request differs from the sealed native work return')
             if split_record is not None and split_record['binding']['input_ref'] != _input_ref(current_lifecycle):
                 raise ValueError('New user input supersedes this Split; prepare the current task')
             if layered:

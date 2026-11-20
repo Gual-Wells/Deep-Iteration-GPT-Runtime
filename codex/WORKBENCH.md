@@ -49,27 +49,41 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 
 ### 两层 Claude 的费用依据
 
-在本版新单冒号任务中，用 `council create --first-opinion "仍然开放的具体取舍" --facts FACTS.md` 加所用任务根、议会 ID 和真实原生 actor，进入 [COUNCIL](COUNCIL.md#单冒号的独立首发) 的单成员首发。宿主判断真实决定窗口，按需以 `--deadline-seconds` 调整默认 300 秒。用 `prepare-round` 准备 exchange，为该 exchange 实际完成 Split。默认 Sonnet 5.5／high／16,000 总输出 token，单次费用预留最多 0.20 美元。收敛问题可显式用 medium。
+在本版新单冒号任务中，用 `council create --first-opinion "仍然开放的具体取舍" --facts FACTS.md` 加所用任务根、议会 ID 和真实原生 actor，进入 [COUNCIL](COUNCIL.md#单冒号的独立首发) 的单成员首发。宿主判断真实决定窗口，按需以 `--deadline-seconds` 调整默认 300 秒。用 `prepare-round` 准备 exchange，为该 exchange 实际完成 Split。默认 Sonnet 5.5／high／16,000 总输出 token。有预期回传时，在第一层累计上限内为首轮及必要续答估算余量。
 
 首发的问题可以是希望 Claude 帮忙发现选项的真实用途或构形选择。把它可能改变的决定和已具备的材料落在当前 Split 和公开阶段。后续按实际所得选择有新贡献的议会研究或正式指导，沿对应角色及费用入口准备。
 
-纯文本首发走 OpenRouter 官方接口，且同一配置能查询模型价格及账户实际余额时，用 `council run-round --root TASK --council-id ID --round-id 1 --split-plan SPLIT.json`。价格与余额取该配置实际响应，预留仍受共享钱包和用户限额约束。密钥用量或密钥额度单列。采用其他提供商或无账户余额查询权限时，用 `--plan PLAN.json` 提供同一实际账户的费用事实。已提交的首发含空答均只沿原 exchange 读回和对账，再入由原生议会完成。
+纯文本首发走 OpenRouter 官方接口，且同一配置能查询模型价格及账户实际余额时，用 `council run-round --root TASK --council-id ID --round-id 1 --split-plan SPLIT.json`。价格与余额取该配置实际响应，预留受分层上限、共享钱包和用户限额约束。密钥用量或密钥额度单列。采用其他提供商或无账户余额查询权限时，用 `--plan PLAN.json` 提供同一实际账户的费用事实。已提交的首发含空答均沿原 exchange 读回和对账，有实际 Codex 工作回传才按该请求另作同线续答。
 
-单冒号的首发和普通议会成员都沿当前第一层许可。发送时提供当前价格、完整请求输入量上界、真实钱包余额与保守费用上界。共享钱包把本次上界和其他已预留费用一起核对，沿用用户实际任务限额。普通议会的 `council create --claude` 用于实际需要进一步研究的对象。对已尝试的首发，按同一 exchange 读回正文、终态与账目。
+1.3 起，当前实际用户选择直接提供对应层的额度内费用许可。单冒号和双冒号的第一层每任务累计 0.20 美元，双冒号第二层累计 1.00 美元。发送时提供当前价格、完整请求输入量上界、真实钱包余额与保守费用上界。共享钱包在同一事务中核对本层已知费用、未结预留和本次预留，沿用用户实际任务限额。
 
-双冒号在首次相关发送前，用 `consult budget-preview --root TASK --input INPUT.json --out PREVIEW.json` 估算安全范围。输入 `wallet_id`、`task_ceiling_usd`、`scope` 和 `jobs`。每项给当前费用 `facts`、`ceiling_usd` 及已准备的 `exchange_id`。为在议会开始前估算，也可用 `planned_council_member` 代替 `exchange_id`，写明真实用途 `purpose`、型号 `model` 和保守的合计输出上限 `max_tokens`。向用户展示拟采用的角色、模型、范围和任务总费用上界。预算预览本身不启动议会、发送或预留余额，实际发送仍核对具体请求和 Split。
+两种入口均可用 `consult budget-preview --root TASK --input INPUT.json --out PREVIEW.json` 提前估算。输入 `wallet_id`、`task_ceiling_usd`、`scope` 和 `jobs`。每项给当前费用 `facts`、`ceiling_usd` 及已准备的 `exchange_id`。为在议会开始前估算，也可用 `planned_council_member` 代替 `exchange_id`，写明实际用途 `purpose`、型号 `model` 和合计输出上限 `max_tokens`。预览的 `layer_budgets` 给出适用层的实际余量和拟预留额度。发送按当前入口授权、钱包和 Split 执行。
 
-1.2.1 起，双冒号预算预览的 `layer_budgets` 给出各层任务累计上限、当前余量与拟预留额度。`COUNCIL` 为 0.20 美元，`CONTENT` 为 1.00 美元。实际并行发送由共享钱包在同一事务中核对已知费用、未结清预留和本次预留。实际批准范围、任务限额和钱包余额同时约束发送。
+可同批估算正式产出的候选与裁决。未准备的阶段用 `planned_production` 代替 `exchange_id`，内含已登记的 `production_id`、`stage`（`candidate` 或 `arbitration`）、`model`、`max_tokens` 和真实 `purpose`。该项同时给当前 `facts` 与 `ceiling_usd`。同一对象两阶段用同一 Claude 型号。两份实际候选、必要材料及公开历史计入裁决的输入上界。
 
-正式产出可在同一预览内为候选与裁决分别估算。未准备的某阶段用 `planned_production` 代替 `exchange_id`，对象内提供已登记的 `production_id`、`stage`（`candidate` 或 `arbitration`）、`model`、`max_tokens` 和真实 `purpose`。该项同时给当前 `facts` 与 `ceiling_usd`。同一对象两阶段用同一 Claude 型号。两份实际候选、其他必要材料及公开历史计入裁决的输入上界。批准覆盖同一对象、版本和具体阶段。发送时以当前事实复算，在该阶段的输出与预留上界及任务总额度内核对实际请求。原生执行可在等待费用决定时继续。
+用户给出更窄额度时，用 `consult budget-limit --root TASK --reply-file RAW.txt --source ACTUAL_REF --quote ACTUAL_EXACT_WORDS --task-ceiling-usd LIMIT` 登记实际原话。更窄限额跨后续发送和入口切换生效。费用单独更新可用 `task handle --action budget` 保留工作输入。实质工作改变则按实际作用域更新请求和 Split。历史 `budget-approve` 按旧 pin 使用。
 
-摄入真实预算答复。答复只决定费用时，以 `task handle --action budget` 处理，保存其来源并沿用当前工作输入。答复同时改变实质工作范围时，按工作更改处理，更新受影响的请求、Split 与费率估算。实际费用答复须与当时展示的范围对应。用下列命令记录用户实际批准的范围。
+### 子议会成员交办的 Codex 工作
+
+Claude 可在实际公开正文末尾发出如下独立区块，区块放在引文和代码围栏之外。每项说明要交付的工作和它会影响的判断。
 
 ```text
-python -B tools/codex.py consult budget-approve --root TASK --preview PREVIEW.json --reply-file RAW.txt --source ACTUAL_REF --quote ACTUAL_EXACT_WORDS
+[[CODEX NATIVE WORK]]
+[{"work":"从论文找到清楚区分上传耗时和路侧计算积压的原式及定义","informs":"决定导读要从信道条件还是历史计算负担切入"}]
+[[END CODEX NATIVE WORK]]
 ```
 
-用户从预览中批准较低数额时，在 `budget-approve` 上用 `--task-ceiling-usd` 记录实际上限。用户主动设置新的任务费用限额时，摄入实际费用答复后用 `consult budget-limit --root TASK --reply-file RAW.txt --source ACTUAL_REF --quote ACTUAL_EXACT_WORDS --task-ceiling-usd LIMIT` 记录。限额也适用于切换入口后的请求。在有效任务范围内复用这条决定。扩大上限、钱包、角色或型号范围时，先说明变化再取得真实决定。发送前两个参与层都重新核对当前余额、价格、已承诺额和准备请求，按 [SPLIT](SPLIT.md) 执行每次本机检查。费用答复只确立付费授权，内容决定分别由任务原话或实际内容答复支持。
+通过正常议会发送后，真实提出支持请求的成员进入 `AWAITING_NATIVE_WORK`。先完成本机工作，再以实际回包和选定的 UTF-8 原件片段登记结果。多个片段重复使用 `--source`，无法完成时登记 `--outcome UNAVAILABLE` 并上传真实遇阻说明。按角色、编号和来源用 [LIVE](LIVE.md) 显示实际状态。
+
+```text
+python -B tools/codex.py council native-work --root TASK --council-id ID --actor Main
+python -B tools/codex.py council native-work-return --root TASK --council-id ID --actor Main --work-id WORK --input RESULT.md --source EXCERPT.md
+python -B tools/codex.py council prepare-round --root TASK --council-id ID --kind NATIVE_WORK_RETURN --member MEMBER
+python -B tools/codex.py consult split --root TASK --exchange-id NEXT --input NATIVE-DECISION.json --out SPLIT.json
+python -B tools/codex.py council run-round --root TASK --council-id ID --round-id ROUND --plan ROUND.json
+```
+
+当前成员的委托结果齐备后再准备回传。轮次使用实际返回的编号和 exchange ID，沿原成员及同一公开历史传入对应的结果。适用的纯文本 OpenRouter 首发同线续答可沿 `run-round --split-plan SPLIT.json` 自动取价和核对余额。常规 `--plan` 每项指明本次费率、保守上界和 Split。续答仍占用第一层余额，沿原决定窗口和 `high` 或更高配置运行。
 
 ### 第二层准备、两份成品与实际落实
 
