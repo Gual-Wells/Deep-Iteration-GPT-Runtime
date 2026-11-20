@@ -10,6 +10,7 @@ import subprocess
 import sys
 import threading
 import time
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -222,8 +223,13 @@ class ParallelConsultTests(unittest.TestCase):
                     raise AssertionError('writer never reached the forced new request boundary')
             return raw
 
-        with ThreadPoolExecutor(1, thread_name_prefix='snapshot-reader') as pool, \
-                patch.object(codex_io, 'read_bytes', side_effect=interleaved):
+        # Let the first read overlap publication beyond the reread budget
+        # without delaying the test or changing the transport's clock.
+        read_clock = SimpleNamespace(monotonic=lambda: 2.0 if new_written.is_set() else 0.0,
+                                     sleep=time.sleep)
+        with (ThreadPoolExecutor(1, thread_name_prefix='snapshot-reader') as pool,
+              patch.object(codex_io, 'read_bytes', side_effect=interleaved),
+              patch.object(consult, 'time', read_clock)):
             job = pool.submit(consult._load, self.root, 'snapshot-race')
             try:
                 self.assertTrue(old_seen.wait(1))

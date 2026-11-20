@@ -6,11 +6,13 @@ for a bounded interval when another process still denies sharing.
 """
 from __future__ import annotations
 
+import errno
 import os
 from pathlib import Path
 import time
 import threading
 from functools import lru_cache
+from typing import Callable
 
 _LOCKS_GUARD = threading.Lock()
 _LOCKS: dict[str, threading.RLock] = {}
@@ -64,14 +66,12 @@ def _read_bytes(path: Path) -> bytes:
         return stream.read()
 
 
-def replace(source: Path, target: Path, *, timeout: float = 1.0) -> None:
-    """Retry a transient Windows sharing denial, preserving the same source."""
-    source, target = Path(source), Path(target)
+def _move_with_windows_retry(target: Path, move: Callable[[], Path], *, timeout: float) -> None:
     end, delay = time.monotonic() + max(timeout, 0.0), .005
     while True:
         try:
             with _file_lock(target):
-                source.replace(target)
+                move()
             return
         except PermissionError as error:
             if (os.name != 'nt' or getattr(error, 'winerror', None) not in {5, 32, 33}
@@ -79,3 +79,27 @@ def replace(source: Path, target: Path, *, timeout: float = 1.0) -> None:
                 raise
             time.sleep(min(delay, max(end - time.monotonic(), 0.0)))
             delay = min(delay * 2, .05)
+
+
+def replace(source: Path, target: Path, *, timeout: float = 1.0) -> None:
+    """Retry a transient Windows sharing denial, preserving the same source."""
+    source, target = Path(source), Path(target)
+    _move_with_windows_retry(target, lambda: source.replace(target), timeout=timeout)
+
+
+def publish_directory(source: Path, target: Path, *, timeout: float = 1.0) -> None:
+    """Rename a completed staging directory to an absent destination.
+
+    The caller holds its cross-process writer lock. Check again on each retry,
+    including for dangling links. Windows rename also refuses an existing target.
+    """
+    source, target = Path(source), Path(target)
+
+    def publish() -> Path:
+        try:
+            target.lstat()
+        except FileNotFoundError:
+            return source.rename(target)
+        raise FileExistsError(errno.EEXIST, 'Destination already exists', str(target))
+
+    _move_with_windows_retry(target, publish, timeout=timeout)

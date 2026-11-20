@@ -6,6 +6,7 @@
 - Use one atomic shared-wallet claim across concurrent and resumed work. Commit the claim before local send intent, keep separate public and billing states, and preserve native-only reconsideration of late replies.
 - Fetch current pricing and account balance from an existing eligible OpenRouter configuration for the first round. Keep the explicit facts path for other configurations and the scoped approval flow for double-colon tasks.
 - Preserve actual public bytes across streaming, settlement, and reconsideration. Keep whitespace-only paid exchanges in the bill without recording a public opinion. Historical pins retain their behavior.
+- Retry transient Windows sharing conflicts when publishing a prepared exchange. Start the existing snapshot retry window at the first observed mismatch. Include the PDF dependency used by the release tests.
 
 ## Codex Stable 1.1.1
 

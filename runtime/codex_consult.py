@@ -469,8 +469,8 @@ def _load(root: Path, exchange_id: str, *, verify_public: bool = True) -> tuple[
     if codex_collaboration.council_enabled(session['P_run']):
         # An attempt and its price-finalized request are separate atomic files.
         # Fence the bytes instead of holding the long-lived exchange/network
-        # lock. A concurrent state publication only repeats these local reads.
-        end = time.monotonic() + 1.0
+        # lock. Start the bounded reread window when a mismatch is observed.
+        retry_until = None
         while True:
             attempt_raw = codex_io.read_bytes(directory / 'attempt.json')
             attempt = json.loads(attempt_raw.decode('utf-8-sig'))
@@ -487,7 +487,10 @@ def _load(root: Path, exchange_id: str, *, verify_public: bool = True) -> tuple[
                               and attempt.get('transport_status') == 'ATTEMPTED')
             if unchanged and not public_pending:
                 break
-            if time.monotonic() >= end:
+            now = time.monotonic()
+            if retry_until is None:
+                retry_until = now + 1.0
+            elif now >= retry_until:
                 raise ValueError('Consult local state kept changing; inspect again without repeating inference')
             time.sleep(.001)
     else:
@@ -915,7 +918,7 @@ def prepare_request(
         try:
             _write(staging / 'request.json', request, new=True)
             _write(staging / 'attempt.json', attempt, new=True)
-            staging.replace(directory)
+            codex_io.publish_directory(staging, directory)
         finally:
             if staging.exists():
                 for name in ('request.json', 'attempt.json'):
