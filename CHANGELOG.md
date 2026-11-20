@@ -1,5 +1,10 @@
 # Changelog
 
+## Codex Stable 1.2.1
+
+- Set cumulative per-task double-colon ceilings of $0.20 for the Claude council and $1.00 for formal guidance, production, and arbitration combined. Check each layer in the scoped budget preview and in the atomic shared-wallet reservation.
+- Carry settled costs and open reservations across revisions and mode changes. Preserve single-colon wallet authority and historical task pins.
+
 ## Codex Stable 1.2.0
 
 - Give each new single-colon task one independent Claude opinion before a decision that can still change the result. The first round starts with Sonnet 5.5 at high effort, with a 16,000-token combined output default and a $0.20 reservation ceiling.

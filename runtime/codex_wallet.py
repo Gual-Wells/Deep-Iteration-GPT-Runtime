@@ -70,7 +70,7 @@ def _transaction(path: Path):
         columns = {row['name'] for row in db.execute('PRAGMA table_info(claims)')}
         for name, declaration in (('cost_revision', 'INTEGER NOT NULL DEFAULT 0'),
                                   ('cost_first_observed_at', 'TEXT'), ('last_cost_checked_at', 'TEXT'),
-                                  ('purpose', 'TEXT')):
+                                  ('purpose', 'TEXT'), ('claude_layer', 'TEXT')):
             if name not in columns:
                 db.execute('ALTER TABLE claims ADD COLUMN ' + name + ' ' + declaration)
         # Historical writes omit purpose. Only a proven-unsent release frees
@@ -113,7 +113,7 @@ def _has_table(db, name: str) -> bool:
 
 
 def _availability(db, task_rows, wallet_rows, wallet_id: str, budget: Mapping[str, Any], *,
-                  save_snapshot: bool) -> dict:
+                  save_snapshot: bool, layer_limits: bool) -> dict:
     task_totals, wallet_totals = _totals(task_rows), _totals(wallet_rows)
     total = budget['budget_total_usd']
     task_available = (None if total is None else total - budget['outside_spent_usd']
@@ -161,19 +161,30 @@ def _availability(db, task_rows, wallet_rows, wallet_id: str, budget: Mapping[st
         account_available = (budget['account_budget_total_usd'] - budget.get('account_outside_spent_usd', 0)
                              - budget.get('account_outside_reserved_usd', 0)
                              - totals['known_cost_usd'] - totals['unresolved_reserved_usd'])
-    return {'task_available_before_usd': task_available, 'wallet_available_before_usd': available,
-            'account_available_before_usd': account_available,
-            'wallet_snapshot_id': snapshot['snapshot_id'] if snapshot is not None else None,
-            'known_uncovered_usd': uncovered,
-            'coverage_basis': 'explicit confirmed cost revisions' if snapshot is not None else 'no confirmed coverage; covered amount zero'}
+    result = {'task_available_before_usd': task_available, 'wallet_available_before_usd': available,
+              'account_available_before_usd': account_available,
+              'wallet_snapshot_id': snapshot['snapshot_id'] if snapshot is not None else None,
+              'known_uncovered_usd': uncovered,
+              'coverage_basis': 'explicit confirmed cost revisions' if snapshot is not None else 'no confirmed coverage; covered amount zero'}
+    if layer_limits:
+        remaining = {}
+        for layer, ceiling in codex_collaboration.DOUBLE_COLON_LAYER_CEILINGS_USD.items():
+            # A task on this pin records the layer for every new claim. If an
+            # older writer left an unlabeled claim, count it conservatively.
+            totals = _totals(row for row in task_rows if dict(row).get('claude_layer') in (None, layer))
+            remaining[layer] = max(0.0, ceiling - totals['known_cost_usd'] - totals['unresolved_reserved_usd'])
+        result['layer_available_before_usd'] = remaining
+    return result
 
 
 def review_capacity(root: Path, session: Mapping[str, Any], *, wallet_id: str,
                     budgets: list[Mapping[str, Any]]) -> list[dict]:
     """Price preview reads one consistent ledger view without creating claims or schema."""
     path, task = ledger_path(), task_id(root, session)
+    layer_limits = codex_collaboration.double_colon_layer_budget_policy(session['P_run'])
     if not path.is_file():
-        return [_availability(None, [], [], wallet_id, budget, save_snapshot=False) for budget in budgets]
+        return [_availability(None, [], [], wallet_id, budget, save_snapshot=False, layer_limits=layer_limits)
+                for budget in budgets]
     try:
         with closing(sqlite3.connect(path.as_uri() + '?mode=ro', uri=True, timeout=15)) as db:
             db.row_factory = sqlite3.Row
@@ -181,7 +192,8 @@ def review_capacity(root: Path, session: Mapping[str, Any], *, wallet_id: str,
             has_claims = _has_table(db, 'claims')
             task_rows = list(db.execute('SELECT * FROM claims WHERE task_id=?', (task,))) if has_claims else []
             wallet_rows = list(db.execute('SELECT * FROM claims WHERE wallet_id=?', (wallet_id,))) if has_claims else []
-            return [_availability(db, task_rows, wallet_rows, wallet_id, budget, save_snapshot=False)
+            return [_availability(db, task_rows, wallet_rows, wallet_id, budget,
+                                  save_snapshot=False, layer_limits=layer_limits)
                     for budget in budgets]
     except sqlite3.Error as error:
         raise ValueError('Shared wallet read failed: ' + type(error).__name__ + '; no local budget fallback') from None
@@ -193,6 +205,13 @@ def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request
         raise ValueError('New DIGR submissions require an explicit shared wallet_id in the private config')
     if budget['budget_total_usd'] is None and not codex_collaboration.layered_policy(session['P_run']):
         raise ValueError('Wallet-only accounting requires the Stable task policy')
+    layer, layer_limits = None, False
+    if codex_collaboration.double_colon_layer_budget_policy(session['P_run']):
+        # These values are derived from the actual role and selected user
+        # decision by resolve(), which overwrites caller-supplied evidence.
+        authority = budget['authorization_evidence']
+        layer = codex_collaboration.CLAUDE_LAYER_BY_ROLE[authority['role']]
+        layer_limits = authority['kind'] != 'SINGLE_COLON_WALLET_ONLY'
     ceiling = budget['ceiling_usd']
     if purpose is not None:
         if (purpose != codex_collaboration.FIRST_OPINION_PURPOSE
@@ -209,16 +228,21 @@ def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request
         if purpose is not None and any(row['purpose'] == purpose and row['state'] != 'ABORTED' for row in task_rows):
             raise ValueError('This task already claimed its first Claude opinion; inspect its existing reservation')
         wallet_rows = list(db.execute('SELECT * FROM claims WHERE wallet_id=?', (wallet_id,)))
-        availability = _availability(db, task_rows, wallet_rows, wallet_id, budget, save_snapshot=True)
+        availability = _availability(db, task_rows, wallet_rows, wallet_id, budget,
+                                     save_snapshot=True, layer_limits=layer_limits)
+        if layer_limits and ceiling > availability['layer_available_before_usd'][layer] + 1e-12:
+            amount = codex_collaboration.DOUBLE_COLON_LAYER_CEILINGS_USD[layer]
+            raise ValueError(f'Shared wallet reservation exceeds the {layer} layer budget (USD {amount:.2f} per task)')
         account_ref = budget.get('account_authorization_ref')
         limits = [availability[key] for key in ('task_available_before_usd', 'wallet_available_before_usd',
                                                 'account_available_before_usd') if availability[key] is not None]
         if ceiling > min(limits) + 1e-12:
             raise ValueError('Shared wallet reservation exceeds remaining task/account/wallet budget')
         db.execute('''INSERT INTO claims
-            (claim_id,task_id,wallet_id,exchange_id,request_sha256,state,ceiling_usd,reserved_at,account_authorization_ref,purpose)
-            VALUES (?,?,?,?,?,'RESERVED',?,?,?,?)''',
-            (identity, task, wallet_id, exchange_id, request_sha256, ceiling, _now(), account_ref, purpose))
+            (claim_id,task_id,wallet_id,exchange_id,request_sha256,state,ceiling_usd,reserved_at,
+             account_authorization_ref,purpose,claude_layer)
+            VALUES (?,?,?,?,?,'RESERVED',?,?,?,?,?)''',
+            (identity, task, wallet_id, exchange_id, request_sha256, ceiling, _now(), account_ref, purpose, layer))
     return {'format': FORMAT, 'claim_id': identity, 'ledger_path': path.as_posix(),
             'wallet_id': wallet_id, 'request_sha256': request_sha256,
             **availability,

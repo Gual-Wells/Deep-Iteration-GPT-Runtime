@@ -7,6 +7,8 @@ FORMAT = 'digr-actual-collaboration-1'
 SONNET_MODEL = re.compile(r'anthropic/claude-(?:sonnet-[0-9]+(?:\.[0-9]+)*|[0-9]+(?:\.[0-9]+)*-sonnet)(?:-[0-9]{8})?')
 CLAUDE_MODEL = re.compile(r'(?:^|/)claude(?:[-/:]|$)', re.IGNORECASE)
 COUNCIL_ONLY = 'COUNCIL_ONLY'
+CLAUDE_LAYER_BY_ROLE = {'council_member': 'COUNCIL', 'consult_guidance': 'CONTENT'}
+DOUBLE_COLON_LAYER_CEILINGS_USD = {'COUNCIL': 0.20, 'CONTENT': 1.00}
 FIRST_OPINION_PURPOSE = 'first_opinion'
 FIRST_OPINION_CEILING_USD = 0.20
 FIRST_OPINION_OUTPUT_TOKENS = 16_000
@@ -32,6 +34,10 @@ def layered_policy(p_run: str) -> bool:
 
 def first_opinion_policy(p_run: str) -> bool:
     return _since(p_run, (1, 2, 0))
+
+
+def double_colon_layer_budget_policy(p_run: str) -> bool:
+    return _since(p_run, (1, 2, 1))
 
 
 def require_first_opinion_permission(lifecycle: Mapping[str, Any]) -> None:
@@ -110,5 +116,5 @@ def requirements(p_run: str, model: str, paper_scope: Mapping[str, Any] | None, 
         result['council_scope'] = dict(council_scope) if council_scope is not None else None
         result['subjective_guidance_priority'] = participation_role == 'consult_guidance' and sonnet
     if layered_policy(p_run):
-        result['claude_layer'] = 'COUNCIL' if participation_role == 'council_member' else 'CONTENT'
+        result['claude_layer'] = CLAUDE_LAYER_BY_ROLE[participation_role]
     return result

@@ -1,4 +1,5 @@
 """Versioned approval and ledger arithmetic, entirely against local fixtures."""
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -13,6 +14,7 @@ from runtime.codex_session import create_session
 
 PIN = '1.0.0@' + 'e' * 40
 PRODUCTION_PIN = '1.1.0@' + 'f' * 40
+LAYER_BUDGET_PIN = '1.2.1@' + 'a' * 40
 WALLET = 'local-offline-wallet'
 
 
@@ -83,10 +85,12 @@ class LayeredBudgetTests(unittest.TestCase):
         return authority.resolve(root, session or self.session, load_lifecycle(root),
                                  self.selected(exchange, root=root), self.facts(**facts), wallet_id)
 
-    def reservation(self, session, *, total=None, ceiling=.2, wallet_remaining=1, label='test-hold'):
+    def reservation(self, session, *, total=None, ceiling=.2, wallet_remaining=1, label='test-hold',
+                    authorization_evidence=None):
         return wallet.reserve(self.root, session, exchange_id=label, request_sha256='b' * 64, wallet_id=WALLET,
                               budget={'budget_total_usd': total, 'outside_spent_usd': 0, 'outside_reserved_usd': 0,
-                                      'wallet_remaining_usd': wallet_remaining, 'ceiling_usd': ceiling})
+                                      'wallet_remaining_usd': wallet_remaining, 'ceiling_usd': ceiling,
+                                      'authorization_evidence': authorization_evidence})
 
     def test_single_colon_resolves_wallet_authority_without_an_artificial_total(self):
         self.root, self.session = self.task('single', 'DIGR: Check one external perspective')
@@ -175,8 +179,8 @@ class LayeredBudgetTests(unittest.TestCase):
             self.view(['guide', member], total=.3)
         self.assertAlmostEqual(self.view(['guide', member], total=.4)['available_to_reserve_usd'], 1.)
 
-    def production_scopes(self, *production_ids):
-        self.root, self.session = self.task('formal', 'DIGR:: Produce a fixture result', pin=PRODUCTION_PIN)
+    def production_scopes(self, *production_ids, pin=PRODUCTION_PIN):
+        self.root, self.session = self.task('formal', 'DIGR:: Produce a fixture result', pin=pin)
         return {name: production.start(self.root, name, actor='D01', dispatch_ref='fixture-dispatch-' + name,
                     scope_path=self.file(name + '-scope.txt', 'Produce the ' + name + ' artifact.'))
                 for name in production_ids}
@@ -224,6 +228,71 @@ class LayeredBudgetTests(unittest.TestCase):
             self.assertEqual(facts['authorization_evidence']['decision_id'], decision['decision_id'])
             self.assertEqual(facts['authorization_evidence']['production'], quote['production'])
         self.assertFalse(self.ledger.exists(), 'pricing, approval and budget resolution make no reservation')
+
+    def test_double_colon_preview_caps_each_layer_including_both_production_stages(self):
+        self.production_scopes('draft', pin=LAYER_BUDGET_PIN)
+        member = self.prepare_council()
+        review = {'exchange_id': member, 'facts': self.facts(wallet_remaining_usd=2), 'ceiling_usd': .20}
+        candidate, arbitration = (self.planned_stage('draft', stage) for stage in ('candidate', 'arbitration'))
+        for job, ceiling in ((candidate, .60), (arbitration, .40)):
+            job['facts']['wallet_remaining_usd'] = 2
+            job['ceiling_usd'] = ceiling
+        parameters = {'task_ceiling_usd': 1.2, 'scope': 'Review, draft and arbitrate', 'wallet_id': WALLET}
+        view = authority.preview(self.root, jobs=[review, candidate, arbitration], **parameters)
+        self.assertEqual(view['layer_budgets'], {
+            'COUNCIL': {'ceiling_usd': .20, 'remaining_usd': .20, 'proposed_reservation_usd': .20},
+            'CONTENT': {'ceiling_usd': 1., 'remaining_usd': 1., 'proposed_reservation_usd': 1.},
+        })
+        with self.assertRaisesRegex(ValueError, 'COUNCIL work exceeds'):
+            authority.preview(self.root, jobs=[{**review, 'ceiling_usd': .21}, candidate], **parameters)
+        with self.assertRaisesRegex(ValueError, 'CONTENT work exceeds'):
+            authority.preview(self.root, jobs=[candidate, {**arbitration, 'ceiling_usd': .41}], **parameters)
+        self.assertFalse(self.ledger.exists())
+
+    def test_double_colon_reservations_count_concurrent_holds_and_settled_layer_cost(self):
+        self.root, self.session = self.task('double', 'DIGR:: Guided work', pin=LAYER_BUDGET_PIN)
+        consult.prepare_request(self.root, input_path=self.work, exchange_id='guide', max_tokens=100, guidance=True)
+        member = self.prepare_council()
+        view = self.view(['guide', member], total=1.2, wallet_remaining_usd=2)
+        reply = self.message('both-approved', 'Approve the two roles within the $1.20 total.')
+        authority.approve(self.root, preview_path=self.save_preview(view), **reply)
+        council_auth = self.resolve(member)
+        content_auth = self.resolve('guide')
+
+        def hold(label, ceiling, approved=council_auth):
+            return self.reservation(self.session, label=label, total=approved['budget_total_usd'],
+                                    wallet_remaining=2, ceiling=ceiling,
+                                    authorization_evidence=approved['authorization_evidence'])
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            claims = [pool.submit(hold, label, .12) for label in ('member-a', 'member-b')]
+        self.assertEqual(sum(claim.exception() is None for claim in claims), 1)
+        denied = next(claim.exception() for claim in claims if claim.exception() is not None)
+        self.assertRegex(str(denied), 'COUNCIL layer budget')
+        reservation = next(claim.result() for claim in claims if claim.exception() is None)
+        wallet.update(reservation, state='COMMITTED')
+        with self.assertRaisesRegex(ValueError, 'COUNCIL layer budget'):
+            hold('over-unsettled-council-budget', .09)
+        content = hold('content', 1., content_auth)
+        with self.assertRaisesRegex(ValueError, 'CONTENT layer budget'):
+            hold('over-content-budget', .01, content_auth)
+        wallet.update(reservation, state='KNOWN', cost=.05, cost_observed_at=consult._now())
+        with self.assertRaisesRegex(ValueError, 'COUNCIL layer budget'):
+            hold('over-settled-council-budget', .16)
+        self.assertAlmostEqual(hold('council-remainder', .15)['layer_available_before_usd']['COUNCIL'], .15)
+        wallet.update(content, state='ABORTED')
+        hold('replaces-proven-unsent-content', 1., content_auth)
+
+    def test_double_colon_tracks_prior_single_colon_council_cost_in_the_same_task(self):
+        self.root, self.session = self.task('switch-mode', 'DIGR: Start with research', pin=LAYER_BUDGET_PIN)
+        single = self.resolve(self.prepare_council())
+        receipt = self.reservation(self.session, ceiling=.23, authorization_evidence=single['authorization_evidence'])
+        wallet.update(receipt, state='KNOWN', cost=.23, cost_observed_at=consult._now())
+        self.message('open-formal', 'Use both layers now.', action='continue', selection='ALLOW')
+        consult.prepare_request(self.root, input_path=self.work, exchange_id='guide', max_tokens=100, guidance=True)
+        view = self.view(['guide'], total=1.23, wallet_remaining_usd=2)
+        self.assertEqual(view['layer_budgets']['COUNCIL']['remaining_usd'], 0)
+        self.assertEqual(view['layer_budgets']['CONTENT']['remaining_usd'], 1)
 
     def test_plain_guidance_and_candidate_approvals_do_not_cover_other_production_stages(self):
         scopes = self.production_scopes('draft', 'other')
