@@ -285,6 +285,19 @@ def preview(root: Path, *, jobs: Sequence[Mapping[str, Any]], task_ceiling_usd: 
              'task_ceiling_usd': total, 'remaining_envelope_usd': remaining,
              'available_to_reserve_usd': safe_available, 'prepared_reservation_upper_usd': reserved_upper,
              'requests': rows, 'basis': 'read-only estimate using actual or projected bounded work and supplied provider facts'}
+    if codex_collaboration.double_colon_layer_budget_policy(session['P_run']):
+        layer_budgets = {}
+        # Layer availability comes from the same task rows for the whole preview.
+        remaining_by_layer = positions[0]['layer_available_before_usd']
+        for layer, ceiling in codex_collaboration.DOUBLE_COLON_LAYER_CEILINGS_USD.items():
+            proposed = sum(row['reservation_ceiling_usd'] for row in rows
+                           if codex_collaboration.CLAUDE_LAYER_BY_ROLE[row['role']] == layer)
+            available = remaining_by_layer[layer]
+            if proposed > available + 1e-12:
+                raise ValueError(f'The proposed {layer} work exceeds its remaining layer budget (USD {ceiling:.2f} per task)')
+            layer_budgets[layer] = {'ceiling_usd': ceiling, 'remaining_usd': available,
+                                    'proposed_reservation_usd': proposed}
+        value['layer_budgets'] = layer_budgets
     return {**value, 'preview_id': consult._hash(consult._json_bytes(value))}
 
 

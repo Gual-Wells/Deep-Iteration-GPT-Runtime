@@ -10,7 +10,7 @@
 | `DIGR(More,N=20)：任务` | 参考 More 投入偏好，按显式 N 声明和实际任务推断完整配置。 |
 | `DIGR/help` | 只读帮助。 |
 
-一处原生议会负责初议和再议，Claude 第一层是其内部研究成员。两层每次提交均有本机 Split、费用预留和公开原文转播。双冒号按实际角色、范围和保守费用上界取得真实批准。同一正式产出的预算可同时覆盖候选与终裁。详见 [PROTOCOL](PROTOCOL.md)、[COUNCIL](COUNCIL.md)、[CONSULT](CONSULT.md)、[SPLIT](SPLIT.md)。
+一处原生议会负责初议和再议，Claude 第一层是其内部研究成员。两层每次提交均有本机 Split、费用预留和公开原文转播。双冒号每个任务第一层累计最多 0.20 美元，第二层累计最多 1.00 美元，按实际角色、范围和保守费用上界取得真实批准。同一正式产出的预算可同时覆盖候选与终裁。详见 [PROTOCOL](PROTOCOL.md)、[COUNCIL](COUNCIL.md)、[CONSULT](CONSULT.md)、[SPLIT](SPLIT.md)。
 
 Claude 可选择或改划议题并先给出立场，原生议会读原文后再议，由 Main 落实。取舍已经确定时可跳过。没有可用正文或超过实际决定窗口时，原生议会用已有材料推进。
 

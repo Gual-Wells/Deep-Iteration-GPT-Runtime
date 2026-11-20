@@ -1,6 +1,6 @@
-# DIGR for Codex · Stable 1.2.0
+# DIGR for Codex · Stable 1.2.1
 
-`DIGR：任务` 默认在一项能影响成品的取舍定案前，安排 Claude 作一次独立首发。Claude 可以自行选择议题，原生议会取得原文后再议，Main 落实。它沿当前单冒号的共享钱包许可使用，单次预留上限为 0.20 美元，取舍已确定时可跳过。`DIGR：：任务` 可同时采用两层，先向用户说明实际范围和保守费用上界，取得决定后再调用。第二层按实际委托让 Claude 指导内容取舍或出稿。每次提交前完成本机 Split，Codex 负责必要原件、核对与工程。详见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
+`DIGR：任务` 默认在一项能影响成品的取舍定案前，安排 Claude 作一次独立首发。Claude 可以自行选择议题，原生议会取得原文后再议，Main 落实。它沿当前单冒号的共享钱包许可使用，单次预留上限为 0.20 美元，取舍已确定时可跳过。`DIGR：：任务` 可同时采用两层，每个任务第一层累计上限 0.20 美元，第二层累计上限 1.00 美元。先向用户说明实际范围和保守费用上界，取得决定后再调用。第二层按实际委托让 Claude 指导内容取舍或出稿。每次提交前完成本机 Split，Codex 负责必要原件、核对与工程。详见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
 
 [原语宪法](codex/CONSTITUTION.md)适用于整个当前 Codex 协议。正式内容委托按 [CONSULT](codex/CONSULT.md) 发起同题双边产出、Claude 裁决及 Main 落实。既有任务按原 pin 接续，适用关系见[兼容范围](docs/CODEX_STABLE_COMPATIBILITY.md)。
 
