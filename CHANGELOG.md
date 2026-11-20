@@ -1,5 +1,10 @@
 # Changelog
 
+## Codex Stable 1.3.0
+
+- Use the current DIGR delimiter as standing authority within the applicable Claude layer and wallet limits. The council has USD 0.20 per task. Double-colon formal content adds a separate USD 1.00 ceiling. Current user limits and historical pin behavior remain enforceable.
+- Let a Claude council member request concrete native work and continue from the actual Codex result on the same research line. Bind the request to the member's public exchange and keep the continuation at high effort or above, within the first-layer budget.
+
 ## Codex Stable 1.2.2
 
 - Favor early, bounded collaboration when independent Claude input can improve an open decision. Use the current question, evidence and expected contribution to decide when another exchange is worth the cost.

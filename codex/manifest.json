@@ -1,6 +1,6 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "protocol": "digr-codex-native-v18",
   "status": "stable",
   "language": "zh-CN",
@@ -107,6 +107,12 @@
     "chat_port": "VERSIONED_LIGHT_AND_ON_DEMAND_DEEP",
     "council_default_members": 2,
     "council_default_deadline_seconds": 300,
+    "council_native_work": {
+      "since": "1.3.0",
+      "source": "PUBLIC_MEMBER_EXCHANGE",
+      "result_round": "NATIVE_WORK_RETURN",
+      "minimum_effort": "high"
+    },
     "public_relay": "LOSSLESS_PARAGRAPHS_AND_HOST_REPORTED_COMMENTARY_CURSORS",
     "direct_supplement_prefixes": [
       "DO:",
@@ -114,8 +120,9 @@
     ],
     "claude_layered_since": "1.0.0",
     "claude_fee_authority": {
-      "single_colon": "SHARED_WALLET_COUNCIL_ONLY",
-      "double_colon": "SOURCE_BOUND_TASK_COST_APPROVAL"
+      "since": "1.3.0",
+      "single_colon": "CURRENT_USER_SELECTION_COUNCIL_WITHIN_LAYER_AND_WALLET",
+      "double_colon": "CURRENT_USER_SELECTION_BOTH_LAYERS_WITHIN_LAYER_AND_WALLET"
     },
     "double_colon_layer_budget": {
       "since": "1.2.1",
@@ -136,37 +143,38 @@
       "default_effort": "high",
       "default_max_output_tokens": 16000,
       "additional_user_approval": false,
-      "automatic_resend": false
+      "automatic_resend": false,
+      "native_work_return_since": "1.3.0"
     },
     "native_model_selection": "ACTIVE_CODEX_SETTINGS",
     "analysis_method": "REASONED_ARGUMENT_WITHOUT_DEFAULT_EXPERIMENT_GATE"
   },
   "file_sha256": {
-    "codex/VERSION": "c62a5cc61ac4525935753f5ec284c0a052a4b1da4b3a3580dce2b7d77a2154ae",
+    "codex/VERSION": "64d23f858ef51b0f996e4966d4e27c0371b437e2d2787890b1f7ad22d4ec5663",
     "codex/AGENTS.light.md": "5abd877bc2f684ce54e34bbefcc9da17a0c00e1c8bbdadfa5a7f1aadcb700abd",
     "codex/ROUTER.experimental.txt": "45b6e2a6f06c9c7ee11845b7873f7ddb526ea1609bc6951f897eaebde85bd290",
-    "codex/STARTUP.md": "0d73da81a0d0c38dcca40f6255fdb6ba929ed2cf1290814c83df967ed3d7724c",
-    "codex/PROTOCOL.md": "91c11fe500388ed1a5e859443df34175cc03be97a44e75c969586861b7b5366c",
+    "codex/STARTUP.md": "ec8868de6185e85b91a9d5f8f546a5c08f298a4bacd56cfe9eba46b119ce8c63",
+    "codex/PROTOCOL.md": "a6f2781d0f90ed9120c0585e9eb5df227b39a57d79db85717db6fd20fb0b7fbd",
     "codex/CONSTITUTION.md": "2ca796187af0e08cb1c267f6abee54e5a91d55e9639644b09df6e93ccc134ab0",
     "codex/FOUNDATION.md": "d3e7a6dfcb58de41eccf77253be7a1c05193a7a27515298575b77ee08ef94065",
     "codex/METHOD.md": "c4346ddd33172f4975ca8d124b550f9d28ddc4a641a9e0c49bc0e160f828225d",
-    "codex/HELP.md": "f92b5caa38ed055423fcd46a2fbcc5dcaa83dfd905dca9738f96028d83931741",
+    "codex/HELP.md": "c3dca0072840d7aeb68a6a13533e644a83db29833d81bd7c7f98905c79145501",
     "codex/PARAMETERS.md": "5bf26d3770c5599f734c2bded0056992bbbebb89f18af656a23ac8f66775930e",
-    "codex/WORKBENCH.md": "a48c3c7eb2d2627ac320742108f79d50b571e69106367453f91c0c0a5f612106",
+    "codex/WORKBENCH.md": "b678ec9bd52db0d4a397bdaa41871c7411b5c3f9d47bff90b0c5c3b3f9489512",
     "codex/CHARACTER.md": "5d016d30092633e45ba3450be82f9dc5af11859faf73f9f41d49e8bd563afbfa",
     "codex/COLLABORATION.md": "8baf5b886aba680cdadd0b10ee2eab62e305ed0d1ca77f629fcd1414e0629286",
-    "codex/CONSULT.md": "6def13d623e80d7b21176839dfdedf6b02ae7e806962c004e06cd2227a0bf0c1",
-    "codex/SPLIT.md": "e9029234e79b62023685468d283463552a8d32fc489e18254d90a11de246fba7",
-    "codex/PERMISSIONS.md": "18cdb50242d96a8ac0d704ae7fe4a6cba0312b0f588cd67bf75fc985af9e7d2d",
+    "codex/CONSULT.md": "ac7e037b20e304f2db07f11490cd2e480eed160eaaf97d08a20f0660d00d9512",
+    "codex/SPLIT.md": "d2461a3eab239753124fecb87c8728e645fcfc7f49eb5dd8aeca79566fac8d95",
+    "codex/PERMISSIONS.md": "a6f47e953c57b97c5e0a930823d41f87c238c7394efa87fc1a1b79412005d71b",
     "codex/DELIVERY.md": "6e794d5919a33e212a651070820b6da2984e32bdb350f58a274888b68314a04f",
-    "codex/RETURN.md": "7fd291cef926d2aaad3e0784c5cd36e61de0618f9322acad3aecfdf6e2bfc722",
-    "codex/EXECUTION_PROTOCOL.json": "4a3e47c31ecea565e8509a35678224af8a353aeb803159d7c7f5234bc90a1ea2",
-    "codex/COUNCIL.md": "31cce586a41afee29f050fa8b425a5874f6f00826410de9d2dbd21df7747e783",
+    "codex/RETURN.md": "f1f1b58837e0b153f39aed3410b2db4e59e1252260de2f621104ca635d468bcf",
+    "codex/EXECUTION_PROTOCOL.json": "11fe61d163fa329c432746c10513b0aa8463283cc61c990d78e8c16fb087241b",
+    "codex/COUNCIL.md": "e3a73ea71129c29a0a818cff57aac59e8f1313fb57fff8262b88ea4547dd3ece",
     "codex/USAGE.md": "7a8cc30aedab48f15988d607ecb1b608727b3f1a2867aab0788f8964a3fc27ee",
     "codex/CHAT.md": "78ac198a70adf5cfb15107d51137b882b1cbb99b2cec13695679bccd074cb41b",
-    "codex/CHAT_LIGHT.md": "44612b1dd2f843a926fbea19933d1ed770e895b3fb2895de774cc4780ba7c444",
-    "codex/CHAT_DEEP.md": "0d9bd00722c13194991342126c6f4b251c215d0148d1edf481a6ce565d9284c4",
-    "codex/LIVE.md": "88808e7d16e7b2563b7943e500af79fd0b66502bd1f9591b091313a275584c14"
+    "codex/CHAT_LIGHT.md": "2f060aca95582b1cba011c867eeaf1692cb00313cdb70a03fd7799627101fb50",
+    "codex/CHAT_DEEP.md": "76aec62ef88d1643d93d541cd78200355658808cdbfa883193309bdabb042fb3",
+    "codex/LIVE.md": "553cd5f85337ba3c4219be1af77b1e6108349b4cb2a08b43e01a01f739ad7593"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {

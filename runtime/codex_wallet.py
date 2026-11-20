@@ -206,17 +206,27 @@ def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request
     if budget['budget_total_usd'] is None and not codex_collaboration.layered_policy(session['P_run']):
         raise ValueError('Wallet-only accounting requires the Stable task policy')
     layer, layer_limits = None, False
+    standing = codex_collaboration.standing_claude_budget_policy(session['P_run'])
     if codex_collaboration.double_colon_layer_budget_policy(session['P_run']):
         # These values are derived from the actual role and selected user
         # decision by resolve(), which overwrites caller-supplied evidence.
         authority = budget['authorization_evidence']
         layer = codex_collaboration.CLAUDE_LAYER_BY_ROLE[authority['role']]
-        layer_limits = authority['kind'] != 'SINGLE_COLON_WALLET_ONLY'
+        layer_limits = standing or authority['kind'] != 'SINGLE_COLON_WALLET_ONLY'
+        if standing:
+            if (authority['kind'] != 'STANDING_CLAUDE_LAYER_LIMIT' or authority['layer'] != layer
+                    or authority['wallet_id'] != wallet_id):
+                raise ValueError('Standing wallet authority must match the current layer and wallet')
+            if purpose is not None and purpose != authority.get('purpose'):
+                raise ValueError('Shared wallet reservation purpose differs from its current scope')
+            purpose = authority.get('purpose')
     ceiling = budget['ceiling_usd']
-    if purpose is not None:
-        if (purpose != codex_collaboration.FIRST_OPINION_PURPOSE
-                or not codex_collaboration.first_opinion_policy(session['P_run'])):
-            raise ValueError('Unknown shared wallet reservation purpose for this task profile')
+    first_opinion = (purpose == codex_collaboration.FIRST_OPINION_PURPOSE
+                     and codex_collaboration.first_opinion_policy(session['P_run']))
+    first_return = standing and purpose == codex_collaboration.FIRST_OPINION_NATIVE_WORK_RETURN_PURPOSE
+    if purpose is not None and (not (first_opinion or first_return) or (standing and layer != 'COUNCIL')):
+        raise ValueError('Unknown shared wallet reservation purpose for this task profile')
+    if first_opinion:
         if type(ceiling) not in (int, float) or not 0 < ceiling <= codex_collaboration.FIRST_OPINION_CEILING_USD:
             raise ValueError('First-opinion reservation exceeds its USD 0.20 ceiling or lacks a positive bound')
     path, task = ledger_path(), task_id(root, session)
@@ -225,8 +235,15 @@ def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request
         if db.execute('SELECT 1 FROM claims WHERE claim_id=?', (identity,)).fetchone():
             raise ValueError('Shared wallet already claimed this exchange; inspect/recover without repeating inference')
         task_rows = list(db.execute('SELECT * FROM claims WHERE task_id=?', (task,)))
-        if purpose is not None and any(row['purpose'] == purpose and row['state'] != 'ABORTED' for row in task_rows):
+        if first_opinion and any(row['purpose'] == purpose and row['state'] != 'ABORTED' for row in task_rows):
             raise ValueError('This task already claimed its first Claude opinion; inspect its existing reservation')
+        if first_return and not any(
+            row['exchange_id'] == authority['first_opinion_exchange_id']
+            and row['purpose'] == codex_collaboration.FIRST_OPINION_PURPOSE
+            and row['state'] in {'COMMITTED', 'KNOWN'}
+            for row in task_rows
+        ):
+            raise ValueError('A first-opinion continuation requires its original sent first-opinion claim')
         wallet_rows = list(db.execute('SELECT * FROM claims WHERE wallet_id=?', (wallet_id,)))
         availability = _availability(db, task_rows, wallet_rows, wallet_id, budget,
                                      save_snapshot=True, layer_limits=layer_limits)

@@ -38,7 +38,7 @@ python -B tools/codex.py consult split --root D:/work/task --exchange-id explain
 
 该命令不生成上例的判断文字，只附加当前绑定并检查实际证据。相对证据按`native-decision.json`的目录解析；即使输出到另一目录，所指原件也不改变。输入带旧`format`或`binding`会被拒绝；输出已有文件时不覆盖。仍可手工使用绑定预览，但不能将旧计划重新盖成当前研究。
 
-此处使用第二层内容协作。按 [WORKBENCH](../../WORKBENCH.md) 展示保守费用上界并绑定用户实际预算答复。当前费用事实须覆盖完整请求和图片、实际模型及共享钱包。取得对应授权后运行：
+此处使用第二层内容协作。按 [WORKBENCH](../../WORKBENCH.md) 核对双冒号的当前层内余额、保守费用上界及实际作用域。当前费用事实须覆盖完整请求和图片、实际模型及共享钱包。1.3 的当前双冒号在额度内直接运行：
 
 ```text
 python -B tools/codex.py consult call --root D:/work/task --exchange-id explain-stability --split-plan D:/work/split-plan.json --facts D:/work/current-cost-facts.json --ceiling-usd <当前真实授权内的本次额度>
