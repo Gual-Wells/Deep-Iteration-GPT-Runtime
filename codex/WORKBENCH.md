@@ -51,6 +51,8 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 
 在本版新单冒号任务中，用 `council create --first-opinion "仍然开放的具体取舍" --facts FACTS.md` 加所用任务根、议会 ID 和真实原生 actor，进入 [COUNCIL](COUNCIL.md#单冒号的独立首发) 的单成员首发。宿主判断真实决定窗口，按需以 `--deadline-seconds` 调整默认 300 秒。用 `prepare-round` 准备 exchange，为该 exchange 实际完成 Split。默认 Sonnet 5.5／high／16,000 总输出 token，单次费用预留最多 0.20 美元。收敛问题可显式用 medium。
 
+首发的问题可以是希望 Claude 帮忙发现选项的真实用途或构形选择。把它可能改变的决定和已具备的材料落在当前 Split 和公开阶段。后续按实际所得选择有新贡献的议会研究或正式指导，沿对应角色及费用入口准备。
+
 纯文本首发走 OpenRouter 官方接口，且同一配置能查询模型价格及账户实际余额时，用 `council run-round --root TASK --council-id ID --round-id 1 --split-plan SPLIT.json`。价格与余额取该配置实际响应，预留仍受共享钱包和用户限额约束。密钥用量或密钥额度单列。采用其他提供商或无账户余额查询权限时，用 `--plan PLAN.json` 提供同一实际账户的费用事实。已提交的首发含空答均只沿原 exchange 读回和对账，再入由原生议会完成。
 
 单冒号的首发和普通议会成员都沿当前第一层许可。发送时提供当前价格、完整请求输入量上界、真实钱包余额与保守费用上界。共享钱包把本次上界和其他已预留费用一起核对，沿用用户实际任务限额。普通议会的 `council create --claude` 用于实际需要进一步研究的对象。对已尝试的首发，按同一 exchange 读回正文、终态与账目。
@@ -206,6 +208,8 @@ python -B tools/codex.py workbench focus --work D:/task/WORK.md --experience D:/
 ## 5. 多主进度的可接续工作包
 
 在正式 INIT 前，Main 依据同 pin 的任务原文和前置判断推断配置。`profile presets` 给出档位目录。`profile parameters --text '(Less,N=8)'` 展示档位来源 `preset`/`preset_explicit`、`preference_baseline`、`explicit_overrides` 和待解释的 `unparsed_tokens`。Main 按原话解释位置参数、来源和时间控制。新会话的 `session.json` 中，`parameter_selection` 保存初始调用预览，`explicit_parameters` 只保存创建时取得的真实用户参数声明。`task create --explicit` 用于补记已从实际原话确认的值。最新纠正以当前消息和相应决定为据。按已取得的 P_run 解释并恢复旧会话。
+
+负责该线的 Main 把较高参数与多承担的实际工作一起落实在生效配置和 INIT。后续有新论证、候选、原件或领域时，用同一理由判断该工作应进入当前责任还是追加相应参数。
 
 若创建会话时已确定 M 目标，使用 `task create --m` 记录。以下示例在创建时已确定两条完整独立路线。
 

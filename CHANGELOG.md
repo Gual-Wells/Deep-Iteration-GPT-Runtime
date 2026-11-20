@@ -1,5 +1,10 @@
 # Changelog
 
+## Codex Stable 1.2.2
+
+- Favor early, bounded collaboration when independent Claude input can improve an open decision. Use the current question, evidence and expected contribution to decide when another exchange is worth the cost.
+- Actively consider deeper native work before initialization and after material changes. Set higher parameters by the work they take on and show that reason with the effective settings.
+
 ## Codex Stable 1.2.1
 
 - Set cumulative per-task double-colon ceilings of $0.20 for the Claude council and $1.00 for formal guidance, production, and arbitration combined. Check each layer in the scoped budget preview and in the atomic shared-wallet reservation.
