@@ -19,7 +19,7 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v18'
+PROFILE_PROTOCOL = 'digr-codex-native-v19'
 PROFILE_CORE = (
     'codex/CONSTITUTION.md',
     'codex/FOUNDATION.md',
@@ -203,7 +203,9 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
                            if text.startswith(alias)), key)
     addon_hint = 'paper' if invocation_key == 'DIGRP' else None
     pin = _PROFILE_PIN.fullmatch(p_run) if p_run is not None else None
-    preference_only = p_run is None or bool(pin and tuple(map(int, pin.groups())) >= (1, 1, 1))
+    version = tuple(map(int, pin.groups())) if pin else ()
+    preference_only = p_run is None or version >= (1, 1, 1)
+    project_research = p_run is None or version >= (1, 4, 0)
     depth_key = 'depth_preferences' if preference_only else 'depth_defaults'
     base = {'classification': 'NATIVE', 'route_key': key, 'task': None,
             'invocation_key': invocation_key, 'addon_hint': addon_hint,
@@ -254,7 +256,8 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
         return {**base, 'classification': 'INVALID', 'reason': 'empty task'}
     try:
         execution_parameters, delivery = _invocation_parameters(prelude)
-        depth = resolve_defaults(execution_parameters, preference_only=preference_only)
+        depth = resolve_defaults(execution_parameters, preference_only=preference_only,
+                                 project_research=project_research)
     except ValueError as exc:
         return {**base, 'classification': 'INVALID', 'reason': str(exc)}
     layered = p_run is None or layered_policy(p_run)
@@ -424,7 +427,9 @@ def refresh_distribution(root: Path) -> dict[str, Any]:
     version = (root / 'codex/VERSION').read_text(encoding='utf-8').strip()
     if manifest.get('protocol') != PROFILE_PROTOCOL or manifest.get('version') != version:
         raise ValueError('Codex manifest/VERSION identity mismatch')
-    manifest['depth_preferences']['presets'] = preset_catalog()['presets']
+    catalog = preset_catalog()
+    manifest['depth_preferences']['presets'] = catalog['presets']
+    manifest['depth_preferences']['task_defaults'] = catalog['task_defaults']
     manifest['depth_preferences']['preset_aliases'] = {'standard': 'Light'}
     manifest['depth_preferences']['default_preset'] = 'Default'
     expected = ['codex/PROTOCOL.md', *PROFILE_CORE]

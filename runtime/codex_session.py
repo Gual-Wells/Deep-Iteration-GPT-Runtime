@@ -118,12 +118,14 @@ def _parameters(parameters: Mapping[str, Any]) -> dict[str, Any]:
     return json.loads(json.dumps(parameters, ensure_ascii=False, allow_nan=False))
 
 
-def _differences(explicit: Mapping[str, Any], actual: Mapping[str, Any],
+def _differences(session: Mapping[str, Any], actual: Mapping[str, Any],
                  reasons: Mapping[str, str] | None = None) -> list[dict[str, Any]]:
     reasons = dict(reasons or {})
+    baseline = (session.get('parameter_selection') or {}).get('preference_baseline', {})
+    task_parameters = {'M', 'F'} if 'F' in baseline else {'M'}
     result = []
-    for key, expected in explicit.items():
-        if key == 'M':
+    for key, expected in session['explicit_parameters'].items():
+        if key in task_parameters:
             continue
         supplied = actual.get(key)
         if key == 'S' and isinstance(expected, Mapping):
@@ -236,6 +238,8 @@ def create_session(root: Path, *, request: Path, p_run: str,
         parameter_selection = preferences or invocation['depth_defaults']
         if preferences is not None:
             explicit = merge_explicit_parameters(preferences['explicit_overrides'], explicit)
+            if 'F' in preferences['preference_baseline'] and 'F' in explicit:
+                require_nonnegative_int('F', explicit['F'])
         else:
             # Historical pins recorded an explicitly named tier as declarations.
             chosen = dict(parameter_selection['parameters']) if parameter_selection['preset_explicit'] else {}
@@ -446,7 +450,7 @@ def create_line(root: Path, line_id: str, *, parameters: Mapping[str, Any], owne
     topics = list(dict.fromkeys(require_nonempty_text('corrections topic', item) for item in corrections_topics))
     cases = list(dict.fromkeys(Path(item).as_posix() for item in experiences))
     package = {'line_id': line_id, 'owner': owner, 'parameters': values,
-               'explicit_parameter_differences': _differences(session['explicit_parameters'], values, parameter_reasons),
+               'explicit_parameter_differences': _differences(session, values, parameter_reasons),
                'work': work.as_posix(), 'candidate': None, 'candidate_ref': None,
                'content_status': 'PREPARED', 'responsibility_status': 'UNVERIFIED',
                'status_basis': 'owner-declared; not verified by the helper', 'unhandled': [],
@@ -525,7 +529,7 @@ def set_line_parameters(root: Path, line_id: str, *, parameters: Mapping[str, An
     package['parameter_changes'].append({'changes': changes, 'user_revision': user_revision,
                                          'recorded_wall_ns': time.time_ns()})
     package['parameters'] = values
-    package['explicit_parameter_differences'] = _differences(session['explicit_parameters'], values, reasons)
+    package['explicit_parameter_differences'] = _differences(session, values, reasons)
     package['updated_wall_ns'] = time.time_ns()
     _write_json(path, package)
     return package

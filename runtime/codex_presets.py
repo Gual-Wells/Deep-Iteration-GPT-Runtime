@@ -11,6 +11,7 @@ PRESETS = {
     "More": {"N": 18, "R": 6, "D": 4, "V": 4, "L": 3, "M": 1},
     "Max": {"N": 24, "R": 8, "D": 6, "V": 6, "L": 3, "M": 1},
 }
+_TASK_DEFAULTS = {"F": 0}
 _NAMES = {name.casefold(): name for name in PRESETS}
 _NAMES["standard"] = "Light"
 _PUNCTUATION = str.maketrans({"（": "(", "）": ")", "，": ",", "＝": "="})
@@ -71,7 +72,7 @@ def merge_explicit_parameters(header: dict, additional: Mapping[str, Any]) -> di
 
 
 def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | None = None,
-                     *, preference_only: bool = False) -> dict:
+                     *, preference_only: bool = False, project_research: bool = True) -> dict:
     """Read the input for the native interpreter, retaining the old pinned preview."""
     if not isinstance(parameter_text, str):
         raise TypeError("parameter text must be str")
@@ -101,6 +102,10 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
                 parsed = merge_explicit_parameters(parsed, {"S": nested})
             elif not preference_only:
                 parsed["S"] = nested
+        elif project_research and ((pair and pair[0] == "F") or re.fullmatch(r"F\s*=?", token)):
+            if not pair or not re.fullmatch(r"[0-9]+", pair[1]):
+                raise ValueError("F must be a nonnegative integer")
+            parsed = merge_explicit_parameters(parsed, {"F": int(pair[1])})
         elif pair and pair[0] in ("N", "R", "D", "V", "L", "M", "B") and re.fullmatch(r"[0-9]+", pair[1]):
             parsed[pair[0]] = int(pair[1])
         elif pair and pair[0] == "T":
@@ -117,6 +122,8 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
     baseline["B"] = 0
     if chosen == "Light":
         baseline.update(T=0, S={"n": 0, "t": 0, "r": 0, "b": 0})
+    if project_research:
+        baseline.update(_TASK_DEFAULTS)
     explicit = parsed
     if overrides is not None:
         if not isinstance(overrides, Mapping):
@@ -124,7 +131,10 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
         explicit = (merge_explicit_parameters(parsed, overrides) if preference_only
                     else _merge(parsed, overrides))
     values = _merge(baseline, explicit)
-    for key in ("N", "R", "D", "V", "L", "M", "B"):
+    count_parameters = ("N", "R", "D", "V", "L", "M", "B")
+    if project_research:
+        count_parameters += ("F",)
+    for key in count_parameters:
         value = values[key]
         if type(value) is not int or value < 0:
             raise ValueError(key + " must be a nonnegative integer")
@@ -147,6 +157,7 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
 
 def preset_catalog() -> dict:
     return {"default": "Default", "presets": deepcopy(PRESETS),
+            "task_defaults": dict(_TASK_DEFAULTS),
             "aliases": {"standard": "Light"}, "L": "native L3 in every preset",
             "scope": "Preference baselines for native task inference before INIT",
             "time": "T/t task-derived soft targets unless explicitly specified",

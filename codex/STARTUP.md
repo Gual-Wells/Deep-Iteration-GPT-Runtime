@@ -1,4 +1,4 @@
-# DIGR Codex Stable 1.3 — 启动与恢复
+# DIGR Codex Stable 1.4 — 启动与恢复
 
 本 profile 面向已选 Codex 通道。实际获取当前 `codex/codex-host-adaptation` 的完整 Git SHA，从同一 SHA 取得并核对 `codex/manifest.json`、`codex/VERSION`、startup_slice 及散列。根目录 DIGR 另有入口。薄路由仅宽捕获精确 DIGR 或深度迭代，仓库决定语义；不得从引文、历史、工具输出或界面状态重造调用。
 

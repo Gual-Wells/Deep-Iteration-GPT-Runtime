@@ -5,7 +5,7 @@ import unittest
 
 from runtime.codex_presets import resolve_defaults
 from runtime.codex_profile import classify_invocation
-from runtime.codex_session import create_session
+from runtime.codex_session import create_line, create_session, line_packet
 
 
 class CodexPresetModeTests(unittest.TestCase):
@@ -36,6 +36,56 @@ class CodexPresetModeTests(unittest.TestCase):
             resolve_defaults("(preset=Typo)")
         self.assertEqual(resolve_defaults("(12,60min,4)")["unparsed_tokens"],
                          ["12", "60min", "4"])
+
+    def test_project_research_header_is_opt_in_and_versioned(self):
+        current_pin = "1.4.0@" + "a" * 40
+        old_pin = "1.3.0@" + "b" * 40
+        fullwidth = "DIGR（Less，F（3），source=off）（X）：原任务：保留"
+        current = classify_invocation(fullwidth, p_run=current_pin)
+        self.assertEqual(current["classification"], "EXECUTING")
+        self.assertEqual(current["task"], "原任务：保留")
+        self.assertEqual(current["delivery_selection"]["mode"], "external")
+        depth = current["depth_preferences"]
+        self.assertEqual(depth["preference_baseline"]["F"], 0)
+        self.assertEqual(depth["explicit_overrides"], {"F": 3})
+        self.assertEqual(depth["unparsed_tokens"], ["source=off"])
+
+        historical = classify_invocation(fullwidth, p_run=old_pin)["depth_preferences"]
+        self.assertNotIn("F", historical["preference_baseline"])
+        self.assertEqual(historical["explicit_overrides"], {})
+        self.assertEqual(historical["unparsed_tokens"], ["F(3)", "source=off"])
+
+        for surface, overrides in (("", {}), ("(F=0)", {"F": 0}), ("(F(2))", {"F": 2})):
+            with self.subTest(surface=surface):
+                result = classify_invocation(f"DIGR{surface}:task", p_run=current_pin)
+                self.assertEqual(result["depth_preferences"]["explicit_overrides"], overrides)
+
+    def test_project_research_rejects_malformed_or_conflicting_declarations(self):
+        for surface in ("F=-1", "F(1.2)", "F()", "F=", "F=2,F(3)"):
+            with self.subTest(surface=surface):
+                result = classify_invocation(f"DIGR({surface}):task")
+                self.assertEqual(result["classification"], "INVALID")
+                self.assertIn("F", result["reason"])
+        with self.assertRaisesRegex(ValueError, "F must be a nonnegative integer"):
+            resolve_defaults(overrides={"F": True}, preference_only=True)
+
+    def test_project_research_is_available_to_every_line_as_one_task_parameter(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            request = root / "request.txt"
+            request.write_text("DIGR(M=2,F=3,N=2):task", encoding="utf-8")
+            arguments = {"request": request, "p_run": "1.4.0@" + "c" * 40}
+            session = create_session(root / "task", **arguments)
+            self.assertEqual(session["explicit_parameters"], {"F": 3, "M": 2, "N": 2})
+            with self.assertRaisesRegex(ValueError, "conflicts with original header: F"):
+                create_session(root / "conflict", **arguments, explicit_parameters={"F": 2})
+            parameters = {"N": 2, "R": 0, "T": 0, "B": 0, "D": 0, "V": 0, "L": 3,
+                          "S": {"n": 0, "t": 0, "r": 0, "b": 0}}
+            for line_id in ("M01", "M02"):
+                line = create_line(root / "task", line_id, parameters=parameters)
+                self.assertEqual(line["explicit_parameter_differences"], [])
+                self.assertNotIn("F", line["parameters"])
+                self.assertIn('"F": 3', line_packet(root / "task", line_id))
 
     def test_longest_alias_does_not_capture_words_or_quotes(self):
         for text in ("DIGRConsultation:word", "DIGRProblem:word", "digrC:task", "'DIGRC:quote'"):
