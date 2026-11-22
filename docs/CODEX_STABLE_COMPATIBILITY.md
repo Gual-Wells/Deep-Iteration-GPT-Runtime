@@ -10,6 +10,7 @@ Codex 路由仍读取 `codex/codex-host-adaptation`，现行语义由发布 SHA 
 | 结果、过程透明、时间与状态 | LIVE、RETURN、共享 visits；独立来源、真实发布与当前文件。历史时间图按明确用途调用 |
 | 事实边界、逻辑分析、实验授权、写作表达 | METHOD、PERMISSIONS；分析可凭充分论证完成，必要工程检查独立作用 |
 | 外部研究、正式内容、公开流、成本与预算 | COUNCIL、CONSULT、逐次 SPLIT、USAGE；按角色与实际来源 |
+| Stable 1.4 的 F | 新 pin 接受任务级 F。未声明时默认 F0。正值在相关定案前要求合格项目先研，按真实达到数及缺额返回。 |
 | Stable 1.3 的额度内授权与子议会委托 | 当前用户选择直接打开适用层的额度。Claude 的实际公开请求可经 Codex 工作、原件回传及同线高 effort 续答。历史 pin 继续按原规则发送。 |
 | Stable 1.2 新任务的单冒号首发 | [PROTOCOL](../codex/PROTOCOL.md#单冒号任务的独立首发) 在开放的实质取舍定案前接入 [COUNCIL](../codex/COUNCIL.md#单冒号的独立首发)。一次发送沿已有单冒号钱包权限，原生初议、再议和落实各有实际记录。 |
 | Stable 1.1 的正式产出与全局约束 | 同范围的原生及 Claude 候选、Claude 终裁和实际落实；原语宪法约束发布与整个新 pin |

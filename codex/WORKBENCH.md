@@ -225,6 +225,8 @@ python -B tools/codex.py workbench focus --work D:/task/WORK.md --experience D:/
 
 负责该线的 Main 把较高参数与多承担的实际工作一起落实在生效配置和 INIT。后续有新论证、候选、原件或领域时，用同一理由判断该工作应进入当前责任还是追加相应参数。
 
+`profile parameters --text '(Less,F=3)'` 预览 F 的显式值。新会话把 F 的初次声明随任务原文保存在 `explicit_parameters`，各线参数仍按各自责任填写。将合格项目与实际决定记入任务现有工作笔记。委托变化时沿 `task message/handle` 保留用户的新要求，接续时以当前要求及笔记中的实际研究为准。显示任务级 `F（目标/实际）`，细则见 [PARAMETERS](PARAMETERS.md#f-公开社区项目先研)。
+
 若创建会话时已确定 M 目标，使用 `task create --m` 记录。以下示例在创建时已确定两条完整独立路线。
 
 ```text

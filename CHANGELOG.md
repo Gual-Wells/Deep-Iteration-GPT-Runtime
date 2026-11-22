@@ -1,5 +1,10 @@
 # Changelog
 
+## Codex Stable 1.4.0
+
+- Add the opt-in, task-wide F floor for studying well-rated, distinctive public-community projects before decisions that depend on the findings.
+- Count distinct projects using community evidence, project materials, and an actual decision. Report shortfalls and the affected tentative decisions alongside independently completed work.
+
 ## Codex Stable 1.3.0
 
 - Use the current DIGR delimiter as standing authority within the applicable Claude layer and wallet limits. The council has USD 0.20 per task. Double-colon formal content adds a separate USD 1.00 ceiling. Current user limits and historical pin behavior remain enforceable.
