@@ -5,7 +5,7 @@ import unittest
 
 from runtime.codex_presets import resolve_defaults
 from runtime.codex_profile import classify_invocation
-from runtime.codex_session import create_line, create_session, line_packet
+from runtime.codex_session import create_line, create_session, line_packet, set_line_parameters
 
 
 class CodexPresetModeTests(unittest.TestCase):
@@ -86,6 +86,10 @@ class CodexPresetModeTests(unittest.TestCase):
                 self.assertEqual(line["explicit_parameter_differences"], [])
                 self.assertNotIn("F", line["parameters"])
                 self.assertIn('"F": 3', line_packet(root / "task", line_id))
+            revised = set_line_parameters(root / "task", "M01", parameters={**parameters, "R": 1},
+                                          reasons={"R": "Compare the whole design"})
+            self.assertEqual(revised["explicit_parameter_differences"], [])
+            self.assertEqual(revised["parameter_changes"][0]["changes"][0]["parameter"], "R")
 
     def test_longest_alias_does_not_capture_words_or_quotes(self):
         for text in ("DIGRConsultation:word", "DIGRProblem:word", "digrC:task", "'DIGRC:quote'"):
