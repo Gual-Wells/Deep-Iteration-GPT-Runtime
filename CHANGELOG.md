@@ -1,5 +1,12 @@
 # Changelog
 
+## Codex Stable 1.4.1
+
+- Keep the F project floor and qualification rules; require source-specific transfer and continued production use after the floor is reached.
+- Carry useful source material, constructions, conditions and current artifacts through delegation, feedback and recovery; allow revision and retirement without recounting projects.
+- Keep generic norm restatements, saved notes and adoption claims separate from actual use. Add no mandatory cards, scoring, per-project agents or effect-evaluation gates.
+- Preserve historical task pins and route-only local installation.
+
 ## Codex Stable 1.4.0
 
 - Add the opt-in, task-wide F floor for studying well-rated, distinctive public-community projects before decisions that depend on the findings.

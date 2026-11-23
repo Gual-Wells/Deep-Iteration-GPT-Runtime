@@ -38,7 +38,7 @@ class CodexPresetModeTests(unittest.TestCase):
                          ["12", "60min", "4"])
 
     def test_project_research_header_is_opt_in_and_versioned(self):
-        current_pin = "1.4.0@" + "a" * 40
+        current_pin = "1.4.1@" + "a" * 40
         old_pin = "1.3.0@" + "b" * 40
         fullwidth = "DIGR（Less，F（3），source=off）（X）：原任务：保留"
         current = classify_invocation(fullwidth, p_run=current_pin)
@@ -49,6 +49,11 @@ class CodexPresetModeTests(unittest.TestCase):
         self.assertEqual(depth["preference_baseline"]["F"], 0)
         self.assertEqual(depth["explicit_overrides"], {"F": 3})
         self.assertEqual(depth["unparsed_tokens"], ["source=off"])
+
+        first_f_pin = "1.4.0@" + "c" * 40
+        first_f = classify_invocation(fullwidth, p_run=first_f_pin)
+        self.assertEqual(first_f["depth_preferences"]["explicit_overrides"], {"F": 3})
+        self.assertEqual(first_f["task"], current["task"])
 
         historical = classify_invocation(fullwidth, p_run=old_pin)["depth_preferences"]
         self.assertNotIn("F", historical["preference_baseline"])
