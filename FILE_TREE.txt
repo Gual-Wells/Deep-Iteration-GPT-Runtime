@@ -58,6 +58,7 @@ codex/USAGE.md
 codex/VERSION
 codex/WORKBENCH.md
 codex/examples/CREATIVE_ROUTE.md
+codex/examples/F_TRANSFER.md
 codex/examples/UNIT_RESPONSIBILITY.md
 codex/examples/assembly/WORK.md
 codex/examples/assembly/reader-example.html
