@@ -291,6 +291,6 @@ python -B tools/codex.py visits repair --root D:/task/session --actor D01 --begi
 
 按 COURT 在原生产与研究责任完成后组织实际法庭，并为当前案卷保留真实角色的派发出处、原需求与前文条件、过程材料和最终候选。法院工具的读写入口为 `python -B tools/codex.py court --help`。正式X/F的任务级推断通过 `task parameters --root TASK --input task-parameters.json` 保存，读取时省略input。每条M的初始化仍走line create。输入对象为 `{"parameters":{"X":0,"F":0},"reasons":{"F":"本任务以现有原件完成，不另设社区项目下限"}}`，X只核对当前实际策略，改变X须先按真实用户来源走task message/handle。
 
-`court open` 固定待返回result、key_changes、argument_scope三段实质正文及artifacts/delivery_files实际字节和过程/需求来源；`submit`保存真实控辩与监庭公开陈述，`verdict`保存法官逐项裁判。须再执行时`remand`保存有理由的完整自定义配置，实际执行后`review`核对完成来源并建立复审。`status`与正常return检查使用同一当前案卷，旧判决不覆盖新产品或另一个结果。完整JSON对象及五步实际来源示例见[法院操作示例](examples/COURT_WORKFLOW.md)。示例字段须换成真实材料，不能代替实际角色与执行。
+`court open` 固定待返回result、key_changes、argument_scope三段实质正文及artifacts/delivery_files实际字节和过程/需求来源，七个角色包括双方各一位律师和实际书记员；`submit`保存公诉意图级审查、控辩论证及全体同等暴力威慑，`verdict`保存法官逐项裁判。`record`保存实际书记员的证据索引、一致性核对、检索来源与长程公开审判记录，当前裁判须纳入记录后才能关闭或发送。须再执行时`remand`保存有理由的完整自定义配置，实际执行后`review`核对完成来源并建立复审。`status`与正常return检查使用同一当前案卷，旧判决不覆盖新产品或另一个结果。完整JSON对象及实际来源示例见[法院操作示例](examples/COURT_WORKFLOW.md)。示例字段须换成真实材料，不能代替实际角色与执行。
 
 书记员可复用工具及现有笔记，实际控辩、法官与监庭仍由宿主组织真实身份。X1的最终候选先受审，之后完成原生Gmail发送与读回，正常return最后收口。暂停或终止保留真实未完，不能改写成无罪。

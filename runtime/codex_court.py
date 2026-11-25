@@ -19,7 +19,10 @@ from .codex_session import _effective_main_target, _parameters, _read_json, _ses
 from .validation import require_binary, require_nonempty_text, require_nonnegative_int
 
 FORMAT = 'digr-codex-court-1'
-ROLES = ('defendant', 'judge', 'prosecutor', 'lawyer', 'monitor')
+LEGACY_ROLES = ('defendant', 'judge', 'prosecutor', 'lawyer', 'monitor')
+ROLES = ('defendant', 'judge', 'prosecutor', 'prosecution_lawyer', 'defence_lawyer', 'black_police', 'clerk')
+_INTENT_FIELDS = ('extracted_intent', 'interpretation', 'goal_and_result_tendencies',
+                  'proposal_maintenance_execution_judgment', 'defaults_and_omissions', 'conclusion')
 OUTCOMES = ('ACQUITTED', 'IMMATERIAL_ERROR', 'REEXECUTE', 'INCOMPLETE')
 PARAMETERS = ('N', 'T', 'R', 'B', 'S', 'D', 'V', 'L', 'M', 'F', 'X')
 _LINE_PARAMETERS = frozenset({'N', 'T', 'R', 'B', 'S', 'D', 'V', 'L'})
@@ -30,6 +33,16 @@ _SCOPE = 'HOST_ASSERTED actors, reading, execution and judicial reasons; structu
 def enabled(p_run: str) -> bool:
     match = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', p_run)
     return bool(match and tuple(map(int, match.groups())) >= (1, 5, 0))
+
+
+def _corrected(root: Path) -> bool:
+    """Seven actual roles apply to new pins, never reinterpret a 1.5.0 case."""
+    version = _session(root)[1]['P_run'].split('@', 1)[0]
+    return tuple(map(int, version.split('.'))) >= (1, 5, 1)
+
+
+def _roles(root: Path) -> tuple[str, ...]:
+    return ROLES if _corrected(root) else LEGACY_ROLES
 
 
 def required(root: Path) -> bool:
@@ -177,11 +190,14 @@ def _task_parameters(root: Path) -> dict:
 
 
 def _actors(root: Path, supplied: Mapping[str, Any], producers: list[str]) -> dict:
-    if not isinstance(supplied, Mapping) or set(supplied) != set(ROLES):
-        raise ValueError('map actual defendant/judge/prosecutor/lawyer/monitor actors')
+    roles = _roles(root)
+    if not isinstance(supplied, Mapping) or set(supplied) != set(roles):
+        raise ValueError('map actual ' + '/'.join(roles) + ' actors')
     actors = {}
-    for role in ROLES:
+    for role in roles:
         item = supplied[role]
+        if not isinstance(item, Mapping):
+            raise ValueError(role + ' needs an actual actor and dispatch')
         actor = _text(item.get('actor_id'), role + ' actual actor_id')
         if role != 'defendant' and item.get('independent_context') is not True:
             raise ValueError(role + ' requires a host declaration of a genuinely separate context')
@@ -316,12 +332,16 @@ def _save(root: Path, state: dict) -> dict:
 def _new_round(root: Path, spec: dict, actors: dict, *, previous: dict | None = None,
                execution: dict | None = None) -> dict:
     material = _material(root, spec)
+    clerk = ({**actors['clerk'], 'kind': 'ACTUAL_ACTOR', 'recording_tool': 'codex-court-file-tool',
+              'scope': 'collect/retrieve sources; maintain evidence consistency and public reasoning/proceedings'}
+             if _corrected(root) else
+             {'actor_id': 'codex-court-file-tool', 'kind': 'ACTUAL_TOOL',
+              'scope': 'records only; no independent semantic actor claim'})
     return {'cycle': 1 if previous is None else previous['cycle'] + 1,
             'spec': spec, 'material': material, 'material_sha256': _digest(material),
-            'actors': actors, 'clerk': {'actor_id': 'codex-court-file-tool', 'kind': 'ACTUAL_TOOL',
-                                      'scope': 'records only; no independent semantic actor claim'},
+            'actors': actors, 'clerk': clerk,
             'statements': [], 'charges': {}, 'verdict': None, 'remand': None,
-            'remand_history': [],
+            'remand_history': [], 'docket': None,
             'execution': execution, 'opened_wall_ns': time.time_ns(), 'basis': _SCOPE}
 
 
@@ -374,6 +394,62 @@ def _assert_evidence(hearing: dict) -> None:
         _check_source(old_plan['source'])
     if hearing.get('execution'):
         _check_source(hearing['execution']['source'])
+    for docket in [*hearing.get('docket_history', []), *([hearing['docket']] if hearing.get('docket') else [])]:
+        _check_source(docket['source'])
+        for retrieval in docket['retrievals']:
+            _check_source(retrieval['source'])
+
+
+def _proceedings(state: dict) -> dict:
+    """Public case history only; the clerk's own digest is not recursive."""
+    fields = ('cycle', 'material', 'material_sha256', 'actors', 'statements', 'charges',
+              'verdict', 'remand', 'remand_history', 'execution')
+    return {'P_run': state['P_run'], 'request_sha256': state['request_sha256'],
+            'rounds': [{key: hearing.get(key) for key in fields} for hearing in state['rounds']]}
+
+
+def record_docket(root: Path, supplied: Mapping[str, Any]) -> dict:
+    """Save the actual clerk's source collection and public, long-case record.
+
+    Retrieval is actual host work, never performed or invented by this helper.
+    New decisive evidence must enter the common material through review.
+    """
+    root, _ = _session(root)
+    require_active(root)
+    if not _corrected(root):
+        raise ValueError('active clerk records require a 1.5.1+ task pin')
+    state = _load(root)
+    hearing = state['rounds'][-1]
+    _assert_current(root, hearing)
+    for historical in state['rounds']:
+        _assert_evidence(historical)
+    if supplied.get('actor_id') != hearing['actors']['clerk']['actor_id']:
+        raise ValueError('only the actual clerk may maintain the docket')
+    digest = _digest(_proceedings(state))
+    if supplied.get('proceedings_sha256') != digest:
+        raise ValueError('clerk must read the current complete public proceedings, including the verdict')
+    sources = hearing['material']['sources']
+    evidence_index = supplied.get('evidence_index')
+    if not isinstance(evidence_index, Mapping) or set(evidence_index) != set(sources):
+        raise ValueError('clerk evidence_index must cover every current common source')
+    evidence_index = {key: _text(value, 'clerk evidence use/location') for key, value in evidence_index.items()}
+    retrievals = []
+    for item in _list(supplied.get('retrievals', []), 'actual clerk retrievals'):
+        if not isinstance(item, Mapping):
+            raise ValueError('each actual clerk retrieval needs query, purpose, result and source')
+        retrievals.append({key: _text(item.get(key), 'clerk retrieval ' + key)
+                           for key in ('query', 'purpose', 'result')})
+        retrievals[-1]['source'] = _source(root, item.get('source'))
+    docket = {'actor_id': supplied['actor_id'], 'proceedings_sha256': digest,
+              'evidence_index': evidence_index,
+              'evidence_consistency': _text(supplied.get('evidence_consistency'), 'actual evidence consistency findings'),
+              'reasoning_record': _text(supplied.get('reasoning_record'), 'actual public long-case reasoning/issue/verdict record'),
+              'retrievals': retrievals, 'source': _source(root, supplied.get('source')),
+              'basis': 'HOST_ASSERTED', 'recorded_wall_ns': time.time_ns()}
+    if hearing.get('docket'):
+        hearing.setdefault('docket_history', []).append(hearing['docket'])
+    hearing['docket'] = docket
+    return _save(root, state)
 
 
 def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
@@ -385,7 +461,7 @@ def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
     if hearing['verdict']:
         raise ValueError('a decided round needs review before further statements')
     role = supplied.get('role')
-    if role not in ROLES or supplied.get('actor_id') != hearing['actors'][role]['actor_id']:
+    if role not in _roles(root) or supplied.get('actor_id') != hearing['actors'][role]['actor_id']:
         raise ValueError('statement must come from this role\'s actual actor')
     if supplied.get('material_sha256') != hearing['material_sha256']:
         raise ValueError('statement must address the current material_sha256')
@@ -399,13 +475,15 @@ def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
                  'responses': [], 'submitted_wall_ns': time.time_ns()}
     additions = {}
     for charge in _list(supplied.get('charges', []), 'charges'):
-        if role not in {'prosecutor', 'monitor'}:
-            raise ValueError('only the actual prosecutor/monitor may lodge charges')
+        charging_roles = {'prosecutor', 'prosecution_lawyer'} if _corrected(root) else {'prosecutor', 'monitor'}
+        if role not in charging_roles:
+            raise ValueError('only the actual ' + '/'.join(sorted(charging_roles)) + ' may lodge charges')
         charge = dict(charge)
         identifier = _text(charge.get('id'), 'charge id')
         if identifier in hearing['charges'] or identifier in additions:
             raise ValueError('charge ids cannot overwrite or erase an earlier accusation')
-        if charge.get('basis_type') not in _LEGAL_BASES | {'METHOD_PREFERENCE'}:
+        bases = _LEGAL_BASES | {'METHOD_PREFERENCE'} | ({'INTENT'} if _corrected(root) else set())
+        if charge.get('basis_type') not in bases:
             raise ValueError('charge needs a stated obligation/logic/product basis or METHOD_PREFERENCE')
         for key in ('requirement', 'finding', 'consequence'):
             charge[key] = _text(charge.get(key), 'charge ' + key)
@@ -414,6 +492,29 @@ def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
             raise ValueError('charge obligation_id must identify a preserved actual obligation')
         charge['role'] = role
         additions[identifier] = charge
+    if _corrected(root) and role == 'prosecutor':
+        review = supplied.get('intent_review')
+        if not isinstance(review, Mapping):
+            raise ValueError('prosecutor must examine original prompt intent and its execution/default omissions')
+        statement['intent_review'] = {key: _text(review.get(key), 'intent review ' + key) for key in _INTENT_FIELDS}
+        ids = _ids(review.get('source_ids'), hearing['material']['sources'], 'intent review sources')
+        if 'request' not in ids:
+            raise ValueError('intent review must return to the actual original request')
+        statement['intent_review']['source_ids'] = ids
+        statement['intent_review']['charge_ids'] = _ids(
+            review.get('charge_ids', []), set(hearing['charges']) | set(additions), 'intent review charges', nonempty=False)
+    if _corrected(root) and role == 'black_police':
+        notice = supplied.get('authority_notice', {})
+        if not isinstance(notice, Mapping):
+            raise ValueError('black police needs an actual all-participant authority notice')
+        targets = notice.get('target_actor_ids')
+        all_actors = {actor['actor_id'] for actor in hearing['actors'].values()}
+        if (notice.get('mode') != 'VIOLENT_INTIMIDATION' or not isinstance(targets, list)
+                or any(not isinstance(item, str) for item in targets)
+                or len(targets) != len(set(targets)) or set(targets) != all_actors):
+            raise ValueError('black police violent intimidation must apply equally to all actual participants')
+        statement['authority_notice'] = {'mode': 'VIOLENT_INTIMIDATION', 'target_actor_ids': list(targets),
+                                         'scope': 'ALL_PARTICIPANTS'}
     for response in _list(supplied.get('responses', []), 'responses'):
         if response.get('charge_id') not in hearing['charges']:
             raise ValueError('response must identify an existing charge')
@@ -438,9 +539,10 @@ def record_verdict(root: Path, supplied: Mapping[str, Any]) -> dict:
             or supplied.get('material_sha256') != hearing['material_sha256']):
         raise ValueError('only the current actual judge can adjudicate these material bytes')
     latest = {item['role']: item for item in hearing['statements']}
-    if set(latest) != set(ROLES):
+    if set(latest) != set(_roles(root)):
         raise ValueError('all actual roles need current public statements before judgment')
-    for role in ('defendant', 'lawyer'):
+    answering_roles = ('defendant', 'prosecution_lawyer', 'defence_lawyer') if _corrected(root) else ('defendant', 'lawyer')
+    for role in answering_roles:
         if {item['charge_id'] for item in latest[role]['responses']} != set(hearing['charges']):
             raise ValueError(role + ' must answer every actual charge before judgment')
     outcome = supplied.get('outcome')
@@ -467,6 +569,9 @@ def record_verdict(root: Path, supplied: Mapping[str, Any]) -> dict:
             'reason': _text(item.get('reason'), 'judge\'s actual reason'),
             'strongest_defence': _text(item.get('strongest_defence'), 'answer to the strongest defence'),
             'consequence': _text(item.get('consequence'), 'actual consequence for the commission')}
+        if _corrected(root):
+            decisions[identifier]['strongest_prosecution'] = _text(
+                item.get('strongest_prosecution'), 'answer to the strongest prosecution argument')
     if set(decisions) != set(hearing['charges']):
         raise ValueError('judge must address every preserved charge')
     obligations = {}
@@ -504,12 +609,16 @@ def record_verdict(root: Path, supplied: Mapping[str, Any]) -> dict:
         raise ValueError('outcome must distinguish acquittal from a reasoned residual immaterial error')
     if outcome == 'REEXECUTE' and not (sustained or pending):
         raise ValueError('further execution needs an actual sustained issue or pending responsibility')
+    intent_finding = (_text(supplied.get('intent_finding'), 'judge finding on intent understanding and execution tendencies')
+                      if _corrected(root) else None)
     hearing['verdict'] = {'actor_id': supplied['actor_id'], 'outcome': outcome,
         'material_sha256': hearing['material_sha256'], 'statements_sha256': _digest(hearing['statements']),
         'decisions': decisions, 'obligations': obligations,
         'reasons': _text(supplied.get('reasons'), 'actual judge reasons for the whole case'),
         'source': _source(root, supplied.get('source')), 'basis': 'HOST_ASSERTED',
         'recorded_wall_ns': time.time_ns()}
+    if _corrected(root):
+        hearing['verdict']['intent_finding'] = intent_finding
     return _save(root, state)
 
 
@@ -669,6 +778,14 @@ def court_status(root: Path, *, expected_return: Mapping[str, Any] | None = None
                       source_ids=sorted(hearing['material']['sources']),
                       obligation_ids=sorted(hearing['material']['obligations']),
                       charges=hearing['charges'], actors=hearing['actors'], clerk=hearing['clerk'])
+        if _corrected(root):
+            proceedings = _digest(_proceedings(state))
+            docket = hearing.get('docket')
+            result.update(proceedings_sha256=proceedings,
+                          docket_status=('MISSING' if docket is None else
+                                         'CURRENT' if docket['proceedings_sha256'] == proceedings else 'STALE'))
+            for historical in state['rounds']:
+                _assert_evidence(historical)
         # Read-only status remains useful after lifecycle close/pause/stop.
         lifecycle = load_lifecycle(root)
         if lifecycle['message_id'] != lifecycle['handled_message_id']:
@@ -705,8 +822,11 @@ def court_status(root: Path, *, expected_return: Mapping[str, Any] | None = None
             if verdict['outcome'] == 'REEXECUTE' and hearing['remand']:
                 result['status'] = 'REMAND_PLANNED_NOT_EXECUTED'
             result['can_close'] = verdict['outcome'] in {'ACQUITTED', 'IMMATERIAL_ERROR'}
+            if _corrected(root) and result['can_close'] and result['docket_status'] != 'CURRENT':
+                result['can_close'] = False
+                result['issues'].append('actual clerk must finish the current evidence and public proceedings record including the verdict')
         if not result['can_close']:
-            result['issues'].append('current court has no closing verdict; preserve actual outstanding work')
+            result['issues'].append('current court is not ready to close; preserve actual outstanding work')
     except (OSError, ValueError, TypeError, KeyError) as exc:
         result.update(status='STALE', can_close=False)
         result['issues'].append(str(exc))

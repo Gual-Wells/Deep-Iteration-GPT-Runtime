@@ -12,7 +12,8 @@ import tempfile
 import unittest
 
 from runtime.codex_court import (
-    PARAMETERS, ROLES, court_status, open_court, record_verdict, remand, require_delivery, review, submit_statement,
+    PARAMETERS, LEGACY_ROLES as ROLES, ROLES as CORRECTED_ROLES, court_status,
+    open_court, record_docket, record_verdict, remand, require_delivery, review, submit_statement,
 )
 from runtime.codex_lifecycle import handle_message, ingest_message, load_lifecycle, recover_session
 from runtime import codex_delivery as delivery
@@ -27,7 +28,11 @@ ROOT = Path(__file__).resolve().parents[1]
 PIN = '1.5.0@' + 'a' * 40  # Constructed, never a live acquisition assertion.
 
 
-class CourtTests(unittest.TestCase):
+class CourtFixture:
+    pin = PIN
+    roles = ROLES
+    answer_roles = {'defendant', 'lawyer'}
+
     def setUp(self):
         cache = ROOT / '.cache'
         cache.mkdir(exist_ok=True)
@@ -40,7 +45,7 @@ class CourtTests(unittest.TestCase):
         self.request = self.base / 'request.txt'
         self.request.write_text('DIGR(Max,N=1,R=0,D=0,V=0,F=0)：解释给定问题并返回正文和文件。', encoding='utf-8')
         self.root = self.base / 'task'
-        create_session(self.root, request=self.request, p_run=PIN,
+        create_session(self.root, request=self.request, p_run=self.pin,
                        visits_path=self.base / 'visits.jsonl', run_id='synthetic-court')
         self.parameters = {'N': 1, 'T': 0, 'R': 0, 'B': 0,
                            'S': {'n': 0, 't': 0, 'r': 0, 'b': 0}, 'D': 0, 'V': 0, 'L': 3}
@@ -59,7 +64,7 @@ class CourtTests(unittest.TestCase):
         self.actors = {role: {'actor_id': 'fixture-' + ('main' if role == 'defendant' else role),
             'independent_context': role != 'defendant',
             'dispatch': self.source(role + '-dispatch', 'Synthetic dispatch; no real actor was scheduled.')}
-            for role in ROLES}
+            for role in self.roles}
         self.open_input = {'return_input': str(self.return_input), 'coverage':
             'Synthetic original request, current accepted conditions, process and final product coverage.',
             'producer_actor_ids': ['fixture-main'], 'actors': self.actors,
@@ -100,7 +105,7 @@ class CourtTests(unittest.TestCase):
             'source': self.source(role + '-statement'), 'charges': charges or [],
             'responses': [{'charge_id': key, 'response': 'Synthetic reasoned answer with a source.',
                            'source_ids': ['request']} for key in status['charges']]
-                          if role in {'defendant', 'lawyer'} else []}
+                          if role in self.answer_roles else []}
 
     def parties(self, charges=None):
         for role in ('prosecutor', 'monitor', 'judge', 'lawyer', 'defendant'):
@@ -144,6 +149,9 @@ class CourtTests(unittest.TestCase):
             'result': 'Synthetic new candidate and source record.',
             'adjacent_effects': 'Synthetic review of affected adjacent requirements.',
             'addressed': addressed or [], 'source': self.source('actual-work-fixture')}}
+
+
+class CourtTests(CourtFixture, unittest.TestCase):
 
     def test_max_without_court_cannot_normally_close_even_at_low_counts(self):
         status = seal_return(self.root, self.return_input)
@@ -626,6 +634,202 @@ class CourtTests(unittest.TestCase):
                                      'quote': '解释给定问题'}
         with self.assertRaisesRegex(ValueError, 'later actual handled current user source'):
             record_verdict(self.root, proposed)
+
+
+class CorrectedCourtTests(CourtFixture, unittest.TestCase):
+    pin = '1.5.1@' + 'c' * 40
+    roles = CORRECTED_ROLES
+    answer_roles = {'defendant', 'prosecution_lawyer', 'defence_lawyer'}
+
+    def statement(self, role, charges=None):
+        statement = super().statement(role, charges)
+        if role == 'prosecutor':
+            statement['intent_review'] = {
+                'source_ids': ['request'], 'charge_ids': [item['id'] for item in charges or []],
+                'extracted_intent': 'Synthetic original requested outcome and its accepted conditions.',
+                'interpretation': 'Separate user intent from producer-created plans and interpretations.',
+                'goal_and_result_tendencies': 'Compare the intended goal with the actual selected result.',
+                'proposal_maintenance_execution_judgment': 'Trace how interpretations were proposed, retained, executed and judged.',
+                'defaults_and_omissions': 'Check actual default actions and neglected parts of the original intent.',
+                'conclusion': 'Synthetic reasoned finding; no keyword or semantic truth certification.'}
+        if role == 'black_police':
+            statement['authority_notice'] = {'mode': 'VIOLENT_INTIMIDATION',
+                'target_actor_ids': [self.actors[key]['actor_id'] for key in self.roles]}
+            statement['statement'] = 'Synthetic violent black-police intimidation applies equally to all court participants.'
+        return statement
+
+    def parties(self, charges=None):
+        for role in ('prosecutor', 'prosecution_lawyer', 'defence_lawyer', 'defendant', 'black_police', 'clerk', 'judge'):
+            submit_statement(self.root, self.statement(role, charges if role == 'prosecutor' else []))
+
+    def verdict(self, *args, **kwargs):
+        verdict = super().verdict(*args, **kwargs)
+        verdict['intent_finding'] = 'Synthetic judicial finding on original intent, actual choices, defaults and result.'
+        for decision in verdict['decisions']:
+            decision['strongest_prosecution'] = 'Synthetic reasoned answer to the prosecution lawyer and prosecutor.'
+        return verdict
+
+    def docket(self):
+        status = court_status(self.root)
+        return {'actor_id': self.actors['clerk']['actor_id'],
+                'proceedings_sha256': status['proceedings_sha256'],
+                'evidence_index': {key: 'Synthetic source location and actual use in the public case.'
+                                   for key in status['source_ids']},
+                'evidence_consistency': 'Synthetic comparison of source versions, quotations and contested evidence.',
+                'reasoning_record': 'Synthetic long-case public arguments, contested issues, judgments and rework history.',
+                'retrievals': [], 'source': self.source('clerk-record')}
+
+    def finish(self, charges=None):
+        self.acquit(charges)
+        return record_docket(self.root, self.docket())
+
+    def test_seven_actual_roles_and_two_distinct_lawyers_are_required(self):
+        old = deepcopy(self.open_input)
+        old['actors'] = {key: value for key, value in old['actors'].items() if key != 'clerk'}
+        with self.assertRaisesRegex(ValueError, 'map actual'):
+            open_court(self.root, old)
+        same = deepcopy(self.open_input)
+        same['actors']['defence_lawyer']['actor_id'] = same['actors']['prosecution_lawyer']['actor_id']
+        with self.assertRaisesRegex(ValueError, 'different actual actor'):
+            open_court(self.root, same)
+        result = self.open()
+        self.assertEqual(set(result['actors']), set(CORRECTED_ROLES))
+        self.assertEqual(result['clerk']['kind'], 'ACTUAL_ACTOR')
+        self.assertEqual(result['clerk']['actor_id'], result['actors']['clerk']['actor_id'])
+
+    def test_prosecutor_must_examine_original_intent_and_default_omissions(self):
+        self.open()
+        statement = self.statement('prosecutor')
+        del statement['intent_review']
+        with self.assertRaisesRegex(ValueError, 'original prompt intent'):
+            submit_statement(self.root, statement)
+        statement = self.statement('prosecutor')
+        statement['intent_review']['source_ids'] = ['line:M01']
+        with self.assertRaisesRegex(ValueError, 'actual original request'):
+            submit_statement(self.root, statement)
+        statement = self.statement('prosecutor')
+        del statement['intent_review']['defaults_and_omissions']
+        with self.assertRaisesRegex(ValueError, 'defaults_and_omissions'):
+            submit_statement(self.root, statement)
+        charge = self.charge(basis='INTENT')
+        submit_statement(self.root, self.statement('prosecutor', [charge]))
+        case = json.loads((self.root / 'court/court.json').read_text(encoding='utf-8'))
+        self.assertEqual(case['rounds'][-1]['statements'][0]['intent_review']['charge_ids'], ['C1'])
+
+    def test_both_lawyers_must_answer_every_current_charge(self):
+        self.open()
+        self.parties([self.charge()])
+        statement = self.statement('prosecution_lawyer')
+        statement['responses'] = []
+        submit_statement(self.root, statement)
+        with self.assertRaisesRegex(ValueError, 'prosecution_lawyer must answer'):
+            record_verdict(self.root, self.verdict())
+        submit_statement(self.root, self.statement('prosecution_lawyer'))
+        statement = self.statement('defence_lawyer')
+        statement['responses'] = []
+        submit_statement(self.root, statement)
+        with self.assertRaisesRegex(ValueError, 'defence_lawyer must answer'):
+            record_verdict(self.root, self.verdict())
+
+    def test_black_police_threatens_all_roles_equally_and_does_not_prosecute(self):
+        self.open()
+        statement = self.statement('black_police')
+        statement['authority_notice']['target_actor_ids'].remove(self.actors['judge']['actor_id'])
+        with self.assertRaisesRegex(ValueError, 'equally to all'):
+            submit_statement(self.root, statement)
+        statement = self.statement('black_police')
+        statement['authority_notice']['mode'] = 'JUSTICE_OVERSIGHT'
+        with self.assertRaisesRegex(ValueError, 'violent intimidation'):
+            submit_statement(self.root, statement)
+        with self.assertRaisesRegex(ValueError, 'prosecution_lawyer/prosecutor'):
+            submit_statement(self.root, self.statement('black_police', [self.charge()]))
+        submit_statement(self.root, self.statement('black_police'))
+
+    def test_judge_addresses_intent_and_strongest_arguments_from_both_sides(self):
+        self.open()
+        self.parties([self.charge()])
+        proposed = self.verdict()
+        del proposed['intent_finding']
+        with self.assertRaisesRegex(ValueError, 'intent understanding'):
+            record_verdict(self.root, proposed)
+        proposed = self.verdict()
+        del proposed['decisions'][0]['strongest_prosecution']
+        with self.assertRaisesRegex(ValueError, 'strongest prosecution'):
+            record_verdict(self.root, proposed)
+
+    def test_pass_needs_actual_clerk_record_including_the_verdict(self):
+        self.open()
+        self.parties([self.charge()])
+        before = record_docket(self.root, self.docket())
+        self.assertEqual(before['docket_status'], 'CURRENT')
+        judged = record_verdict(self.root, self.verdict())
+        self.assertEqual(judged['status'], 'ACQUITTED')
+        self.assertEqual(judged['docket_status'], 'STALE')
+        self.assertFalse(judged['can_close'])
+        with self.assertRaisesRegex(ValueError, 'current closing court'):
+            require_delivery(self.root, [self.product])
+        final = record_docket(self.root, self.docket())
+        self.assertTrue(final['can_close'])
+        require_delivery(self.root, [self.product])
+        self.assertTrue(seal_return(self.root, self.return_input)['can_close'])
+        self.assertEqual(close_return(self.root, reason='Synthetic complete seven-role court.')['current_receipt'], 'CLOSED')
+
+    def test_clerk_covers_actual_sources_and_preserves_retrieval_evidence(self):
+        self.open()
+        self.parties()
+        record_verdict(self.root, self.verdict())
+        proposed = self.docket()
+        proposed['actor_id'] = self.actors['judge']['actor_id']
+        with self.assertRaisesRegex(ValueError, 'actual clerk'):
+            record_docket(self.root, proposed)
+        proposed = self.docket()
+        proposed['proceedings_sha256'] = '0' * 64
+        with self.assertRaisesRegex(ValueError, 'complete public proceedings'):
+            record_docket(self.root, proposed)
+        proposed = self.docket()
+        del proposed['evidence_index']['request']
+        with self.assertRaisesRegex(ValueError, 'every current common source'):
+            record_docket(self.root, proposed)
+        proposed = self.docket()
+        retrieval = self.source('actual-retrieval-fixture')
+        proposed['retrievals'] = [{'query': 'Synthetic search for prior accepted conditions.',
+                                  'purpose': 'Locate a contested original condition.',
+                                  'result': 'Synthetic located source and bounded search result.', 'source': retrieval}]
+        self.assertTrue(record_docket(self.root, proposed)['can_close'])
+        Path(retrieval['path']).write_text('Changed retrieval evidence.', encoding='utf-8')
+        self.assertEqual(court_status(self.root)['status'], 'STALE')
+
+    def test_remand_and_review_preserve_long_public_record_and_new_role_duties(self):
+        self.open()
+        self.parties([self.charge(basis='INTENT')])
+        record_verdict(self.root, self.verdict('REEXECUTE', 'SUSTAINED'))
+        first = record_docket(self.root, self.docket())
+        remand(self.root, self.rework_plan())
+        self.product.write_text('Synthetic corrected original intent.', encoding='utf-8')
+        self.mark_complete()
+        second = review(self.root, self.performed_work(['C1']))
+        self.assertNotEqual(first['proceedings_sha256'], second['proceedings_sha256'])
+        self.assertEqual(second['docket_status'], 'MISSING')
+        self.assertIn('C1', second['charges'])
+        self.parties()
+        self.assertFalse(record_verdict(self.root, self.verdict())['can_close'])
+        self.assertTrue(record_docket(self.root, self.docket())['can_close'])
+        case = json.loads((self.root / 'court/court.json').read_text(encoding='utf-8'))
+        self.assertEqual(len(case['rounds']), 2)
+        self.assertIsNotNone(case['rounds'][0]['docket'])
+        historical_verdict = Path(case['rounds'][0]['verdict']['source']['path'])
+        historical_verdict.write_text('Changed historical public judgment.', encoding='utf-8')
+        self.assertEqual(court_status(self.root)['status'], 'STALE')
+
+    def test_record_is_exposed_through_normal_cli(self):
+        self.acquit()
+        path = self.base / 'record-input.json'
+        path.write_text(json.dumps(self.docket()), encoding='utf-8')
+        actual = subprocess.run([sys.executable, '-B', str(ROOT / 'tools/codex.py'), 'court', 'record',
+                                 '--root', str(self.root), '--input', str(path)], capture_output=True, text=True,
+                                encoding='utf-8', timeout=30)
+        self.assertEqual(actual.returncode, 0, actual.stderr)
+        self.assertTrue(json.loads(actual.stdout)['can_close'])
 
 
 if __name__ == '__main__':

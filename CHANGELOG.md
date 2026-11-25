@@ -1,5 +1,12 @@
 # Changelog
 
+## Codex Stable 1.5.1
+
+- Correct Max court to seven actual roles: separate prosecution and defence lawyers, an active evidence/retrieval clerk, and violent black-police intimidation applied equally to all participants rather than justice oversight.
+- Require prosecution to trace original prompt intent through interpretations, goal/result tendencies, proposed/maintained/executed/judged choices and default omissions; judges address intent and both sides' strongest arguments.
+- Preserve actual clerk source indexes, evidence consistency, retrieval sources and complete public proceedings across remand cycles. Bind the current verdict into the clerk record before closure or delivery.
+- Keep frozen 1.5.0 court contracts and prior X/F behavior unchanged.
+
 ## Codex Stable 1.5.0
 
 - Add a post-production Max court with actual judge, clerk, prosecutor, defendant, counsel and court monitor responsibilities, source-bound public arguments, reasoned verdicts and same-task custom re-execution until acquittal or immaterial error.
