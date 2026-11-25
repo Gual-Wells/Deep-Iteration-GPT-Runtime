@@ -53,7 +53,7 @@ class CodexXInvocationTests(unittest.TestCase):
         # A lexical candidate is not a supported channel or resolved account.
         for target in ('Gmail', 'Private_Archive-2', 'a', 'A' * 64):
             with self.subTest(target=target):
-                result = classify_invocation('DIGR(X=' + target + '):task')
+                result = classify_invocation('DIGR(X=' + target + '):task', p_run='1.4.1@' + 'a' * 40)
                 self.assertEqual(result['classification'], 'EXECUTING')
                 self.assertEqual(result['delivery_selection'],
                                  {'mode': 'external', 'target': target.casefold(), 'explicit': True})
@@ -91,7 +91,7 @@ class CodexXInvocationTests(unittest.TestCase):
         }
         for name, prelude in cases.items():
             with self.subTest(name=name, prelude=prelude):
-                result = classify_invocation('DIGRP' + prelude + ':task')
+                result = classify_invocation('DIGRP' + prelude + ':task', p_run='1.4.1@' + 'a' * 40)
                 self.assertEqual(result['classification'], 'INVALID')
                 self.assertEqual(result['delivery_selection'], LOCAL)
                 self.assertIsNone(result['addon_selection'])

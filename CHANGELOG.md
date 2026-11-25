@@ -1,5 +1,12 @@
 # Changelog
 
+## Codex Stable 1.5.0
+
+- Add a post-production Max court with actual judge, clerk, prosecutor, defendant, counsel and court monitor responsibilities, source-bound public arguments, reasoned verdicts and same-task custom re-execution until acquittal or immaterial error.
+- Bind court results to current task conditions and actual final products, preserve remand obligations across recovery, and check the applicable court at normal return closure. Existing method, permission, budget and stop boundaries continue to apply.
+- Promote binary X and task-scoped F into formal parameter groups, named preference baselines and custom configurations. Preserve legacy X syntax and old pinned task behavior. Explicit X controls delivery authority; F baselines remain task-inference references.
+- Keep actual file transmission after final-candidate review, followed by existing Gmail read-back and deduplication.
+
 ## Codex Stable 1.4.1
 
 - Keep the F project floor and qualification rules; require source-specific transfer and continued production use after the floor is reached.

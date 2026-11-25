@@ -653,6 +653,9 @@ def mark_sending(root, payload, **revision):
         issues = _delivery_issues(root, delivery)
         if issues:
             raise ValueError('delivery snapshot or prior evidence changed: ' + '; '.join(issues))
+        from .codex_court import require_delivery
+        authority['court_files'] = [item['path'] for item in delivery['files']]
+        require_delivery(Path(root), authority['court_files'])
         attempt_id = _digest({'delivery_id': delivery['id'], 'number': len(delivery['attempts']) + 1})
         delivery['attempts'].append({'id': attempt_id, 'outcome': 'uncertain',
             'started_at_ns': time.time_ns(), 'identity': deepcopy(payload['identity']),
@@ -662,6 +665,8 @@ def mark_sending(root, payload, **revision):
         return {'delivery_id': delivery['id'], 'attempt_id': attempt_id, 'status': 'SENDING',
                 'send_allowed': True, 'files': deepcopy(delivery['files']), 'policy': deepcopy(policy)}
     def guard():
+        from .codex_court import require_delivery
+        require_delivery(Path(root), authority['court_files'])
         if _task_policy(root, authority['policy'], production=True) != authority['snapshot']:
             raise ValueError('task delivery authority changed before returning the send reservation')
         if 'production' in authority and _production_evidence(

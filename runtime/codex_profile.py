@@ -19,7 +19,7 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v20'
+PROFILE_PROTOCOL = 'digr-codex-native-v21'
 PROFILE_CORE = (
     'codex/CONSTITUTION.md',
     'codex/FOUNDATION.md',
@@ -28,6 +28,7 @@ PROFILE_CORE = (
     'codex/CONSULT.md',
     'codex/SPLIT.md',
     'codex/COUNCIL.md',
+    'codex/COURT.md',
     'codex/USAGE.md',
     'codex/CHAT.md',
     'codex/LIVE.md',
@@ -55,6 +56,7 @@ PROFILE_FILES = (
     'codex/RETURN.md',
     'codex/EXECUTION_PROTOCOL.json',
     'codex/COUNCIL.md',
+    'codex/COURT.md',
     'codex/USAGE.md',
     'codex/CHAT.md',
     'codex/CHAT_LIGHT.md',
@@ -173,6 +175,24 @@ def _invocation_parameters(prelude: str) -> tuple[str, dict[str, Any]]:
     return execution, selection
 
 
+def _formal_invocation_parameters(prelude: str) -> tuple[str, int | None]:
+    """Keep one formal group and an optional compatible standalone X group."""
+    groups = _parameter_group_spans(prelude)
+    if len(groups) > 2:
+        raise ValueError('only one formal parameter group and an optional final X group are allowed')
+    if not groups:
+        return prelude, None
+    start, end = groups[-1]
+    content = prelude[start + 1:end - 1].translate(str.maketrans({'（':'(', '）':')', '＝':'='})).strip()
+    standalone = re.fullmatch(r'X(?:\s*=\s*(0|1|[Gg][Mm][Aa][Ii][Ll])|\s*\(\s*([01])\s*\))?', content)
+    if standalone:
+        value = standalone[1] or standalone[2] or '1'
+        return prelude[:start], 1 if value.casefold() == 'gmail' else int(value)
+    if len(groups) > 1:
+        raise ValueError('only a standalone X parameter may follow the formal parameter group')
+    return prelude, None
+
+
 def parse_do_supplement(message: str, *, p_run: str | None = None) -> dict[str, str] | None:
     """Recognize a DO marker in the current user message without interpreting its body."""
     text = message.lstrip()
@@ -206,6 +226,7 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
     version = tuple(map(int, pin.groups())) if pin else ()
     preference_only = p_run is None or version >= (1, 1, 1)
     project_research = p_run is None or version >= (1, 4, 0)
+    formal_task_parameters = p_run is None or version >= (1, 5, 0)
     depth_key = 'depth_preferences' if preference_only else 'depth_defaults'
     base = {'classification': 'NATIVE', 'route_key': key, 'task': None,
             'invocation_key': invocation_key, 'addon_hint': addon_hint,
@@ -255,9 +276,23 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
     if not task.strip():
         return {**base, 'classification': 'INVALID', 'reason': 'empty task'}
     try:
-        execution_parameters, delivery = _invocation_parameters(prelude)
+        standalone_x = None
+        if formal_task_parameters:
+            execution_parameters, standalone_x = _formal_invocation_parameters(prelude)
+        else:
+            execution_parameters, delivery = _invocation_parameters(prelude)
         depth = resolve_defaults(execution_parameters, preference_only=preference_only,
-                                 project_research=project_research)
+                                 project_research=project_research,
+                                 formal_task_parameters=formal_task_parameters)
+        if formal_task_parameters:
+            declared = depth['explicit_overrides']
+            if standalone_x is not None:
+                if 'X' in declared:
+                    raise ValueError('duplicate X parameter declarations')
+                declared['X'] = standalone_x
+            delivery = ({'mode': 'external', 'target': 'gmail', 'explicit': True}
+                        if declared.get('X') == 1 else
+                        {'mode': 'local', 'target': None, 'explicit': False})
     except ValueError as exc:
         return {**base, 'classification': 'INVALID', 'reason': str(exc)}
     layered = p_run is None or layered_policy(p_run)
@@ -270,6 +305,8 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
             selection['work_profile'] = 'CLAUDE_GUIDED' if double else 'EXECUTION'
     return {**base, 'classification': 'EXECUTING', 'task': task,
             **selection,
+            **({'delivery_explicit': 'X' in depth['explicit_overrides']}
+               if formal_task_parameters else {}),
             'parameter_text': prelude, 'execution_parameter_text': execution_parameters,
             'delivery_selection': delivery, 'addon_selection': addon_hint,
             'consult_selection': invocation_key in ('DIGRC', 'DIGRP'),
@@ -430,6 +467,9 @@ def refresh_distribution(root: Path) -> dict[str, Any]:
     catalog = preset_catalog()
     manifest['depth_preferences']['presets'] = catalog['presets']
     manifest['depth_preferences']['task_defaults'] = catalog['task_defaults']
+    manifest['depth_preferences']['task_parameters'] = catalog['task_parameters']
+    manifest['depth_preferences']['task_defaults_scope'] = catalog['task_defaults_scope']
+    manifest['depth_preferences']['implicit_deep'] = dict(catalog['presets']['Default'])
     manifest['depth_preferences']['preset_aliases'] = {'standard': 'Light'}
     manifest['depth_preferences']['default_preset'] = 'Default'
     expected = ['codex/PROTOCOL.md', *PROFILE_CORE]

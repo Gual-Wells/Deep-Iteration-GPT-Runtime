@@ -18,7 +18,7 @@ class CodexPresetModeTests(unittest.TestCase):
         self.assertTrue(result["consult_selection"])
         depth = result["depth_preferences"]
         self.assertEqual((depth["preference_baseline"]["N"], depth["preference_baseline"]["R"]), (6, 2))
-        self.assertEqual(depth["explicit_overrides"], {"N": 8, "S": {"n": 3, "t": "20min"}})
+        self.assertEqual(depth["explicit_overrides"], {"N": 8, "S": {"n": 3, "t": "20min"}, "X": 1})
         self.assertEqual(result["delivery_selection"]["mode"], "external")
 
     def test_light_is_managed_and_never_reduces_native_isolation(self):

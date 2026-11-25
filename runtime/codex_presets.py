@@ -4,7 +4,7 @@ from copy import deepcopy
 import re
 from typing import Any, Mapping
 
-PRESETS = {
+_LEGACY_PRESETS = {
     "Light": {"N": 2, "R": 1, "D": 0, "V": 0, "L": 3, "M": 1},
     "Less": {"N": 6, "R": 2, "D": 1, "V": 1, "L": 3, "M": 1},
     "Default": {"N": 12, "R": 4, "D": 3, "V": 3, "L": 3, "M": 1},
@@ -12,6 +12,9 @@ PRESETS = {
     "Max": {"N": 24, "R": 8, "D": 6, "V": 6, "L": 3, "M": 1},
 }
 _TASK_DEFAULTS = {"F": 0}
+_F_REFERENCES = {"Light": 0, "Less": 2, "Default": 3, "More": 4, "Max": 6}
+PRESETS = {name: {**values, "X": 0, "F": _F_REFERENCES[name]}
+           for name, values in _LEGACY_PRESETS.items()}
 _NAMES = {name.casefold(): name for name in PRESETS}
 _NAMES["standard"] = "Light"
 _PUNCTUATION = str.maketrans({"（": "(", "）": ")", "，": ",", "＝": "="})
@@ -72,10 +75,12 @@ def merge_explicit_parameters(header: dict, additional: Mapping[str, Any]) -> di
 
 
 def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | None = None,
-                     *, preference_only: bool = False, project_research: bool = True) -> dict:
+                     *, preference_only: bool = False, project_research: bool = True,
+                     formal_task_parameters: bool = True) -> dict:
     """Read the input for the native interpreter, retaining the old pinned preview."""
     if not isinstance(parameter_text, str):
         raise TypeError("parameter text must be str")
+    formal_task_parameters = formal_task_parameters and project_research
     text = parameter_text.translate(_PUNCTUATION).strip()
     if text.startswith("(") and text.endswith(")"):
         text = text[1:-1]
@@ -96,12 +101,26 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
                     nested[entry[0]] = int(entry[1])
                 elif entry and entry[0] == "t":
                     nested["t"] = entry[1]
+                elif formal_task_parameters and ((entry and entry[0] == "X") or part == "X"):
+                    raise ValueError("X is a task parameter, not an S subparameter")
                 else:
                     unparsed.append("S." + part)
             if preference_only and nested:
                 parsed = merge_explicit_parameters(parsed, {"S": nested})
             elif not preference_only:
                 parsed["S"] = nested
+        elif formal_task_parameters and ((pair and pair[0] == "X") or re.fullmatch(r"X\s*=?", token)):
+            if token == "X":
+                value = 1
+            elif pair and pair[1].casefold() == "gmail":
+                value = 1
+            elif pair and re.fullmatch(r"[01]", pair[1]):
+                value = int(pair[1])
+            else:
+                raise ValueError("X must be binary 0 or 1; (X) and (X=Gmail) mean 1")
+            if "X" in parsed:
+                raise ValueError("duplicate X parameter declarations")
+            parsed["X"] = value
         elif project_research and ((pair and pair[0] == "F") or re.fullmatch(r"F\s*=?", token)):
             if not pair or not re.fullmatch(r"[0-9]+", pair[1]):
                 raise ValueError("F must be a nonnegative integer")
@@ -118,11 +137,11 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
     if len(selected) > 1:
         raise ValueError("select exactly one depth preset")
     chosen = selected[0] if selected else "Default"
-    baseline = deepcopy(PRESETS[chosen])
+    baseline = deepcopy((PRESETS if formal_task_parameters else _LEGACY_PRESETS)[chosen])
     baseline["B"] = 0
     if chosen == "Light":
         baseline.update(T=0, S={"n": 0, "t": 0, "r": 0, "b": 0})
-    if project_research:
+    if project_research and not formal_task_parameters:
         baseline.update(_TASK_DEFAULTS)
     explicit = parsed
     if overrides is not None:
@@ -134,6 +153,8 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
     count_parameters = ("N", "R", "D", "V", "L", "M", "B")
     if project_research:
         count_parameters += ("F",)
+    if formal_task_parameters:
+        count_parameters += ("X",)
     for key in count_parameters:
         value = values[key]
         if type(value) is not int or value < 0:
@@ -142,6 +163,8 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
         raise ValueError("Codex requires real native L3 at every preset")
     if values["M"] < 1 or values["B"] not in (0, 1):
         raise ValueError("M must be positive and B binary")
+    if formal_task_parameters and values["X"] not in (0, 1):
+        raise ValueError("X must be binary 0 or 1")
     if preference_only:
         return {"preset": chosen, "preset_explicit": bool(selected),
                 "preference_baseline": baseline, "explicit_overrides": explicit,
@@ -157,7 +180,9 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
 
 def preset_catalog() -> dict:
     return {"default": "Default", "presets": deepcopy(PRESETS),
-            "task_defaults": dict(_TASK_DEFAULTS),
+            "task_defaults": {"X": 0, "F": _F_REFERENCES["Default"]},
+            "task_parameters": ["X", "F"],
+            "task_defaults_scope": "Default reference only; Main infers F and only explicit X=1 enables external files",
             "aliases": {"standard": "Light"}, "L": "native L3 in every preset",
             "scope": "Preference baselines for native task inference before INIT",
             "time": "T/t task-derived soft targets unless explicitly specified",
