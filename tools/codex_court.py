@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Record a real Max court: open/submit/verdict/remand/review/status. No model calls."""
+"""Record a real Max court: open/submit/verdict/record/remand/review/status. No model calls."""
 from pathlib import Path
 import argparse
 import json
@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from runtime.codex_court import court_status, open_court, record_verdict, remand, review, submit_statement
+from runtime.codex_court import court_status, open_court, record_docket, record_verdict, remand, review, submit_statement
 
 
 def main(argv=None):
@@ -17,7 +17,7 @@ def main(argv=None):
         if hasattr(stream, 'reconfigure'):
             stream.reconfigure(encoding='utf-8', newline='\n')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('open', 'submit', 'verdict', 'remand', 'review', 'status'))
+    parser.add_argument('action', choices=('open', 'submit', 'verdict', 'record', 'remand', 'review', 'status'))
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--input', type=Path, help='actual source-bound public input JSON, required for writes')
     args = parser.parse_args(argv)
@@ -31,7 +31,7 @@ def main(argv=None):
             if not isinstance(supplied, dict):
                 raise ValueError('--input must contain a JSON object')
             functions = {'open': open_court, 'submit': submit_statement, 'verdict': record_verdict,
-                         'remand': remand, 'review': review}
+                         'record': record_docket, 'remand': remand, 'review': review}
             result = functions[args.action](args.root, supplied)
         print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
         return 2 if result['status'] == 'STALE' else 0
