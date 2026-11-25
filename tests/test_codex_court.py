@@ -832,5 +832,97 @@ class CorrectedCourtTests(CourtFixture, unittest.TestCase):
         self.assertTrue(json.loads(actual.stdout)['can_close'])
 
 
+class ContinuousProsecutionTests(CorrectedCourtTests):
+    pin = '1.5.2@' + 'd' * 40
+
+    def statement(self, role, charges=None):
+        statement = super().statement(role, charges)
+        if role == 'prosecutor':
+            statement['reviewed_context_sha256'] = court_status(self.root)['prosecution_context_sha256']
+        return statement
+
+    def parties(self, charges=None):
+        super().parties(charges)
+        submit_statement(self.root, self.statement('prosecutor'))
+
+    def test_initial_handoff_cannot_stand_in_for_continued_investigation(self):
+        self.open()
+        CorrectedCourtTests.parties(self, [self.charge()])
+        self.assertEqual(court_status(self.root)['prosecution_review_status'], 'STALE')
+        with self.assertRaisesRegex(ValueError, 'continue investigation after handoff'):
+            record_verdict(self.root, self.verdict())
+        submit_statement(self.root, self.statement('prosecutor'))
+        self.assertEqual(court_status(self.root)['prosecution_review_status'], 'CURRENT')
+        record_verdict(self.root, self.verdict())
+
+    def test_initial_research_is_before_handoff_even_without_charges(self):
+        self.open()
+        submit_statement(self.root, self.statement('prosecutor'))
+        self.assertEqual(court_status(self.root)['prosecution_review_status'], 'BEFORE_HANDOFF')
+
+    def test_new_defence_without_new_charge_requires_actual_prosecutor_reentry(self):
+        self.open()
+        self.parties([self.charge()])
+        submit_statement(self.root, self.statement('defence_lawyer'))
+        self.assertEqual(court_status(self.root)['prosecution_review_status'], 'STALE')
+        with self.assertRaisesRegex(ValueError, 'latest party returns'):
+            record_verdict(self.root, self.verdict())
+        submit_statement(self.root, self.statement('prosecutor'))
+        record_verdict(self.root, self.verdict())
+
+    def test_missing_or_stale_context_cannot_claim_current_research(self):
+        self.open()
+        old = self.statement('prosecutor')
+        submit_statement(self.root, self.statement('prosecution_lawyer'))
+        with self.assertRaisesRegex(ValueError, 'current party returns'):
+            submit_statement(self.root, old)
+        current = self.statement('prosecutor')
+        del current['reviewed_context_sha256']
+        with self.assertRaisesRegex(ValueError, 'prosecution_context_sha256'):
+            submit_statement(self.root, current)
+
+    def test_incremental_charge_gets_real_answers_then_further_investigation(self):
+        self.open()
+        self.parties([self.charge()])
+        submit_statement(self.root, self.statement('prosecutor', [self.charge('C2', 'INTENT')]))
+        with self.assertRaisesRegex(ValueError, 'must answer every actual charge'):
+            record_verdict(self.root, self.verdict())
+        for role in ('prosecution_lawyer', 'defence_lawyer', 'defendant'):
+            submit_statement(self.root, self.statement(role))
+        with self.assertRaisesRegex(ValueError, 'continue investigation'):
+            record_verdict(self.root, self.verdict())
+        submit_statement(self.root, self.statement('prosecutor'))
+        result = record_verdict(self.root, self.verdict())
+        self.assertEqual(set(result['charges']), {'C1', 'C2'})
+        case = json.loads((self.root / 'court/court.json').read_text(encoding='utf-8'))
+        prosecutors = [item for item in case['rounds'][0]['statements'] if item['role'] == 'prosecutor']
+        self.assertEqual(len(prosecutors), 4)
+        self.assertIn('intent_review', prosecutors[0])
+
+    def test_clerk_recording_and_police_notice_do_not_force_empty_research_rounds(self):
+        self.open()
+        self.parties()
+        before = court_status(self.root)['prosecution_context_sha256']
+        submit_statement(self.root, self.statement('clerk'))
+        submit_statement(self.root, self.statement('black_police'))
+        after = court_status(self.root)
+        self.assertEqual(after['prosecution_context_sha256'], before)
+        self.assertEqual(after['prosecution_review_status'], 'CURRENT')
+        record_verdict(self.root, self.verdict())
+        self.assertTrue(record_docket(self.root, self.docket())['can_close'])
+
+    def test_judge_can_dismiss_without_prosecutor_withdrawing_or_accepting_defence(self):
+        self.open()
+        self.parties([self.charge()])
+        continued = self.statement('prosecutor')
+        continued['statement'] = ('Synthetic continued prosecution: the allegation remains disputed; '
+                                  'present its grounds to the judge without withdrawal or accepting the defence.')
+        submit_statement(self.root, continued)
+        result = record_verdict(self.root, self.verdict('ACQUITTED', 'DISMISSED'))
+        self.assertIn('C1', result['charges'])
+        self.assertEqual(result['outcome'], 'ACQUITTED')
+        self.assertTrue(record_docket(self.root, self.docket())['can_close'])
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,11 @@
 # Changelog
 
+## Codex Stable 1.5.2
+
+- Keep prosecutors actively investigating the entire intent-to-process-to-product chain after handing charges to prosecution counsel. File new grounds, open issues and supporting material promptly; do not require prosecutors to withdraw, narrow or pre-screen the defence's case. Defendants and defence counsel rebut; judges decide admissibility, dismissal and guilt.
+- Require real post-handoff prosecution research on the latest party returns before judgment. Preserve incremental public statements and response opportunities; new party arguments make an older prosecution review stale without imposing a fixed round count.
+- Bind prosecutor submissions to the current public party context. Clerical bookkeeping and police notices alone do not force empty review rounds. Keep research and role execution host-owned, and preserve all earlier frozen pins and completed cases.
+
 ## Codex Stable 1.5.1
 
 - Correct Max court to seven actual roles: separate prosecution and defence lawyers, an active evidence/retrieval clerk, and violent black-police intimidation applied equally to all participants rather than justice oversight.

@@ -293,4 +293,6 @@ python -B tools/codex.py visits repair --root D:/task/session --actor D01 --begi
 
 `court open` 固定待返回result、key_changes、argument_scope三段实质正文及artifacts/delivery_files实际字节和过程/需求来源，七个角色包括双方各一位律师和实际书记员；`submit`保存公诉意图级审查、控辩论证及全体同等暴力威慑，`verdict`保存法官逐项裁判。`record`保存实际书记员的证据索引、一致性核对、检索来源与长程公开审判记录，当前裁判须纳入记录后才能关闭或发送。须再执行时`remand`保存有理由的完整自定义配置，实际执行后`review`核对完成来源并建立复审。`status`与正常return检查使用同一当前案卷，旧判决不覆盖新产品或另一个结果。完整JSON对象及实际来源示例见[法院操作示例](examples/COURT_WORKFLOW.md)。示例字段须换成真实材料，不能代替实际角色与执行。
 
+1.5.2及以后，公诉交给控方律师后持续研究并及时补交，不能只交初稿等终审。公诉submit的reviewed_context_sha256使用实际研究后取得的status.prosecution_context_sha256；新的控辩或被告陈述使旧公诉研究过时，法官verdict前须有覆盖当前材料的公诉研究。status.prosecution_review_status显示对应状态；字段只绑定来源上下文，不认证研究实质。新增指控须给各方回应，书记员维持全部增量记录，旧pin不增加该字段。
+
 书记员可复用工具及现有笔记，实际控辩、法官与监庭仍由宿主组织真实身份。X1的最终候选先受审，之后完成原生Gmail发送与读回，正常return最后收口。暂停或终止保留真实未完，不能改写成无罪。
