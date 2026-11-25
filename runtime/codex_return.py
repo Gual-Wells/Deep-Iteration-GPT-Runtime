@@ -61,8 +61,8 @@ def _tool_paths() -> set[Path]:
     runtime = Path(__file__).resolve().parent
     files = {runtime / (name + '.py') for name in
              ('codex_return', 'codex_response', 'codex_visits', 'codex_timeline',
-              'codex_session', 'codex_foundation', 'codex_lifecycle', 'codex_delivery')}
-    files.update({runtime.parent / 'tools' / name for name in ('codex.py', 'codex_return.py')})
+              'codex_session', 'codex_foundation', 'codex_lifecycle', 'codex_delivery', 'codex_court')}
+    files.update({runtime.parent / 'tools' / name for name in ('codex.py', 'codex_return.py', 'codex_court.py')})
     files.update(path for path in (runtime / 'assets').glob('codex_timeline*') if path.is_file())
     for name in ('codex_usage', 'codex_council', 'codex_allot', 'codex_wallet', 'codex_live', 'codex_io',
                  'codex_guidance', 'codex_consult', 'codex_permissions', 'codex_consult_budget', 'codex_production'):
@@ -89,6 +89,13 @@ def _native_state(root: Path) -> dict[str, Any]:
         files.add(root / 'foundation.json')
     if metadata.get('decisions'):
         files.add(_path(root, metadata['decisions']))
+    from .codex_court import enabled as court_enabled
+    task_parameters_state = None
+    if court_enabled(metadata['P_run']):
+        from .codex_session import task_parameters
+        task_parameters_state = task_parameters(root)
+        if (root / 'task-parameters.json').is_file():
+            files.add(root / 'task-parameters.json')
     if _resources_enabled(metadata):
         from .codex_collaboration import layered_policy
         from .codex_usage import usage_dependency_paths
@@ -157,6 +164,10 @@ def _native_state(root: Path) -> dict[str, Any]:
             'task_input_ref': lifecycle.get('task_input_ref'),
             'files': _fingerprints(files), 'directory_candidates': candidates,
             'open_activity': active, 'unreadable_activity': unknown}
+    if task_parameters_state is not None:
+        state['task_parameters'] = task_parameters_state
+        state['max_court_required'] = lifecycle.get('max_court_required', False)
+        state['max_court_source'] = lifecycle.get('max_court_source')
     if 'M_target_reason' in metadata:
         state['task']['M_target_reason'] = metadata['M_target_reason']
     if _resources_enabled(metadata):
@@ -361,6 +372,7 @@ def return_status(root: Path, *, refresh_entry: bool = False) -> dict[str, Any]:
               'issues': [], 'semantic_certification': False,
               'can_close': False, 'cannot_close': [],
               'scope': 'selected current bytes and declared return; not semantic completion'}
+    selected_return = None
     if not (root / 'current-return.json').exists():
         result['issues'].append('no return snapshot has been sealed')
     else:
@@ -377,6 +389,7 @@ def return_status(root: Path, *, refresh_entry: bool = False) -> dict[str, Any]:
             result['response_body'] = str(receipt_path.parent / 'RETURN.md')
             result['return_schema'] = receipt.get('return_schema', 1)
             result['coverage'] = receipt['coverage']
+            selected_return = receipt.get('court_return_binding')
             for name, ref in receipt['inputs'].items():
                 if _file_ref(Path(name)) != ref:
                     result['issues'].append('selected input changed or redirected: ' + name)
@@ -418,6 +431,15 @@ def return_status(root: Path, *, refresh_entry: bool = False) -> dict[str, Any]:
             result['production_completion'] = productions
             if not productions['complete']:
                 result['cannot_close'].append('assigned dual production still awaits a valid Claude arbitration and applied output')
+    from .codex_court import court_status
+    from .codex_session import task_parameters
+    formal_parameters = task_parameters(root)
+    if formal_parameters is not None and not formal_parameters['F_initialized']:
+        result['cannot_close'].append('infer and save the formal task F before normal closure')
+    court = court_status(root, expected_return=selected_return)
+    result['court_completion'] = court
+    if court['required'] and (not court['can_close'] or selected_return is None):
+        result['cannot_close'].append('selected Max requires a current closing court verdict for the actual final answer and all products')
     if result['current_receipt'] not in {'READY_UNCLOSED', 'CLOSED'}:
         result['cannot_close'].append('a current sealed return is required before normal task closure')
     result['can_close'] = result['current_receipt'] == 'READY_UNCLOSED' and not result['cannot_close']
@@ -460,6 +482,9 @@ def seal_return(root: Path, input_path: Path) -> dict[str, Any]:
                'tool_state': tool_state,
                'outputs': outputs, 'semantic_certification': False,
                'collection_scope': 'explicit selected public facts; no automatic chat collection'}
+    from .codex_court import required, return_binding
+    if required(root):
+        receipt['court_return_binding'] = return_binding(path.parent, data)
     receipt_path = folder / 'receipt.json'
     _write_json(receipt_path, receipt, new=True)
     _write_json(root / 'current-return.json', {'format': FORMAT,

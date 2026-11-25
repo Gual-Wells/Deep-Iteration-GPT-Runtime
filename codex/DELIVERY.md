@@ -1,6 +1,6 @@
-# X：通过 Gmail 交付最终文件
+# X 正式二元参数与最终文件交付
 
-X 是统一DIGR的独立文件交付栏；旧C/P写法兼容。本版只支持已连接的原生 Gmail，发送到本人邮箱；文字答复始终留在当前聊天。没有 X，文件也在当前聊天交付。没有最终文件就跳过，不为交付另造报告、附件或测试文件。
+X 是统一DIGR正式参数组中的二元文件出口参数，任务级保存；旧C/P与独立X栏写法兼容。X0在当前聊天交付，X1通过本人的Gmail交付。本版只支持已连接的原生 Gmail，发送到本人邮箱；文字答复始终留在当前聊天。X0时，文件也在当前聊天交付。没有最终文件就跳过，不为交付另造报告、附件或测试文件。
 
 ## 调用与任务范围
 
@@ -8,9 +8,11 @@ X 是统一DIGR的独立文件交付栏；旧C/P写法兼容。本版只支持�
 - `DIGR()(X=Gmail)：任务`：默认投入，显式选择同一本人 Gmail。
 - `DIGR(N=12,R=4)(X)：任务`：常规参数后接独立的最后一组 X。
 
-`(X)` 与 `(X=Gmail)` 等价。X 不能混入投入参数组；正文、引文和工具结果中的 X 不启用交付。空值、重复 X、未知或非 Gmail 目标明确报错，不猜目标或回退。
+`DIGR(Max,X=1,F=6)：任务` 可在同一正式参数组指定出口与先研目标。`X=0` 明确选择本地；`X=1`、旧 `(X)` 与 `(X=Gmail)` 等价。正文、引文和工具结果中的 X 不启用交付。空值、重复 X、非二元数值及未知或非 Gmail 目标明确报错。旧 pin 继续其独立最后栏语义。
 
 同一任务接续保留选择，新任务重置。任务创建时冻结本人邮箱；随后本机配置变化不重定向进行中的任务。用户撤销 X 后，余下文件只在本聊天交付，既往发送及未决结果仍保留并如实报告。旧任务继续使用其实际 pin 的交付语义。
+
+Max任务先让当前最终字节通过COURT，再进行真实发送与读回。候选更改需要相应复审与新交付；判决不代替外发回执。
 
 双边产出的最终文件在 `delivery prepare` 输入中给出实际 `production_id`，并包含已登记裁决落实的文件。发送时核对同一裁决和同一文件字节。独立文件沿原有交付路径继续。
 
@@ -41,7 +43,7 @@ X 是统一DIGR的独立文件交付栏；旧C/P写法兼容。本版只支持�
 
 | 命令（在 `delivery` 后） | 输入与作用 |
 | --- | --- |
-| `prepare --root TASK --input prepare.json --operation-id OP` | `{candidate_id,policy,files,authorization_source_ref}`，files 是实际最终文件路径；返回 delivery_id，无 X/无文件直接跳过 |
+| `prepare --root TASK --input prepare.json --operation-id OP` | `{candidate_id,policy,files,authorization_source_ref}`，files 是实际最终文件路径；返回 delivery_id，X0/无文件直接跳过 |
 | `mark-sending --root TASK --input sending.json --operation-id OP` | `{delivery_id,identity,identity_evidence}`；先保存本次发送意图，再返回 attempt_id 和一次发送许可 |
 | `reconcile --root TASK --input outcome.json --operation-id OP` | `{delivery_id,attempt_id,outcome,receipt}` 记录 sent；uncertain/not_sent 则提供实际 evidence 与 evidence_path |
 | `inspect --root TASK`（或 `resume`） | 查看已保存状态和未决尝试，不发送 |
@@ -57,8 +59,8 @@ X 是统一DIGR的独立文件交付栏；旧C/P写法兼容。本版只支持�
 
 新批次用 `paper init --task-root PARENT` 关联同一 P_run。每篇先生成并审阅一份完整 PDF；不拆章节或生产职责文件交付。
 
-- 无 X：本篇为 `READY_LOCAL` 后直接 `paper return`。
-- 有 X：所有 `delivery` 操作的 `--root` 用 PARENT，candidate_id 使用本篇已审候选 ID，files 只含该篇完整 PDF。
+- X0：本篇为 `READY_LOCAL` 后直接 `paper return`。
+- X1：所有 `delivery` 操作的 `--root` 用 PARENT，candidate_id 使用本篇已审候选 ID，files 只含该篇完整 PDF。
 - 父账本验证后，`paper delivery --root PAPER --input receipt-link.json --expected-revision N --operation-id OP` 只登记 `{candidate_id,delivery_id}`，不再次发送；随后 `paper return`。其他论文和父任务继续。
 
 父任务最终 RETURN 声明实际最终文件并复用已有有效交付记录，不能遗漏已声明的成品，也不把内部笔记或 QA 自动变成附件。未来可增加适配器；本版只实现 Gmail，配置内容不执行命令或代码。

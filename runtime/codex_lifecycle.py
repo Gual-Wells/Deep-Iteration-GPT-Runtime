@@ -172,6 +172,16 @@ def initialize_lifecycle(root: Path, metadata: Mapping[str, Any]) -> dict[str, A
         value['delivery_selection'] = metadata['delivery_selection']
         value['delivery_policy'] = metadata['initial_delivery_policy']
         value['delivery_history'] = []
+    from .codex_session import formal_task_parameters
+    if formal_task_parameters(metadata['P_run']):
+        value['x_parameter_source'] = {
+            'value': int(metadata['initial_delivery_policy']['mode'] == 'external'),
+            'input_explicit': bool(surface.get('delivery_explicit')),
+            'message_id': 0, 'source_ref': source['source_ref'],
+            'basis': 'INVOCATION_HEADER' if surface.get('delivery_explicit') else 'NEW_TASK_DEFAULT'}
+        if (surface.get('depth_preferences') or {}).get('preset') == 'Max':
+            value['max_court_required'] = True
+            value['max_court_source'] = _input_ref(value['current_message'])
     _write_json(root / 'lifecycle.json', value, new=True)
     return value
 
@@ -264,6 +274,22 @@ def require_active(root: Path) -> dict[str, Any]:
         raise ValueError('managed task is ' + value['status'] + '; no continued execution')
     if value['handled_message_id'] != value['message_id']:
         raise ValueError('new user message is pending; process it before the next managed action')
+    return value
+
+
+def _bind_task_parameter_input(root: Path, *, source: Mapping[str, Any]) -> dict[str, Any]:
+    """Anchor an actual handled parameter revision, never Main's inference."""
+    from .codex_session import formal_task_parameters
+    value = require_active(root)
+    if not formal_task_parameters(value['P_run']):
+        raise ValueError('task parameter source binding requires the new pinned parameter contract')
+    current = value['current_message']
+    actual = _input_ref(current)
+    if any(source.get(key) != actual[key] for key in ('message_id', 'source_ref', 'source_sha256')):
+        raise ValueError('task parameter revision must bind the current handled actual user source')
+    if value['task_input_ref'] != actual:
+        _set_task_input(value)
+        return _save(Path(root), value)
     return value
 
 
@@ -447,6 +473,15 @@ def handle_message(root: Path, *, message_id: int, action: str, reason: str,
     The message itself is already pending before this call; an external host
     must also honor later user input after it receives a one-time send grant.
     """
+    if delivery_selection is None and action not in {'stop', 'cancel', 'pause'}:
+        from .codex_session import _session, formal_task_parameters
+        metadata = _session(Path(root))[1]
+        if formal_task_parameters(metadata['P_run']):
+            from .codex_profile import classify_invocation
+            selected = load_lifecycle(Path(root))['current_message']['source']['text']
+            surface = classify_invocation(selected, p_run=metadata['P_run'])
+            if surface['classification'] == 'EXECUTING' and surface.get('delivery_explicit'):
+                delivery_selection = surface['delivery_selection']
     if delivery_selection is not None and action not in {'stop','cancel','pause'}:
         from .codex_delivery import policy_lock
         with policy_lock(Path(root).resolve()):
@@ -482,9 +517,17 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
         raise ValueError('unresolved route does not continue deep execution')
     if action == 'continue' and value['status'] == 'PAUSED':
         raise ValueError('paused task needs an actual resume decision, not implicit continuation')
-    from .codex_session import _session, read_delivery_registry
+    from .codex_session import _session, read_delivery_registry, formal_task_parameters
     from .codex_collaboration import layered_policy
     metadata = _session(root)[1]
+    formal = formal_task_parameters(metadata['P_run'])
+    prior_x = int(value.get('delivery_policy', {}).get('mode') == 'external')
+    prior_max = (value.get('max_court_required') is True
+                 or (metadata.get('parameter_selection') or {}).get('preset') == 'Max')
+    if formal and delivery_selection is not None and delivery_selection not in (
+            {'mode': 'local', 'target': None, 'explicit': False},
+            {'mode': 'external', 'target': 'gmail', 'explicit': True}):
+        raise ValueError('1.5+ X selects local files or the frozen Gmail mailbox; use binary X=0/1')
     layered = layered_policy(metadata['P_run'])
     if action == 'budget':
         if (not layered or value['status'] != 'ACTIVE'
@@ -503,6 +546,9 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
         current = value.get('delivery_selection', metadata['delivery_selection'])
         if delivery_selection is not None and surface['classification'] in {'HELP','INVALID','ROUTE_PENDING'}:
             raise ValueError('malformed/help/unresolved source cannot authorize an X delivery change')
+        if (formal and delivery_selection is not None and surface['classification'] == 'EXECUTING'
+                and surface.get('delivery_explicit') and incoming != delivery_selection):
+            raise ValueError('delivery change differs from the current source X header')
         if delivery_selection is None and incoming.get('explicit') and incoming != current:
             from .codex_delivery import resolve_policy
             registry, _ = read_delivery_registry(destinations)
@@ -514,24 +560,49 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
             # newly edited registry capability/identity observations.
             value['delivery_selection'] = incoming
         if delivery_selection is not None and delivery_selection != current:
-            if surface['classification'] == 'EXECUTING' and incoming.get('explicit') and incoming != delivery_selection:
+            header_choice = surface.get('delivery_explicit') if formal else incoming.get('explicit')
+            if surface['classification'] == 'EXECUTING' and header_choice and incoming != delivery_selection:
                 raise ValueError('delivery change differs from the current source X header')
             from .codex_delivery import inspect as inspect_delivery, resolve_policy
             deliveries = inspect_delivery(root)['deliveries']
-            if delivery_selection.get('mode') != 'local' and any(
+            if not formal and delivery_selection.get('mode') != 'local' and any(
                     item['unresolved'] or item['recorded_status'] == 'SENT_VERIFIED' for item in deliveries):
                 raise ValueError('external retarget after a send is not automatic; reconcile uncertain sends and use a new explicitly scoped task')
-            registry, origin = (read_delivery_registry(destinations)
-                                if delivery_selection.get('mode') == 'external' else (None,None))
-            policy = resolve_policy(delivery_selection, registry)
+            previous_external = next((entry for entry in reversed(value.get('delivery_history', []))
+                                      if entry['policy'].get('mode') == 'external'), None)
+            if formal and delivery_selection.get('mode') == 'external' and previous_external is not None:
+                # A fresh explicit X=1 can resume the same frozen mailbox. It
+                # never rebinds to an edited registry or clears prior effects.
+                from .codex_delivery import validate_policy
+                policy = validate_policy(previous_external['policy'])
+                origin = previous_external.get('registry_origin', metadata.get('delivery_registry_origin'))
+            else:
+                registry, origin = (read_delivery_registry(destinations)
+                                    if delivery_selection.get('mode') == 'external' else (None,None))
+                policy = resolve_policy(delivery_selection, registry)
             value.setdefault('delivery_history', []).append({
                 'selection':current,'policy':value['delivery_policy'],
+                **({'registry_origin': value.get('delivery_registry_origin')} if formal else {}),
                 'changed_by_message_id':message_id,'source_ref':message['source']['source_ref'],
                 'reason':reason,'recorded_wall_ns':time.time_ns()})
             value.update(delivery_selection=delivery_selection,delivery_policy=policy,
                          delivery_registry_origin=origin)
+        if formal and (surface.get('delivery_explicit') or delivery_selection is not None):
+            value['x_parameter_source'] = {
+                'value': int(value['delivery_policy']['mode'] == 'external'),
+                'input_explicit': True, 'message_id': message_id,
+                'source_ref': message['source']['source_ref'],
+                'basis': 'INVOCATION_HEADER' if surface.get('delivery_explicit') else 'USER_MESSAGE_INTERPRETATION'}
     elif delivery_selection is not None or destinations is not None:
         raise ValueError('delivery changes require an active 0.9+ task source and an applicable message action')
+    if formal and action not in {'stop', 'cancel'}:
+        from .codex_profile import classify_invocation
+        selected_surface = classify_invocation(message['source']['text'], p_run=metadata['P_run'])
+        if (selected_surface['classification'] == 'EXECUTING'
+                and (selected_surface.get('depth_preferences') or {}).get('preset') == 'Max'
+                and not value.get('max_court_required')):
+            value['max_court_required'] = True
+            value['max_court_source'] = _input_ref(message)
     if action == 'revise':
         # Keep the input fence closed until the stale decision is invalidated.
         if layered and (root / 'foundation.json').exists():
@@ -553,7 +624,16 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
                             'message_id': message_id, 'result_ref': None,
                             'task_input_ref': dict(value['task_input_ref']),
                             'wall_ns': time.time_ns(), 'scope': 'lifecycle termination; no quality claim'}
-    if (action in {'continue', 'resume', 'revise'}
+    changed_user_parameter = False
+    if formal and action == 'ordinary' and value['status'] == 'ACTIVE':
+        changed_user_parameter = (prior_x != int(value['delivery_policy']['mode'] == 'external')
+                                  or not prior_max and value.get('max_court_required') is True)
+        declared = (selected_surface.get('depth_preferences') or {}).get('explicit_overrides', {})
+        if selected_surface['classification'] == 'EXECUTING' and 'F' in declared:
+            from .codex_session import task_parameters
+            changed_user_parameter = (changed_user_parameter
+                                      or declared['F'] != task_parameters(root)['parameters']['F'])
+    if (action in {'continue', 'resume', 'revise'} or changed_user_parameter
             or action == 'ordinary' and not layered and value['status'] not in TERMINAL):
         _set_task_input(value)
     message['handling'] = {'action': action, 'reason': reason, 'wall_ns': time.time_ns()}
@@ -561,6 +641,14 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
     # Persist the fence/terminal status first. Failure in optional cleanup or
     # decision history must never leave STOP as a preview with execution open.
     _save(root, value)
+    if formal and value['status'] == 'ACTIVE' and action not in {'stop', 'cancel', 'pause'}:
+        selected_surface = classify_invocation(message['source']['text'], p_run=metadata['P_run'])
+        declared = (selected_surface.get('depth_preferences') or {}).get('explicit_overrides', {})
+        if selected_surface['classification'] == 'EXECUTING' and 'F' in declared:
+            from .codex_session import set_task_parameters
+            set_task_parameters(root, parameters={'F': declared['F']},
+                                reasons={'F': 'Current selected user header explicitly sets F'},
+                                user_revision=message['source']['source_ref'])
     if action in {'stop', 'cancel'}:
         _revoke_if_present(root, message, reason)
     if cleanup:

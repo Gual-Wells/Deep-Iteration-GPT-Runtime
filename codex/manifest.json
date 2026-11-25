@@ -1,7 +1,7 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "1.4.1",
-  "protocol": "digr-codex-native-v20",
+  "version": "1.5.0",
+  "protocol": "digr-codex-native-v21",
   "status": "stable",
   "language": "zh-CN",
   "version_path": "codex/VERSION",
@@ -20,6 +20,7 @@
     "codex/CONSULT.md",
     "codex/SPLIT.md",
     "codex/COUNCIL.md",
+    "codex/COURT.md",
     "codex/USAGE.md",
     "codex/CHAT.md",
     "codex/LIVE.md",
@@ -147,34 +148,50 @@
       "native_work_return_since": "1.3.0"
     },
     "native_model_selection": "ACTIVE_CODEX_SETTINGS",
-    "analysis_method": "REASONED_ARGUMENT_WITHOUT_DEFAULT_EXPERIMENT_GATE"
+    "analysis_method": "REASONED_ARGUMENT_WITHOUT_DEFAULT_EXPERIMENT_GATE",
+    "max_completion": "SOURCE_BOUND_SUSPICION_COURT_AND_REAL_REEXECUTION_UNTIL_CURRENT_ACQUITTAL",
+    "court_roles": [
+      "judge",
+      "clerk",
+      "prosecutor",
+      "defendant",
+      "counsel",
+      "oversight"
+    ],
+    "formal_task_parameters": [
+      "X",
+      "F"
+    ],
+    "x_parameter": "BINARY_EXPLICIT_FILE_DELIVERY",
+    "court_since": "1.5.0"
   },
   "file_sha256": {
-    "codex/VERSION": "7d072b48526b023950e4c48db01e8c273554a6401119f5691e7589ba9bc65d9d",
+    "codex/VERSION": "acb57a7135b2d7d6e665f67f056e21353023b93835f54def1ae523bf76f1bfb3",
     "codex/AGENTS.light.md": "5abd877bc2f684ce54e34bbefcc9da17a0c00e1c8bbdadfa5a7f1aadcb700abd",
     "codex/ROUTER.experimental.txt": "45b6e2a6f06c9c7ee11845b7873f7ddb526ea1609bc6951f897eaebde85bd290",
-    "codex/STARTUP.md": "b4621c0df16cf719d9bbcd1d986b79df401de82a501f9594711dd12f01a4c5ee",
-    "codex/PROTOCOL.md": "77ce8726b869b9dbcd0ba46958cef66a9c600e1c062467b86b8839b490cc45d1",
+    "codex/STARTUP.md": "7debfc196e71ab7da53bcf3954f691bb5efc47716781184d9d4db7148fc94ade",
+    "codex/PROTOCOL.md": "4102444d112428ce4963b8106ed75681bd14b8dfe8a87e5f4fa01bdf44087244",
     "codex/CONSTITUTION.md": "2ca796187af0e08cb1c267f6abee54e5a91d55e9639644b09df6e93ccc134ab0",
     "codex/FOUNDATION.md": "d3e7a6dfcb58de41eccf77253be7a1c05193a7a27515298575b77ee08ef94065",
     "codex/METHOD.md": "c4346ddd33172f4975ca8d124b550f9d28ddc4a641a9e0c49bc0e160f828225d",
-    "codex/HELP.md": "f491cad122464351da2007155705ffd7c16285de0a530071d30af0ef87407fa9",
-    "codex/PARAMETERS.md": "2f557cbb79787eb23d905b0976085993734ad9f6dc615d851dd146d3d67817be",
-    "codex/WORKBENCH.md": "c43de2549a788900420d337caf242e810c7818d90d94ab549370b5a73e1ace47",
+    "codex/HELP.md": "3c7a456389e9addb8f7110693a91bb5836ec0c921c1ad07494960a39ad17197e",
+    "codex/PARAMETERS.md": "353cc24fc979a9f670a5741aa023e6df51abf20b7e050567e1e0f0ead5d52760",
+    "codex/WORKBENCH.md": "ebc987fd4e7df7d10afef9ed82d0fb7c5bbeca9f182e5a6ffc6686ff8d5a2ac2",
     "codex/CHARACTER.md": "5d016d30092633e45ba3450be82f9dc5af11859faf73f9f41d49e8bd563afbfa",
     "codex/COLLABORATION.md": "cfc4b57c4a85fb7494b5b470995b53e5fedcb2d0ec0a4da3880e3b668847c333",
     "codex/CONSULT.md": "ac7e037b20e304f2db07f11490cd2e480eed160eaaf97d08a20f0660d00d9512",
     "codex/SPLIT.md": "d2461a3eab239753124fecb87c8728e645fcfc7f49eb5dd8aeca79566fac8d95",
     "codex/PERMISSIONS.md": "a6f47e953c57b97c5e0a930823d41f87c238c7394efa87fc1a1b79412005d71b",
-    "codex/DELIVERY.md": "6e794d5919a33e212a651070820b6da2984e32bdb350f58a274888b68314a04f",
-    "codex/RETURN.md": "2dae41c15385916e25e4a825cf4c8fda54e57fdedde3c5e7f074f1c01151386f",
-    "codex/EXECUTION_PROTOCOL.json": "c99eb42752b53a3e0bf0ef7861dd810842e57067e99f3ef0452d2dc08d8a6d46",
-    "codex/COUNCIL.md": "e3a73ea71129c29a0a818cff57aac59e8f1313fb57fff8262b88ea4547dd3ece",
+    "codex/DELIVERY.md": "c19bbaa9080f9a4e2919c67964085bac9c0b4e8c897cf0cf126cce46271d5cf2",
+    "codex/RETURN.md": "dd5cae91d272d38069e74fb36649f3c3f67acd2e239378cfec57d4ed11f7a168",
+    "codex/EXECUTION_PROTOCOL.json": "f37e248ca2dcc042ecbae03bfa8914be50ac9a8624d37e7e381b4983f1da8575",
+    "codex/COUNCIL.md": "58aced46e9dba000a6db537993aadc4fecfbbfec90898868de7df433ed350639",
+    "codex/COURT.md": "1eab2f878c5949097938d7ce0679293317fc12510c9cd5b44e7e783b68c3be4b",
     "codex/USAGE.md": "7a8cc30aedab48f15988d607ecb1b608727b3f1a2867aab0788f8964a3fc27ee",
     "codex/CHAT.md": "78ac198a70adf5cfb15107d51137b882b1cbb99b2cec13695679bccd074cb41b",
-    "codex/CHAT_LIGHT.md": "be50d7471bb42b1014ff0914af69dace368b705b322e79697be607f893e74722",
-    "codex/CHAT_DEEP.md": "5807658fbf68b7659e50d446d824012f1a4513d293b071a485153d60e743a6b3",
-    "codex/LIVE.md": "c656563d1b21f7195fb2e372d4779a119d844d496e4c66420136c2843a542d85"
+    "codex/CHAT_LIGHT.md": "1fd1430bb3c32ea31dcc8d7f80a31fd76ac439cb8973072eba6d32288c4d53c7",
+    "codex/CHAT_DEEP.md": "c6e06f09d6803e1d8f8fcce9f952bade1943af9fcc34db62ded74f2d1459f970",
+    "codex/LIVE.md": "af6c3c332200865a97391412ca014bd224883524527b23503639582d707166a7"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {
@@ -184,7 +201,9 @@
       "D": 3,
       "V": 3,
       "L": 3,
-      "M": 1
+      "M": 1,
+      "X": 0,
+      "F": 3
     },
     "complex_tasks_raise_investment": true,
     "unit_semantics": "codex/PARAMETERS.md",
@@ -206,7 +225,9 @@
         "D": 0,
         "V": 0,
         "L": 3,
-        "M": 1
+        "M": 1,
+        "X": 0,
+        "F": 0
       },
       "Less": {
         "N": 6,
@@ -214,7 +235,9 @@
         "D": 1,
         "V": 1,
         "L": 3,
-        "M": 1
+        "M": 1,
+        "X": 0,
+        "F": 2
       },
       "Default": {
         "N": 12,
@@ -222,7 +245,9 @@
         "D": 3,
         "V": 3,
         "L": 3,
-        "M": 1
+        "M": 1,
+        "X": 0,
+        "F": 3
       },
       "More": {
         "N": 18,
@@ -230,7 +255,9 @@
         "D": 4,
         "V": 4,
         "L": 3,
-        "M": 1
+        "M": 1,
+        "X": 0,
+        "F": 4
       },
       "Max": {
         "N": 24,
@@ -238,7 +265,9 @@
         "D": 6,
         "V": 6,
         "L": 3,
-        "M": 1
+        "M": 1,
+        "X": 0,
+        "F": 6
       }
     },
     "preset_aliases": {
@@ -246,8 +275,14 @@
     },
     "default_preset": "Default",
     "task_defaults": {
-      "F": 0
-    }
+      "X": 0,
+      "F": 3
+    },
+    "task_parameters": [
+      "X",
+      "F"
+    ],
+    "task_defaults_scope": "Default reference only; Main infers F and only explicit X=1 enables external files"
   },
   "execution_bundle": {
     "path": "codex/EXECUTION_PROTOCOL.json",
@@ -264,6 +299,7 @@
       "codex/CONSULT.md",
       "codex/SPLIT.md",
       "codex/COUNCIL.md",
+      "codex/COURT.md",
       "codex/USAGE.md",
       "codex/CHAT.md",
       "codex/LIVE.md",

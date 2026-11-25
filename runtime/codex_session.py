@@ -40,6 +40,12 @@ ACTIVITY_STATES = frozenset({'MAIN', 'SOURCE', 'D_EXCLUSIVE', 'V_EXCLUSIVE', 'ME
 _LINE_ID = re.compile(r'M[0-9]{2,}')
 _PROCESS_SESSION = uuid.uuid4().hex
 _PARAMETER_KEYS = frozenset({'N', 'T', 'R', 'B', 'S', 'D', 'V', 'L'})
+TASK_PARAMETERS_FORMAT = 'digr-codex-task-parameters-1'
+
+
+def formal_task_parameters(p_run: str) -> bool:
+    version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', p_run)
+    return bool(version and tuple(map(int, version.groups())) >= (1, 5, 0))
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -121,6 +127,8 @@ def _parameters(parameters: Mapping[str, Any]) -> dict[str, Any]:
 def _line_explicit_parameters(session: Mapping[str, Any]) -> Mapping[str, Any]:
     explicit = session['explicit_parameters']
     baseline = (session.get('parameter_selection') or {}).get('preference_baseline', {})
+    if formal_task_parameters(session['P_run']):
+        return {key: value for key, value in explicit.items() if key not in {'X', 'F'}}
     if 'F' in baseline:
         return {key: value for key, value in explicit.items() if key != 'F'}
     return explicit
@@ -243,9 +251,13 @@ def create_session(root: Path, *, request: Path, p_run: str,
         preferences = invocation.get('depth_preferences')
         parameter_selection = preferences or invocation['depth_defaults']
         if preferences is not None:
+            if formal_task_parameters(p_run) and 'X' in explicit and 'X' not in preferences['explicit_overrides']:
+                raise ValueError('X selection must come from the original user header, not an added parameter record')
             explicit = merge_explicit_parameters(preferences['explicit_overrides'], explicit)
             if 'F' in preferences['preference_baseline'] and 'F' in explicit:
                 require_nonnegative_int('F', explicit['F'])
+            if formal_task_parameters(p_run) and 'X' in explicit:
+                require_binary('X', explicit['X'])
         else:
             # Historical pins recorded an explicitly named tier as declarations.
             chosen = dict(parameter_selection['parameters']) if parameter_selection['preset_explicit'] else {}
@@ -356,6 +368,9 @@ def create_session(root: Path, *, request: Path, p_run: str,
                         initial_delivery_policy=policy, delivery_registry_origin=registry_ref)
         metadata['initial_invocation'].update({key: invocation[key] for key in
             ('parameter_text', 'execution_parameter_text', 'delivery_selection')})
+        if formal_task_parameters(p_run):
+            metadata['task_parameter_contract'] = TASK_PARAMETERS_FORMAT
+            metadata['initial_invocation']['delivery_explicit'] = invocation['delivery_explicit']
     if profile_uses_visits:
         if visits_path is None:
             configured = os.environ.get('DIGR_VISITS_PATH')
@@ -375,6 +390,17 @@ def create_session(root: Path, *, request: Path, p_run: str,
     if profile_requires_lifecycle:
         from .codex_lifecycle import initialize_lifecycle
         initialize_lifecycle(root, metadata)
+    if formal_task_parameters(p_run):
+        reference = parameter_selection['preference_baseline']
+        initial = {'format': TASK_PARAMETERS_FORMAT, 'P_run': p_run,
+                   'reference': {key: reference[key] for key in ('X', 'F')},
+                   'parameters': {'F': explicit.get('F')},
+                   'input_explicit': {'F': 'F' in explicit},
+                   'explicit_parameters': {key: explicit[key] for key in ('F',) if key in explicit},
+                   'parameter_reasons': {'F': 'Original user declaration'} if 'F' in explicit else {},
+                   'changes': [], 'updated_wall_ns': time.time_ns(),
+                   'scope': 'Task-wide F target; X is read from the current source-bound delivery policy'}
+        _write_json(root / 'task-parameters.json', initial, new=True)
     return metadata
 
 
@@ -439,11 +465,96 @@ def task_delivery_policy(root: Path) -> dict | None:
     return json.loads(json.dumps(lifecycle.get('delivery_policy', metadata['initial_delivery_policy'])))
 
 
+def task_parameters(root: Path) -> dict[str, Any] | None:
+    """Read effective task-wide X/F without promoting a reference to a target."""
+    root, metadata = _session(root)
+    if not formal_task_parameters(metadata['P_run']):
+        return None
+    value = _read_json(root / 'task-parameters.json')
+    if value.get('format') != TASK_PARAMETERS_FORMAT or value.get('P_run') != metadata['P_run']:
+        raise ValueError('task parameter state does not match the frozen task pin')
+    target = value.get('parameters', {}).get('F')
+    if target is not None:
+        require_nonnegative_int('F', target)
+    from .codex_lifecycle import load_lifecycle
+    lifecycle = load_lifecycle(root)
+    x_value = int(lifecycle['delivery_policy']['mode'] == 'external')
+    source = lifecycle.get('x_parameter_source', {})
+    return {**value, 'parameters': {'X': x_value, 'F': target},
+            'input_explicit': {**value['input_explicit'], 'X': bool(source.get('input_explicit'))},
+            'X_source': json.loads(json.dumps(source)),
+            'F_initialized': target is not None}
+
+
+def set_task_parameters(root: Path, *, parameters: Mapping[str, Any],
+                        reasons: Mapping[str, str], user_revision: str | None = None) -> dict[str, Any]:
+    """Record Main's F inference; delivery changes retain their user-source path."""
+    root, metadata = _session(root)
+    if not formal_task_parameters(metadata['P_run']):
+        raise ValueError('task X/F parameters require 1.5+; keep older pins unchanged')
+    if not isinstance(parameters, Mapping) or 'F' not in parameters or set(parameters) - {'X', 'F'}:
+        raise ValueError('task parameters require F and optionally the current X value')
+    require_nonnegative_int('F', parameters['F'])
+    if not isinstance(reasons, Mapping):
+        raise TypeError('task parameter reasons must be a mapping')
+    reason = require_nonempty_text('F inference or adjustment reason', reasons.get('F'))
+    if user_revision is not None:
+        user_revision = require_nonempty_text('user_revision', user_revision)
+    from .codex_lifecycle import require_active
+    lifecycle = require_active(root)
+    current = task_parameters(root)
+    if 'X' in parameters:
+        require_binary('X', parameters['X'])
+        if parameters['X'] != current['parameters']['X']:
+            raise ValueError('X changes require the actual selected user input and lifecycle delivery change')
+    previous, target = current['parameters']['F'], parameters['F']
+    revision_input = None
+    if user_revision is not None:
+        message = lifecycle['current_message']
+        source = message['source']
+        observed = lifecycle['seen_source_refs'].get(source['source_ref'])
+        if (user_revision != source['source_ref']
+                or observed != {'sha256': source['sha256'], 'message_id': message['id']}
+                or message['id'] != lifecycle['handled_message_id']):
+            raise ValueError('F user_revision must identify the currently handled actual user source')
+        from .codex_profile import classify_invocation
+        selected = classify_invocation(source['text'], p_run=metadata['P_run'])
+        header_f = (selected.get('depth_preferences') or {}).get('explicit_overrides', {}).get('F')
+        if selected['classification'] == 'EXECUTING' and header_f is not None and target != header_f:
+            raise ValueError('F revision differs from the current explicit user header')
+        revision_input = {'message_id': message['id'], 'source_ref': source['source_ref'],
+                          'source_sha256': source['sha256']}
+    declared = current.get('explicit_parameters', {}).get('F')
+    if user_revision is None and ((previous is not None and target < previous)
+                                  or (declared is not None and target < declared)):
+        raise ValueError('F cannot be silently reduced after its effective target or explicit declaration')
+    if previous == target and user_revision is None:
+        return current
+    if previous != target and revision_input is not None:
+        from .codex_lifecycle import _bind_task_parameter_input
+        _bind_task_parameter_input(root, source=revision_input)
+    value = _read_json(root / 'task-parameters.json')
+    value['parameters']['F'] = target
+    value['parameter_reasons']['F'] = reason
+    if user_revision is not None:
+        value['explicit_parameters']['F'] = target
+        value['input_explicit']['F'] = True
+    value['changes'].append({'parameter': 'F', 'previous': previous, 'effective': target,
+                             'reason': reason, 'user_revision': user_revision,
+                             'user_revision_input': revision_input,
+                             'recorded_wall_ns': time.time_ns()})
+    value['updated_wall_ns'] = time.time_ns()
+    _write_json(root / 'task-parameters.json', value)
+    return task_parameters(root)
+
+
 def create_line(root: Path, line_id: str, *, parameters: Mapping[str, Any], owner: str | None = None,
                 work: Path | None = None, parameter_reasons: Mapping[str, str] | None = None,
                 corrections_topics: Iterable[str] = (), experiences: Iterable[str | Path] = ()) -> dict[str, Any]:
     """Accept this owner's complete initialization; do not clone another line."""
     root, session = _session(root)
+    if formal_task_parameters(session['P_run']) and not task_parameters(root)['F_initialized']:
+        raise ValueError('complete task-wide F inference with task parameters before creating a formal work line')
     values = _parameters(parameters)
     if owner is not None:
         owner = require_nonempty_text('owner', owner)
@@ -741,7 +852,10 @@ def session_report(root: Path) -> dict[str, Any]:
     root, metadata = _session(root)
     metadata = _effective_main_target(root, metadata)
     if metadata.get('visit_clock'):
-        return _visit_session_report(root, metadata)
+        report = _visit_session_report(root, metadata)
+        if formal_task_parameters(metadata['P_run']):
+            report['task_parameters'] = task_parameters(root)
+        return report
     streams, packages, issues = {}, {}, []
     unavailable = {}
 
@@ -806,6 +920,7 @@ def session_report(root: Path) -> dict[str, Any]:
         issues.append(issue)
         lifecycle = {'managed': True, 'status': 'UNREADABLE', 'issue': issue}
     return {'session': metadata, 'line_packages': packages, 'timing': timing, 'lifecycle': lifecycle,
+            **({'task_parameters': task_parameters(root)} if formal_task_parameters(metadata['P_run']) else {}),
             'consult': _consult_snapshot(root, metadata),
             'foundation_timing': foundation_timing,
             'registered_line_count': len(packages), 'effective_M_count': None,
@@ -860,6 +975,10 @@ def line_packet(root: Path, line_id: str, *, topic: str | None = None,
                               'M_target': metadata['M_target'],
                               'M_target_reason': metadata.get('M_target_reason')},
                              ensure_ascii=False, indent=2, allow_nan=False)]
+    if formal_task_parameters(metadata['P_run']):
+        parts += ['## 当前任务级 X/F 生效参数',
+                  json.dumps(task_parameters(root), ensure_ascii=False, indent=2, allow_nan=False),
+                  'X/F在全任务共享；参考F不是已生效目标，X只由当前有来源的用户选择改变。']
     consultation = _consult_snapshot(root, metadata)
     if consultation is not None:
         parts += ['## 当前Consult公开交换与费用事实',

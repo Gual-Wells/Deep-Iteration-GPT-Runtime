@@ -23,6 +23,7 @@ from runtime.codex_foundation import (
 from runtime.codex_session import (
     ACTIVITY_STATES, activity, create_line, create_session, line_packet,
     session_report, set_clock_anchor, set_line_parameters, set_main_target, update_line,
+    task_parameters, set_task_parameters,
 )
 from runtime.codex_transport import CodexRepositoryTransport, load_acquisition
 from runtime.codex_lifecycle import (
@@ -31,7 +32,7 @@ from runtime.codex_lifecycle import (
 
 TOOL_GROUPS = ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice',
                'return', 'preprint', 'personal', 'visits', 'paper', 'delivery',
-               'consult', 'council', 'production', 'usage', 'allot', 'live')
+               'consult', 'council', 'production', 'usage', 'allot', 'live', 'court')
 
 
 def read_object(path: Path) -> dict:
@@ -80,6 +81,10 @@ def main(argv: list[str] | None = None) -> int:
     main_target.add_argument('--root', required=True, type=Path)
     main_target.add_argument('--m', required=True, type=int)
     main_target.add_argument('--reason', required=True)
+    task_values = ts.add_parser('parameters', help='read or set the effective task-wide F target and current X')
+    task_values.add_argument('--root', required=True, type=Path)
+    task_values.add_argument('--input', type=Path,
+                             help='JSON with parameters:{F,X?}, reasons:{F}, optional user_revision')
     report = ts.add_parser('report')
     report.add_argument('--root', required=True, type=Path)
     message = ts.add_parser('message', help='snapshot an actual user input; fence managed execution until handled')
@@ -208,6 +213,9 @@ def main(argv: list[str] | None = None) -> int:
                     visits_path=args.visits, run_id=args.run_id, destinations=args.destinations)
             elif args.action == 'main-target':
                 result = set_main_target(args.root, count=args.m, reason=args.reason)
+            elif args.action == 'parameters':
+                result = (set_task_parameters(args.root, **read_object(args.input))
+                          if args.input else task_parameters(args.root))
             elif args.action == 'message':
                 result = ingest_message(args.root, source=args.source_file,
                     source_ref=args.source_ref, route_pin=args.route_pin)
