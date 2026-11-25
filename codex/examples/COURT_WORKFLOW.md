@@ -49,6 +49,7 @@
   "actor_id": "actual-prosecutor-id",
   "material_sha256": "复制当前status返回的64位散列",
   "read_sources": ["request", "foundation", "line:M01", "work:M01", "accepted-context", "process-evidence"],
+  "reviewed_context_sha256": "1.5.2及以后公诉输入：实际研究对应公开返回后，使用当前status的prosecution_context_sha256",
   "statement": "粘贴实际公诉人的公开陈述。",
   "source": {"path": "D:/task/public/prosecutor-initial.txt", "source_ref": "host:actual-prosecutor-return"},
   "charges": [
@@ -69,6 +70,10 @@
 
 `role` 为 `defendant/judge/prosecutor/prosecution_lawyer/defence_lawyer/black_police/clerk`。只有公诉人和控方律师可提出新 `charges`。公诉人即使无指控也须提交有内容的intent_review，其source_ids须含原始request，无关联指控时charge_ids为[]。指控 `basis_type` 为 `REQUIREMENT/INTENT/LOGIC/IMPLEMENTATION/PRODUCT/PERMISSION/PROTOCOL`，或记录仅属于方法偏好的 `METHOD_PREFERENCE`；后者不能获准立案。语义上的合法性与实质影响由真实法官解释，不靠关键词分类。`obligation_id` 可省略；存在时须指向当前保留义务。指控 id 不可覆盖旧指控。
 
+1.5.2及以后，公诉交给控方律师后仍持续反复研究全流程，按实际发现随时再次submit，补充新诉点、疑点和材料。新增指控使用新id，对已有诉点的新材料与论证写入公开statement或responses，不覆盖旧记录。公诉不承担主动撤诉、自我限缩或替辩方筛除指控的职责；被告及辩方律师提出反驳，由法官逐项裁判，也不要求公诉先认可辩护才能结案。书记员纳入共同案卷并提供给双方，主线将实际材料送回同一公诉身份，不能等到结尾才让其读律师总结。
+
+公诉每次submit须以reviewed_context_sha256绑定其实际研究的最新控方律师、辩方律师和被告公开陈述；值取当前status.prosecution_context_sha256。该字段只记录研究对应的公开上下文，不代替阅读或全流程调查。status.prosecution_review_status可能为MISSING、BEFORE_HANDOFF、STALE或CURRENT。律师接手后的公开研究尚未提交，或之后任一方有新公开论证时，旧公诉研究不能用于终判。补充指控仍须被告和双方律师实际回答，公诉再研究其返回并提交当前结论；没有固定次数要求。黑警威慑与单纯案卷整理不迫使空转，新决定性证据按共同材料的review规则处理。旧pin无需新增该字段。
+
 被告及双方律师均需在全部当前指控形成后逐项答复，控方律师处理辩方反驳，辩方律师处理最强控告。无新增指控时提交 `charges: []`，并提供：
 
 ```json
@@ -83,7 +88,7 @@
 
 ## 3. verdict
 
-法官在处理公诉、双方律师及被告的公开论证后提供实际理由裁判，同时判断意图理解级问题。每个指控恰好一个 `decisions`，当前 `status.obligation_ids` 的每项义务恰好一个 `obligations`；不能漏掉自动原责任。
+法官在处理公诉、双方律师及被告的公开论证后提供实际理由裁判，同时判断意图理解级问题。1.5.2及以后先确认公诉持续调查已取得覆盖当前材料的实际结论，status.prosecution_review_status为CURRENT；不接受仅有初控或过时终述。每个指控恰好一个 `decisions`，当前 `status.obligation_ids` 的每项义务恰好一个 `obligations`；不能漏掉自动原责任。
 
 ```json
 {

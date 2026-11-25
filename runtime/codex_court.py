@@ -41,6 +41,36 @@ def _corrected(root: Path) -> bool:
     return tuple(map(int, version.split('.'))) >= (1, 5, 1)
 
 
+def _continuous_prosecution(root: Path) -> bool:
+    """Do not retroactively change hearings frozen before continuous review."""
+    version = _session(root)[1]['P_run'].split('@', 1)[0]
+    return tuple(map(int, version.split('.'))) >= (1, 5, 2)
+
+
+def _prosecution_context(hearing: dict) -> str:
+    """Bind the actual party returns, not an invented count of research rounds.
+
+    New decisive clerk evidence already changes the common material. Police
+    notices and clerical bookkeeping alone do not force empty re-investigation.
+    Reading and substantive investigation remain host responsibilities.
+    """
+    return _digest({'material_sha256': hearing['material_sha256'],
+                    'party_statements': [item for item in hearing['statements']
+                                         if item['role'] in {
+                                             'defendant', 'prosecution_lawyer', 'defence_lawyer'}]})
+
+
+def _prosecution_review_status(hearing: dict) -> str:
+    prosecutors = [item for item in hearing['statements'] if item['role'] == 'prosecutor']
+    if not prosecutors:
+        return 'MISSING'
+    if not any(item['role'] == 'prosecution_lawyer' for item in hearing['statements']):
+        return 'BEFORE_HANDOFF'
+    if prosecutors[-1].get('reviewed_context_sha256') != _prosecution_context(hearing):
+        return 'STALE'
+    return 'CURRENT'
+
+
 def _roles(root: Path) -> tuple[str, ...]:
     return ROLES if _corrected(root) else LEGACY_ROLES
 
@@ -503,6 +533,11 @@ def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
         statement['intent_review']['source_ids'] = ids
         statement['intent_review']['charge_ids'] = _ids(
             review.get('charge_ids', []), set(hearing['charges']) | set(additions), 'intent review charges', nonempty=False)
+        if _continuous_prosecution(root):
+            if supplied.get('reviewed_context_sha256') != _prosecution_context(hearing):
+                raise ValueError('prosecutor must investigate the current party returns before submitting; '
+                                 'use the current prosecution_context_sha256')
+            statement['reviewed_context_sha256'] = supplied['reviewed_context_sha256']
     if _corrected(root) and role == 'black_police':
         notice = supplied.get('authority_notice', {})
         if not isinstance(notice, Mapping):
@@ -545,6 +580,9 @@ def record_verdict(root: Path, supplied: Mapping[str, Any]) -> dict:
     for role in answering_roles:
         if {item['charge_id'] for item in latest[role]['responses']} != set(hearing['charges']):
             raise ValueError(role + ' must answer every actual charge before judgment')
+    if _continuous_prosecution(root) and _prosecution_review_status(hearing) != 'CURRENT':
+        raise ValueError('prosecutor must continue investigation after handoff and submit research '
+                         'covering the latest party returns before judgment')
     outcome = supplied.get('outcome')
     if outcome not in OUTCOMES:
         raise ValueError('unsupported actual court outcome')
@@ -778,6 +816,9 @@ def court_status(root: Path, *, expected_return: Mapping[str, Any] | None = None
                       source_ids=sorted(hearing['material']['sources']),
                       obligation_ids=sorted(hearing['material']['obligations']),
                       charges=hearing['charges'], actors=hearing['actors'], clerk=hearing['clerk'])
+        if _continuous_prosecution(root):
+            result.update(prosecution_context_sha256=_prosecution_context(hearing),
+                          prosecution_review_status=_prosecution_review_status(hearing))
         if _corrected(root):
             proceedings = _digest(_proceedings(state))
             docket = hearing.get('docket')

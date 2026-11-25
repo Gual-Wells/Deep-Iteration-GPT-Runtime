@@ -1,7 +1,7 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "1.5.1",
-  "protocol": "digr-codex-native-v22",
+  "version": "1.5.2",
+  "protocol": "digr-codex-native-v23",
   "status": "stable",
   "language": "zh-CN",
   "version_path": "codex/VERSION",
@@ -165,10 +165,12 @@
     ],
     "x_parameter": "BINARY_EXPLICIT_FILE_DELIVERY",
     "court_since": "1.5.0",
-    "court_roles_since": "1.5.1"
+    "court_roles_since": "1.5.1",
+    "court_prosecution_since": "1.5.2",
+    "court_prosecution": "CONTINUOUS_PROCESS_RESEARCH_AND_INCREMENTAL_FILING"
   },
   "file_sha256": {
-    "codex/VERSION": "dfe7d71b3f428eb73ed853f8fded65e2986896e21d69f45ebf06bb623b450e14",
+    "codex/VERSION": "ded1b601e81d31ca1f65c4f3ccf2ebd7992b6390e37bc2a86f3837282f1e00cf",
     "codex/AGENTS.light.md": "5abd877bc2f684ce54e34bbefcc9da17a0c00e1c8bbdadfa5a7f1aadcb700abd",
     "codex/ROUTER.experimental.txt": "45b6e2a6f06c9c7ee11845b7873f7ddb526ea1609bc6951f897eaebde85bd290",
     "codex/STARTUP.md": "7debfc196e71ab7da53bcf3954f691bb5efc47716781184d9d4db7148fc94ade",
@@ -178,22 +180,22 @@
     "codex/METHOD.md": "c4346ddd33172f4975ca8d124b550f9d28ddc4a641a9e0c49bc0e160f828225d",
     "codex/HELP.md": "13010e82a1712384e2b5e362e202fba804e576054b2674d3cdfbcfa7cb6dd6f1",
     "codex/PARAMETERS.md": "353cc24fc979a9f670a5741aa023e6df51abf20b7e050567e1e0f0ead5d52760",
-    "codex/WORKBENCH.md": "f120ecb358ec5fe25e7929a3096988dd356765e29763193c188cbf771c67df18",
+    "codex/WORKBENCH.md": "46897ebbbfc751768a2ec883ba496759a051cb8409124d057abbaabba1acd6fe",
     "codex/CHARACTER.md": "5d016d30092633e45ba3450be82f9dc5af11859faf73f9f41d49e8bd563afbfa",
     "codex/COLLABORATION.md": "cfc4b57c4a85fb7494b5b470995b53e5fedcb2d0ec0a4da3880e3b668847c333",
     "codex/CONSULT.md": "ac7e037b20e304f2db07f11490cd2e480eed160eaaf97d08a20f0660d00d9512",
     "codex/SPLIT.md": "d2461a3eab239753124fecb87c8728e645fcfc7f49eb5dd8aeca79566fac8d95",
     "codex/PERMISSIONS.md": "a6f47e953c57b97c5e0a930823d41f87c238c7394efa87fc1a1b79412005d71b",
     "codex/DELIVERY.md": "c19bbaa9080f9a4e2919c67964085bac9c0b4e8c897cf0cf126cce46271d5cf2",
-    "codex/RETURN.md": "5276c25367d62bbbd84116c715e8096b1cb1ccc08d1f8a898eb67bd17d15d411",
-    "codex/EXECUTION_PROTOCOL.json": "ceeecf24363ce2d6ae7cd0b17865929aa717c234b8fa9bd7bdb61540569cc255",
+    "codex/RETURN.md": "8391025c12f7e5ef129dfded541e2340c7efb792b1e13104a1f8f63e966f3758",
+    "codex/EXECUTION_PROTOCOL.json": "e6afd6ece513cdf88d4303a5c2dba637d5211fdffe8e28c3c814e86f60e963c7",
     "codex/COUNCIL.md": "58aced46e9dba000a6db537993aadc4fecfbbfec90898868de7df433ed350639",
-    "codex/COURT.md": "1b5b1b2456b9a50f688ca60449e67b342181c69ca1e3b5f4223c06132a74087b",
+    "codex/COURT.md": "3fb04d964b731b22e674e57b4a782f6ea4d51f39d86adbd38de4ac5594453d5d",
     "codex/USAGE.md": "7a8cc30aedab48f15988d607ecb1b608727b3f1a2867aab0788f8964a3fc27ee",
     "codex/CHAT.md": "78ac198a70adf5cfb15107d51137b882b1cbb99b2cec13695679bccd074cb41b",
     "codex/CHAT_LIGHT.md": "7785945f456596312976a16ed330368beb181770f0fbcaa7e4e6bb39289be445",
     "codex/CHAT_DEEP.md": "6e4341b7615b5c941a9cb3a908372ed6828c1acc6afd9dd41c0fba0021f96ab9",
-    "codex/LIVE.md": "764d6bcf6e549bb6728333f845d4af17ebe6fe7823933adf518e76fcd207241b"
+    "codex/LIVE.md": "4ed6b5f1a83447f07d32522564d182f767b2ec0506789ca259bf930396243cdd"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {
