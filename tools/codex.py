@@ -81,10 +81,10 @@ def main(argv: list[str] | None = None) -> int:
     main_target.add_argument('--root', required=True, type=Path)
     main_target.add_argument('--m', required=True, type=int)
     main_target.add_argument('--reason', required=True)
-    task_values = ts.add_parser('parameters', help='read or set the effective task-wide F target and current X')
+    task_values = ts.add_parser('parameters', help='read/set task-wide F and check current source-bound X/C')
     task_values.add_argument('--root', required=True, type=Path)
     task_values.add_argument('--input', type=Path,
-                             help='JSON with parameters:{F,X?}, reasons:{F}, optional user_revision')
+                             help='JSON with parameters:{F,X?,C?}, reasons:{F}, optional user_revision; C requires 1.6+')
     report = ts.add_parser('report')
     report.add_argument('--root', required=True, type=Path)
     message = ts.add_parser('message', help='snapshot an actual user input; fence managed execution until handled')
@@ -102,6 +102,8 @@ def main(argv: list[str] | None = None) -> int:
     handle.add_argument('--destinations', type=Path, help='resolve a genuinely changed X target once')
     handle.add_argument('--claude-selection', choices=('ALLOW', 'COUNCIL_ONLY', 'DENY'),
                         help='actual current prose user choice; complete one/two-colon headers apply directly')
+    handle.add_argument('--court-mode', type=int, choices=(0, 1),
+                        help='actual current prose user C choice; headers apply directly, 1.6+ only')
     lifecycle = ts.add_parser('lifecycle', help='read managed continuation state or explicit legacy status')
     lifecycle.add_argument('--root', required=True, type=Path)
     stop = ts.add_parser('terminate', help='stop/cancel a task; completed delivery uses return close')
@@ -223,7 +225,8 @@ def main(argv: list[str] | None = None) -> int:
                 result = handle_message(args.root, message_id=args.message_id,
                     action=args.message_action, reason=args.reason,
                     delivery_selection=read_object(args.delivery_selection) if args.delivery_selection else None,
-                    destinations=args.destinations, claude_selection=args.claude_selection)
+                    destinations=args.destinations, claude_selection=args.claude_selection,
+                    court_mode=args.court_mode)
             elif args.action == 'lifecycle':
                 result = load_lifecycle(args.root)
             elif args.action == 'terminate':

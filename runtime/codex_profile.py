@@ -19,7 +19,7 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v23'
+PROFILE_PROTOCOL = 'digr-codex-native-v24'
 PROFILE_CORE = (
     'codex/CONSTITUTION.md',
     'codex/FOUNDATION.md',
@@ -227,6 +227,7 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
     preference_only = p_run is None or version >= (1, 1, 1)
     project_research = p_run is None or version >= (1, 4, 0)
     formal_task_parameters = p_run is None or version >= (1, 5, 0)
+    court_mode = p_run is None or version >= (1, 6, 0)
     depth_key = 'depth_preferences' if preference_only else 'depth_defaults'
     base = {'classification': 'NATIVE', 'route_key': key, 'task': None,
             'invocation_key': invocation_key, 'addon_hint': addon_hint,
@@ -283,7 +284,7 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
             execution_parameters, delivery = _invocation_parameters(prelude)
         depth = resolve_defaults(execution_parameters, preference_only=preference_only,
                                  project_research=project_research,
-                                 formal_task_parameters=formal_task_parameters)
+                                 formal_task_parameters=formal_task_parameters, court_mode=court_mode)
         if formal_task_parameters:
             declared = depth['explicit_overrides']
             if standalone_x is not None:

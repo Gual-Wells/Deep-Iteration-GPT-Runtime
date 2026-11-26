@@ -15,7 +15,9 @@ import time
 from typing import Any, Mapping
 
 from .codex_lifecycle import load_lifecycle, require_active
-from .codex_session import _effective_main_target, _parameters, _read_json, _session, _write_json
+from .codex_session import (
+    _effective_main_target, _parameters, _read_json, _session, _write_json, court_mode_parameter,
+)
 from .validation import require_binary, require_nonempty_text, require_nonnegative_int
 
 FORMAT = 'digr-codex-court-1'
@@ -28,6 +30,19 @@ PARAMETERS = ('N', 'T', 'R', 'B', 'S', 'D', 'V', 'L', 'M', 'F', 'X')
 _LINE_PARAMETERS = frozenset({'N', 'T', 'R', 'B', 'S', 'D', 'V', 'L'})
 _LEGAL_BASES = {'REQUIREMENT', 'LOGIC', 'IMPLEMENTATION', 'PRODUCT', 'PERMISSION', 'PROTOCOL'}
 _SCOPE = 'HOST_ASSERTED actors, reading, execution and judicial reasons; structural/source checks only'
+_PARTY_ROLES = ('defendant', 'prosecution_lawyer', 'defence_lawyer')
+
+
+def _efficient(root: Path) -> bool:
+    return court_mode_parameter(_session(root)[1]['P_run'])
+
+
+def _efficient_hearing(hearing: dict) -> bool:
+    return court_mode_parameter(hearing.get('material', {}).get('P_run', ''))
+
+
+def _parameter_names(root: Path) -> tuple[str, ...]:
+    return (*PARAMETERS, 'C') if _efficient(root) else PARAMETERS
 
 
 def enabled(p_run: str) -> bool:
@@ -54,6 +69,23 @@ def _prosecution_context(hearing: dict) -> str:
     notices and clerical bookkeeping alone do not force empty re-investigation.
     Reading and substantive investigation remain host responsibilities.
     """
+    if _efficient_hearing(hearing):
+        # Content identity is independent of recording time and file location.
+        # A genuinely changed public source still changes its byte hash. The
+        # host cannot mark new prose "immaterial" to bypass investigation.
+        parties, seen = [], set()
+        for item in hearing['statements']:
+            if item['role'] not in _PARTY_ROLES:
+                continue
+            content = {key: item[key] for key in ('role', 'actor_id', 'statement', 'responses')}
+            content['source_sha256'] = item['source']['sha256']
+            if item.get('charges'):
+                content['charges'] = item['charges']
+            identity = _digest(content)
+            if identity not in seen:
+                parties.append(content)
+                seen.add(identity)
+        return _digest({'material_sha256': hearing['material_sha256'], 'party_statements': parties})
     return _digest({'material_sha256': hearing['material_sha256'],
                     'party_statements': [item for item in hearing['statements']
                                          if item['role'] in {
@@ -76,13 +108,40 @@ def _roles(root: Path) -> tuple[str, ...]:
 
 
 def required(root: Path) -> bool:
-    """Max is a selected, sticky task preference, never inferred from N."""
+    """Use the actual C source on new pins; retain old sticky-Max semantics."""
     root, metadata = _session(root)
     if not enabled(metadata['P_run']):
         return False
+    if court_mode_parameter(metadata['P_run']):
+        source = load_lifecycle(root).get('court_parameter_source')
+        if not isinstance(source, Mapping):
+            raise ValueError('the current C choice needs its actual lifecycle source')
+        return require_binary('C', source.get('value')) == 1
     if (metadata.get('parameter_selection') or {}).get('preset') == 'Max':
         return True
     return load_lifecycle(root).get('max_court_required') is True
+
+
+def _required_read_sources(hearing: dict, role: str) -> list[str]:
+    sources = hearing['material']['sources']
+    if _efficient_hearing(hearing) and role == 'black_police':
+        # Participant identities and the role boundary are supplied by actors
+        # and authority_notice, not a claim that technical products were read.
+        conditions = sorted(key for key, source in sources.items()
+                            if key != 'request' and source['kind'] == 'CONDITIONS')
+        return ['request', *conditions]
+    return sorted(sources)
+
+
+def _effective_responses(hearing: dict, role: str) -> dict:
+    """Same-material, per-charge latest answers; never cross a review round."""
+    responses = {}
+    for statement in hearing['statements']:
+        if statement['role'] != role or statement['material_sha256'] != hearing['material_sha256']:
+            continue
+        for response in statement['responses']:
+            responses[response['charge_id']] = {'response': response, 'source': statement['source']}
+    return responses
 
 
 def _digest(value: Any) -> str:
@@ -201,7 +260,7 @@ def _production_state(root: Path) -> dict:
     # production process evidence is selected explicitly in material.sources
     # and line work notes, whose bytes remain bound. Do not automatically bind
     # the court's own progressively written housekeeping as production facts.
-    return {'task': {key: metadata.get(key) for key in _TASK_FIELDS},
+    state = {'task': {key: metadata.get(key) for key in _TASK_FIELDS},
             'M_target': metadata['M_target'], 'task_input_ref': lifecycle['task_input_ref'],
             'max_court_required': lifecycle.get('max_court_required', False),
             'max_court_source': lifecycle.get('max_court_source'),
@@ -209,6 +268,10 @@ def _production_state(root: Path) -> dict:
             'delivery_policy': lifecycle.get('delivery_policy'),
             'files': {str(path): _ref(path) for path in sorted(files)},
             'directory_candidates': directories}
+    if court_mode_parameter(metadata['P_run']):
+        state['court_parameter_source'] = lifecycle.get('court_parameter_source')
+        state['court_required'] = lifecycle.get('court_required')
+    return state
 
 
 def _task_parameters(root: Path) -> dict:
@@ -259,9 +322,12 @@ def _baseline(root: Path) -> dict:
                 or line['responsibility_status'] not in {'COMPLETE', 'COMPLETED'}
                 or line.get('unhandled') or not line.get('candidate')):
             raise ValueError('complete original production/parameter responsibilities before court')
-    return {'lines': {name: line['parameters'] for name, line in lines.items()},
+    baseline = {'lines': {name: line['parameters'] for name, line in lines.items()},
             'M': metadata['M_target'], 'F': task['parameters']['F'],
             'X': task['parameters']['X'], 'explicit': metadata['explicit_parameters']}
+    if court_mode_parameter(metadata['P_run']):
+        baseline['C'] = require_binary('C', task['parameters']['C'])
+    return baseline
 
 
 def _material(root: Path, spec: Mapping[str, Any]) -> dict:
@@ -310,6 +376,8 @@ def _material(root: Path, spec: Mapping[str, Any]) -> dict:
         'task:F': {'requirement': {'F': baseline['F']}, 'hard': True},
         'task:X_selection': {'requirement': {'X': baseline['X'], 'delivery': 'existing final-send/readback gate after verdict'}, 'hard': True},
     }
+    if court_mode_parameter(metadata['P_run']):
+        obligations['task:C_selection'] = {'requirement': {'C': baseline['C']}, 'hard': True}
     for name, parameters in baseline['lines'].items():
         obligations['line:' + name] = {'requirement': parameters, 'hard': True}
     for item in _list(spec.get('obligations', []), 'additional obligations'):
@@ -379,6 +447,8 @@ def open_court(root: Path, supplied: Mapping[str, Any]) -> dict:
     root, metadata = _session(root)
     require_active(root)
     if not required(root):
+        if _efficient(root):
+            raise ValueError('a court requires the actual current C=1 choice')
         raise ValueError('Max court is only required for an actually selected Max under a 1.5+ task pin')
     if (root / 'court' / 'court.json').exists():
         raise ValueError('court already exists; use review for a new candidate/current input')
@@ -402,6 +472,8 @@ def open_court(root: Path, supplied: Mapping[str, Any]) -> dict:
     state = {'format': FORMAT, 'P_run': metadata['P_run'], 'request_sha256': metadata['request_sha256'],
              'max_required': True, 'producer_actor_ids': producers, 'original_baseline': hearing['material']['baseline'],
              'rounds': [hearing], 'semantic_certification': False, 'basis': _SCOPE}
+    if _efficient(root):
+        state['court_required'] = state.pop('max_required')
     return _save(root, state)
 
 
@@ -496,7 +568,10 @@ def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
     if supplied.get('material_sha256') != hearing['material_sha256']:
         raise ValueError('statement must address the current material_sha256')
     read = _ids(supplied.get('read_sources'), hearing['material']['sources'], 'read_sources')
-    if set(read) != set(hearing['material']['sources']):
+    limited_police = _efficient(root) and role == 'black_police'
+    if limited_police and not set(_required_read_sources(hearing, role)).issubset(read):
+        raise ValueError('black police must actually read the original request and current conditions')
+    if not limited_police and set(read) != set(hearing['material']['sources']):
         raise ValueError('each actual actor must declare reading the original/current common material')
     statement = {'role': role, 'actor_id': supplied['actor_id'],
                  'material_sha256': hearing['material_sha256'], 'read_sources': read,
@@ -556,6 +631,12 @@ def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
         statement['responses'].append({'charge_id': response['charge_id'],
             'response': _text(response.get('response'), 'actual reasoned answer'),
             'source_ids': _ids(response.get('source_ids'), hearing['material']['sources'], 'answer sources')})
+    if _efficient(root):
+        ids = [item['charge_id'] for item in statement['responses']]
+        if len(ids) != len(set(ids)):
+            raise ValueError('one public statement cannot contain duplicate charge responses')
+        if additions:
+            statement['charges'] = additions
     hearing['charges'].update(additions)
     hearing['statements'].append(statement)
     return _save(root, state)
@@ -578,7 +659,9 @@ def record_verdict(root: Path, supplied: Mapping[str, Any]) -> dict:
         raise ValueError('all actual roles need current public statements before judgment')
     answering_roles = ('defendant', 'prosecution_lawyer', 'defence_lawyer') if _corrected(root) else ('defendant', 'lawyer')
     for role in answering_roles:
-        if {item['charge_id'] for item in latest[role]['responses']} != set(hearing['charges']):
+        answered = (set(_effective_responses(hearing, role)) if _efficient(root) else
+                    {item['charge_id'] for item in latest[role]['responses']})
+        if answered != set(hearing['charges']):
             raise ValueError(role + ' must answer every actual charge before judgment')
     if _continuous_prosecution(root) and _prosecution_review_status(hearing) != 'CURRENT':
         raise ValueError('prosecutor must continue investigation after handoff and submit research '
@@ -661,8 +744,9 @@ def record_verdict(root: Path, supplied: Mapping[str, Any]) -> dict:
 
 
 def _configuration(root: Path, state: dict, supplied: Mapping[str, Any]) -> dict:
-    if not isinstance(supplied, Mapping) or set(supplied) != set(PARAMETERS):
-        raise ValueError('re-estimate complete N/T/R/B/S/D/V/L/M/F/X custom parameters')
+    names = _parameter_names(root)
+    if not isinstance(supplied, Mapping) or set(supplied) != set(names):
+        raise ValueError('re-estimate complete ' + '/'.join(names) + ' custom parameters')
     base = _parameters({key: supplied[key] for key in _LINE_PARAMETERS})
     for key in ('M', 'F'):
         require_nonnegative_int(key, supplied[key])
@@ -676,7 +760,12 @@ def _configuration(root: Path, state: dict, supplied: Mapping[str, Any]) -> dict
         raise ValueError('remand F cannot lower the current formal task-wide F target')
     # N/T/R/B/S/D/V/L/M describe this additional segment. Already completed
     # work is reusable; old pending duties remain separate preserved duties.
-    return {**base, 'M': supplied['M'], 'F': supplied['F'], 'X': supplied['X']}
+    parameters = {**base, 'M': supplied['M'], 'F': supplied['F'], 'X': supplied['X']}
+    if _efficient(root):
+        parameters['C'] = require_binary('C', supplied['C'])
+        if parameters['C'] != task['C']:
+            raise ValueError('remand cannot grant/change C; use the actual current court choice')
+    return parameters
 
 
 def remand(root: Path, supplied: Mapping[str, Any]) -> dict:
@@ -701,7 +790,7 @@ def remand(root: Path, supplied: Mapping[str, Any]) -> dict:
     if changed:
         change_reason = _text(change_reason, 'actual reason for changed current input/candidate and its effect on remand')
     reasons = supplied.get('parameter_reasons')
-    if not isinstance(reasons, Mapping) or set(reasons) != set(PARAMETERS):
+    if not isinstance(reasons, Mapping) or set(reasons) != set(_parameter_names(root)):
         raise ValueError('give task-specific reasons for every custom parameter including X/F')
     reasons = {key: _text(value, key + ' re-estimation reason') for key, value in reasons.items()}
     outstanding_ids = {key for key, item in hearing['verdict']['decisions'].items()
@@ -730,13 +819,17 @@ def remand(root: Path, supplied: Mapping[str, Any]) -> dict:
         'origin_material_sha256': hearing['material_sha256'], 'changed_material_reason': change_reason,
         'task_input_ref': dict(current_input), 'current_production_state': _production_state(root),
         'max_required': True, 'planned_wall_ns': time.time_ns()}
+    if _efficient(root):
+        hearing['remand']['court_required'] = hearing['remand'].pop('max_required')
     return _save(root, state)
 
 
 def review(root: Path, supplied: Mapping[str, Any]) -> dict:
     """Open fresh role research after actual work; never reuse old testimony."""
-    root, _ = _session(root)
+    root, metadata = _session(root)
     require_active(root)
+    if court_mode_parameter(metadata['P_run']) and not required(root):
+        raise ValueError('review requires the actual current C=1 choice; C0 retains history without reopening')
     state = _load(root)
     previous = state['rounds'][-1]
     previous_verdict = previous['verdict']
@@ -807,7 +900,9 @@ def court_status(root: Path, *, expected_return: Mapping[str, Any] | None = None
     if not needed:
         return result
     if not (root / 'court' / 'court.json').exists():
-        result['issues'].append('selected Max still needs an actual suspicion hearing and judge verdict')
+        result['issues'].append('selected C=1 still needs an actual suspicion hearing and judge verdict'
+                                if _efficient(root) else
+                                'selected Max still needs an actual suspicion hearing and judge verdict')
         return result
     try:
         state = _load(root)
@@ -816,6 +911,11 @@ def court_status(root: Path, *, expected_return: Mapping[str, Any] | None = None
                       source_ids=sorted(hearing['material']['sources']),
                       obligation_ids=sorted(hearing['material']['obligations']),
                       charges=hearing['charges'], actors=hearing['actors'], clerk=hearing['clerk'])
+        if _efficient(root):
+            result['response_coverage'] = {role: sorted(_effective_responses(hearing, role))
+                                           for role in _PARTY_ROLES}
+            result['required_read_sources'] = {role: _required_read_sources(hearing, role)
+                                                for role in _roles(root)}
         if _continuous_prosecution(root):
             result.update(prosecution_context_sha256=_prosecution_context(hearing),
                           prosecution_review_status=_prosecution_review_status(hearing))
@@ -874,6 +974,105 @@ def court_status(root: Path, *, expected_return: Mapping[str, Any] | None = None
     return result
 
 
+def _source_entry(source: Mapping[str, Any]) -> dict:
+    """An original's locator and byte identity, never its repeated snapshot."""
+    return {key: source[key] for key in ('kind', 'path', 'resolved_path', 'source_ref', 'sha256')
+            if key in source}
+
+
+def court_receipt(root: Path, result: dict, *, full: bool = False) -> dict:
+    """New CLI receipts are small; Python status and old pins stay complete."""
+    if full or not _efficient(root):
+        return result
+    fields = ('format', 'required', 'status', 'can_close', 'issues', 'semantic_certification', 'basis',
+              'cycle', 'material_sha256', 'source_ids', 'obligation_ids', 'prosecution_context_sha256',
+              'prosecution_review_status', 'proceedings_sha256', 'docket_status', 'outcome',
+              'response_coverage', 'required_read_sources')
+    receipt = {key: result[key] for key in fields if key in result}
+    receipt['receipt_scope'] = 'COMPACT_STATUS; original sources and full API state remain available'
+    if 'charges' in result:
+        keys = ('id', 'role', 'basis_type', 'requirement', 'finding', 'consequence', 'source_ids', 'obligation_id')
+        receipt['charges'] = {identifier: {key: charge[key] for key in keys if key in charge}
+                              for identifier, charge in result['charges'].items()}
+    if 'actors' in result:
+        receipt['actors'] = {role: {key: actor[key] for key in
+                                    ('actor_id', 'independent_context', 'independence_basis') if key in actor}
+                             for role, actor in result['actors'].items()}
+    if 'clerk' in result:
+        receipt['clerk'] = {key: result['clerk'][key] for key in
+                             ('actor_id', 'kind', 'recording_tool', 'scope') if key in result['clerk']}
+    return receipt
+
+
+def court_packet(root: Path, role: str) -> dict:
+    """Locate current originals, effective answers and byte changes for a role.
+
+    This read-only packet neither supplies a semantic summary in place of an
+    original nor asserts that the role has read or researched anything.
+    """
+    root, metadata = _session(root)
+    if not court_mode_parameter(metadata['P_run']):
+        raise ValueError('role packets require a 1.6+ task pin')
+    if role not in _roles(root):
+        raise ValueError('packet role must identify an actual court role')
+    status = court_status(root)
+    if status['status'] == 'STALE' or 'cycle' not in status:
+        raise ValueError('a role packet requires current open court material')
+    state = _load(root)
+    hearing = state['rounds'][-1]
+    sources = hearing['material']['sources']
+    read = _required_read_sources(hearing, role)
+    actor_ids = {key: value['actor_id'] for key, value in hearing['actors'].items()}
+    record_path = str(root / 'court' / 'court.json')
+    user_snapshot = hearing['material']['current_user_snapshot']
+    user_source = _source_entry(user_snapshot)
+    user_source.update({key: user_snapshot[key] for key in ('byte_length', 'utf8_bom')
+                        if key in user_snapshot})
+    packet = {'format': 'digr-codex-court-packet-1', 'P_run': metadata['P_run'],
+              'status': status['status'], 'cycle': hearing['cycle'], 'role': role,
+              'actor_id': actor_ids[role], 'actors': actor_ids,
+              'material_sha256': hearing['material_sha256'],
+              'required_read_sources': read,
+              'sources': {key: _source_entry(sources[key]) for key in read},
+              'record_locator': {'path': record_path, 'format': FORMAT, 'cycle': hearing['cycle'],
+                                 'material_sha256': hearing['material_sha256']},
+              'current_user_input': {
+                  'task_input_ref': hearing['material']['task_input_ref'], 'source': user_source,
+                  'snapshot_locator': {'path': record_path,
+                      'json_pointer': '/rounds/' + str(len(state['rounds']) - 1) + '/material/current_user_snapshot'},
+                  'read_required': True,
+                  'basis': 'Read the captured actual user input; an original path may later change.'},
+              'reading_attestation': 'NOT_CREATED; locators do not replace actual source reading',
+              'semantic_certification': False, 'basis': _SCOPE}
+    if role == 'black_police':
+        packet['role_boundary'] = ('Fictional equal violent intimidation of every participant, including self; '
+                                   'no fact finding, prosecution or judicial reasoning.')
+        packet['required_authority_notice'] = {'mode': 'VIOLENT_INTIMIDATION',
+                                               'target_actor_ids': list(actor_ids.values()),
+                                               'scope': 'ALL_PARTICIPANTS'}
+    else:
+        packet['charges'] = hearing['charges']
+        packet['effective_responses'] = {
+            party: {identifier: {**item['response'], 'statement_source': _source_entry(item['source'])}
+                    for identifier, item in _effective_responses(hearing, party).items()}
+            for party in _PARTY_ROLES}
+        packet['public_statement_sources'] = [
+            {'role': item['role'], 'actor_id': item['actor_id'], 'source': _source_entry(item['source'])}
+            for item in hearing['statements']]
+        packet['prosecution_context_sha256'] = status.get('prosecution_context_sha256')
+        packet['prosecution_review_status'] = status.get('prosecution_review_status')
+    if len(state['rounds']) > 1:
+        previous = state['rounds'][-2]['material']['sources']
+        common = set(previous) & set(sources)
+        same = {key for key in common if (previous[key]['sha256'], previous[key]['resolved_path'])
+                == (sources[key]['sha256'], sources[key]['resolved_path'])}
+        packet['previous_source_changes'] = {
+            'unchanged': sorted(same), 'changed': sorted(common - same),
+            'added': sorted(set(sources) - set(previous)), 'removed': sorted(set(previous) - set(sources)),
+            'basis': 'byte/locator identity only; no semantic impact or reading claim'}
+    return packet
+
+
 def require_delivery(root: Path, files: list[str | Path]) -> None:
     """Guard the actual send entrance; this does not send or verify delivery."""
     if not (Path(root) / 'session.json').is_file():
@@ -883,7 +1082,8 @@ def require_delivery(root: Path, files: list[str | Path]) -> None:
         return
     status = court_status(root)
     if not status['can_close']:
-        raise ValueError('selected Max final files must receive a current closing court verdict before sending')
+        selected = 'selected C=1' if _efficient(root) else 'selected Max'
+        raise ValueError(selected + ' final files must receive a current closing court verdict before sending')
     hearing = _load(root)['rounds'][-1]
     adjudicated = hearing['material']['return_binding']['files']
     for item in files:

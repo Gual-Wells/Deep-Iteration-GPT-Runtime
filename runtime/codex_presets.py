@@ -13,8 +13,10 @@ _LEGACY_PRESETS = {
 }
 _TASK_DEFAULTS = {"F": 0}
 _F_REFERENCES = {"Light": 0, "Less": 2, "Default": 3, "More": 4, "Max": 6}
-PRESETS = {name: {**values, "X": 0, "F": _F_REFERENCES[name]}
-           for name, values in _LEGACY_PRESETS.items()}
+_FORMAL_PRESETS = {name: {**values, "X": 0, "F": _F_REFERENCES[name]}
+                   for name, values in _LEGACY_PRESETS.items()}
+PRESETS = {name: {**values, "C": int(name == "Max")}
+           for name, values in _FORMAL_PRESETS.items()}
 _NAMES = {name.casefold(): name for name in PRESETS}
 _NAMES["standard"] = "Light"
 _PUNCTUATION = str.maketrans({"（": "(", "）": ")", "，": ",", "＝": "="})
@@ -76,11 +78,12 @@ def merge_explicit_parameters(header: dict, additional: Mapping[str, Any]) -> di
 
 def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | None = None,
                      *, preference_only: bool = False, project_research: bool = True,
-                     formal_task_parameters: bool = True) -> dict:
+                     formal_task_parameters: bool = True, court_mode: bool = True) -> dict:
     """Read the input for the native interpreter, retaining the old pinned preview."""
     if not isinstance(parameter_text, str):
         raise TypeError("parameter text must be str")
     formal_task_parameters = formal_task_parameters and project_research
+    court_mode = court_mode and formal_task_parameters
     text = parameter_text.translate(_PUNCTUATION).strip()
     if text.startswith("(") and text.endswith(")"):
         text = text[1:-1]
@@ -101,8 +104,9 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
                     nested[entry[0]] = int(entry[1])
                 elif entry and entry[0] == "t":
                     nested["t"] = entry[1]
-                elif formal_task_parameters and ((entry and entry[0] == "X") or part == "X"):
-                    raise ValueError("X is a task parameter, not an S subparameter")
+                elif (formal_task_parameters and ((entry and entry[0] == "X") or part == "X")
+                      or court_mode and ((entry and entry[0] == "C") or part == "C")):
+                    raise ValueError("X/C are task parameters, not S subparameters")
                 else:
                     unparsed.append("S." + part)
             if preference_only and nested:
@@ -121,6 +125,12 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
             if "X" in parsed:
                 raise ValueError("duplicate X parameter declarations")
             parsed["X"] = value
+        elif court_mode and ((pair and pair[0] == "C") or re.fullmatch(r"C\s*=?", token)):
+            if not pair or not re.fullmatch(r"[01]", pair[1]):
+                raise ValueError("C must be binary 0 or 1")
+            if "C" in parsed:
+                raise ValueError("duplicate C parameter declarations")
+            parsed["C"] = int(pair[1])
         elif project_research and ((pair and pair[0] == "F") or re.fullmatch(r"F\s*=?", token)):
             if not pair or not re.fullmatch(r"[0-9]+", pair[1]):
                 raise ValueError("F must be a nonnegative integer")
@@ -137,7 +147,8 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
     if len(selected) > 1:
         raise ValueError("select exactly one depth preset")
     chosen = selected[0] if selected else "Default"
-    baseline = deepcopy((PRESETS if formal_task_parameters else _LEGACY_PRESETS)[chosen])
+    catalog = PRESETS if court_mode else _FORMAL_PRESETS if formal_task_parameters else _LEGACY_PRESETS
+    baseline = deepcopy(catalog[chosen])
     baseline["B"] = 0
     if chosen == "Light":
         baseline.update(T=0, S={"n": 0, "t": 0, "r": 0, "b": 0})
@@ -155,6 +166,8 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
         count_parameters += ("F",)
     if formal_task_parameters:
         count_parameters += ("X",)
+    if court_mode:
+        count_parameters += ("C",)
     for key in count_parameters:
         value = values[key]
         if type(value) is not int or value < 0:
@@ -165,6 +178,8 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
         raise ValueError("M must be positive and B binary")
     if formal_task_parameters and values["X"] not in (0, 1):
         raise ValueError("X must be binary 0 or 1")
+    if court_mode and values["C"] not in (0, 1):
+        raise ValueError("C must be binary 0 or 1")
     if preference_only:
         return {"preset": chosen, "preset_explicit": bool(selected),
                 "preference_baseline": baseline, "explicit_overrides": explicit,
@@ -180,9 +195,9 @@ def resolve_defaults(parameter_text: str = "", overrides: Mapping[str, Any] | No
 
 def preset_catalog() -> dict:
     return {"default": "Default", "presets": deepcopy(PRESETS),
-            "task_defaults": {"X": 0, "F": _F_REFERENCES["Default"]},
-            "task_parameters": ["X", "F"],
-            "task_defaults_scope": "Default reference only; Main infers F and only explicit X=1 enables external files",
+            "task_defaults": {"X": 0, "F": _F_REFERENCES["Default"], "C": 0},
+            "task_parameters": ["X", "F", "C"],
+            "task_defaults_scope": "Main infers F; X is explicit file delivery; C is binary court mode, Max defaults to 1 and other tiers to 0, explicit C wins",
             "aliases": {"standard": "Light"}, "L": "native L3 in every preset",
             "scope": "Preference baselines for native task inference before INIT",
             "time": "T/t task-derived soft targets unless explicitly specified",

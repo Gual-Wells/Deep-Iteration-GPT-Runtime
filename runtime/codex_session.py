@@ -48,6 +48,12 @@ def formal_task_parameters(p_run: str) -> bool:
     return bool(version and tuple(map(int, version.groups())) >= (1, 5, 0))
 
 
+def court_mode_parameter(p_run: str) -> bool:
+    """Binary task-scoped C is new in 1.6; never reinterpret an older pin."""
+    version = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', p_run)
+    return bool(version and tuple(map(int, version.groups())) >= (1, 6, 0))
+
+
 def _read_json(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding='utf-8-sig'))
     if not isinstance(value, dict):
@@ -128,7 +134,8 @@ def _line_explicit_parameters(session: Mapping[str, Any]) -> Mapping[str, Any]:
     explicit = session['explicit_parameters']
     baseline = (session.get('parameter_selection') or {}).get('preference_baseline', {})
     if formal_task_parameters(session['P_run']):
-        return {key: value for key, value in explicit.items() if key not in {'X', 'F'}}
+        task_keys = {'X', 'F', 'C'} if court_mode_parameter(session['P_run']) else {'X', 'F'}
+        return {key: value for key, value in explicit.items() if key not in task_keys}
     if 'F' in baseline:
         return {key: value for key, value in explicit.items() if key != 'F'}
     return explicit
@@ -253,11 +260,15 @@ def create_session(root: Path, *, request: Path, p_run: str,
         if preferences is not None:
             if formal_task_parameters(p_run) and 'X' in explicit and 'X' not in preferences['explicit_overrides']:
                 raise ValueError('X selection must come from the original user header, not an added parameter record')
+            if court_mode_parameter(p_run) and 'C' in explicit and 'C' not in preferences['explicit_overrides']:
+                raise ValueError('C selection must come from the original user header, not an added parameter record')
             explicit = merge_explicit_parameters(preferences['explicit_overrides'], explicit)
             if 'F' in preferences['preference_baseline'] and 'F' in explicit:
                 require_nonnegative_int('F', explicit['F'])
             if formal_task_parameters(p_run) and 'X' in explicit:
                 require_binary('X', explicit['X'])
+            if court_mode_parameter(p_run) and 'C' in explicit:
+                require_binary('C', explicit['C'])
         else:
             # Historical pins recorded an explicitly named tier as declarations.
             chosen = dict(parameter_selection['parameters']) if parameter_selection['preset_explicit'] else {}
@@ -393,7 +404,7 @@ def create_session(root: Path, *, request: Path, p_run: str,
     if formal_task_parameters(p_run):
         reference = parameter_selection['preference_baseline']
         initial = {'format': TASK_PARAMETERS_FORMAT, 'P_run': p_run,
-                   'reference': {key: reference[key] for key in ('X', 'F')},
+                   'reference': {key: reference[key] for key in (('X', 'F', 'C') if court_mode_parameter(p_run) else ('X', 'F'))},
                    'parameters': {'F': explicit.get('F')},
                    'input_explicit': {'F': 'F' in explicit},
                    'explicit_parameters': {key: explicit[key] for key in ('F',) if key in explicit},
@@ -466,7 +477,7 @@ def task_delivery_policy(root: Path) -> dict | None:
 
 
 def task_parameters(root: Path) -> dict[str, Any] | None:
-    """Read effective task-wide X/F without promoting a reference to a target."""
+    """Read effective task-wide X/F/C without promoting references to targets."""
     root, metadata = _session(root)
     if not formal_task_parameters(metadata['P_run']):
         return None
@@ -480,20 +491,30 @@ def task_parameters(root: Path) -> dict[str, Any] | None:
     lifecycle = load_lifecycle(root)
     x_value = int(lifecycle['delivery_policy']['mode'] == 'external')
     source = lifecycle.get('x_parameter_source', {})
-    return {**value, 'parameters': {'X': x_value, 'F': target},
+    result = {**value, 'parameters': {'X': x_value, 'F': target},
             'input_explicit': {**value['input_explicit'], 'X': bool(source.get('input_explicit'))},
             'X_source': json.loads(json.dumps(source)),
             'F_initialized': target is not None}
+    if court_mode_parameter(metadata['P_run']):
+        c_source = lifecycle.get('court_parameter_source')
+        if not isinstance(c_source, dict):
+            raise ValueError('1.6+ task is missing its source-bound C selection')
+        require_binary('C', c_source.get('value'))
+        result['parameters']['C'] = c_source['value']
+        result['input_explicit']['C'] = bool(c_source.get('input_explicit'))
+        result['C_source'] = json.loads(json.dumps(c_source))
+    return result
 
 
 def set_task_parameters(root: Path, *, parameters: Mapping[str, Any],
                         reasons: Mapping[str, str], user_revision: str | None = None) -> dict[str, Any]:
-    """Record Main's F inference; delivery changes retain their user-source path."""
+    """Record Main's F inference; X/C choices retain their user-source path."""
     root, metadata = _session(root)
     if not formal_task_parameters(metadata['P_run']):
         raise ValueError('task X/F parameters require 1.5+; keep older pins unchanged')
-    if not isinstance(parameters, Mapping) or 'F' not in parameters or set(parameters) - {'X', 'F'}:
-        raise ValueError('task parameters require F and optionally the current X value')
+    allowed = {'X', 'F', 'C'} if court_mode_parameter(metadata['P_run']) else {'X', 'F'}
+    if not isinstance(parameters, Mapping) or 'F' not in parameters or set(parameters) - allowed:
+        raise ValueError('task parameters require F and optionally the current X/C values supported by this pin')
     require_nonnegative_int('F', parameters['F'])
     if not isinstance(reasons, Mapping):
         raise TypeError('task parameter reasons must be a mapping')
@@ -507,6 +528,10 @@ def set_task_parameters(root: Path, *, parameters: Mapping[str, Any],
         require_binary('X', parameters['X'])
         if parameters['X'] != current['parameters']['X']:
             raise ValueError('X changes require the actual selected user input and lifecycle delivery change')
+    if 'C' in parameters:
+        require_binary('C', parameters['C'])
+        if parameters['C'] != current['parameters']['C']:
+            raise ValueError('C changes require the actual selected user input and lifecycle court choice')
     previous, target = current['parameters']['F'], parameters['F']
     revision_input = None
     if user_revision is not None:

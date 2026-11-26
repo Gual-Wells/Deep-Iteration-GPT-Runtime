@@ -1,7 +1,7 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "1.5.2",
-  "protocol": "digr-codex-native-v23",
+  "version": "1.6.0",
+  "protocol": "digr-codex-native-v24",
   "status": "stable",
   "language": "zh-CN",
   "version_path": "codex/VERSION",
@@ -149,7 +149,6 @@
     },
     "native_model_selection": "ACTIVE_CODEX_SETTINGS",
     "analysis_method": "REASONED_ARGUMENT_WITHOUT_DEFAULT_EXPERIMENT_GATE",
-    "max_completion": "SOURCE_BOUND_SUSPICION_COURT_AND_REAL_REEXECUTION_UNTIL_CURRENT_ACQUITTAL",
     "court_roles": [
       "judge",
       "clerk",
@@ -161,41 +160,49 @@
     ],
     "formal_task_parameters": [
       "X",
-      "F"
+      "F",
+      "C"
     ],
     "x_parameter": "BINARY_EXPLICIT_FILE_DELIVERY",
     "court_since": "1.5.0",
     "court_roles_since": "1.5.1",
     "court_prosecution_since": "1.5.2",
-    "court_prosecution": "CONTINUOUS_PROCESS_RESEARCH_AND_INCREMENTAL_FILING"
+    "court_prosecution": "CONTINUOUS_PROCESS_RESEARCH_AND_INCREMENTAL_FILING",
+    "court_mode_since": "1.6.0",
+    "court_parameter": "BINARY_SOURCE_BOUND_TASK_CHOICE_EXPLICIT_OVERRIDES_NEW_TASK_PRESET",
+    "court_completion": "C1_SOURCE_BOUND_COURT_AND_REAL_REEXECUTION_UNTIL_CURRENT_ACQUITTAL",
+    "court_response_coverage": "LATEST_PER_ROLE_AND_CHARGE_WITHIN_SAME_MATERIAL",
+    "court_context": "PUBLIC_CONTENT_IDENTITY_NOT_SUBMISSION_METADATA",
+    "post_u0_reminder": "AFTER_EVERY_ACTUAL_U0_AT_ANY_LAYER_WITHOUT_RECURSIVE_INITIALIZATION",
+    "court_cli": "COMPACT_DEFAULT_NEW_PIN_FULL_ON_DEMAND"
   },
   "file_sha256": {
-    "codex/VERSION": "ded1b601e81d31ca1f65c4f3ccf2ebd7992b6390e37bc2a86f3837282f1e00cf",
+    "codex/VERSION": "cb1d9a30bc4ab8a397f39b7d786bb82aca0b816077eefc35d7c822017d75f6a5",
     "codex/AGENTS.light.md": "5abd877bc2f684ce54e34bbefcc9da17a0c00e1c8bbdadfa5a7f1aadcb700abd",
     "codex/ROUTER.experimental.txt": "45b6e2a6f06c9c7ee11845b7873f7ddb526ea1609bc6951f897eaebde85bd290",
-    "codex/STARTUP.md": "7debfc196e71ab7da53bcf3954f691bb5efc47716781184d9d4db7148fc94ade",
-    "codex/PROTOCOL.md": "00390ef91272d507c27b76192666918487b7f2e3fab5aa95d2fe5f9e739f9fc4",
+    "codex/STARTUP.md": "d1f2bd4ab07455d59ec96f615cb3a41fc074d80766cc84d8077778a0facf0289",
+    "codex/PROTOCOL.md": "3f3ebe5d29bbe22bf10ea9fa1946b26425f2cfccd44a556d6403675d36d6f540",
     "codex/CONSTITUTION.md": "2ca796187af0e08cb1c267f6abee54e5a91d55e9639644b09df6e93ccc134ab0",
-    "codex/FOUNDATION.md": "d3e7a6dfcb58de41eccf77253be7a1c05193a7a27515298575b77ee08ef94065",
+    "codex/FOUNDATION.md": "fe60abbf834ea65a9bdeb38838ff5269f297d19561829b08f9b840d1c28aacac",
     "codex/METHOD.md": "c4346ddd33172f4975ca8d124b550f9d28ddc4a641a9e0c49bc0e160f828225d",
-    "codex/HELP.md": "13010e82a1712384e2b5e362e202fba804e576054b2674d3cdfbcfa7cb6dd6f1",
-    "codex/PARAMETERS.md": "353cc24fc979a9f670a5741aa023e6df51abf20b7e050567e1e0f0ead5d52760",
-    "codex/WORKBENCH.md": "46897ebbbfc751768a2ec883ba496759a051cb8409124d057abbaabba1acd6fe",
+    "codex/HELP.md": "76ba89a7de17aa2645fef74ecfb0809a0de22526e45cd9d43cfb8712ac8bb31b",
+    "codex/PARAMETERS.md": "cd415319277052f555484b61a9a9b7238d22117a7e44d97734a02caa1613f90a",
+    "codex/WORKBENCH.md": "86cc17a558d1ac80676f745afe40d2c2e17bbff38f946b87423a3a3cf8ca36b1",
     "codex/CHARACTER.md": "5d016d30092633e45ba3450be82f9dc5af11859faf73f9f41d49e8bd563afbfa",
     "codex/COLLABORATION.md": "cfc4b57c4a85fb7494b5b470995b53e5fedcb2d0ec0a4da3880e3b668847c333",
-    "codex/CONSULT.md": "ac7e037b20e304f2db07f11490cd2e480eed160eaaf97d08a20f0660d00d9512",
-    "codex/SPLIT.md": "d2461a3eab239753124fecb87c8728e645fcfc7f49eb5dd8aeca79566fac8d95",
+    "codex/CONSULT.md": "ebcc8fc7c0f8ecd31ab4e4f1744638c90b4959f1cb19a88c36ca5db39a4e2fce",
+    "codex/SPLIT.md": "1d9d78c895a67b1fae2b3862e402b73f70923c63f2c1a1c349ebdd7706ba70b9",
     "codex/PERMISSIONS.md": "a6f47e953c57b97c5e0a930823d41f87c238c7394efa87fc1a1b79412005d71b",
     "codex/DELIVERY.md": "c19bbaa9080f9a4e2919c67964085bac9c0b4e8c897cf0cf126cce46271d5cf2",
-    "codex/RETURN.md": "8391025c12f7e5ef129dfded541e2340c7efb792b1e13104a1f8f63e966f3758",
-    "codex/EXECUTION_PROTOCOL.json": "e6afd6ece513cdf88d4303a5c2dba637d5211fdffe8e28c3c814e86f60e963c7",
-    "codex/COUNCIL.md": "58aced46e9dba000a6db537993aadc4fecfbbfec90898868de7df433ed350639",
-    "codex/COURT.md": "3fb04d964b731b22e674e57b4a782f6ea4d51f39d86adbd38de4ac5594453d5d",
+    "codex/RETURN.md": "c5b227fdb0ce63096f6bcb1e89ad8ea088c6b4d76cb1eab0ed24907c900ac767",
+    "codex/EXECUTION_PROTOCOL.json": "a0971bbcfc5ef823807a3c284d0fb2d6662b0c05cdc7226137ae77068684b516",
+    "codex/COUNCIL.md": "cf0c6e07fb6916c3b2974dd609d8a8d248808387d1278ed925e3cfcaedb6465d",
+    "codex/COURT.md": "66463392984284d853a0e692110d4f8a4e22a29f540fef5ed8e58a678c5c2678",
     "codex/USAGE.md": "7a8cc30aedab48f15988d607ecb1b608727b3f1a2867aab0788f8964a3fc27ee",
     "codex/CHAT.md": "78ac198a70adf5cfb15107d51137b882b1cbb99b2cec13695679bccd074cb41b",
-    "codex/CHAT_LIGHT.md": "7785945f456596312976a16ed330368beb181770f0fbcaa7e4e6bb39289be445",
-    "codex/CHAT_DEEP.md": "6e4341b7615b5c941a9cb3a908372ed6828c1acc6afd9dd41c0fba0021f96ab9",
-    "codex/LIVE.md": "4ed6b5f1a83447f07d32522564d182f767b2ec0506789ca259bf930396243cdd"
+    "codex/CHAT_LIGHT.md": "0cdd6cb20526b0672cd040daec45bbb81a7ecdd26f944f8b429899eaef0baf8b",
+    "codex/CHAT_DEEP.md": "85584cd36bd075dbc4bdab3c1984673e0ecf272e0729071245724b0394794a0c",
+    "codex/LIVE.md": "ed87b8d0ec6839abb65e36da5d5326a0e1e3bfc7b1928531ba9fa218658b1eaa"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {
@@ -207,7 +214,8 @@
       "L": 3,
       "M": 1,
       "X": 0,
-      "F": 3
+      "F": 3,
+      "C": 0
     },
     "complex_tasks_raise_investment": true,
     "unit_semantics": "codex/PARAMETERS.md",
@@ -231,7 +239,8 @@
         "L": 3,
         "M": 1,
         "X": 0,
-        "F": 0
+        "F": 0,
+        "C": 0
       },
       "Less": {
         "N": 6,
@@ -241,7 +250,8 @@
         "L": 3,
         "M": 1,
         "X": 0,
-        "F": 2
+        "F": 2,
+        "C": 0
       },
       "Default": {
         "N": 12,
@@ -251,7 +261,8 @@
         "L": 3,
         "M": 1,
         "X": 0,
-        "F": 3
+        "F": 3,
+        "C": 0
       },
       "More": {
         "N": 18,
@@ -261,7 +272,8 @@
         "L": 3,
         "M": 1,
         "X": 0,
-        "F": 4
+        "F": 4,
+        "C": 0
       },
       "Max": {
         "N": 24,
@@ -271,7 +283,8 @@
         "L": 3,
         "M": 1,
         "X": 0,
-        "F": 6
+        "F": 6,
+        "C": 1
       }
     },
     "preset_aliases": {
@@ -280,13 +293,15 @@
     "default_preset": "Default",
     "task_defaults": {
       "X": 0,
-      "F": 3
+      "F": 3,
+      "C": 0
     },
     "task_parameters": [
       "X",
-      "F"
+      "F",
+      "C"
     ],
-    "task_defaults_scope": "Default reference only; Main infers F and only explicit X=1 enables external files"
+    "task_defaults_scope": "Main infers F; X is explicit file delivery; C is binary court mode, Max defaults to 1 and other tiers to 0, explicit C wins"
   },
   "execution_bundle": {
     "path": "codex/EXECUTION_PROTOCOL.json",

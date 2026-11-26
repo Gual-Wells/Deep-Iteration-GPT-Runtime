@@ -1,5 +1,12 @@
 # Changelog
 
+## Codex Stable 1.6.0
+
+- Align HELP with every named N/T/R/B/S(n,t,r,b)/D/V/L/M/X/F/C call. Add task-scoped binary C: new Max tasks default to 1, others to 0; explicit C wins and later omitted C inherits. Bind changes to actual user sources, preserve history, and retain old-pin semantics.
+- Reduce avoidable court work: accumulate latest responses per role/charge in the same material, fingerprint public content instead of submission metadata, scope black-police reading to real duties, and provide compact CLI receipts plus original-source role packets. Preserve every role, current prosecution and genuine new-argument reentry.
+- Require a short adherence reminder after every actual U0 at any layer, including revisions/recovery. Do not recursively initialize new tasks to perform the reminder.
+- Explain observed repeated-context growth and dependency tails using anonymous native aggregates. Keep raw input, cached input, output, effective timing and billing claims separate; no unmeasured performance percentage.
+
 ## Codex Stable 1.5.2
 
 - Keep prosecutors actively investigating the entire intent-to-process-to-product chain after handing charges to prosecution counsel. File new grounds, open issues and supporting material promptly; do not require prosecutors to withdraw, narrow or pre-screen the defence's case. Defendants and defence counsel rebut; judges decide admissibility, dismissal and guilt.
