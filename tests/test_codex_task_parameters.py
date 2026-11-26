@@ -35,7 +35,9 @@ class FormalTaskParameterParsing(unittest.TestCase):
                 self.assertNotIn('X', old['preference_baseline'])
         catalog = preset_catalog()
         self.assertEqual(catalog['presets']['Max']['F'], 6)
-        self.assertEqual(catalog['task_parameters'], ['X', 'F'])
+        self.assertEqual(catalog['task_parameters'], ['X', 'F', 'C'])
+        for tier, values in catalog['presets'].items():
+            self.assertEqual(values['C'], int(tier == 'Max'))
 
     def test_binary_values_share_the_formal_group_and_preserve_the_body(self):
         for group, x in (('(Max,F=4,X=0,source=off)', 0), ('（Less，X（1），F（2））', 1),
