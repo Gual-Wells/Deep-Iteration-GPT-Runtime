@@ -236,7 +236,7 @@ class CodexDistributionTests(unittest.TestCase):
 
     def test_default_depth_is_the_implicit_preference_baseline(self):
         preference = depth_preferences(ROOT)
-        self.assertEqual(preference['implicit_deep'], {'N': 12, 'R': 4, 'D': 3, 'V': 3, 'L': 3, 'M': 1, 'X': 0, 'F': 3})
+        self.assertEqual(preference['implicit_deep'], {'N': 12, 'R': 4, 'D': 3, 'V': 3, 'L': 3, 'M': 1, 'X': 0, 'F': 3, 'C': 0})
         self.assertEqual(preference['preset_semantics'], 'PREFERENCE_BASELINES')
         self.assertEqual(preference['calibration'], 'TASK_INFERENCE_BEFORE_INIT')
         self.assertFalse(preference['autonomous_downshift_after_init'])

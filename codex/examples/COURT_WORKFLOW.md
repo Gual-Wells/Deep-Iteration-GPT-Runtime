@@ -4,7 +4,7 @@
 
 以下七角色和record命令适用于1.5.1及以后任务pin，1.5.0冻结任务保留原角色输入。
 
-统一调用使用 `python -B tools/codex.py court <action> --root D:/task --input D:/task/inputs/<action>.json`。`status` 不需要 `--input`。所有文件路径建议写绝对路径；输入 JSON 中的相对源路径相对于任务根目录，`return_input` 里面的 artifact 路径相对于该返回 JSON 的目录。
+统一调用使用 `python -B tools/codex.py court <action> --root D:/task --input D:/task/inputs/<action>.json`。`status`不需要`--input`。1.6+默认短回执，需要完整对象时加`--full`；旧pin默认和Python API仍完整。所有文件路径建议写绝对路径；输入 JSON 中的相对源路径相对于任务根目录，`return_input` 里面的 artifact 路径相对于该返回 JSON 的目录。
 
 ## 1. open
 
@@ -37,7 +37,7 @@
 
 自动原件包含 `request`、存在时的 `decisions`/`foundation`、每条 `line:M01` 与 `work:M01`，并保存当前实质用户输入。重要生产材料可通过 `sources` 增补，不要求新增全量日志。文件保持可读；关键来源或产物变化会让当前庭审 `STALE`。法院自己的 LIVE、用量及访时流增长不触发自失效，但显式选中的决定性源文件仍绑定字节。
 
-`open`/`status` 返回 `material_sha256`、完整 `source_ids`、`obligation_ids`、当前 `charges`。每个角色先实际读取同一组原件与当前成品，再提交自己的公开陈述。六个独立身份均须不同，且不能是任何Main/实际生产者，双方各一位律师，书记员是真实参与者。status另返回覆盖全部轮次公开案卷的proceedings_sha256，完整原文在court/court.json。
+`open`/`status` 返回 `material_sha256`、完整 `source_ids`、`obligation_ids`、当前 `charges`。实质角色先实际读取共同原件与当前成品，再提交公开陈述；1.6+黑警必读request与所有kind=CONDITIONS来源，取得当前补充、全体身份和共同案卷入口，不强制重读技术产品。六个独立身份均须不同，且不能是任何Main/实际生产者，双方各一位律师，书记员是真实参与者。status另返回覆盖全部轮次公开案卷的proceedings_sha256，完整原文在court/court.json。
 
 ## 2. submit
 
@@ -159,12 +159,12 @@ evidence_index的键须恰好覆盖当前status.source_ids，示例按实际增�
 
 ## 5. remand
 
-只在实际 `REEXECUTE` 后登记完整重新估参。下列数值仅示意新增的小范围段；`F` 至少为当前正式任务级目标，`X` 必须等于当前生命周期实际选择。原已完成工作可复用；原欠项及本次新承诺都保留，不用新参数覆盖旧义务。
+只在实际 `REEXECUTE` 后登记完整重新估参。下列数值仅示意新增的小范围段；`F` 至少为当前正式任务级目标，`X`和1.6+的`C`必须等于当前生命周期实际选择。以下JSON展示1.6+；旧1.5.x按原schema去掉C及其理由。原已完成工作可复用；原欠项及本次新承诺都保留，不用新参数覆盖旧义务。
 
 ```json
 {
-  "parameters": {"N": 2, "T": "5min", "R": 1, "B": 0, "S": {"n": 0, "t": 0, "r": 0, "b": 0}, "D": 0, "V": 0, "L": 3, "M": 1, "F": 0, "X": 0},
-  "parameter_reasons": {"N": "实际问题所需新增推导。", "T": "此次工作的时间估计。", "R": "一次针对性反查。", "B": "时间仍为软目标。", "S": "无需新增S分支。", "D": "该修复不需变更问题空间。", "V": "该修复不需另立V单元。", "L": "实际采用原生L3。", "M": "新增段由一条完整线承担。", "F": "沿用当前任务级正式F与真实可复用材料。", "X": "沿用当前真实X策略，不新增授权。"},
+  "parameters": {"N": 2, "T": "5min", "R": 1, "B": 0, "S": {"n": 0, "t": 0, "r": 0, "b": 0}, "D": 0, "V": 0, "L": 3, "M": 1, "F": 0, "X": 0, "C": 1},
+  "parameter_reasons": {"N": "实际问题所需新增推导。", "T": "此次工作的时间估计。", "R": "一次针对性反查。", "B": "时间仍为软目标。", "S": "无需新增S分支。", "D": "该修复不需变更问题空间。", "V": "该修复不需另立V单元。", "L": "实际采用原生L3。", "M": "新增段由一条完整线承担。", "F": "沿用当前任务级正式F与真实可复用材料。", "X": "沿用当前真实X策略，不新增授权。", "C": "沿用当前真实C1，不由返工估算启用或撤销庭审。"},
   "reuse": "说明原已完成工作如何复用，哪些责任仍须实际完成。",
   "outstanding": {"C1": "说明实际如何处理该成立问题。", "task:commission": "说明原委托欠项如何完成。", "explicit-deliverable": "说明明确成品欠项如何完成。"},
   "work_required": "实际新增工作及受影响相邻要求。",
@@ -204,3 +204,7 @@ evidence_index的键须恰好覆盖当前status.source_ids，示例按实际增�
 ## 最终返回与X
 
 只有当前候选得到 `ACQUITTED` 或 `IMMATERIAL_ERROR`，且实际书记员完成包含当前裁判的全程案卷后，才允许实际X发送入口授权；发送的每个文件路径与字节都必须在受审产品集合中。庭审通过不代表文件已发送，既有 X 的发送与读回仍须完成，然后 `return seal`/`return close` 正常收口。X0任务走既有本地返回。改变 `result`、`key_changes` 或第四段 `argument_scope`（兼容旧键 `verification_limits`）的任何实质正文原文、最终文件集合、任何最终文件字节或关键材料后，旧判决不可复用。第四段仅在新旧键之间切换且原文完全一致，仍对应同一受审正文；双键同时输入继续拒绝。真实 `work_process`、`parameters` 及用量记录可在庭审/X后更新，这些过程报告字段不替代上述三段实质产品。
+
+## 1.6+的当前角色原件包
+
+`court packet --root D:/task --role judge`返回原件位置/字节身份、当前逐指控有效回应、公开陈述入口和上轮字节变化。`--role black_police`给出职责所需来源、全体身份、当前案情及共同案卷入口。入口不是已读或研究完成证明；真正新公开理由仍要求公诉同线再研究。新material不自动复用旧答复。verdict的自动义务还包括`task:C_selection`，须按当前status.obligation_ids逐项裁判。

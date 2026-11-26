@@ -166,8 +166,14 @@ def _native_state(root: Path) -> dict[str, Any]:
             'open_activity': active, 'unreadable_activity': unknown}
     if task_parameters_state is not None:
         state['task_parameters'] = task_parameters_state
-        state['max_court_required'] = lifecycle.get('max_court_required', False)
-        state['max_court_source'] = lifecycle.get('max_court_source')
+        from .codex_session import court_mode_parameter
+        if court_mode_parameter(metadata['P_run']):
+            state['court_required'] = lifecycle['court_required']
+            state['court_parameter_source'] = lifecycle['court_parameter_source']
+            state['court_selection_history'] = lifecycle.get('court_selection_history', [])
+        else:
+            state['max_court_required'] = lifecycle.get('max_court_required', False)
+            state['max_court_source'] = lifecycle.get('max_court_source')
     if 'M_target_reason' in metadata:
         state['task']['M_target_reason'] = metadata['M_target_reason']
     if _resources_enabled(metadata):

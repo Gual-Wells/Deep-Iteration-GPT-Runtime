@@ -14,7 +14,7 @@ import re
 import time
 from typing import Any, Mapping
 
-from .validation import require_nonempty_text
+from .validation import require_binary, require_nonempty_text
 
 FORMAT = 'digr-codex-lifecycle-1'
 TERMINAL = frozenset({'CLOSED', 'STOPPED', 'CANCELLED'})
@@ -172,18 +172,61 @@ def initialize_lifecycle(root: Path, metadata: Mapping[str, Any]) -> dict[str, A
         value['delivery_selection'] = metadata['delivery_selection']
         value['delivery_policy'] = metadata['initial_delivery_policy']
         value['delivery_history'] = []
-    from .codex_session import formal_task_parameters
+    from .codex_session import formal_task_parameters, court_mode_parameter
     if formal_task_parameters(metadata['P_run']):
         value['x_parameter_source'] = {
             'value': int(metadata['initial_delivery_policy']['mode'] == 'external'),
             'input_explicit': bool(surface.get('delivery_explicit')),
             'message_id': 0, 'source_ref': source['source_ref'],
             'basis': 'INVOCATION_HEADER' if surface.get('delivery_explicit') else 'NEW_TASK_DEFAULT'}
-        if (surface.get('depth_preferences') or {}).get('preset') == 'Max':
+        if court_mode_parameter(metadata['P_run']):
+            _apply_court_selection(value, metadata, value['current_message'])
+        elif (surface.get('depth_preferences') or {}).get('preset') == 'Max':
             value['max_court_required'] = True
             value['max_court_source'] = _input_ref(value['current_message'])
     _write_json(root / 'lifecycle.json', value, new=True)
     return value
+
+
+def _apply_court_selection(value: dict, metadata: Mapping[str, Any],
+                           message: Mapping[str, Any], selection: int | None = None) -> None:
+    """C is an independent user-source choice, not a production-depth estimate."""
+    from .codex_session import court_mode_parameter
+    if not court_mode_parameter(metadata['P_run']):
+        if selection is not None:
+            raise ValueError('C requires a 1.6+ pin; older court rules remain unchanged')
+        return
+    if selection is not None:
+        require_binary('C', selection)
+    from .codex_profile import classify_invocation
+    surface = classify_invocation(message['source']['text'], p_run=metadata['P_run'])
+    if surface['classification'] in {'HELP', 'INVALID', 'ROUTE_PENDING'}:
+        if selection is not None:
+            raise ValueError('help/malformed/unresolved source cannot change C')
+        return
+    depth = surface.get('depth_preferences') or {}
+    declared = depth.get('explicit_overrides', {})
+    header = declared.get('C')
+    if header is not None:
+        if selection is not None and selection != header:
+            raise ValueError('C choice conflicts with the current user header')
+        selection = header
+    previous = value.get('court_parameter_source')
+    if selection is None and previous is not None:
+        return  # Later tiers and ordinary messages inherit the actual task C.
+    explicit = selection is not None
+    if selection is None:
+        selection = depth['preference_baseline']['C']
+    require_binary('C', selection)
+    source = {'value': selection, 'input_explicit': explicit,
+              'message_id': message['id'], 'source_ref': message['source']['source_ref'],
+              'source_sha256': message['source']['sha256'],
+              'basis': ('INVOCATION_HEADER' if header is not None else
+                        'CURRENT_USER_DECISION' if explicit else 'NEW_TASK_PRESET_DEFAULT')}
+    if previous is not None and previous != source:
+        value.setdefault('court_selection_history', []).append(previous)
+    value['court_parameter_source'] = source
+    value['court_required'] = bool(selection)
 
 
 def load_lifecycle(root: Path) -> dict[str, Any]:
@@ -207,6 +250,16 @@ def load_lifecycle(root: Path) -> dict[str, Any]:
     current = value['current_message']
     if current['id'] != value['message_id']:
         raise ValueError('current lifecycle message identity mismatch')
+    from .codex_session import court_mode_parameter
+    if court_mode_parameter(metadata['P_run']):
+        choice = value.get('court_parameter_source', {})
+        require_binary('C', choice.get('value'))
+        if type(value.get('court_required')) is not bool or value['court_required'] != bool(choice['value']):
+            raise ValueError('C and court_required differ')
+        observed = value['seen_source_refs'].get(choice.get('source_ref'))
+        if (type(choice.get('message_id')) is not int or choice['message_id'] > value['handled_message_id']
+                or observed != {'sha256': choice.get('source_sha256'), 'message_id': choice['message_id']}):
+            raise ValueError('C is not bound to a handled actual user source')
     _validate_snapshot(current['source'])
     _pin_reference(current.get('upstream_route_pin_ref'))
     from .codex_profile import parse_do_supplement
@@ -467,7 +520,7 @@ def _revoke_if_present(root: Path, message: Mapping[str, Any], reason: str) -> N
 
 def handle_message(root: Path, *, message_id: int, action: str, reason: str,
                    delivery_selection: dict | None = None, destinations: Path | None = None,
-                   claude_selection: str | None = None) -> dict[str, Any]:
+                   claude_selection: str | None = None, court_mode: int | None = None) -> dict[str, Any]:
     """Serialize a real policy change with pre-send reservation, not STOP.
 
     The message itself is already pending before this call; an external host
@@ -486,14 +539,16 @@ def handle_message(root: Path, *, message_id: int, action: str, reason: str,
         from .codex_delivery import policy_lock
         with policy_lock(Path(root).resolve()):
             return _handle_message(root,message_id=message_id,action=action,reason=reason,
-                delivery_selection=delivery_selection,destinations=destinations,claude_selection=claude_selection)
+                delivery_selection=delivery_selection,destinations=destinations,claude_selection=claude_selection,
+                court_mode=court_mode)
     return _handle_message(root,message_id=message_id,action=action,reason=reason,
-        delivery_selection=delivery_selection,destinations=destinations,claude_selection=claude_selection)
+        delivery_selection=delivery_selection,destinations=destinations,claude_selection=claude_selection,
+        court_mode=court_mode)
 
 
 def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
                     delivery_selection: dict | None = None, destinations: Path | None = None,
-                    claude_selection: str | None = None) -> dict[str, Any]:
+                    claude_selection: str | None = None, court_mode: int | None = None) -> dict[str, Any]:
     """Apply a model-owned interpretation; this does not judge free-text intent.
 
     Message disposition is not task termination. Ordinary input to ACTIVE is
@@ -517,10 +572,12 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
         raise ValueError('unresolved route does not continue deep execution')
     if action == 'continue' and value['status'] == 'PAUSED':
         raise ValueError('paused task needs an actual resume decision, not implicit continuation')
-    from .codex_session import _session, read_delivery_registry, formal_task_parameters
+    from .codex_session import _session, read_delivery_registry, formal_task_parameters, court_mode_parameter
     from .codex_collaboration import layered_policy
     metadata = _session(root)[1]
     formal = formal_task_parameters(metadata['P_run'])
+    binary_court = court_mode_parameter(metadata['P_run'])
+    prior_c = value.get('court_parameter_source', {}).get('value')
     prior_x = int(value.get('delivery_policy', {}).get('mode') == 'external')
     prior_max = (value.get('max_court_required') is True
                  or (metadata.get('parameter_selection') or {}).get('preset') == 'Max')
@@ -532,13 +589,18 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
     if action == 'budget':
         if (not layered or value['status'] != 'ACTIVE'
                 or message['surface'] != 'NATIVE' or message['route_required']
-                or claude_selection is not None or delivery_selection is not None or destinations is not None):
+                or claude_selection is not None or delivery_selection is not None or destinations is not None
+                or court_mode is not None):
             raise ValueError('Budget handling is for a standalone fee-only reply on an active Stable task')
         value['latest_budget_message_id'] = message_id
     if action not in {'stop', 'cancel'} and value['status'] not in TERMINAL:
         _apply_claude_selection(value, metadata, message, claude_selection)
     elif claude_selection is not None:
         raise ValueError('a terminal task/source cannot change Claude selection')
+    if action not in {'stop', 'cancel'} and value['status'] not in TERMINAL:
+        _apply_court_selection(value, metadata, message, court_mode)
+    elif court_mode is not None:
+        raise ValueError('a terminal task/source cannot change C')
     if metadata.get('delivery_contract') == 'x-files-v1' and action not in {'stop','cancel','pause'}:
         from .codex_profile import classify_invocation
         surface = classify_invocation(message['source']['text'], p_run=metadata['P_run'])
@@ -598,7 +660,7 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
     if formal and action not in {'stop', 'cancel'}:
         from .codex_profile import classify_invocation
         selected_surface = classify_invocation(message['source']['text'], p_run=metadata['P_run'])
-        if (selected_surface['classification'] == 'EXECUTING'
+        if (not binary_court and selected_surface['classification'] == 'EXECUTING'
                 and (selected_surface.get('depth_preferences') or {}).get('preset') == 'Max'
                 and not value.get('max_court_required')):
             value['max_court_required'] = True
@@ -627,7 +689,8 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
     changed_user_parameter = False
     if formal and action == 'ordinary' and value['status'] == 'ACTIVE':
         changed_user_parameter = (prior_x != int(value['delivery_policy']['mode'] == 'external')
-                                  or not prior_max and value.get('max_court_required') is True)
+                                  or (prior_c != value['court_parameter_source']['value'] if binary_court else
+                                      not prior_max and value.get('max_court_required') is True))
         declared = (selected_surface.get('depth_preferences') or {}).get('explicit_overrides', {})
         if selected_surface['classification'] == 'EXECUTING' and 'F' in declared:
             from .codex_session import task_parameters

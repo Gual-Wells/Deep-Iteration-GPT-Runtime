@@ -30,6 +30,11 @@ BRIEF_FIELDS = {
 DECISION_FIELDS = frozenset(BRIEF_FIELDS) - {'basis'}
 _STANDING_COMMISSION = 'STANDING_COMMISSION'
 _GUIDED_COMMISSION = 'STANDING_COMMISSION_WITH_CLAUDE_GUIDANCE'
+POST_U0_REMINDER = (
+    'U0后协议自提醒：沿当前P_run与真实委托继续；按LIVE及时显示实际阶段、独立返回、'
+    '主线处理和公开正文；保持独立性、权限与费用边界，完成RETURN和生命周期收口。'
+    '只核对本次相关规则，不递归初始化，不把提醒当作已遵循的证明。'
+)
 
 
 def _digest(value: Any) -> str:
@@ -217,6 +222,9 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
             value['revocations'] = deepcopy(previous['revocations'])
     if covered_change is not None:
         value['covered_change'] = covered_change
+    from .codex_session import court_mode_parameter
+    if court_mode_parameter(session['P_run']):
+        value['post_u0_protocol_reminder'] = POST_U0_REMINDER
     _write_json(root / 'foundation.json', value)
     return value
 
@@ -619,4 +627,6 @@ def foundation_packet(root: Path) -> str:
               '按这份说明执行时，以完整可用结果组织工作。中间文件、代理结束和参数次数不替代约定成品。'
               '已确认续做只研究相关变化；重要目标、路线或成本变化须先讨论。'
               '脚本记录与可执行入口检查不等于意图正确、用户身份认证或宿主全局拦截。']
+    if value.get('post_u0_protocol_reminder'):
+        parts += ['## U0后协议自提醒', value['post_u0_protocol_reminder']]
     return '\n\n'.join(parts).rstrip() + '\n'

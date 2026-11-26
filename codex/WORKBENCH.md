@@ -225,7 +225,7 @@ python -B tools/codex.py workbench focus --work D:/task/WORK.md --experience D:/
 
 负责该线的 Main 把较高参数与多承担的实际工作一起落实在生效配置和 INIT。后续有新论证、候选、原件或领域时，用同一理由判断该工作应进入当前责任还是追加相应参数。
 
-`profile parameters --text '(Less,X=0,F=3)'` 预览正式X/F及档位参考。新会话把 F 的初次声明随任务原文保存在 `explicit_parameters`，各线参数仍按各自责任填写。将合格项目与实际决定记入任务现有工作笔记。委托变化时沿 `task message/handle` 保留用户的新要求，接续时以当前要求及笔记中的实际研究为准。显示任务级 `X（0或1）` 与 `F（目标/实际）`，细则见 [PARAMETERS](PARAMETERS.md#f-公开社区项目先研)。
+`profile parameters --text '(Less,X=0,F=3,C=1)'` 预览正式X/F/C及档位参考。新会话把 F 的初次声明随任务原文保存在 `explicit_parameters`，各线参数仍按各自责任填写。将合格项目与实际决定记入任务现有工作笔记。委托变化时沿 `task message/handle` 保留用户的新要求，接续时以当前要求及笔记中的实际研究为准。显示任务级 `X（0或1）` 、`F（目标/实际）`与`C（0或1）`，细则见 [PARAMETERS](PARAMETERS.md#f-公开社区项目先研)。
 
 若创建会话时已确定 M 目标，使用 `task create --m` 记录。以下示例在创建时已确定两条完整独立路线。
 
@@ -287,12 +287,16 @@ python -B tools/codex.py visits repair --root D:/task/session --actor D01 --begi
 
 0.8.0及更早session保持旧pin与逐owner activity路径；新任务用session-3/schema2，旧writer不能误读。旧clock/anchor命令仍供原会话使用，不能成为新任务默认入口。产物路径、缓存和日志遵守实际存储分工；无工具需求的短任务直接完成，不先搭工作站。
 
-## Max 法庭与同任务返工
+## C模式法庭与同任务返工
 
-按 COURT 在原生产与研究责任完成后组织实际法庭，并为当前案卷保留真实角色的派发出处、原需求与前文条件、过程材料和最终候选。法院工具的读写入口为 `python -B tools/codex.py court --help`。正式X/F的任务级推断通过 `task parameters --root TASK --input task-parameters.json` 保存，读取时省略input。每条M的初始化仍走line create。输入对象为 `{"parameters":{"X":0,"F":0},"reasons":{"F":"本任务以现有原件完成，不另设社区项目下限"}}`，X只核对当前实际策略，改变X须先按真实用户来源走task message/handle。
+按 COURT 在原生产与研究责任完成后组织实际法庭，并为当前案卷保留真实角色的派发出处、原需求与前文条件、过程材料和最终候选。法院工具的读写入口为 `python -B tools/codex.py court --help`。正式X/F/C的任务级记录通过 `task parameters --root TASK --input task-parameters.json` 保存，读取时省略input。每条M的初始化仍走line create。输入对象为 `{"parameters":{"X":0,"F":0,"C":1},"reasons":{"F":"本任务以现有原件完成，不另设社区项目下限"}}`；X/C只核对当前实际选择。改变X/C须先按真实用户来源走task message/handle；自然语言C选择用`task handle --court-mode 0|1`绑定当前原话，显式头部C自动应用，HELP/损坏/终止输入不能授权改变。
 
 `court open` 固定待返回result、key_changes、argument_scope三段实质正文及artifacts/delivery_files实际字节和过程/需求来源，七个角色包括双方各一位律师和实际书记员；`submit`保存公诉意图级审查、控辩论证及全体同等暴力威慑，`verdict`保存法官逐项裁判。`record`保存实际书记员的证据索引、一致性核对、检索来源与长程公开审判记录，当前裁判须纳入记录后才能关闭或发送。须再执行时`remand`保存有理由的完整自定义配置，实际执行后`review`核对完成来源并建立复审。`status`与正常return检查使用同一当前案卷，旧判决不覆盖新产品或另一个结果。完整JSON对象及实际来源示例见[法院操作示例](examples/COURT_WORKFLOW.md)。示例字段须换成真实材料，不能代替实际角色与执行。
 
 1.5.2及以后，公诉交给控方律师后持续研究并及时补交，不能只交初稿等终审。公诉submit的reviewed_context_sha256使用实际研究后取得的status.prosecution_context_sha256；新的控辩或被告陈述使旧公诉研究过时，法官verdict前须有覆盖当前材料的公诉研究。status.prosecution_review_status显示对应状态；字段只绑定来源上下文，不认证研究实质。新增指控须给各方回应，书记员维持全部增量记录，旧pin不增加该字段。
 
 书记员可复用工具及现有笔记，实际控辩、法官与监庭仍由宿主组织真实身份。X1的最终候选先受审，之后完成原生Gmail发送与读回，正常return最后收口。暂停或终止保留真实未完，不能改写成无罪。
+
+1.6+法院CLI默认返回短回执，`--full`按需取得完整对象；旧pin默认及Python API仍完整。`court packet --root TASK --role ROLE`提供当前原件入口、角色必读来源、逐指控有效回应和上轮字节变化；它不产生已读或研究证明。新C选择及历史进入RETURN与材料绑定。
+
+短回执用于登记/状态，packet用于真实初读、受影响再入或恢复，可能比status大。取得足够材料后继续该问题，按新材料、身份变化或实际失效刷新；不要每次提交前机械串行status、packet与全量重读。packet的record_locator和current_user_input.snapshot_locator可取得本轮真实用户字节，原补充文件日后改变也不替换受审快照。

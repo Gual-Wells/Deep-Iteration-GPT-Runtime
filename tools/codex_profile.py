@@ -26,7 +26,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser('depth', help='show depth preferences and unit-responsibility references')
     sub.add_parser('presets', help='list five preference baselines; no execution or budget')
     parameters = sub.add_parser('parameters', help='show the preference baseline and explicit overrides')
-    parameters.add_argument('--text', default='', help='execution parameter group, without X')
+    parameters.add_argument('--text', default='', help='N/T/R/B/S(n,t,r,b)/D/V/L/M/X/F/C named parameter group')
     parameters.add_argument('--overrides', type=Path, help='explicit structured overrides JSON')
     ins = sub.add_parser('instructions', help='print a layer; never install it')
     ins.add_argument('layer', choices=('light', 'experimental-router', 'codex-agents', 'chat-light', 'chat-deep'))
