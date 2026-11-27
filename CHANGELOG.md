@@ -1,5 +1,12 @@
 # Changelog
 
+## Codex Stable 1.7.0
+
+- 纳入社区的批量论文去重、证据定位、筛选状态、并行研究交接与版本归并，沿现有 S、D、V、F 和工作笔记执行。
+- Gemini 4 Carbon 与 Claude Sonnet 5.5 同等参与前置意图、独立首发、议会研究、正式内容指导、候选和裁决及论文内容。对同一实际输入保持三份独立的 U0，完整外部稿共同主导重组。
+- 两模型共同占用第一层每任务 0.25 美元、第二层每任务 1.25 美元。既有任务继续使用冻结 pin。
+- 成功对接后逐项流式展示两模型的公开目录价。实际请求的授权、费用估计和保留余额继续按自己的入口核验。
+
 ## Codex Stable 1.6.1
 
 - Reuse confirmed charge revisions for the same wallet when pricing a Claude first opinion from OpenRouter's current credits. Deduct uncovered cost changes and unresolved reservations from that balance before sending.

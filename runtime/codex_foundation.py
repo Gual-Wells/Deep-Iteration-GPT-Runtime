@@ -132,6 +132,16 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
                            stable=layered)
     previous = load_foundation(root) if (root / 'foundation.json').exists() else None
     material = change_kind == 'material'
+    intent_review = None
+    intent_council = proposal.get('intent_council')
+    if intent_council is not None:
+        from .codex_collaboration import foundation_intent_policy
+        from .codex_council import foundation_intent_receipt
+        if not material or not foundation_intent_policy(session['P_run']):
+            raise ValueError('Link parallel U0 on a material proposal under the current pin')
+        intent_review = foundation_intent_receipt(root, intent_council)
+    elif previous and not material:
+        intent_review = deepcopy(previous.get('intent_review'))
     guidance_required = False
     if layered:
         supplied_guidance = proposal.get('guidance') is not None
@@ -185,6 +195,8 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
                         'change_kind': change_kind,
                         'guidance': deepcopy(previous.get('guidance')),
                         'covered_change': deepcopy(previous.get('covered_change'))})
+        if previous.get('intent_review'):
+            history[-1]['intent_review'] = deepcopy(previous['intent_review'])
         if layered and previous['latest_change'].get('user_change'):
             history[-1]['user_change'] = deepcopy(previous['latest_change']['user_change'])
         if ((change_kind == 'non_material' or covered_change is not None)
@@ -212,6 +224,8 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
                         'AWAITING_GUIDANCE' if awaiting_guidance else 'AWAITING_USER'),
              'updated_wall_ns': time.time_ns(),
              'record_basis': 'model-authored interpretation; user replies recorded by operator, not authenticated by helper'}
+    if intent_review is not None:
+        value['intent_review'] = intent_review
     if guidance is not None:
         value['guidance'] = guidance
     if enabled(session['P_run']):
@@ -389,7 +403,7 @@ def bind_guidance(root: Path, supplied: Mapping[str, Any]) -> dict[str, Any]:
 
 def answer_foundation(root: Path, question_id: str, *, revision: int, user_text: str,
                       source: str, effect: str, change_kind: str = 'material') -> dict[str, Any]:
-    from .codex_collaboration import layered_policy
+    from .codex_collaboration import foundation_intent_policy, layered_policy
     from .codex_session import _write_json
     from .codex_lifecycle import require_open_decision, consume_decision_message
     root, session = _context(root)
@@ -418,6 +432,12 @@ def answer_foundation(root: Path, question_id: str, *, revision: int, user_text:
     elif not value['confirmation'] and value['status'] not in {'REVISION_REQUIRED', 'AWAITING_GUIDANCE'}:
         value['status'] = 'AWAITING_USER'
     value['latest_change'] = {'kind': change_kind, 'reason': effect}
+    if change_kind == 'material' and foundation_intent_policy(session['P_run']):
+        message = decision_context.get('current_message')
+        if message:
+            src = message['source']
+            value['latest_change']['intent_input'] = {
+                'message_id': message['id'], 'sha256': src['sha256'], 'source_ref': src['source_ref']}
     value['updated_wall_ns'] = time.time_ns()
     _write_json(root / 'foundation.json', value)
     if decision_context.get('managed') is not False:

@@ -34,6 +34,8 @@ def main(argv=None):
     create.add_argument('--claude', action='store_true')
     create.add_argument('--first-opinion', metavar='OPEN_DECISION',
                         help='open one independent Claude opinion before this still-open decision')
+    create.add_argument('--foundation-intent', action='store_true',
+                        help='open independent task-level U0 drafts under the current first layer')
     create.add_argument('--member-count', type=int)
     create.add_argument('--deadline-seconds', type=int, default=300)
     command('inspect', 'read statuses and identity metadata without opinion bodies')
@@ -67,7 +69,9 @@ def main(argv=None):
     plan_options.add_argument('--plan', type=Path,
         help='JSON members object: each member has facts (object or file), ceiling_usd, split_path, optional config_path')
     plan_options.add_argument('--split-plan', type=Path,
-        help='first opinion and its native work returns: read price and wallet facts using OpenRouter')
+        help='one prepared member: use actual Split and quote current OpenRouter cost')
+    plan_options.add_argument('--member-splits', type=Path,
+        help='JSON member-ID-to-Split-path map for paired U0 and first-opinion quotes')
     run.add_argument('--config', type=Path, help='private billing configuration for --split-plan')
     seal = command('seal-member', 'seal actual existing member work without a further paid synthesis')
     seal.add_argument('--member', required=True)
@@ -94,7 +98,7 @@ def main(argv=None):
             result = council.create_council(args.root, council_id=args.council_id,
                 native_actors=args.native_actor, facts_path=args.facts, materials=args.material,
                 enable_claude=args.claude, member_count=args.member_count, deadline_seconds=args.deadline_seconds,
-                first_opinion=args.first_opinion)
+                first_opinion=args.first_opinion, foundation_intent=args.foundation_intent)
         elif args.command == 'inspect':
             result = council.inspect_council(args.root, args.council_id)
         elif args.command == 'packet':
@@ -112,15 +116,22 @@ def main(argv=None):
             result = council.prepare_round(args.root, args.council_id, kind=args.kind,
                 members=args.member, model=args.model, effort=args.effort, max_tokens=args.max_tokens)
         elif args.command == 'run-round':
-            if args.split_plan is not None:
-                jobs = council.first_opinion_plan(args.root, args.council_id, round_id=args.round_id,
-                    split_path=args.split_plan, config_path=args.config)
-                quote = next(iter(jobs.values()))
-                print(json.dumps({'event': 'first_opinion_quote', 'ceiling_usd': quote['ceiling_usd'],
-                                  'model': quote['facts']['model']}, allow_nan=False), flush=True)
+            if args.split_plan is not None or args.member_splits is not None:
+                member_splits = None
+                if args.member_splits is not None:
+                    supplied = read(args.member_splits)
+                    if not isinstance(supplied, dict):
+                        raise ValueError('The member Split file must map member IDs to paths')
+                    base = args.member_splits.resolve().parent
+                    member_splits = {key: base / Path(path) for key, path in supplied.items()}
+                event_name, jobs = council.automatic_round_plan(args.root, args.council_id, round_id=args.round_id,
+                    split_path=args.split_plan, split_paths=member_splits, config_path=args.config)
+                for quote in jobs.values():
+                    print(json.dumps({'event': event_name, 'ceiling_usd': quote['ceiling_usd'],
+                                      'model': quote['facts']['model']}, allow_nan=False), flush=True)
             else:
                 if args.config is not None:
-                    raise ValueError('--config applies to --split-plan; put config_path in an explicit plan')
+                    raise ValueError('--config applies to automatic quotes; use config_path in an explicit plan')
                 jobs = read(args.plan)['members']
                 base = args.plan.resolve().parent
                 for job in jobs.values():

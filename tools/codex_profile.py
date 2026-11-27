@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inspect/export the candidate profile, with no network, model calls or install."""
+"""Inspect or export the profile; quotes read its public model prices."""
 from __future__ import annotations
 
 import argparse
@@ -22,6 +22,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     sub = ap.add_subparsers(dest='command', required=True)
     sub.add_parser('check', help='verify local instruction identity and bytes')
+    sub.add_parser('quotes', help='stream both public model quotes after verified protocol acquisition')
     sub.add_parser('refresh', help='explicitly regenerate local bundle and profile hashes')
     sub.add_parser('depth', help='show depth preferences and unit-responsibility references')
     sub.add_parser('presets', help='list five preference baselines; no execution or budget')
@@ -44,6 +45,15 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == 'check':
             result = verify_distribution(ROOT)
+        elif args.command == 'quotes':
+            from runtime.codex_collaboration import parallel_external_policy
+            from runtime.codex_consult_budget import startup_collaboration_quotes
+            version = verify_distribution(ROOT)['version']
+            if not parallel_external_policy(version + '@' + '0' * 40):
+                raise ValueError('The installed profile does not define paired price display')
+            for quote in startup_collaboration_quotes():
+                print(json.dumps(quote, ensure_ascii=False, allow_nan=False), flush=True)
+            return 0
         elif args.command == 'refresh':
             result = refresh_distribution(ROOT)
         elif args.command == 'depth':

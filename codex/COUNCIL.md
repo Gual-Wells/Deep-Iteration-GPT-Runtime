@@ -1,12 +1,12 @@
-# 单一原生议会与内部 Claude 子议会
+# 单一原生议会与外部并行成员
 
-第一层 Claude 是原生议会内的外部研究成员，参与竞争解释、选择与仲裁。每项议会在同一原生研究链上推进。原生独立者完成初议，待两侧达到完整或明确异常终态后，由原生独立者取得真实公开材料，自主再议并形成返回。Main 负责真实调用、权限费用、来源、暂存和忠实转交，不能先筛 Claude 观点、改写成议会结论。Main 继续完成主线作品和处理返回。
+Sonnet 和 Carbon 是第一层同等地位的外部研究成员，参与竞争解释、选择与仲裁。每项议会在同一原生研究链上推进。原生独立者完成初议，待两侧达到完整或明确异常终态后，由原生独立者取得真实公开材料，自主再议并形成返回。Main 负责真实调用、权限费用、来源、暂存和原文转交。Main 继续完成主线作品和处理返回。
 
 ## 实际身份、观点距离与来源
 
 原生 actor 使用宿主实际创建的独立代理身份；`--native-actor` 是对应关系的本机记录，不是凭名字创造代理。Main 不用自己的总结冒充初议或再议。初议 actor 在取得对侧观点之前，先形成自己的有内容认识、候选问题和候选分域；首次正式采用的领域可以由再议重划。
 
-Claude 成员具有独立 `participation_role=council_member`，按 `council_id/member_id` 保持研究线身份；cycle、共同输入版本和 round 分开绑定。型号、provider、effort 和成员身份是不同字段。成员没有正式 Consult 的主观指导优先权，不能把 Sonnet 型号当成权威来源。正式 Consult 的原有条件关系继续有效；成员意见与既有指导真正发生前提冲突时，按原规则带来源和强替代选择性再入，不能把每条异议都升级成付费终审。
+每位外部成员具有独立 `participation_role=council_member`，按 `council_id/member_id` 保持研究线身份；cycle、共同输入版本和 round 分开绑定。型号、provider、effort 和成员身份是不同字段。成员没有正式 Consult 的主观指导优先权，不能把 Sonnet 型号当成权威来源。正式 Consult 的原有条件关系继续有效；成员意见与既有指导真正发生前提冲突时，按原规则带来源和强替代选择性再入，不能把每条异议都升级成付费终审。
 
 共同输入包保存原始用户原话、当前用户消息、已接受事实和约束，以及实际原件正文和散列。Main 负责排除任一初议侧已形成的推导；散列能固定字节，不能证明其中全是事实。引用、附件历史和模型旧话保留数据身份，不变成新的执行或费用授权。文件路径只用于核对，传入请求的是实际正文。
 
@@ -14,21 +14,21 @@ Claude 成员具有独立 `participation_role=council_member`，按 `council_id/
 
 ## 单冒号的独立首发
 
-Main 按 [PROTOCOL](PROTOCOL.md#单冒号任务的独立首发) 主动发现可能改变交付的开放取舍，在定案前安排一次首发。给 Claude 真实用途、可指认的材料和仍值得探索的选择，保留它自行发现支配议题或提出选项的空间。公开正文先交付站得住的具体立场，理由可在同次正文的后续段落展开。原生初议者独立研究同一任务，收到可用原文再审视观点、依据和替代方案。
+Main 按 [PROTOCOL](PROTOCOL.md#单冒号任务的独立首发) 主动发现可能改变交付的开放取舍，在定案前安排一次首发。给两位外部成员真实用途、可指认的材料和仍值得探索的选择，保留它自行发现支配议题或提出选项的空间。公开正文先交付站得住的具体立场，理由可在同次正文的后续段落展开。原生初议者独立研究同一任务，收到可用原文再审视观点、依据和替代方案。
 
-新任务当前为单冒号时，`council create --first-opinion` 登记一次 `INDEPENDENT` 轮。同一任务恢复时沿用原议会和实际尝试记录。默认 Sonnet 5.5、`high`、16,000 总输出 token，推理与公开正文共用容量。初始请求和真正的 Codex 工作回传续答累计占用第一层额度，遵守真实钱包与用户更窄限额。
+新任务当前为单冒号时，`council create --first-opinion` 登记一次 `INDEPENDENT` 轮。同一任务恢复时沿用原议会和实际尝试记录。默认 Sonnet 5.5 与 Gemini 4 Carbon 各一条成员线，均用 `high`，各 6,000 总输出 token 起步。推理与公开正文共用各自容量。初始请求和真正的 Codex 工作回传续答累计占用第一层额度，遵守真实钱包与用户更窄限额。
 
-已经提交的首发，包括空答，均占用本任务的一次机会。有实际的 Codex 支持工作待回传时，沿该请求同线继续。完成或明确结束后封存该成员。费用、空答、部分正文和传输未明各保留自身事实。Main 按 [LIVE](LIVE.md) 及时原文转播，并在屏障释放后把原文和实际状态交给原生 actor。再议返回处理正文中有依据的立场，说明哪些取舍受影响，随后由 Main 落实。
+每位成员首次实际提交占用其在该任务的一次首发机会，包括空答。各成员的支出仍共用第一层总额度。有实际的 Codex 支持工作待回传时，沿该请求同线继续。完成或明确结束后封存该成员。费用、空答、部分正文和传输未明各保留自身事实。Main 按 [LIVE](LIVE.md) 及时原文转播，并在屏障释放后把原文和实际状态交给原生 actor。再议返回处理正文中有依据的立场，说明哪些取舍受影响，随后由 Main 落实。
 
 等待限于本次取舍，默认期限 300 秒，可按真实决定窗口设置。局部条件无法满足时，原生工作依可用材料继续。已登记而无法发送时，按实际原因处置成员和当前议会。首发的迟到原文可转交原生参与者再议。已有真正的支持工作回传时，沿当前请求、截止时间和额度续答。后续另有实质研究问题时，按当前权限启动普通议会。首发的正文和费用沿原交换读取、转播和对账。
 
-## Claude 委托 Codex 支持工作
+## 外部成员委托 Codex 支持工作
 
-让 Claude 先抓住材料里可能改变交付的东西。它可提出用户没有预设的比较角度、指出一个决定性的假设，或者试写一个能重新组织作品的片段。为了推进自己的判断，它可发起具体委托，说明要验证的问题、需要的原件或产物，以及何种结果会影响判断。委托可以由有分量的发现自然产生。
+让 Sonnet 和 Carbon 各自抓住材料里可能改变交付的东西。它可提出用户没有预设的比较角度、指出一个决定性的假设，或者试写一个能重新组织作品的片段。为了推进自己的判断，它可发起具体委托，说明要验证的问题、需要的原件或产物，以及何种结果会影响判断。委托可以由有分量的发现自然产生。
 
 Codex 根据当前用户要求，承接定位、提取、核对、复算、试作或其它可交付的支持工作，保留真正的限制和证据。宿主从该成员的实际公开返回登记委托。按成员希望区分的解释，保存并回传可读结果、决定性的原件与相邻定义、约束，以及能推翻当前候选的证据。标明出处、覆盖边界和影响判断的实际缺口。经新一次 Split 送回同一成员，沿其公开历史续答。已有费用、截止窗口和任务范围继续生效。相应 Sonnet 回合保留 `high` 或更高的真实配置。
 
-Claude 收到后继续自己提出的问题，依据结果决定要保留、修订还是重做，并给出影响交付的判断、写法或候选。例如一篇车载 DNN 导读可以从「同样的切分、上传和算力，为什么两次运行等待不同」切入。成员可委托 Codex 对照上传公式与计算队列、复算一个只改变历史积压的例子。原件显示跨时隙的积压位于按模型类型划分的 RSU 计算队列，成员据此选择如何先解释历史留下的工作，再引出长期约束。原生议会和 Main 按各自原有角色再议与落实。[论文作者公开稿](https://hub.hku.hk/bitstream/10722/353231/1/content.pdf)
+成员收到后继续自己提出的问题，依据结果决定要保留、修订还是重做，并给出影响交付的判断、写法或候选。例如一篇车载 DNN 导读可以从「同样的切分、上传和算力，为什么两次运行等待不同」切入。成员可委托 Codex 对照上传公式与计算队列、复算一个只改变历史积压的例子。原件显示跨时隙的积压位于按模型类型划分的 RSU 计算队列，成员据此选择如何先解释历史留下的工作，再引出长期约束。原生议会和 Main 按各自原有角色再议与落实。[论文作者公开稿](https://hub.hku.hk/bitstream/10722/353231/1/content.pdf)
 
 每次真实续答在该层保守上界内安排。决定窗口内预计有工作回传时，先给首轮和可能的续答各留合适的空间。若实际受阻，保留该项委托的真实状态及已取得的成果，继续其余工作。具体执行命令见 [WORKBENCH](WORKBENCH.md)。
 
@@ -44,13 +44,19 @@ Claude 收到后继续自己提出的问题，依据结果决定要保留、修�
 
 Stable 的实际成员发送统一从已登记的 `council run-round` 进入，保留单次提交、真实成员和共享钱包检查。当前任务许可及第一层余量支持本轮时直接开展，必要时先估算拟议成员和回传轮的合计上界。已封存成员的待发请求退出本批，其余可派发成员依本轮继续。已经在途的回执按原身份处理，迟到公开正文供后续相关再入。
 
-`INITIAL → REDELIBERATION → COMPLETE` 是本机研究对象的阶段，不代表代码认证了内容质量。每个原生初议 actor 和每个相关 Claude 成员分别封存 `COMPLETE/PARTIAL/FAILED/BUDGET_STOPPED/TIMEOUT/CANCELLED/OUTCOME_UNKNOWN`。只有两侧都进入终态才能释放屏障；异常解除等待，不证明研究完成，不视为支持或反对。
+`INITIAL → REDELIBERATION → COMPLETE` 是本机研究对象的阶段，不代表代码认证了内容质量。每个原生初议 actor 和每个相关外部成员分别封存 `COMPLETE/PARTIAL/FAILED/BUDGET_STOPPED/TIMEOUT/CANCELLED/OUTCOME_UNKNOWN`。只有两侧都进入终态才能释放屏障；异常解除等待，不证明研究完成，不视为支持或反对。
 
 默认 deadline 是每个 cycle 300 秒，可在创建时明确覆盖；不静默延长。屏障只限制相关议会决定，其他主线工作继续。`run-round` 真正并发发送当轮已准备的各成员请求。到 deadline 先返回明确异常阶段，不等待所有 future 的网络工作完成；HTTP 超时也以剩余 deadline 为上限。服务端是否取消和收费仍可能未知，保留共享钱包预留。
 
 屏障释放时固定实际可用的成员 exchange 列表。迟到公开正文保留原 cycle/input 身份，进入 `late_results`，不倒改旧再议包。`reenter-late` 将它作为带来源的新材料开启后续相关再入，不重复发送旧请求。若用户停止，先停止新增请求，再查服务端和费用；断开连接不能当作免费取消。
 
 再议由原生 actor 各自返回实际作品，讨论完整成员材料中的实质主张，尤其是强替代，说明采用、部分采用或反驳的理由及后果。只保存 API 返回或 Main 写“已采纳”不是再议。所有指定原生 actor 返回后才进入 `COMPLETE`。明确停止可 `close --reason ...`，仍保留未完成责任；它不伪造再议已经发生。
+
+## 独立前置意图提取
+
+新 pin 1.7.0 起，对确需重新提取的任务输入创建 `council create --foundation-intent`，命名为 `u0-<实际内容消息编号>`。一名原生作者和 Sonnet、Carbon 两位成员在同一个当前输入包上独立起稿。单、双冒号共用本任务第一层权限和额度。该轮使用独立前置身份，首发及其它第一层研究仍按各自作用域登记。
+
+使用 `prepare-round` 冻结各请求，按成员分别绑定 Split。并行发送后逐方记录公开增量、实际身份与终态。屏障释放后原生作者比较已有完整稿，同等采用两位外部成员的意图理解，依据实际来源处理分歧与缺稿。把已比较的当前议会以 `intent_council` 附给 `foundation propose`。早先用户输入的稿件仍可回核；晚到原文按原轮保留。
 
 ## 持续发展与相关事件
 
@@ -74,17 +80,17 @@ python -B tools/codex.py council packet --root TASK --council-id c-first --actor
 python -B tools/codex.py council prepare-round --root TASK --council-id c-first --kind INDEPENDENT
 ```
 
-把初议包交给真实原生 actor。按 [SPLIT](SPLIT.md) 给已准备的首发 exchange 绑定实际本机分工。已准备的纯文本首发使用 OpenRouter 官方接口、且同一配置能查询模型价格与账户真实余额时，可直接用已绑定的 Split 文件运行。程序通过 `/credits` 核对共享钱包，沿用同一钱包已明确核实的历史费用覆盖，并扣除其后未覆盖的费用和未结预留。按完整请求估算并核对用户限额和 0.20 美元上限后提交单次请求。`/key` 返回的密钥用量和额度属于另一项数据。需要指定私有配置时带 `--config CONFIG.json`。
+把初议包交给真实原生 actor。按 [SPLIT](SPLIT.md) 为每个实际准备的 exchange 绑定本机分工。若当前 OpenRouter 配置可查实际钱包，使用 `--member-splits` 指向 JSON，例如 `{"member-1":"sonnet-split.json","member-2":"carbon-split.json"}`。请求的独立报价、真实余额与已结费用先核对，0.25 美元覆盖本任务两位成员累计支出。只准备一位成员时沿用 `--split-plan`。必要时带 `--config CONFIG.json`。
 
 ```text
-python -B tools/codex.py council run-round --root TASK --council-id c-first --round-id 1 --split-plan SPLIT.json
+python -B tools/codex.py council run-round --root TASK --council-id c-first --round-id 1 --member-splits SPLITS.json
 ```
 
 无法由当前配置读取实际钱包，或采用其他提供商时，可用实际费用事实运行同一已准备请求。以下是 `FIRST.json` 的单成员结构。费用文件和 Split 路径换成本次真实记录，费用预留填适用限额内的实际保守上界。需要指定凭据时，在成员项内填 `config_path`。
 
 ```json
 {"members": {
-  "member-1": {"facts": "wallet-facts.json", "ceiling_usd": 0.20,
+  "member-1": {"facts": "wallet-facts.json", "ceiling_usd": 0.10,
     "split_path": "first-split.json"}
 }}
 ```
@@ -117,9 +123,9 @@ python -B tools/codex.py council prepare-round --root D:/task/session --council-
 
 ```json
 {"members": {
-  "member-1": {"facts": "facts.json", "ceiling_usd": 0.2,
+  "member-1": {"facts": "facts.json", "ceiling_usd": 0.10,
     "split_path": "member-1-split.json", "config_path": "D:/private/consult.json"},
-  "member-2": {"facts": "facts.json", "ceiling_usd": 0.2,
+  "member-2": {"facts": "facts.json", "ceiling_usd": 0.10,
     "split_path": "member-2-split.json", "config_path": "D:/private/consult.json"}
 }}
 ```

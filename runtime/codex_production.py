@@ -22,8 +22,8 @@ def enabled(p_run: str) -> bool:
     return codex_collaboration._since(p_run, (1, 1, 0))
 
 
-def claude_model(model: Any) -> bool:
-    return isinstance(model, str) and bool(re.fullmatch(r'anthropic/claude-[a-z0-9][a-z0-9._:-]*', model))
+def production_model(p_run: str, model: Any) -> bool:
+    return isinstance(model, str) and codex_collaboration.authorized_model(p_run, model)
 
 
 def _task(root: Path, *, active: bool = False) -> tuple[Path, dict, dict]:
@@ -186,8 +186,8 @@ def _candidate_binding(state: Mapping[str, Any]) -> dict:
 
 def _verify_request(binding: Mapping[str, Any], paths: list[Path], request: Mapping[str, Any]) -> None:
     model = request.get('model')
-    if not claude_model(model) or (binding['stage'] == 'arbitration' and model != binding['model']):
-        raise ValueError('Production requires the selected Claude model across candidate and arbitration')
+    if not production_model(binding['P_run'], model) or (binding['stage'] == 'arbitration' and model != binding['model']):
+        raise ValueError('Production requires the same supported collaborator across candidate and arbitration')
     messages = request.get('messages', [])
     latest = messages[-1] if isinstance(messages, list) and messages else None
     if not isinstance(latest, Mapping) or latest.get('role') != 'user':
@@ -217,7 +217,8 @@ def _receipt(directory: Path, attempt: Mapping[str, Any], request: Mapping[str, 
     if (attempt.get('production') != binding or attempt.get('input_ref') != binding['input_ref']
             or attempt.get('participation_role') != 'consult_guidance'
             or attempt.get('authoring_scope') != binding['authoring_scope']
-            or attempt.get('response_model') != request.get('model')
+            or not codex_collaboration.observed_model_matches(
+                binding['P_run'], request.get('model'), attempt.get('response_model'))
             or attempt.get('transport_status') != 'RESPONDED' or attempt.get('public_status') != 'COMPLETE'
             or attempt.get('finish_reason') != 'stop' or attempt.get('http_status') != 200):
         raise ValueError('Production requires a complete actual Claude return in the same task and scope')
@@ -252,7 +253,7 @@ def _binding(root: Path, directory: Path, state: Mapping[str, Any], stage: str,
     candidate = _receipt(candidate_dir, candidate_attempt, candidate_request, binding, [scope_path])
     binding.update(stage=stage, candidate_exchange=candidate['exchange_id'],
                    candidate_request_sha256=candidate['request_sha256'],
-                   candidate_public_sha256=candidate['public_sha256'], model=candidate['model'],
+                   candidate_public_sha256=candidate['public_sha256'], model=candidate_request['model'],
                    native_sha256=native['sha256'], native_return_ref=state['native']['return_ref'])
     return binding, [scope_path, native_path, Path(candidate['public_path'])]
 
@@ -293,7 +294,7 @@ def _arbitration(root: Path, directory: Path, state: Mapping[str, Any], exchange
 
 
 def record_applied(root: Path, production_id: str, *, arbitration_exchange: str,
-                   output_path: Path, effect: str) -> dict:
+                   output_path: Path, effect: str, peer_exchange: str | None = None) -> dict:
     """Record how the actual Claude arbitration was implemented in the final bytes."""
     root, session, _ = _task(root, active=True)
     effect = consult._text('actual effect of arbitration on the final output', effect)
@@ -309,7 +310,17 @@ def record_applied(root: Path, production_id: str, *, arbitration_exchange: str,
         else:
             _require_current_state(state, lifecycle)
         receipt, binding = _arbitration(root, directory, state, arbitration_exchange)
-        if previous is not None and (receipt != previous['arbitration'] or binding != previous['binding']):
+        peer = None
+        if peer_exchange is not None:
+            if not codex_collaboration.parallel_external_policy(session['P_run']):
+                raise ValueError('Paired production requires Codex 1.7.0+')
+            peer_receipt, peer_binding = _arbitration(root, directory, state, peer_exchange)
+            selected = {binding['model'], peer_binding['model']}
+            if selected != set(codex_collaboration.EXTERNAL_MODELS.values()):
+                raise ValueError('Paired arbitration needs one Sonnet and one Carbon response')
+            peer = {'arbitration': peer_receipt, 'binding': peer_binding}
+        if previous is not None and (receipt != previous['arbitration'] or binding != previous['binding']
+                                     or peer != previous.get('peer')):
             raise ValueError('Applied production arbitration provenance changed')
         output = _seal(directory, output_path, 'final', text=False)
         history = list(previous['previous_outputs']) if previous is not None else []
@@ -318,6 +329,8 @@ def record_applied(root: Path, production_id: str, *, arbitration_exchange: str,
         state.update(status='APPLIED', applied={'arbitration': receipt, 'binding': binding,
             'output': output, 'effect': effect, 'applied_at': consult._now(),
             'message_id': lifecycle['handled_message_id'], 'previous_outputs': history})
+        if peer is not None:
+            state['applied']['peer'] = peer
         consult._write(directory / 'production.json', state)
     return inspect(root, production_id)
 
@@ -387,6 +400,12 @@ def _inspect(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any
         receipt, binding = _arbitration(root, directory, state, applied['arbitration']['exchange_id'])
         if receipt != applied['arbitration'] or binding != applied['binding']:
             raise ValueError('Applied production arbitration provenance changed')
+        peer = applied.get('peer')
+        if peer is not None:
+            peer_receipt, peer_binding = _arbitration(root, directory, state, peer['arbitration']['exchange_id'])
+            if (peer != {'arbitration': peer_receipt, 'binding': peer_binding}
+                    or {binding['model'], peer_binding['model']} != set(codex_collaboration.EXTERNAL_MODELS.values())):
+                raise ValueError('Applied paired arbitration provenance changed')
         if state['status'] == 'APPLIED' and state['input_ref'] == consult._input_ref(lifecycle):
             output_matches = _original_matches(output)
     view = {**state, 'input_source': {key: value for key, value in state['input_source'].items() if key != 'text'}}
@@ -423,8 +442,12 @@ def require_applied(root: Path, production_id: str, *, arbitration_exchange: str
     root, session, lifecycle = _task(root, active=True)
     item = _inspect(root, session, lifecycle, production_id)
     applied = item['applied']
-    if (item['status'] != 'APPLIED' or item['input_ref'] != consult._input_ref(lifecycle)
-            or (arbitration_exchange is not None and applied['arbitration']['exchange_id'] != arbitration_exchange)):
+    if item['status'] != 'APPLIED' or item['input_ref'] != consult._input_ref(lifecycle):
+        raise ValueError('Delivery requires a current applied production arbitration')
+    exchanges = {applied['arbitration']['exchange_id']}
+    if applied.get('peer') is not None:
+        exchanges.add(applied['peer']['arbitration']['exchange_id'])
+    if arbitration_exchange is not None and arbitration_exchange not in exchanges:
         raise ValueError('Delivery requires a current applied production arbitration')
     if item['current_output_matches'] is not True:
         raise ValueError('Current final artifact differs from the applied production output')

@@ -49,13 +49,13 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 
 ### 两层 Claude 的费用依据
 
-在本版新单冒号任务中，用 `council create --first-opinion "仍然开放的具体取舍" --facts FACTS.md` 加所用任务根、议会 ID 和真实原生 actor，进入 [COUNCIL](COUNCIL.md#单冒号的独立首发) 的单成员首发。宿主判断真实决定窗口，按需以 `--deadline-seconds` 调整默认 300 秒。用 `prepare-round` 准备 exchange，为该 exchange 实际完成 Split。默认 Sonnet 5.5／high／16,000 总输出 token。有预期回传时，在第一层累计上限内为首轮及必要续答估算余量。
+在本版新单冒号任务中，用 `council create --first-opinion "仍然开放的具体取舍" --facts FACTS.md` 加所用任务根、议会 ID 和真实原生 actor，进入 [COUNCIL](COUNCIL.md#单冒号的独立首发) 的双成员首发。宿主判断真实决定窗口，按需以 `--deadline-seconds` 调整默认 300 秒。用 `prepare-round` 准备 exchange，为每个成员的 exchange 完成实际 Split。Sonnet 5.5 与 Carbon 默认各用 high，分别有 6,000 总输出 token 起步。有预期回传时，在第一层累计上限内为首轮及必要续答估算余量。
 
 首发的问题可以是希望 Claude 帮忙发现选项的真实用途或构形选择。把它可能改变的决定和已具备的材料落在当前 Split 和公开阶段。后续按实际所得选择有新贡献的议会研究或正式指导，沿对应角色及费用入口准备。
 
-纯文本首发走 OpenRouter 官方接口，且同一配置能查询模型价格及账户实际余额时，用 `council run-round --root TASK --council-id ID --round-id 1 --split-plan SPLIT.json`。价格与余额取该配置实际响应，预留受分层上限、共享钱包和用户限额约束。密钥用量或密钥额度单列。采用其他提供商或无账户余额查询权限时，用 `--plan PLAN.json` 提供同一实际账户的费用事实。已提交的首发含空答均沿原 exchange 读回和对账，有实际 Codex 工作回传才按该请求另作同线续答。
+纯文本首发走 OpenRouter 官方接口，且同一配置能查询模型价格及账户实际余额时，用 `council run-round --root TASK --council-id ID --round-id 1 --member-splits SPLITS.json`。SPLITS.json 将每个实际成员 ID 映射到该成员的 Split 文件。价格与余额取该配置实际响应，预留受分层上限、共享钱包和用户限额约束。密钥用量或密钥额度单列。采用其他提供商或无账户余额查询权限时，用 `--plan PLAN.json` 提供同一实际账户的费用事实。已提交的首发含空答均沿原 exchange 读回和对账，有实际 Codex 工作回传才按该请求另作同线续答。
 
-1.3 起，当前实际用户选择直接提供对应层的额度内费用许可。单冒号和双冒号的第一层每任务累计 0.20 美元，双冒号第二层累计 1.00 美元。发送时提供当前价格、完整请求输入量上界、真实钱包余额与保守费用上界。共享钱包在同一事务中核对本层已知费用、未结预留和本次预留，沿用用户实际任务限额。
+当前实际用户选择直接提供对应层的额度内费用许可。1.7 起，Sonnet 和 Carbon 按实际费用及预留共同占用各层额度。单冒号和双冒号的第一层每任务累计 0.25 美元，双冒号第二层累计 1.25 美元。发送时提供当前价格、完整请求输入量上界、真实钱包余额与保守费用上界。共享钱包在同一事务中核对本层已知费用、未结预留和本次预留，沿用用户实际任务限额。 成功对接时的公开目录展示见 [STARTUP](STARTUP.md)，可用 `profile quotes` 流式读取两个型号。
 
 两种入口均可用 `consult budget-preview --root TASK --input INPUT.json --out PREVIEW.json` 提前估算。输入 `wallet_id`、`task_ceiling_usd`、`scope` 和 `jobs`。每项给当前费用 `facts`、`ceiling_usd` 及已准备的 `exchange_id`。为在议会开始前估算，也可用 `planned_council_member` 代替 `exchange_id`，写明实际用途 `purpose`、型号 `model` 和合计输出上限 `max_tokens`。预览的 `layer_budgets` 给出适用层的实际余量和拟预留额度。发送按当前入口授权、钱包和 Split 执行。
 
@@ -83,7 +83,7 @@ python -B tools/codex.py consult split --root TASK --exchange-id NEXT --input NA
 python -B tools/codex.py council run-round --root TASK --council-id ID --round-id ROUND --plan ROUND.json
 ```
 
-当前成员的委托结果齐备后再准备回传。轮次使用实际返回的编号和 exchange ID，沿原成员及同一公开历史传入对应的结果。适用的纯文本 OpenRouter 首发同线续答可沿 `run-round --split-plan SPLIT.json` 自动取价和核对余额。常规 `--plan` 每项指明本次费率、保守上界和 Split。续答仍占用第一层余额，沿原决定窗口和 `high` 或更高配置运行。
+当前成员的委托结果齐备后再准备回传。轮次使用实际返回的编号和 exchange ID，沿原成员及同一公开历史传入对应的结果。适用的纯文本 OpenRouter 首发同线续答可沿成员对应的 `--split-plan` 或多成员 `--member-splits` 自动取价和核对余额。常规 `--plan` 每项指明本次费率、保守上界和 Split。续答仍占用第一层余额，沿原决定窗口和 `high` 或更高配置运行。
 
 ### 第二层准备、两份成品与实际落实
 
@@ -115,6 +115,14 @@ python -B tools/codex.py production inspect --root TASK --production-id F
 
 ## 2. 一份普通笔记与按需材料
 
+### 批量论文证据与并行交接
+
+沿 [METHOD](METHOD.md#批量论文研究与选题评价) 用已有工作笔记维护最少够用的记录。对同一工作可写「工作身份和别名；实际使用的报告、版本和定位；阅读覆盖；贡献主张与前驱实际能力；争议和当前取舍」。例如预印本与正式篇答同一问题，但正式篇实验条件改变。比较时保留两个位置，只把同源结果计为一份证据。出版摘要明确写了全本地对照时，可报告该结果。独立的算法收益继续据正文对照判断。
+
+按需要把「能改判的问题、相关原文、已知条件」交给真实独立研究者。接回「发现、原件位置、条件、异议」后，直接读关键原段并作主线处理。大批可按这个问题迭代推进，已覆盖的小组直接收束。普通 S、D、V 和社区 F 沿其既有语义。原始研究论文按 S，社区项目只有其实际借法产生了后果才计 F。
+
+本做法吸收 [K-Dense 文献审查](https://github.com/K-Dense-AI/scientific-agent-skills/blob/c21d13b3cc2894680229ba9959a53281acb9200e/skills/literature-review/SKILL.md#L83-L108) 的记录与研究分组、[ASReview](https://github.com/asreview/asreview/blob/79d568212b2b0a78f9fd7be3c5117dfb890489f9/docs/source/lab/progress.rst#L110-L128) 的实际筛阅状态、[PaperQA2](https://github.com/Future-House/paper-qa/blob/c692d0dfeac4a0296599f7fe21a253a58b7ac12a/src/paperqa/readers.py#L93-L142) 的原页定位、[Open Deep Research](https://github.com/langchain-ai/open_deep_research/blob/1b7d2e80db9faa586165c60e09096dbbfd483a64/src/open_deep_research/deep_researcher.py#L282-L330) 的按问题并行和 [Zotero](https://github.com/zotero/zotero/blob/8e29f7e654e0e922253bce06f25f1fa9d6da1a2c/test/tests/mergeItemsTest.js#L129-L180) 的合并后来源回查。PRISMA 报表、主动学习筛选、自动成稿或外部搜索服务按具体委托和权限另行选择。
+
 ### 新任务先形成可供决定的完整说明
 
 0.7起的新会话默认要求前置任务说明；0.8起另有当前任务生命周期与消息来源闸门。旧pin仍保留其真实状态，不静默升级。模型先研究实际材料与原话，再提供proposal；脚本不自动识别意图。
@@ -135,6 +143,25 @@ python -B tools/codex.py visits end --root D:/task/session --actor Main --line C
 ```
 
 answer不自动确认整体。模型理解真实答复：用户已看完整说明并明确要求改后执行，可按该决定记录，无需固定口令；提出新重要取舍则先讨论。material修订默认使旧确认不再覆盖当前稿；non_material只允许不改变决策的基础观察维护，并保留原接受内容。目标/成品/范围/粒度/依赖/路线/资源/完成字段改变会拒绝这条快捷路径。改问题或选项后不沿用旧答案；revoke立即失效旧确认，不因仍有accepted历史而可继续。
+
+### 独立提取 U0 的实际入口
+
+在初次 `task create` 或已处理的实质改向后，依据 `task lifecycle` 的当前 `task_input_ref.message_id` 构造本轮 ID。前置工作按 FOUNDATION 计时，正常命令可在已有 brief 被确认之前运行。下例 (0) 是实际原始调用编号。
+
+```text
+python -B tools/codex.py council create --root TASK --council-id u0-0 --foundation-intent --native-actor U0Native --facts FACTS.md
+python -B tools/codex.py council packet --root TASK --council-id u0-0 --actor U0Native
+python -B tools/codex.py council prepare-round --root TASK --council-id u0-0 --kind INDEPENDENT
+python -B tools/codex.py consult split --root TASK --exchange-id SONNET_ID --input SONNET_DECISION.json --out SONNET_SPLIT.json
+python -B tools/codex.py consult split --root TASK --exchange-id CARBON_ID --input CARBON_DECISION.json --out CARBON_SPLIT.json
+python -B tools/codex.py council run-round --root TASK --council-id u0-0 --round-id 1 --member-splits SPLITS.json
+python -B tools/codex.py council native-return --root TASK --council-id u0-0 --actor U0Native --input NATIVE-U0.md --input-version 1
+python -B tools/codex.py council barrier --root TASK --council-id u0-0
+python -B tools/codex.py council packet --root TASK --council-id u0-0 --actor U0Native --stage REDELIBERATION
+python -B tools/codex.py council redeliberation-return --root TASK --council-id u0-0 --actor U0Native --input REORGANIZED-U0.md --input-version 1
+```
+
+Main 启动成员网络调用和独立原生提取后持续按 LIVE 转播。命令的返回顺序取实际发生。最后在重组的 `proposal.json` 顶层附 `"intent_council":"u0-0"`，走本章已有 `foundation propose` 与实际委托或用户决定。SPLITS.json 记录两位准备就绪成员的 Split 路径。工具将实际初稿、当前输入和比较稿的来源身份写入 `intent_review`，语义取舍由 Main 落实。只取得一位完整外部稿时采用其有据理解。两位均未完成时采用原生前置，保留各方已取得的证据与真实终态。因输入变更而无关的旧前置轮，按真实原因关闭；新版输入使用自己的轮和证据。
 
 ### 当前输入、真实续做与结束
 
