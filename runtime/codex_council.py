@@ -697,7 +697,8 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
                 body = (parent_dir / 'public.md').read_bytes().decode('utf-8')
                 codex_council_work.verify_origin(entries, parent, body)
                 if model is not None and model != parent_request['model']:
-                    raise ValueError('Native work returns use the requesting member’s model')
+                    role = 'external' if paired else 'Claude'
+                    raise ValueError(f'Native work returns use the requesting {role} member’s model')
                 for item in entries.values():
                     _artifact_text(directory, item['result'])
             elif entries:
