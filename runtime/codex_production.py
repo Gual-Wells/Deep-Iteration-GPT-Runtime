@@ -1,4 +1,4 @@
-"""Bind a native and a Claude candidate to one current task assignment."""
+"""Bind independent candidates and their actual use to one task assignment."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -316,40 +316,82 @@ def _peer_arbitrations(root: Path, directory: Path, state: Mapping[str, Any],
     return peers
 
 
-def record_applied(root: Path, production_id: str, *, arbitration_exchange: str,
-                   output_path: Path, effect: str, peer_exchange: str | Sequence[str] | None = None) -> dict:
-    """Record how the actual Claude arbitration was implemented in the final bytes."""
+def _peer_decision(root: Path, directory: Path, state: Mapping[str, Any], *,
+                   decision_ref: str, candidate_exchanges: Sequence[str], reviews: Sequence[str]) -> dict:
+    decision_ref = consult._text('actual Main decision reference', decision_ref)
+    if state['native'] is None:
+        raise ValueError('Comparison requires the actual assigned native candidate')
+    _snapshot_path(directory, state['native']['output'], 'native.md')
+    binding, paths = _binding(root, directory, state, 'candidate', None)
+    candidates = []
+    models = set()
+    for exchange in candidate_exchanges:
+        candidate_dir, attempt, request = consult._load(root, exchange)
+        candidate = _receipt(candidate_dir, attempt, request, binding, paths)
+        if request['model'] in models:
+            raise ValueError('Compare at most one current candidate from each external model')
+        models.add(request['model'])
+        candidates.append(candidate)
+    if not candidates:
+        raise ValueError('Comparison requires at least one complete external candidate for the same assignment')
+    external_reviews = []
+    reviewed = set()
+    for exchange in reviews:
+        receipt, review = _arbitration(root, directory, state, exchange)
+        candidate = review['candidate_exchange']
+        if candidate in reviewed or candidate not in candidate_exchanges:
+            raise ValueError('Each optional review must match a different compared external candidate')
+        reviewed.add(candidate)
+        external_reviews.append({'arbitration': receipt, 'binding': review})
+    return {'decision_ref': decision_ref, 'candidates': candidates, 'reviews': external_reviews}
+
+
+def record_applied(root: Path, production_id: str, *, arbitration_exchange: str | None = None,
+                   output_path: Path, effect: str, peer_exchange: str | Sequence[str] | None = None,
+                   candidate_exchanges: Sequence[str] = (), decision_ref: str | None = None) -> dict:
+    """Record the frozen pin's decision evidence and the actual final bytes."""
     root, session, _ = _task(root, active=True)
-    effect = consult._text('actual effect of arbitration on the final output', effect)
+    p_run = session['P_run']
+    comparison = codex_collaboration.peer_collaboration(p_run)
+    if not comparison and (decision_ref is not None or candidate_exchanges or not arbitration_exchange):
+        raise ValueError('This pin requires the actual scoped Claude arbitration')
+    effect = consult._text('actual decision effect on the final output', effect)
+    peer_ids = [peer_exchange] if isinstance(peer_exchange, str) else list(peer_exchange or ())
     with _writer(root):
         lifecycle = require_active(root)
         directory, state = _state(root, session, production_id)
         previous = state['applied']
         if state['status'] == 'APPLIED':
             if (state['input_ref'] != consult._input_ref(lifecycle)
-                    or previous['arbitration']['exchange_id'] != arbitration_exchange):
-                raise ValueError('Reapplying requires the same current assignment and arbitration')
+                    or (comparison and not _current(state, lifecycle))
+                    or (not comparison and previous['arbitration']['exchange_id'] != arbitration_exchange)):
+                kind = 'decision' if comparison else 'arbitration'
+                raise ValueError('Reapplying requires the same current assignment and ' + kind)
             _snapshot_path(directory, previous['output'], _final_name(previous['output']['sha256']))
         else:
             _require_current_state(state, lifecycle)
-        receipt, binding = _arbitration(root, directory, state, arbitration_exchange)
-        peer_ids = [peer_exchange] if isinstance(peer_exchange, str) else list(peer_exchange or ())
-        peers = _peer_arbitrations(root, directory, state, binding['model'], peer_ids)
-        if previous is not None and (receipt != previous['arbitration'] or binding != previous['binding']
-                                     or peers != _saved_peers(previous)):
-            raise ValueError('Applied production arbitration provenance changed')
+        if comparison:
+            review_ids = ([arbitration_exchange] if arbitration_exchange else []) + peer_ids
+            basis = _peer_decision(root, directory, state, decision_ref=decision_ref,
+                                   candidate_exchanges=candidate_exchanges, reviews=review_ids)
+        else:
+            receipt, binding = _arbitration(root, directory, state, arbitration_exchange)
+            basis = {'arbitration': receipt, 'binding': binding}
+            peers = _peer_arbitrations(root, directory, state, binding['model'], peer_ids)
+            if peers:
+                basis.update({'peers': peers} if codex_collaboration.flex_collaboration_policy(p_run)
+                             else {'peer': peers[0]})
+        if previous is not None:
+            prior_basis = {key: value for key, value in previous.items()
+                           if key not in {'output', 'effect', 'applied_at', 'message_id', 'previous_outputs'}}
+            if basis != prior_basis:
+                raise ValueError('Applied production decision provenance changed')
         output = _seal(directory, output_path, 'final', text=False)
         history = list(previous['previous_outputs']) if previous is not None else []
         if previous is not None and output != previous['output']:
             history.append({key: previous[key] for key in ('output', 'effect', 'applied_at', 'message_id')})
-        state.update(status='APPLIED', applied={'arbitration': receipt, 'binding': binding,
-            'output': output, 'effect': effect, 'applied_at': consult._now(),
-            'message_id': lifecycle['handled_message_id'], 'previous_outputs': history})
-        if peers:
-            if codex_collaboration.flex_collaboration_policy(session['P_run']):
-                state['applied']['peers'] = peers
-            else:
-                state['applied']['peer'] = peers[0]
+        state.update(status='APPLIED', applied={**basis, 'output': output, 'effect': effect,
+            'applied_at': consult._now(), 'message_id': lifecycle['handled_message_id'], 'previous_outputs': history})
         consult._write(directory / 'production.json', state)
     return inspect(root, production_id)
 
@@ -420,13 +462,20 @@ def _inspect(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any
         applied = state['applied']
         output = applied['output']
         _snapshot_path(directory, output, _final_name(output['sha256']))
-        receipt, binding = _arbitration(root, directory, state, applied['arbitration']['exchange_id'])
-        if receipt != applied['arbitration'] or binding != applied['binding']:
-            raise ValueError('Applied production arbitration provenance changed')
-        peers = _saved_peers(applied)
-        peer_ids = [peer['arbitration']['exchange_id'] for peer in peers]
-        if _peer_arbitrations(root, directory, state, binding['model'], peer_ids) != peers:
-            raise ValueError('Applied peer arbitration provenance changed')
+        if codex_collaboration.peer_collaboration(session['P_run']):
+            observed = _peer_decision(root, directory, state, decision_ref=applied['decision_ref'],
+                candidate_exchanges=[item['exchange_id'] for item in applied['candidates']],
+                reviews=[item['arbitration']['exchange_id'] for item in applied['reviews']])
+            if any(applied[key] != value for key, value in observed.items()):
+                raise ValueError('Applied comparison evidence changed')
+        else:
+            receipt, binding = _arbitration(root, directory, state, applied['arbitration']['exchange_id'])
+            if receipt != applied['arbitration'] or binding != applied['binding']:
+                raise ValueError('Applied production arbitration provenance changed')
+            peers = _saved_peers(applied)
+            peer_ids = [peer['arbitration']['exchange_id'] for peer in peers]
+            if _peer_arbitrations(root, directory, state, binding['model'], peer_ids) != peers:
+                raise ValueError('Applied peer arbitration provenance changed')
         if state['status'] == 'APPLIED' and state['input_ref'] == consult._input_ref(lifecycle):
             output_matches = _original_matches(output)
     view = {**state, 'input_source': {key: value for key, value in state['input_source'].items() if key != 'text'}}
@@ -458,17 +507,24 @@ def inspect(root: Path, production_id: str | None = None) -> dict:
     return _inspect(root, session, lifecycle, production_id)
 
 
-def require_applied(root: Path, production_id: str, *, arbitration_exchange: str | None = None) -> dict:
+def require_applied(root: Path, production_id: str, *, arbitration_exchange: str | None = None,
+                    candidate_exchange: str | None = None) -> dict:
     """Verify actual applied bytes for a current task delivery or paper artifact."""
     root, session, lifecycle = _task(root, active=True)
     item = _inspect(root, session, lifecycle, production_id)
     applied = item['applied']
     if item['status'] != 'APPLIED' or item['input_ref'] != consult._input_ref(lifecycle):
-        raise ValueError('Delivery requires a current applied production arbitration')
-    exchanges = {applied['arbitration']['exchange_id']}
-    exchanges.update(peer['arbitration']['exchange_id'] for peer in _saved_peers(applied))
-    if arbitration_exchange is not None and arbitration_exchange not in exchanges:
-        raise ValueError('Delivery requires a current applied production arbitration')
+        raise ValueError('Delivery requires a current applied production decision')
+    if candidate_exchange is not None and not any(
+            candidate['exchange_id'] == candidate_exchange for candidate in applied.get('candidates', [])):
+        raise ValueError('Delivery requires a candidate from the current applied comparison')
+    if arbitration_exchange is not None:
+        reviews = applied.get('reviews', _saved_peers(applied))
+        exchanges = {review['arbitration']['exchange_id'] for review in reviews}
+        if 'arbitration' in applied:
+            exchanges.add(applied['arbitration']['exchange_id'])
+        if arbitration_exchange not in exchanges:
+            raise ValueError('Delivery requires a review from the current applied production decision')
     if item['current_output_matches'] is not True:
         raise ValueError('Current final artifact differs from the applied production output')
     return applied

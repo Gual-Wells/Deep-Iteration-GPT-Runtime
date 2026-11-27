@@ -1,4 +1,4 @@
-"""Render the five-part report intended for the conversation response body.
+"""Render the versioned report intended for the conversation response body.
 
 This checks a selected Markdown document, not a host UI event, factual accuracy,
 or whether the model actually pasted that document into its final response.
@@ -6,6 +6,7 @@ or whether the model actually pasted that document into its final response.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from html import escape
 from html.parser import HTMLParser
 import re
 
@@ -18,6 +19,46 @@ SECTIONS = (
     ('parameters', '参数'),
 )
 LEGACY_SCOPE = ('verification_limits', '核验与限制')
+ERROR_SECTION = ('execution_errors', '执行报错')
+ERROR_REPORT_SCHEMA = 3
+_ERROR_STATUS = {'RECOVERED': '已恢复', 'OPEN': '未解决', 'BLOCKED': '受阻'}
+_ERROR_FIELDS = ('id', 'stage', 'problem', 'impact', 'status', 'handling')
+_ERROR_HEADER = '| 顺序 | 阶段 | 问题 | 影响 | 状态 | 处理 |'
+_NO_ERRORS = '未记录执行报错。'
+
+
+def ordered_error_policy(p_run: str) -> bool:
+    from .codex_collaboration import _since
+    return _since(p_run, (1, 9, 0))
+
+
+def execution_error(item: Mapping[str, object]) -> dict[str, str]:
+    if not isinstance(item, Mapping) or set(item) != set(_ERROR_FIELDS):
+        raise ValueError('execution error needs id, stage, problem, impact, status and handling')
+    if any(not isinstance(item[key], str) or not item[key].strip() for key in _ERROR_FIELDS):
+        raise ValueError('execution error fields must be nonempty public text')
+    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,95}', item['id']):
+        raise ValueError('execution error id must be a stable simple identifier')
+    if item['status'] not in _ERROR_STATUS:
+        raise ValueError('execution error status must be RECOVERED, OPEN or BLOCKED')
+    return {key: item[key].strip() for key in _ERROR_FIELDS}
+
+
+def render_execution_errors(items: Sequence[Mapping[str, object]]) -> str:
+    if not isinstance(items, list):
+        raise ValueError('a current ordered execution error list is required')
+    if not items:
+        return _NO_ERRORS
+    lines = [_ERROR_HEADER, '| --- | --- | --- | --- | --- | --- |']
+    substitutions = str.maketrans({char: '\\' + char for char in '\\[]*_\x60'} | {'|': '&#124;'})
+    for number, item in enumerate(items, 1):
+        row = execution_error(item)
+        cells = (str(number), row['stage'], row['problem'], row['impact'],
+                 _ERROR_STATUS[row['status']], row['handling'])
+        # Keep observed text literal and on one table row.
+        plain = [escape(' '.join(cell.split()), quote=False).translate(substitutions) for cell in cells]
+        lines.append('| ' + ' | '.join(plain) + ' |')
+    return '\n'.join(lines)
 
 
 def response_sections(data: Mapping[str, object]):
@@ -25,7 +66,8 @@ def response_sections(data: Mapping[str, object]):
     if 'argument_scope' in data and 'verification_limits' in data:
         raise ValueError('provide argument_scope or legacy verification_limits, not both')
     fourth = LEGACY_SCOPE if 'verification_limits' in data else SECTIONS[3]
-    return SECTIONS[:3] + (fourth,) + SECTIONS[4:]
+    tail = (ERROR_SECTION,) if data.get('schema_version') == ERROR_REPORT_SCHEMA else ()
+    return SECTIONS[:3] + (fourth,) + SECTIONS[4:] + tail
 
 
 def _prose_lines(text: str):
@@ -123,8 +165,8 @@ def _has_work_table(text: str) -> bool:
     return False
 
 
-def validate_response(text: str) -> None:
-    """Check five ordered, nonempty level-two sections and no raw prose HTML.
+def validate_response(text: str, *, schema_version: int = 2) -> None:
+    """Check the ordered, nonempty level-two sections and no raw prose HTML.
 
     Subheadings and literal code are allowed. Artifact links are allowed. This
     function deliberately does not guess whether a linked artifact replaces an
@@ -142,17 +184,18 @@ def validate_response(text: str) -> None:
             if stripped.startswith('## ') and not stripped.startswith('### '):
                 headings.append((index, stripped[3:].strip()))
             elif stripped.startswith('# '):
-                raise ValueError('use the five level-two report sections; subheadings start at level three')
+                raise ValueError('use level-two report sections; subheadings start at level three')
             prose.append(line)
     parser.feed(_without_angle_link_destinations(_without_inline_code('\n'.join(prose))))
     parser.close()
     if parser.found:
         raise ValueError('raw HTML cannot carry the response report; quote code samples as Markdown code')
     titles = tuple(title for _, title in headings)
-    current_titles = tuple(title for _, title in SECTIONS)
+    sections = SECTIONS + ((ERROR_SECTION,) if schema_version == ERROR_REPORT_SCHEMA else ())
+    current_titles = tuple(title for _, title in sections)
     legacy_titles = current_titles[:3] + (LEGACY_SCOPE[1],) + current_titles[4:]
     if titles not in (current_titles, legacy_titles):
-        raise ValueError('response needs five ordered sections: ' + ' -> '.join(title for _, title in SECTIONS))
+        raise ValueError('response needs ordered sections: ' + ' -> '.join(current_titles))
     if any(line.strip() for line in lines[:headings[0][0]]):
         raise ValueError('the response starts with the result section, without an outer code fence or preface')
     for position, (start, title) in enumerate(headings):
@@ -162,6 +205,10 @@ def validate_response(text: str) -> None:
     work = '\n'.join(lines[headings[2][0] + 1:headings[3][0]])
     if not _has_work_table(work):
         raise ValueError('work process needs a readable Markdown time/work table; unknown times may be explicit')
+    if schema_version == ERROR_REPORT_SCHEMA:
+        errors = '\n'.join(lines[headings[-1][0] + 1:]).strip()
+        if errors != _NO_ERRORS and (not errors.startswith(_ERROR_HEADER + '\n') or not _has_work_table(errors)):
+            raise ValueError('execution error section needs the ordered error table or explicit empty report')
 
 
 def render_response(data: Mapping[str, object]) -> str:
@@ -169,11 +216,13 @@ def render_response(data: Mapping[str, object]) -> str:
     parts = []
     for field, title in response_sections(data):
         body = data.get(field)
+        if field == ERROR_SECTION[0]:
+            body = render_execution_errors(body)
         if not isinstance(body, str) or not body.strip():
             raise ValueError('explicit Markdown body required for ' + field)
         parts.append('## ' + title + '\n\n' + body.strip())
     text = '\n\n'.join(parts) + '\n'
-    validate_response(text)
+    validate_response(text, schema_version=data.get('schema_version', 2))
     return text
 
 

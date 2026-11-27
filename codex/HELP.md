@@ -4,8 +4,8 @@
 | --- | --- |
 | `DIGR：核对这组设计的机制并完成约定修改` | Codex 研究和交付。在能影响成品的取舍定案前，请 Sonnet、Hydrogen 和 Grok 作独立首发。第一层累计 0.25 美元内直接使用。 |
 | `DIGR：：请 Claude 就这份稿件的结构给建议` | 第二层指导。Main 落实有效建议。 |
-| `DIGR：：让 Claude 制作一份可用的解释` | 第二层正式产出。原生 L3 和 Claude 独立完成同范围候选，Claude 对两份成品终裁，Main 落实并交付。 |
-| `DIGR：：用 Sonnet 完整讲通这篇论文` | 对完整论文读物执行双边产出与裁决，接入同 pin 的[论文增量](../paper/PROTOCOL.md)。 |
+| `DIGR：：让 Claude 制作一份可用的解释` | 第二层正式产出。原生 L3 和 Claude 独立完成同范围候选，Main 按同一标准比较并交付。 |
+| `DIGR：：用 Sonnet 完整讲通这篇论文` | 为完整论文读物产出同范围独立候选并比较，接入同 pin 的[论文增量](../paper/PROTOCOL.md)。 |
 | `DIGR(Less)(X)：任务` | 参考 Less 投入偏好推断各项参数，最终文件按配置交付至本人 Gmail。 |
 | `DIGR(More,N=20)：任务` | 参考 More 投入偏好，按显式 N 声明和实际任务推断完整配置。 |
 | `DIGR(Less,F=3)：设计离线阅读器的批注同步方案` | 先研究至少 3 个来自相关公开社区的高评价、有特色的项目，再将所得用于相关方案的取舍。 |
@@ -61,6 +61,8 @@ X 是正式二元参数，X0在当前聊天交付，显式X1选择本人Gmail；
 
 ## 本机工具
 
-`python -B tools/codex.py consult prepare` 组装实际任务包。第二层用 `--guidance` 或正式对象和阶段参数声明实际目的。`consult split --input native-decision.json --out split-plan.json` 绑定当前计划，`consult call --split-plan …` 通过本机 Split 核对后在真实预算内作一次提交。`consult inspect` 读公开事实，`reconcile-cost` 负责对账。`consult budget-preview` 用于估算，`consult budget-limit` 登记用户给出的更窄限额。`production` 记录实际派发、候选及裁决进入成品的后果，论文请求用 `--paper-root` 绑定对应对象。
+`python -B tools/codex.py consult prepare` 组装实际任务包。第二层用 `--guidance` 或正式对象和阶段参数声明实际目的。`consult split --input native-decision.json --out split-plan.json` 绑定当前计划，`consult call --split-plan …` 通过本机 Split 核对后在真实预算内作一次提交。`consult inspect` 读公开事实，`reconcile-cost` 负责对账。`consult budget-preview` 用于估算，`consult budget-limit` 登记用户给出的更窄限额。`production` 记录实际派发、候选、实际选择及成品后果，论文请求用 `--paper-root` 绑定对应对象。
 
 `profile check`只检本地完整性，`acquire`真实联网取pin；`live work/read/ack` 保存真实阶段和无损公开流，宿主实际转播后再确认显示。 `usage` 返回真实 Claude 美元及 Codex 模型和档位的用量证据。 `paper`、`visits` 和 `return` 保存作用域、事实与接续。它们不代替模型的研究、内容判断或有效指导的落实。完整执行按[PROTOCOL](PROTOCOL.md)及manifest全部核心，操作细节见[WORKBENCH](WORKBENCH.md)。
+
+1.9 的最终正文在参数之后显示「执行报错」，按首次发生顺序附阶段、问题、影响、状态和处理。

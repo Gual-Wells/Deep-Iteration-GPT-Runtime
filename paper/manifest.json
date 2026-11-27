@@ -1,6 +1,6 @@
 {
   "name": "DIGR Paper Reading",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "protocol": "digrp-codex-1",
   "version_path": "paper/VERSION",
   "entrypoint": "paper/PROTOCOL.md",
@@ -10,11 +10,11 @@
   "authoring_contract": "sonnet-native-v1",
   "mapping_contract": "source-bound-native-v1",
   "file_sha256": {
-    "paper/VERSION": "a466ef209f5c3aee5ff0c702e2e9d5cced4783d2a655e8ab66330f21a5557b3f",
-    "paper/PROTOCOL.md": "8aa66949ce68c914566ae9d863d7b3b785baece2322c82597f3d5b8f8f03b9e0",
-    "paper/DATA.md": "428bc08456947d27b9083025ce657090ae1547f8e713b4d8fc1e72e7f33b62da",
+    "paper/VERSION": "c9f56eb9348cbc8345bdaea7ca24c9f960e1598af05472794760a2682ff07a8c",
+    "paper/PROTOCOL.md": "f43a5e31f94c12ef8c43e089304a6da015f7980817f8ebe3d49ea202e23bfe21",
+    "paper/DATA.md": "3cfad044dfa10daf2ced83b51c243e08f0db9a3e6a1177d3ecda53eb1ed26a7b",
     "paper/PDF_DESIGN.md": "2ca1484e2010b244eb89c7d27e3921c555fe7b49786cf608f3b93e0ca2272d98",
-    ".agents/skills/digr-paper/SKILL.md": "83eba8e2da6d02069ec070ff4fed32e0146cbbcf4178c8dbbc10db8ec28c03b2",
+    ".agents/skills/digr-paper/SKILL.md": "a4d06e73aa7f4658c0e1f58b07755d7f3dbee76cb779323e2606d33963469f0b",
     ".agents/skills/digr-paper/agents/openai.yaml": "389a53aeddbfddb7125ca1dac25685a5ecd3b14a7979423fe83d92d516d89ca1"
   }
 }

@@ -114,7 +114,7 @@ def _questions(items: Any, *, restriction_admission: bool = False,
 
 def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
                        change_kind: str = 'material') -> dict[str, Any]:
-    from .codex_collaboration import layered_policy
+    from .codex_collaboration import layered_policy, peer_collaboration
     from .codex_guidance import covered_revision, enabled, for_proposal
     from .codex_session import _write_json
     from .codex_lifecycle import require_open_decision
@@ -146,8 +146,9 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
     if layered:
         supplied_guidance = proposal.get('guidance') is not None
         previously_required = bool(previous and previous['guidance_required'])
-        guidance_required = proposal.get('guidance_required', supplied_guidance or previously_required)
-        if type(guidance_required) is not bool or (supplied_guidance and not guidance_required):
+        legacy_guidance = supplied_guidance and not peer_collaboration(session['P_run'])
+        guidance_required = proposal.get('guidance_required', previously_required or legacy_guidance)
+        if type(guidance_required) is not bool or (legacy_guidance and not guidance_required):
             raise ValueError('formal guidance receipt and guidance_required must describe the same content dependency')
         if previous and not material and guidance_required != previously_required:
             raise ValueError('a different formal content-guidance dependency needs a material revision')
@@ -250,9 +251,9 @@ def adopt_commission(root: Path, supplied: Mapping[str, Any]) -> dict[str, Any]:
     Stable scope change. It does not parse intent, consume an old message as new, turn a
     budget reply into consent, or revive a withdrawn decision. The operator owns
     the source-grounded claim that the original commission actually delegates
-    the execution; the guidance author settles the task's prior choices.
+    the execution and how any public guidance informed the actual decision.
     """
-    from .codex_collaboration import layered_policy
+    from .codex_collaboration import layered_policy, peer_collaboration
     from .codex_guidance import enabled, input_ref, public_receipt
     from .codex_lifecycle import content_message, require_active
     from .codex_session import _write_json
@@ -314,9 +315,9 @@ def adopt_commission(root: Path, supplied: Mapping[str, Any]) -> dict[str, Any]:
         if commission_quote not in authority_text:
             raise ValueError('standing commission scope quote must be in the selected task instruction')
         declared = value.get('guidance')
-        if value['guidance_required']:
-            if not declared:
-                raise ValueError('the dependent content scope awaits complete formal guidance')
+        if value['guidance_required'] and not declared:
+            raise ValueError('the dependent content scope awaits complete formal guidance')
+        if declared and (value['guidance_required'] or peer_collaboration(session['P_run'])):
             candidate_guidance = candidate_guidance if candidate_guidance is not None else declared
         elif candidate_guidance is not None:
             raise ValueError('attach formal guidance to the actual content scope in a proposal first')

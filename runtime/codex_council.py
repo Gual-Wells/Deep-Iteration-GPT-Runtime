@@ -1155,7 +1155,8 @@ def foundation_intent_receipt(root: Path, council_id: str) -> dict:
     return {'council_id': council_id, 'input_ref': packet['input_ref'],
             'native': {'actor': actor, 'sha256': native['sha256']}, 'external_drafts': drafts,
             'completed_collaborators': full, 'comparison_sha256': comparison['sha256'],
-            'basis': 'EXTERNAL_INTENT_PRIORITY' if full else 'NATIVE_FALLBACK',
+            'basis': ('PEER_COMPARISON' if full and codex_collaboration.peer_collaboration(state['P_run'])
+                      else 'EXTERNAL_INTENT_PRIORITY' if full else 'NATIVE_FALLBACK'),
             'scope': 'actual combined comparison, independent input evidence and current user commission'}
 
 
@@ -1205,6 +1206,13 @@ def read_packet(root: Path, council_id: str, *, actor: str, stage: str = 'INITIA
                         'known_cost_usd': attempt.get('known_cost_usd'), 'reserved_usd': attempt.get('reserved_usd'),
                         'sha256': attempt['public_sha256'], 'chunks': _chunks(body, chunk_chars)})
         if state.get('foundation_intent'):
+            if codex_collaboration.peer_collaboration(state['P_run']):
+                result['native_duty'] = (
+                    'Assess each complete native and external draft by the same actual user words, '
+                    'verified facts, feasibility and authority. Explain material differences and how the '
+                    'resulting U0 resolves them. Partial material can contribute verifiable points. '
+                    'Surface any consequential choice still reserved for the user.')
+                return result
             result['native_duty'] = ('Compare independent drafts on the same input. Give each complete '
                 'identified external draft equal priority over native preferences. If the two disagree, '
                 'resolve against explicit user words, verified facts, feasibility and actual authority or '

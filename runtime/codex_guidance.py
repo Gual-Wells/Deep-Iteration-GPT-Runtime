@@ -65,6 +65,7 @@ def _legacy_identity(root: Path, session: Mapping, attempt: Mapping,
 
 def public_receipt(root: Path, supplied: Mapping, *, current: bool = True) -> dict:
     """Verify an actual complete formal Claude exchange, never a caller's quote."""
+    from . import codex_collaboration
     from .codex_consult import DEFAULT_MODEL, _load
     from .codex_lifecycle import require_active
     from .codex_session import _session
@@ -76,7 +77,7 @@ def public_receipt(root: Path, supplied: Mapping, *, current: bool = True) -> di
     if not isinstance(exchange_id, str) or not exchange_id:
         raise ValueError('guidance must identify a real exchange')
     directory, attempt, request = _load(root, exchange_id)
-    if attempt.get('production', {}).get('stage') == 'candidate':
+    if (attempt.get('production') or {}).get('stage') == 'candidate':
         raise ValueError('A production candidate is not the scoped arbitration decision')
     legacy = None
     if enabled(session['P_run']):
@@ -85,9 +86,14 @@ def public_receipt(root: Path, supplied: Mapping, *, current: bool = True) -> di
         legacy = _legacy_identity(root, session, attempt, supplied)
         identity = {'kind': 'EXPLICIT_LEGACY_PRECALL_WALLET_CLAIM',
                     'task_uuid': session['task_uuid'], 'claim_id': legacy['claim_id']}
+    requested, returned = request.get('model'), attempt.get('response_model')
+    if codex_collaboration.peer_collaboration(session['P_run']):
+        same_model = (isinstance(requested, str) and codex_collaboration.authorized_model(session['P_run'], requested)
+                      and codex_collaboration.observed_model_matches(session['P_run'], requested, returned))
+    else:
+        same_model = requested == returned == DEFAULT_MODEL
     if (attempt.get('participation_role') != 'consult_guidance'
-            or request.get('model') != DEFAULT_MODEL
-            or attempt.get('response_model') != DEFAULT_MODEL
+            or not same_model
             or attempt.get('transport_status') != 'RESPONDED'
             or attempt.get('public_status') != 'COMPLETE'
             or attempt.get('finish_reason') != 'stop'
@@ -193,13 +199,13 @@ def for_proposal(root: Path, session: Mapping, supplied: Mapping | None,
                  *, previous: Mapping | None, material: bool,
                  covered_change: Mapping | None = None,
                  guidance_required: bool = False) -> dict | None:
-    from .codex_collaboration import layered_policy
+    from .codex_collaboration import layered_policy, peer_collaboration
     from .codex_lifecycle import load_lifecycle
     if not enabled(session['P_run']):
         return None  # Immutable old pins retain their original entry semantics.
     lifecycle = load_lifecycle(root)
     if layered_policy(session['P_run']):
-        if not guidance_required:
+        if not guidance_required and not peer_collaboration(session['P_run']):
             return None
         if covered_change is not None:
             return covered_change['guidance']

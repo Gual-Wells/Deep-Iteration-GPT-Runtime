@@ -76,6 +76,10 @@ def flex_collaboration_policy(p_run: str) -> bool:
     return _since(p_run, (1, 8, 0))
 
 
+def peer_collaboration(p_run: str) -> bool:
+    return _since(p_run, (1, 9, 0))
+
+
 def external_models(p_run: str) -> Mapping[str, str]:
     return _FLEX_EXTERNAL_MODELS if flex_collaboration_policy(p_run) else EXTERNAL_MODELS
 
@@ -99,9 +103,13 @@ def layer_ceilings(p_run: str) -> dict[str, float]:
     return SHARED_LAYER_CEILINGS_USD if parallel_external_policy(p_run) else DOUBLE_COLON_LAYER_CEILINGS_USD
 
 
-def priority_collaborator(p_run: str, model: str) -> bool:
+def paper_collaborator(p_run: str, model: str) -> bool:
     return bool(SONNET_MODEL.fullmatch(model)) or (
         parallel_external_policy(p_run) and model in external_models(p_run).values())
+
+
+def priority_collaborator(p_run: str, model: str) -> bool:
+    return not peer_collaboration(p_run) and paper_collaborator(p_run, model)
 
 
 def external_participant(p_run: str, model: str | None) -> str | None:
@@ -196,7 +204,7 @@ def requirements(p_run: str, model: str, paper_scope: Mapping[str, Any] | None, 
     if participation_role == 'council_member':
         protocols = ['codex/COUNCIL.md', 'codex/COLLABORATION.md', 'codex/SPLIT.md', 'codex/PERMISSIONS.md']
     if paper_scope is not None:
-        if not priority:
+        if not paper_collaborator(p_run, model):
             raise ValueError('Selected paper content driving requires a supported canonical authoring model')
         protocols += ['paper/PROTOCOL.md', 'paper/DATA.md', 'paper/PDF_DESIGN.md']
     result = {'format': FORMAT, 'entrypoint': 'DIGR', 'selection_basis': 'ACTUAL_REQUEST_MODEL_AND_SCOPE',
@@ -216,6 +224,8 @@ def requirements(p_run: str, model: str, paper_scope: Mapping[str, Any] | None, 
         result['subjective_guidance_priority'] = participation_role == 'consult_guidance' and priority
         if parallel_external_policy(p_run):
             result['external_participant'] = content_author
+        if peer_collaboration(p_run):
+            result['decision_weight'] = 'EQUAL_TO_NATIVE_ON_THE_SAME_SCOPE'
     if layered_policy(p_run):
         result['claude_layer'] = CLAUDE_LAYER_BY_ROLE[participation_role]
     return result

@@ -18,11 +18,12 @@ import re
 import time
 from typing import Any
 
-VERSION = '0.6.2'
+VERSION = '0.6.3'
 CORE_MINIMUMS = {
     '0.3.0': (0, 9, 0), '0.4.0': (0, 10, 0), '0.5.0': (0, 11, 0),
     '0.5.1': (0, 11, 1), '0.5.2': (0, 12, 0), '0.5.3': (0, 12, 1),
-    '0.5.4': (0, 13, 0), '0.6.0': (0, 14, 0), '0.6.1': (1, 0, 0), VERSION: (1, 1, 0),
+    '0.5.4': (0, 13, 0), '0.6.0': (0, 14, 0), '0.6.1': (1, 0, 0),
+    '0.6.2': (1, 1, 0), VERSION: (1, 9, 0),
 }
 SINGLE_PDF_CONTRACT = 'single-pdf-one-message'
 X_PDF_CONTRACT = 'single-pdf-x-files'
@@ -370,10 +371,12 @@ def _native_consultation(root, value, supplied):
     scope = attempt.get('authoring_scope')
     if not isinstance(scope, dict) or any(scope.get(key) != item for key, item in expected.items()):
         raise ValueError('Sonnet exchange authoring scope differs from this paper')
-    from . import codex_production
+    from . import codex_collaboration, codex_production
     production = attempt.get('production')
-    if codex_production.enabled(value['P_run']) and (not production or production['stage'] != 'arbitration'):
-        raise ValueError('A Stable paper candidate needs its actual dual-production arbitration exchange')
+    comparison = codex_collaboration.peer_collaboration(value['P_run'])
+    stages = {'candidate', 'arbitration'} if comparison else {'arbitration'}
+    if codex_production.enabled(value['P_run']) and (not production or production['stage'] not in stages):
+        raise ValueError('A Stable paper candidate needs its actual scoped production exchange')
     guidance = _file(root, observed['public_path'], 'consult_guidance')
     if guidance['sha256'] != attempt.get('public_sha256'):
         raise ValueError('Sonnet public output changed while preparing the paper candidate')
@@ -384,6 +387,8 @@ def _native_consultation(root, value, supplied):
               'scope': _text(supplied.get('scope'), 'actual applicable authoring scope')}
     if production is not None:
         source['production_id'] = production['production_id']
+        if comparison:
+            source['production_stage'] = production['stage']
     return source
 
 
@@ -523,11 +528,13 @@ def prepare_candidate(root, payload, **revision):
             consultation = _native_consultation(root, value, payload.get('consultation'))
             if 'production_id' in consultation:
                 from .codex_production import require_applied
+                exchange_field = ('candidate_exchange' if consultation.get('production_stage') == 'candidate'
+                                  else 'arbitration_exchange')
                 applied = require_applied(Path(value['task_root']), consultation['production_id'],
-                                          arbitration_exchange=consultation['exchange_id'])
+                                          **{exchange_field: consultation['exchange_id']})
                 if (Path(applied['output']['path']) != (Path(root) / pdfs[0]['path']).resolve()
                         or applied['output']['sha256'] != pdfs[0]['sha256']):
-                    raise ValueError('The selected final paper PDF does not match the applied arbitration output')
+                    raise ValueError('The selected final paper PDF does not match the applied production output')
             files.append(consultation['guidance'])
         elif integrated:
             supplied = payload.get('consultation')

@@ -515,7 +515,9 @@ def _production_evidence(root, production_id, files):
     if not any((Path(root) / item['path']).resolve() == Path(output['path'])
                and item['sha256'] == output['sha256'] for item in files):
         raise ValueError('X delivery does not include the exact applied dual-production output')
-    return {'production_id': production_id, 'arbitration_exchange': applied['arbitration']['exchange_id'],
+    decision = ({'decision_ref': applied['decision_ref']} if 'decision_ref' in applied else
+                {'arbitration_exchange': applied['arbitration']['exchange_id']})
+    return {'production_id': production_id, **decision,
             'output_sha256': output['sha256']}
 
 

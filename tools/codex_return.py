@@ -8,7 +8,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from runtime.codex_return import close_return, return_status, seal_return, response_body
+from runtime.codex_return import (close_return, execution_errors, record_execution_error,
+                                  return_status, seal_return, response_body)
 
 
 def main(argv=None):
@@ -16,7 +17,7 @@ def main(argv=None):
         if hasattr(stream, 'reconfigure'):
             stream.reconfigure(encoding='utf-8', newline='\n')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('seal', 'status', 'close', 'body'))
+    parser.add_argument('action', choices=('seal', 'status', 'close', 'body', 'record-error', 'errors'))
     parser.add_argument('--root', required=True, type=Path)
     parser.add_argument('--input', type=Path)
     parser.add_argument('--outcome', choices=('CLOSED', 'STOPPED', 'CANCELLED'), default='CLOSED')
@@ -25,6 +26,15 @@ def main(argv=None):
     try:
         if args.action == 'body':
             print(response_body(args.root), end='')
+            return 0
+        if args.action in {'record-error', 'errors'}:
+            if args.action == 'record-error':
+                if args.input is None:
+                    raise ValueError('--input is required for record-error')
+                result = record_execution_error(args.root, json.loads(args.input.read_text(encoding='utf-8-sig')))
+            else:
+                result = execution_errors(args.root)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
             return 0
         if args.action == 'seal':
             if args.input is None:

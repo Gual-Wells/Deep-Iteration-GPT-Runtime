@@ -94,6 +94,7 @@ docs/CLOCK_RELIABILITY.md
 docs/CODEX_0_8_UPGRADE.md
 docs/CODEX_ADAPTATION.md
 docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md
+docs/CODEX_COURT_EFFICIENCY_1_6.md
 docs/CODEX_FAMILY_UPGRADE_0_11_1.md
 docs/CODEX_QUALITY_DESIGN.md
 docs/CODEX_REAL_WORLD_CONTINUITY_UPGRADE.md
@@ -402,6 +403,7 @@ docs/research/codex-value-20261107/prototypes/trace/example/WORK.md
 docs/research/codex-value-20261107/prototypes/trace/example/events.jsonl
 docs/research/codex-value-20261107/prototypes/trace/trace.py
 docs/research/codex-value-20261107/trace-design.md
+docs/research/court-efficiency-1.6/anonymous-stats.json
 entry/DEEP_ITERATION_ENTRY.md
 entry/HELP.md
 entry/STARTUP.md
@@ -918,6 +920,8 @@ tests/test_codex_consult_parallel.py
 tests/test_codex_council.py
 tests/test_codex_council_work.py
 tests/test_codex_court.py
+tests/test_codex_court_efficiency.py
+tests/test_codex_court_mode.py
 tests/test_codex_delivery.py
 tests/test_codex_depth_calibration.py
 tests/test_codex_do_supplement.py

@@ -1,7 +1,7 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "1.8.0",
-  "protocol": "digr-codex-native-v25",
+  "version": "1.9.0",
+  "protocol": "digr-codex-native-v26",
   "status": "stable",
   "language": "zh-CN",
   "version_path": "codex/VERSION",
@@ -37,7 +37,7 @@
   },
   "host_contract": {
     "constitution": "codex/CONSTITUTION.md",
-    "formal_production": "SAME_SCOPE_NATIVE_AND_CLAUDE_CANDIDATES_THEN_CLAUDE_ARBITRATION",
+    "formal_production": "SAME_SCOPE_PEER_CANDIDATES_AND_MAIN_COMPARISON",
     "ordinary_mode": "LIGHT",
     "explicit_mode": "MODEL_NATIVE",
     "local_helper_provides_live_routing": false,
@@ -57,7 +57,7 @@
     "foundation_budget_separate": true,
     "foundation_helper_gate": "SOURCE_BOUND_DECISION_AND_MANAGED_LIFECYCLE",
     "managed_lifecycle_since": "0.8.0",
-    "return_contract": "RESPONSE_BODY_FIVE_SECTIONS_AND_WORK_TABLE",
+    "return_contract": "RESPONSE_BODY_SIX_SECTIONS_WITH_ORDERED_EXECUTION_ERRORS",
     "return_snapshot_is_semantic_approval": false,
     "visit_scope": "ALL_PARTICIPANTS_WITH_SCOPED_APPROXIMATE_REPAIR",
     "completed_task_non_sticky": true,
@@ -81,8 +81,8 @@
     ],
     "native_default_preserved": true,
     "consult_is_native_l3": false,
-    "consult_guidance": "SUBJECTIVE_PRIORITY_UNDER_EQUAL_ACTUAL_CONDITIONS",
-    "paper_content_driver": "SONNET_NATIVE_FOR_SELECTED_PAPER_0_5",
+    "consult_guidance": "EQUAL_WEIGHT_WITH_NATIVE_UNDER_THE_SAME_TASK_CRITERIA",
+    "paper_content_driver": "SAME_SCOPE_PEER_AUTHORING_AND_MAIN_COMPARISON",
     "consult_split": "NATIVE_CODEX_RESEARCH_AND_PER_SUBMISSION_LOCAL_BINDING",
     "split_contract": "digr-native-split-1",
     "split_external_model_calls": 0,
@@ -186,7 +186,7 @@
       "since": "1.7.0",
       "role": "COUNCIL",
       "independent_on": "CURRENT_CONTENT_INPUT",
-      "synthesis": "COEQUAL_EXTERNAL_INTENT_PRIORITY_UNDER_USER_FACTS_AND_AUTHORITY",
+      "synthesis": "COEQUAL_NATIVE_AND_EXTERNAL_DRAFTS_UNDER_USER_FACTS_AND_AUTHORITY",
       "additional_budget": false,
       "external_roles": [
         "sonnet",
@@ -232,35 +232,48 @@
       "enabled": 1,
       "task_scoped": true,
       "fee_authority": false
+    },
+    "execution_errors": {
+      "since": "1.9.0",
+      "return_schema": 3,
+      "order": "FIRST_OCCURRENCE",
+      "fields": [
+        "id",
+        "stage",
+        "problem",
+        "impact",
+        "status",
+        "handling"
+      ]
     }
   },
   "file_sha256": {
-    "codex/VERSION": "3eb1ef94b5890ca727158b106142685c8733b0ace5bcb4cf3f0ac14f9f0643f4",
+    "codex/VERSION": "30f4611383aa30a15753789f40effde81332f2f8714e6d3b2940bf0fc4592377",
     "codex/AGENTS.light.md": "5abd877bc2f684ce54e34bbefcc9da17a0c00e1c8bbdadfa5a7f1aadcb700abd",
     "codex/ROUTER.experimental.txt": "45b6e2a6f06c9c7ee11845b7873f7ddb526ea1609bc6951f897eaebde85bd290",
     "codex/STARTUP.md": "c309dbb1d8508d4932e9077c85a0f71943e113962cd5e2739ce6c8dc14bc8e7b",
-    "codex/PROTOCOL.md": "659afb2bae235d2c11b230915171f21ccc93d355b6f8071c59c647694924059b",
+    "codex/PROTOCOL.md": "7067c0024df0ff4342f00949fac2a8798d2a36ccef2b9861c0f37a275e896b2f",
     "codex/CONSTITUTION.md": "2ca796187af0e08cb1c267f6abee54e5a91d55e9639644b09df6e93ccc134ab0",
-    "codex/FOUNDATION.md": "770f6b5e322b963bb2b743bfdd6d6bef92d73957380d8a9bb6a0be5c99f900e1",
+    "codex/FOUNDATION.md": "d849c63d50b02c9f6fdfc313dc3333a37d047b20db516a3634ef8e0e389c0547",
     "codex/METHOD.md": "ad1f7d9571c6d36d35dcf0c85440436472ac6450da53c4d03b8b52249534c996",
-    "codex/HELP.md": "360f9c4c85851fd02b065e517b64c87ec711966d87448af74c13a59a35bd9d7a",
-    "codex/PARAMETERS.md": "6f7b33b637efa21f9fa4693d0eb862c6833a59f0ca80542892851770e667da3d",
-    "codex/WORKBENCH.md": "1112f9d1583e030a352dc5475deaaa55e446c037f042818917934de206cfd3d4",
+    "codex/HELP.md": "0f75ccc2667f6f113128a09036de3e380519e6763e53dff443f8e8cfc2bc5b70",
+    "codex/PARAMETERS.md": "caa4eab82fde9b73446807eee77aad64b33fe58241368821fddfa86afc86637c",
+    "codex/WORKBENCH.md": "fc37a9ea9b3702b7f9564ba91e070f8826c316abaaf64129ddf1c60fbc4933ce",
     "codex/CHARACTER.md": "5d016d30092633e45ba3450be82f9dc5af11859faf73f9f41d49e8bd563afbfa",
     "codex/COLLABORATION.md": "cfc4b57c4a85fb7494b5b470995b53e5fedcb2d0ec0a4da3880e3b668847c333",
-    "codex/CONSULT.md": "98f82aaa96d92fba5fd5a3b0521a46345cc4c83583ec14dd17c2f31b97297785",
-    "codex/SPLIT.md": "9535aca6e963336e557358f69dd972405073c0310e7214ae30762a935c3bc5be",
-    "codex/PERMISSIONS.md": "a6f47e953c57b97c5e0a930823d41f87c238c7394efa87fc1a1b79412005d71b",
+    "codex/CONSULT.md": "a627d57b3e9a69bed0b76ecf3cc81451fba488efe4c676f7a34ad2379ef0fde0",
+    "codex/SPLIT.md": "1d9782ac656a4030ec2e643811988315838fff52a1bfc320e667b7ea8344fb8f",
+    "codex/PERMISSIONS.md": "272727702628cda944ee29ee0df28180bd5360f7efb6aeffe5fd7963d33b1164",
     "codex/DELIVERY.md": "c19bbaa9080f9a4e2919c67964085bac9c0b4e8c897cf0cf126cce46271d5cf2",
-    "codex/RETURN.md": "c5b227fdb0ce63096f6bcb1e89ad8ea088c6b4d76cb1eab0ed24907c900ac767",
-    "codex/EXECUTION_PROTOCOL.json": "f27cc9fca2220858675dbcce0f42a30654c03c55a74d89499a13fcf2cae916bc",
-    "codex/COUNCIL.md": "871f7d20ddd511161b54a78826f091094616e9171bae63fb92840b48529d5d93",
+    "codex/RETURN.md": "5a108225df2390b5df1e0184f97bad5febbbaa756c9c3407a9dd2fdc941cc193",
+    "codex/EXECUTION_PROTOCOL.json": "1b18e620858bc9ad6484e1e077a68292fcee54fa454723b092ba6722de5b4977",
+    "codex/COUNCIL.md": "f32d11c5768a67468314d558acf8084d058ad992dc7de450d773aacea42748bc",
     "codex/COURT.md": "66463392984284d853a0e692110d4f8a4e22a29f540fef5ed8e58a678c5c2678",
     "codex/USAGE.md": "3d5eaaddab86370cead04b2c66f3f260db47e97eedbb91fae6b3aaefe3b654d6",
     "codex/CHAT.md": "78ac198a70adf5cfb15107d51137b882b1cbb99b2cec13695679bccd074cb41b",
     "codex/CHAT_LIGHT.md": "ce77bb503231c820ff3a8a5f119b90f082df04b507c5882c9681d2de47958956",
-    "codex/CHAT_DEEP.md": "c7a13b05308dd9bd8201f5837474207cab296c96d0f874cd0d9400cca20c92b1",
-    "codex/LIVE.md": "542c39d5bf9c984eb724003dd4f0d49f683fe107d4dc5ee4b845148caa13a9ca"
+    "codex/CHAT_DEEP.md": "037969629c493e32ca39c993df13ef92004bfbf96485ad4403a6cc4c451ac59e",
+    "codex/LIVE.md": "d9e9c56057eaf3cc5a599bf55b25652fcfd48d87969f04c7ff217aa46e881bc3"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {
@@ -394,8 +407,8 @@
   },
   "paper_addon": {
     "manifest": "paper/manifest.json",
-    "version": "0.6.2",
-    "sha256": "8b57a3994a58eb968443cd932345c932ca92c103f3deec684619506c0d4b9142"
+    "version": "0.6.3",
+    "sha256": "c8210658dbcb6ffc8d37b6ba25a4d18cb057fde1a1ff1ee354ea1922f5cf34ed"
   },
   "supporting_instructions": [
     "codex/CHAT_LIGHT.md",

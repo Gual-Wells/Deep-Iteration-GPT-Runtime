@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Record same-task native dispatch, candidates and application of Claude arbitration."""
+"""Record same-task native dispatch, candidates and the applied decision."""
 from __future__ import annotations
 
 import argparse
@@ -26,8 +26,11 @@ def main(argv=None):
     submit.add_argument('--actor', required=True)
     submit.add_argument('--output', type=Path, required=True, help='usable native candidate in UTF-8')
     submit.add_argument('--return-ref', required=True, help='actual native host return event reference')
-    applied = commands.add_parser('record-applied', help='bind actual Claude arbitration to the final artifact')
-    applied.add_argument('--arbitration-exchange', required=True)
+    applied = commands.add_parser('record-applied', help='bind the current decision to the final artifact')
+    applied.add_argument('--arbitration-exchange', help='required on legacy pins; optional review on 1.9+')
+    applied.add_argument('--candidate-exchange', action='append', default=[],
+                         help='complete external candidate actually compared under 1.9+; repeat as needed')
+    applied.add_argument('--decision-ref', help='actual Main comparison and synthesis reference for 1.9+')
     applied.add_argument('--peer-arbitration-exchange', action='append',
                          help='a complete coequal arbitration for the same assignment; repeat for multiple peers')
     applied.add_argument('--output', type=Path, required=True)
@@ -53,7 +56,8 @@ def main(argv=None):
         elif args.command == 'record-applied':
             result = production.record_applied(args.root, args.production_id,
                 arbitration_exchange=args.arbitration_exchange, output_path=args.output,
-                effect=args.effect, peer_exchange=args.peer_arbitration_exchange)
+                effect=args.effect, peer_exchange=args.peer_arbitration_exchange,
+                candidate_exchanges=args.candidate_exchange, decision_ref=args.decision_ref)
         elif args.command == 'release':
             result = production.release(args.root, args.production_id, disposition=args.disposition,
                 source=args.source, quote=args.quote, effect=args.effect,

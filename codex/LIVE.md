@@ -62,3 +62,5 @@ python -B tools/codex.py live ack --root TASK --delivery-id ID --evidence-ref AC
 需要给原生工作保留可重读的位置时，可用 `live work --root TASK --input work.json` 保存实际事件。输入含 `actor`、`kind`、`unit`、`stage`、`text`、`operation_id`，可附 `line`、`topic`，`RETURN` 与 `HANDLED` 附实际 `source_ref`。`RETURN` 的 `return_mode` 用 `quote` 标逐字引文，默认 `summary` 为概括。`kind` 支持 `U0`、`INIT`、`N`、`R`、`D`、`V`、`S`、`M`、`ARBITRATION`、`SIDECAR`。复用 `operation_id` 只为同一事实。省略 `--exchange-id` 的 `live read` 读取这些原生记录。无会话记录或游标时，照常将真实边界直接发到对话。
 
 每层真实U0形成、修订或恢复后，先按[FOUNDATION的协议自提醒](FOUNDATION.md#每个真实u0之后的协议自提醒)恢复本层适用责任，再进入实质工作。短提醒不能代替随后真实阶段、独立返回、主线处理及公开正文的及时显示。
+
+1.9 起，遇到实际执行错误时按 [RETURN](RETURN.md#记录执行报错) 及时登记。影响用户判断或后续交付的发现同时在对话中说明。恢复更新同一条问题。

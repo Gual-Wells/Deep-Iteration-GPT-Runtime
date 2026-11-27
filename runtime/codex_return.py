@@ -20,7 +20,7 @@ from .codex_session import (
     _effective_main_target, _read_activity, _read_json, _session, _write_json, derive_activity, session_report,
 )
 from .codex_timeline import fragment, render_svg, validate as validate_timeline
-from .codex_response import render_response, validate_response
+from .codex_response import ERROR_REPORT_SCHEMA, execution_error, ordered_error_policy, render_response, validate_response
 
 FORMAT = 'digr-codex-return-1'
 _TEXT_FIELDS = ('result', 'scope', 'evidence', 'limits', 'time_and_responsibilities')
@@ -186,6 +186,8 @@ def _native_state(root: Path) -> dict[str, Any]:
         ledger = root / 'delivery.json'
         if ledger.is_file():
             state['delivery_ledger'] = _file_ref(ledger)
+    if ordered_error_policy(metadata['P_run']):
+        state['execution_errors'] = execution_errors(root)
     if metadata.get('visit_clock'):
         from .codex_visits import run_projection
         clock = metadata['visit_clock']
@@ -201,6 +203,57 @@ def _lifecycle(root: Path) -> dict[str, Any]:
     return load_lifecycle(root)
 
 
+def _error_path(root: Path) -> Path:
+    path = (root / 'return-state' / 'errors.json').resolve()
+    if path != root / 'return-state' / 'errors.json':
+        raise ValueError('execution error record escapes or aliases its task')
+    return path
+
+
+def execution_errors(root: Path) -> list[dict[str, str]]:
+    root, metadata = _session(root)
+    if not ordered_error_policy(metadata['P_run']):
+        raise ValueError('ordered execution error records require a frozen Codex 1.9+ task')
+    path = _error_path(root)
+    if not path.exists():
+        return []
+    data = _read_json(path)
+    if (data.get('schema_version') != 1 or data.get('task_uuid') != metadata['task_uuid']
+            or data.get('P_run') != metadata['P_run'] or not isinstance(data.get('errors'), list)):
+        raise ValueError('execution error record does not belong to this frozen task')
+    errors = [execution_error(item) for item in data['errors']]
+    if len({item['id'] for item in errors}) != len(errors):
+        raise ValueError('duplicate execution error identity')
+    return errors
+
+
+def record_execution_error(root: Path, supplied: Mapping[str, Any]) -> dict[str, str]:
+    from .codex_council import _writer
+    from .codex_lifecycle import require_active
+    root, metadata = _session(root)
+    if not ordered_error_policy(metadata['P_run']):
+        raise ValueError('ordered execution error records require a frozen Codex 1.9+ task')
+    item = execution_error(supplied)
+    path = _error_path(root)
+    with _writer(path.parent):
+        require_active(root)
+        errors = execution_errors(root)
+        for index, prior in enumerate(errors):
+            if prior['id'] != item['id']:
+                continue
+            if (prior['stage'], prior['problem']) != (item['stage'], item['problem']):
+                raise ValueError('execution error id already describes a different occurrence')
+            if prior == item:
+                return prior
+            errors[index] = item
+            break
+        else:
+            errors.append(item)
+        _write_json(path, {'schema_version': 1, 'task_uuid': metadata['task_uuid'],
+                          'P_run': metadata['P_run'], 'errors': errors})
+    return item
+
+
 def _strings(data: Mapping[str, Any], field: str) -> list[str]:
     value = data.get(field, [])
     if not isinstance(value, list) or any(not isinstance(item, str) or not item.strip() for item in value):
@@ -211,11 +264,19 @@ def _strings(data: Mapping[str, Any], field: str) -> list[str]:
 def _input(root: Path, path: Path) -> tuple[dict[str, Any], set[Path], bytes]:
     raw = path.read_bytes()
     data = json.loads(raw.decode('utf-8-sig'))
-    if not isinstance(data, dict) or data.get('schema_version') not in {1, 2}:
+    if not isinstance(data, dict) or data.get('schema_version') not in {1, 2, ERROR_REPORT_SCHEMA}:
         raise ValueError('unsupported return-input schema')
-    new_body = data['schema_version'] == 2
-    if _session(root)[1].get('return_schema') == 2 and not new_body:
+    metadata = _session(root)[1]
+    with_errors = data['schema_version'] == ERROR_REPORT_SCHEMA
+    if with_errors != ordered_error_policy(metadata['P_run']):
+        raise ValueError('return schema 3 is required by, and restricted to, Codex 1.9+ task pins')
+    new_body = data['schema_version'] >= 2
+    if metadata.get('return_schema') == 2 and not new_body:
         raise ValueError('this task requires schema 2: five-part response Markdown body')
+    if with_errors:
+        if 'execution_errors' in data:
+            raise ValueError('record actual execution errors with return record-error before sealing')
+        data['execution_errors'] = execution_errors(root)
     fields = ('result', 'key_changes', 'work_process', 'parameters') if new_body else _TEXT_FIELDS
     for field in fields:
         if not isinstance(data.get(field), str) or not data[field].strip():
@@ -240,7 +301,7 @@ def _input(root: Path, path: Path) -> tuple[dict[str, Any], set[Path], bytes]:
     timeline = data.get('timeline')
     if new_body:
         if timeline is not None:
-            raise ValueError('schema 2 uses the response work table; a timeline cannot replace the report body')
+            raise ValueError('the response uses a work table; a timeline cannot replace the report body')
         from .codex_session import task_delivery_policy
         policy = task_delivery_policy(root)
         if policy is not None:
@@ -257,7 +318,7 @@ def _input(root: Path, path: Path) -> tuple[dict[str, Any], set[Path], bytes]:
                 raise ValueError('selected X file delivery is incomplete: ' + json.dumps(completion, ensure_ascii=False))
             data['delivery_files'] = [item.as_posix() for item in final_paths]
             data['delivery_completion'] = completion
-        if _resources_enabled(_session(root)[1]):
+        if _resources_enabled(metadata):
             from .codex_usage import build_usage_report, render_usage_markdown
             report = build_usage_report(root)
             data['usage_report'] = report
@@ -290,7 +351,7 @@ def _relative(path: str | Path, folder: Path) -> str:
 
 def _write_views(folder: Path, data: Mapping[str, Any], report: Mapping[str, Any]) -> None:
     _write_json(folder / 'native-report.json', report)
-    if data['schema_version'] == 2:
+    if data['schema_version'] >= 2:
         selected = dict(data)
         if data['artifacts']:
             links = ['[' + item['label'] + '](<' + Path(item['path']).as_posix() + '>)'
@@ -436,7 +497,11 @@ def return_status(root: Path, *, refresh_entry: bool = False) -> dict[str, Any]:
                 productions = {'complete': False, 'issues': [str(error)]}
             result['production_completion'] = productions
             if not productions['complete']:
-                result['cannot_close'].append('assigned dual production still awaits a valid Claude arbitration and applied output')
+                from .codex_collaboration import peer_collaboration
+                if peer_collaboration(metadata['P_run']):
+                    result['cannot_close'].append('assigned production still awaits its candidate comparison and applied output')
+                else:
+                    result['cannot_close'].append('assigned dual production still awaits a valid Claude arbitration and applied output')
     from .codex_court import court_status
     from .codex_session import task_parameters
     formal_parameters = task_parameters(root)
@@ -469,6 +534,8 @@ def seal_return(root: Path, input_path: Path) -> dict[str, Any]:
     if inputs[str(path)]['sha256'] != sha256(raw).hexdigest():
         raise ValueError('return input changed while being read; retry from current input')
     native = _native_state(root)
+    if data['schema_version'] == ERROR_REPORT_SCHEMA and data['execution_errors'] != native['execution_errors']:
+        raise ValueError('execution errors changed while sealing; retry with the current records')
     if native['open_activity']:
         raise ValueError('end or recover open managed activity before sealing a return')
     returns = root / 'returns'
@@ -483,7 +550,8 @@ def seal_return(root: Path, input_path: Path) -> dict[str, Any]:
         raise ValueError('return dependencies changed during rendering; no current pointer was published')
     outputs = {file.name: _file_ref(file) for file in sorted(folder.iterdir()) if file.is_file()}
     receipt = {'format': FORMAT, 'task_root': str(root), 'P_run': metadata['P_run'],
-               'coverage': data.get('scope', 'selected five-part response body'),
+               'coverage': data.get('scope', 'selected six-part response body' if data['schema_version'] == ERROR_REPORT_SCHEMA
+                                    else 'selected five-part response body'),
                'return_schema': data['schema_version'], 'inputs': inputs, 'native_state': native,
                'tool_state': tool_state,
                'outputs': outputs, 'semantic_certification': False,
@@ -505,10 +573,11 @@ def response_body(root: Path) -> str:
     status = return_status(root)
     if status['current_receipt'] not in {'READY_UNCLOSED', 'CLOSED'}:
         raise ValueError('a current sealed return is required before emitting the response body')
-    if status.get('return_schema') != 2:
-        raise ValueError('legacy return is a saved view, not a five-part response body')
+    schema = status.get('return_schema')
+    if schema not in {2, ERROR_REPORT_SCHEMA}:
+        raise ValueError('legacy return is a saved view, not a response body')
     text = Path(status['response_body']).read_text(encoding='utf-8')
-    validate_response(text)
+    validate_response(text, schema_version=schema)
     return text
 
 

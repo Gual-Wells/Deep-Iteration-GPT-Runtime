@@ -144,6 +144,55 @@ class ProductionRecordTests(unittest.TestCase):
                          ['hydrogen-ruling', 'grok-ruling'])
         self.assertTrue(production.require_applied(self.root, 'explanation', arbitration_exchange='grok-ruling'))
 
+    def test_peer_comparison_can_apply_the_native_work_without_external_arbitration(self):
+        self.root = self.work / 'equal-models'
+        pin = '1.9.0@' + 'b' * 40
+        create_session(self.root, request=self.file('equal.txt', 'DIGR:: Produce the shared result.'), p_run=pin)
+        self.start()
+        native = self.file('native.md', 'Native candidate cites the controlling source.')
+        production.submit_native(self.root, 'explanation', actor='D01', output_path=native, return_ref='return-4')
+        peers = []
+        for name, model in collaboration.external_models(pin).items():
+            exchange = name + '-independent'
+            self.prepare(exchange, model=model)
+            _, attempt, request = consult._load(self.root, exchange)
+            self.assertFalse(attempt['collaboration_contract']['subjective_guidance_priority'])
+            self.assertIn('equal decision weight', request['messages'][0]['content'])
+            self.fixture_return(exchange, name + ' candidate.', model=collaboration.OPENROUTER_SNAPSHOTS[model])
+            peers.append(exchange)
+        args = {'output_path': native, 'effect': 'Adopt the native explanation supported by the controlling source.',
+                'decision_ref': 'main-comparison-4'}
+        with self.assertRaisesRegex(ValueError, 'at least one complete external candidate'):
+            production.record_applied(self.root, 'explanation', **args)
+        with self.assertRaisesRegex(ValueError, 'at most one current candidate'):
+            production.record_applied(self.root, 'explanation', candidate_exchanges=[peers[0], peers[0]], **args)
+        selected = production.record_applied(self.root, 'explanation', candidate_exchanges=peers, **args)
+        self.assertEqual([item['exchange_id'] for item in selected['applied']['candidates']], peers)
+        self.assertEqual(selected['applied']['reviews'], [])
+        self.assertEqual(selected['applied']['output']['sha256'], consult._hash(native.read_bytes()))
+        self.assertEqual(production.require_applied(self.root, 'explanation', candidate_exchange=peers[1]),
+                         selected['applied'])
+        self.assertTrue(production.completion_status(self.root)['complete'])
+
+    def test_peer_guidance_is_a_comparable_source_without_an_implied_dependency(self):
+        from runtime.codex_foundation import propose_foundation
+        self.root = self.work / 'peer-advice'
+        pin = '1.9.0@' + 'b' * 40
+        create_session(self.root, request=self.file('advice.txt', 'DIGR:: Compare the advice with your judgment.'), p_run=pin)
+        exchange = 'hydrogen-guidance'
+        model = collaboration.GEMINI_HYDROGEN
+        consult.prepare_request(self.root, input_path=self.host, exchange_id=exchange, max_tokens=100,
+                                guidance=True, model=model)
+        self.fixture_return(exchange, 'Advisory evidence from the same source.', model=collaboration.OPENROUTER_SNAPSHOTS[model])
+        _, attempt, _ = consult._load(self.root, exchange)
+        brief = {key: 'The actual comparative fixture.' for key in
+                 ('goal', 'results', 'scope', 'granularity', 'basis', 'dependencies', 'approach', 'resources', 'completion')}
+        proposal = propose_foundation(self.root, {'brief': brief, 'guidance': {
+            'exchange_id': exchange, 'public_sha256': attempt['public_sha256']}}, reason='Consider a verified source')
+        self.assertFalse(proposal['guidance_required'])
+        self.assertEqual(proposal['status'], 'AWAITING_USER')
+        self.assertEqual(proposal['guidance']['exchange_id'], exchange)
+
     def test_user_revision_invalidates_prepared_stage_and_explicitly_releases_old_assignment(self):
         self.start()
         binding, _ = production.bind_exchange(self.root, 'explanation', stage='candidate')

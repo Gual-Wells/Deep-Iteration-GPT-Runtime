@@ -120,7 +120,7 @@ class UnifiedDIGRTests(unittest.TestCase):
         self.root = self.folder / 'stable-production-paper'
         self.original = self.file('production-paper-user.txt', 'DIGR:: Produce this same complete paper guide.')
         create_session(self.root, request=self.original, p_run=self.pin)
-        paper_root = self.paper_scope(version=paper.VERSION)
+        paper_root = self.paper_scope(version='0.6.2')
         with self.assertRaisesRegex(ValueError, 'Formal paper authoring requires'):
             self.prepare('paper-guidance', paper_root=paper_root, guidance=True)
         assignment = self.file('shared-paper.md', 'A source-bound guide to exactly this paper.')
@@ -131,6 +131,23 @@ class UnifiedDIGRTests(unittest.TestCase):
         prepared = self.prepare('matched-paper', paper_root=paper_root, production_id='paper')
         self.assertEqual(prepared['exchange']['authoring_scope'], prepared['exchange']['production']['authoring_scope'])
         self.assertEqual(prepared['exchange']['authoring_scope']['addon_version'], '0.6.2')
+        self.assertEqual(self.server.post_calls, [])
+
+    def test_new_paper_prompt_verifies_each_author_as_an_equal_candidate(self):
+        from runtime import codex_production
+        self.pin = '1.9.0@' + 'e' * 40
+        self.root = self.folder / 'peer-paper'
+        self.original = self.file('peer-paper-user.txt', 'DIGR:: Produce this scoped complete paper guide.')
+        create_session(self.root, request=self.original, p_run=self.pin)
+        paper_root = self.paper_scope(version='0.6.3')
+        codex_production.start(self.root, 'paper', scope_path=self.file('assignment.md', 'The same paper.'),
+                               actor='native-test', dispatch_ref='synthetic host dispatch', paper_root=paper_root)
+        for label, model in collaboration.external_models(self.pin).items():
+            prepared = self.prepare(label, paper_root=paper_root, production_id='paper', model=model)
+            self.assertFalse(prepared['collaboration']['subjective_guidance_priority'])
+            _, attempt, request = consult._load(self.root, label)
+            self.assertEqual(attempt['production']['stage'], 'candidate')
+            self.assertIn('Your draft and the independent native draft are assessed', request['messages'][0]['content'])
         self.assertEqual(self.server.post_calls, [])
 
     def test_plain_entry_paper_and_later_generic_work_keep_separate_scopes(self):

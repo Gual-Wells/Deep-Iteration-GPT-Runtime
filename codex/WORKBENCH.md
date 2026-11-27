@@ -8,7 +8,7 @@
 
 统一 DIGR 第二层实际委托外部作者制作整篇解构、导读或完整读物时，应用同 SHA 声明的[论文协议](../paper/PROTOCOL.md)、[技能](../.agents/skills/digr-paper/SKILL.md)与 `python -B tools/codex.py paper --help`。它保存每篇的来源/导读映射、候选和Gmail读回事实；不替知识池写学习证据，单篇返回也不关闭当前DIGR任务。
 
-必读[RETURN](RETURN.md)要求最终response正文固定五段：结果、关键变化、工作过程、论证与适用范围、参数。过程用正文时间／工作表，不能由文件、内嵌页或截图替代；真实任务产物仍可链接。`return seal/status/body/close`保存选定正文并收口；body输出待发送Markdown，不证明宿主已发送。历史timeline是按需工具，不再是默认报告。
+必读[RETURN](RETURN.md)规定 1.9 的最终正文依次为结果、关键变化、工作过程、论证与适用范围、参数、执行报错。正文内使用时间／工作表，实际产物可以链接。`return seal/status/body/close`保存、读回与收口，`return record-error/errors`记录并读回执行异常。
 
 ## 0. 在其它项目找到工具，及时开始记录
 
@@ -59,7 +59,7 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 
 两种入口均可用 `consult budget-preview --root TASK --input INPUT.json --out PREVIEW.json` 提前估算。输入 `wallet_id`、`task_ceiling_usd`、`scope` 和 `jobs`。每项给当前费用 `facts`、`ceiling_usd` 及已准备的 `exchange_id`。为在议会开始前估算，也可用 `planned_council_member` 代替 `exchange_id`，写明实际用途 `purpose`、型号 `model` 和合计输出上限 `max_tokens`。预览的 `layer_budgets` 给出适用层的实际余量和拟预留额度。发送按当前入口授权、钱包和 Split 执行。
 
-可同批估算正式产出的候选与裁决。未准备的阶段用 `planned_production` 代替 `exchange_id`，内含已登记的 `production_id`、`stage`（`candidate` 或 `arbitration`）、`model`、`max_tokens` 和真实 `purpose`。该项同时给当前 `facts` 与 `ceiling_usd`。同一对象两阶段用同一 Claude 型号。两份实际候选、必要材料及公开历史计入裁决的输入上界。
+可同批估算正式产出的候选与可选复审。未准备的阶段用 `planned_production` 代替 `exchange_id`，内含已登记的 `production_id`、`stage`（`candidate` 或 `arbitration`）、`model`、`max_tokens` 和真实 `purpose`。该项同时给当前 `facts` 与 `ceiling_usd`。同一对象两阶段用同一 Claude 型号。两份实际候选、必要材料及公开历史计入复审的输入上界。
 
 用户给出更窄额度时，用 `consult budget-limit --root TASK --reply-file RAW.txt --source ACTUAL_REF --quote ACTUAL_EXACT_WORDS --task-ceiling-usd LIMIT` 登记实际原话。更窄限额跨后续发送和入口切换生效。费用单独更新可用 `task handle --action budget` 保留工作输入。实质工作改变则按实际作用域更新请求和 Split。历史 `budget-approve` 按旧 pin 使用。
 
@@ -94,7 +94,7 @@ python -B tools/codex.py production start --root TASK --production-id F --scope 
 python -B tools/codex.py consult prepare --root TASK --input CANDIDATE_TASK.md --exchange-id C --production-id F --production-stage candidate
 ```
 
-每次准备可选择必要原文与图。准备后按 [SPLIT](SPLIT.md) 绑定该请求的计划，按当前已批准阶段与费用事实实际发送。调用中的公开正文按 [LIVE](LIVE.md) 转播。原生完成后登记同范围真实候选的完整 UTF-8 正文与返回出处。取得两份同版本可用成品后，准备终裁请求。
+每次准备可选择必要原文与图。按 [SPLIT](SPLIT.md) 核对当前请求，并按 [LIVE](LIVE.md) 转播实际公开增量。登记同范围原生候选的完整 UTF-8 正文及返回出处；两侧候选可用后由 Main 比较并落实。
 
 ```text
 python -B tools/codex.py production submit-native --root TASK --production-id F --actor NATIVE_ACTOR --output NATIVE.md --return-ref ACTUAL_RETURN
@@ -102,12 +102,12 @@ python -B tools/codex.py consult inspect --root TASK --exchange-id C
 python -B tools/codex.py consult prepare --root TASK --input ARBITRATION_TASK.md --exchange-id A --production-id F --production-stage arbitration --candidate-exchange C
 ```
 
-终裁准备复用实际 Claude 候选交换，按原样回放其公开正文，在当前提交加入共同作用域及原生候选全文。按真实对象加所需原件和图，让 Claude 能判断两份作品。两轮 `prepare` 使用同一个实际型号，选择非默认型号时两轮均明确传入 `--model`。终裁另做当前 Split、费用核对和发送。`consult inspect` 查看实际交换，`production inspect` 查看原生派发、实际稿件及当前应用状态。
+如需外部复审，用旧字段名 `--production-stage arbitration` 沿该方真实候选续调，提交同一共同作用域与原生候选全文。两轮使用同一实际型号。复审实际提交仍需 Split 和费用核对。`consult inspect`与 `production inspect`显示实际交换、稿件和应用状态。
 
-Main 实际采纳裁决后，将交付的文件或完整答复正文与裁决绑定。记录具体作品变化，交付按 [RETURN](RETURN.md) 和 [DELIVERY](DELIVERY.md) 进行。
+Main 比较同范围的候选后，将实际决定与交付文件或完整正文绑定。每个纳入比较的外部候选各传一次 `--candidate-exchange`。取得额外复审时，附相应的 `--arbitration-exchange` 或 `--peer-arbitration-exchange`。交付按 [RETURN](RETURN.md) 和 [DELIVERY](DELIVERY.md) 进行。
 
 ```text
-python -B tools/codex.py production record-applied --root TASK --production-id F --arbitration-exchange A --output FINAL --effect ACTUAL_EFFECT
+python -B tools/codex.py production record-applied --root TASK --production-id F --decision-ref ACTUAL_COMPARISON --candidate-exchange C --output FINAL --effect ACTUAL_EFFECT
 python -B tools/codex.py production inspect --root TASK --production-id F
 ```
 
@@ -182,10 +182,10 @@ source-ref是本地不可变消息身份，同引用不重新编号；编辑后�
 先结束真实活动，编写一个明确选定的返回输入，例如：
 
 ```json
-{"schema_version":2,"result":"完整答案或成品入口","key_changes":"形成的认识与实际后果","work_process":"| 时间／记录范围 | 工作与后果 |\n| --- | --- |\n| 未单列 | 真实工作与所得 |","verification_limits":"实际验证与限制","parameters":"真实参数及T/t、补点、缺口、P_run","artifacts":[],"sources":[]}
+{"schema_version":3,"result":"完整答案或成品入口","key_changes":"形成的认识与实际后果","work_process":"| 时间／记录范围 | 工作与后果 |\n| --- | --- |\n| 未单列 | 真实工作与所得 |","verification_limits":"实际验证与限制","parameters":"真实参数及T/t、补点、缺口、P_run","artifacts":[],"sources":[]}
 ```
 
-文字研究以完整正文交付；文件成品用artifacts的label/path补充链接。sources只选必要文件，路径相对输入；不扫描聊天。schema2不接受timeline替代过程表，schema1仅供旧pin路径。
+文字研究以完整正文交付；文件成品用artifacts的label/path补充链接。sources只选必要文件，路径相对输入；不扫描聊天。报错由任务记录自动生成。1.8 及更早的任务按原 pin 使用 schema 2 或历史 schema 1。
 
 ```text
 python -B tools/codex.py return seal --root D:/task/session --input D:/task/return-input.json

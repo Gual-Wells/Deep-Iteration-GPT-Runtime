@@ -1,6 +1,6 @@
-# DIGR for Codex · Stable 1.7.0
+# DIGR for Codex · Stable 1.9.0
 
-`DIGR：任务` 主动寻找能影响成品的开放取舍，在定案前安排 Sonnet 和 Carbon 作一次独立首发。两位成员都可以自行选择议题，也可委托 Codex 取原件、复算或试作，再根据结果继续判断。单冒号直接开放第一层，双冒号直接开放两层。两位共同占用第一层每任务 0.25 美元和第二层每任务 1.25 美元，受真实钱包和用户更窄限额约束。每次提交前完成本机 Split，Sonnet 保留适合实质判断的 `high`，Codex 完成所需的支持工作。详见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
+`DIGR：任务` 开放第一层研究议会，`DIGR：：任务` 同时开放第二层内容协作。原生 Codex 与 Sonnet 5.5、Gemini 4 Hydrogen Flex、Grok 4.7 的意见和候选按同一标准比较。各外部模型共用第一层每任务 0.25 美元和第二层每任务 1.25 美元，受真实钱包和用户更窄限额约束。实际提交依现有 Split、权限与对账流程。见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
 
 用 `DIGR(F=3)：任务` 要求先研究至少三个来自相关公开社区的高评价特色项目，再据此决定相关方案。项目按任务去重，每个项目要进入实际比较；达额后，已采用的具体内容继续参与生产、修订、分工和恢复。五档F参考为0、2、3、4、6，INIT前按实际任务推断并保存正式目标，详见 [F 的完整规则](codex/PARAMETERS.md#f-公开社区项目先研)。
 
@@ -16,7 +16,7 @@ N/T/R/B/S(n,t,r,b)/D/V/L/M/X/F/C的完整调用已在[HELP](codex/HELP.md#完整
 
 0.9.0把[X文件交付](codex/DELIVERY.md)接入DIGR、DIGRP：无`X`在当前聊天返回文件；`DIGR(X):…`、`DIGRP(X):…`和`(X=Gmail)`均发送到本机配置的本人Gmail。常规投入参数后可另接一个X栏，例如`DIGRP(N=16,R=4)(X=Gmail):…`。X只控制任务约定的最终文件；没有文件时保留文字答复，不额外造文件。本版仅实现Gmail，个人目标在私有本机配置中，任务建立时解析并保存。
 
-[DIGR 论文0.6.2](paper/PROTOCOL.md)以同一论文和用户用途组织原生与所选 Sonnet、Carbon 独立候选，外部作者给出裁决后由 Codex 落实。每篇有完整 M 和一份[标准页桌面 PDF](paper/PDF_DESIGN.md)。无 X 在聊天交付，有 X 时逐篇发送本人 Gmail 并读回。确切来源、发送意图与旧 pin 均按原契约保存。[交付操作](.agents/skills/digr-delivery/SKILL.md)随同一不可变 pin 提供。
+[DIGR 论文 0.6.3](paper/PROTOCOL.md)以同一论文原件和读者用途组织独立候选。Main 比较并落实为每篇一份[标准页桌面 PDF](paper/PDF_DESIGN.md)。无 X 在聊天交付，有 X 时逐篇发送本人 Gmail 并读回。
 
 0.8.3接入社区 Anti-Defensive Writing：有据主张先行，删除重复辩护、叠加保留和自我贬低，必要限定准确落在相关主张。核心规则进入必读PROTOCOL、RETURN及普通任务轻量约定；中英双语完整技能连同不可变来源和MIT许可随分发提供。[来源与接入说明](docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md)。
 
@@ -24,7 +24,7 @@ N/T/R/B/S(n,t,r,b)/D/V/L/M/X/F/C的完整调用已在[HELP](codex/HELP.md#完整
 
 **让深入研究、竞争方案和实际制作共同推动任务结果。**
 
-0.8 将[默认返回](codex/RETURN.md)纳入必读执行包，并接通实际任务生命周期：显式只读调用仍执行 DIGR；新纠错先改变下一步；已结束任务不能被旧确认或普通讨论复活。0.8.1固定response正文五段与工作表，禁用内嵌页或附件替代；各参与者共用Begin/End文件，收尾按run并集统计T/t，允许有依据的近似补点。消息、决定、产物和当前返回有可核对入口，记录缺口仍如实保留。[本次接口与兼容说明](docs/CODEX_RESPONSE_CLOCK_UPGRADE.md)；[0.8生命周期说明](docs/CODEX_0_8_UPGRADE.md)。
+[默认返回](codex/RETURN.md)在对话正文呈现结果、工作表和参数等内容，1.9 在末尾追加按发生顺序的「执行报错」。各参与者共用 Begin/End 记录，T/t 按同一任务的区间并集统计。消息、决定、产物和返回沿原 pin 接续。
 
 0.7新增[U0前置任务工程](codex/FOUNDATION.md)：先调查已有材料，把完整结果、处理粒度、依赖、竞争路线和资源去向说清，经问答纠偏与明确决定后再全面执行。前置与正式任务独立预算、独立计时；已确认续做只问重要变化。[本轮研究与实际工作](docs/research/codex-task-foundation-20261109/WORK.md)记录了取舍和验证范围。
 

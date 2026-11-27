@@ -9,8 +9,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from runtime.codex_return import close_return, response_body, return_status, seal_return
-from runtime.codex_session import activity, create_session, session_report
+from runtime.codex_return import (close_return, record_execution_error, response_body, return_status, seal_return)
+from runtime.codex_session import activity, create_session, session_report, set_task_parameters
 from runtime.codex_visits import append_visit
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -72,6 +72,42 @@ class SharedReturnTests(unittest.TestCase):
         self.assertNotIn('## 核验与限制', body)
         self.assertIn(self.data['argument_scope'], body)
         self.assertEqual(close_return(self.session, reason='reasoned explanation completed')['current_receipt'], 'CLOSED')
+
+    def test_ordered_errors_survive_retry_and_refresh_the_current_return(self):
+        self.session = self.base / 'ordered-session'
+        create_session(self.session, request=self.request, p_run='1.9.0@' + 'a' * 40)
+        set_task_parameters(self.session, parameters={'F': 0}, reasons={'F': 'This test has no source search'})
+        with self.assertRaisesRegex(ValueError, 'schema 3'):
+            seal_return(self.session, self.input)
+        self.data['schema_version'] = 3
+        self.data['argument_scope'] = self.data.pop('verification_limits')
+        self.save()
+        seal_return(self.session, self.input)
+        self.assertTrue(response_body(self.session).endswith('未记录执行报错。\n'))
+
+        first = {'id': 'read-document', 'stage': '来源', 'problem': '资料读取失败 <first>',
+                 'impact': '暂缺原件', 'status': 'OPEN', 'handling': '准备从同一版本重读'}
+        second = {'id': 'validate-output', 'stage': '验证', 'problem': '交叉核对失败',
+                  'impact': '影响 A | B', 'status': 'BLOCKED', 'handling': '等待证据'}
+        item = self.base / 'incident.json'
+        item.write_text(json.dumps(first, ensure_ascii=False), encoding='utf-8')
+        cli = subprocess.run([sys.executable, '-B', str(ROOT / 'tools/codex.py'),
+                              'return', 'record-error', '--root', str(self.session), '--input', str(item)],
+                             capture_output=True)
+        self.assertEqual(cli.returncode, 0, cli.stderr)
+        record_execution_error(self.session, second)
+        self.assertEqual(return_status(self.session)['current_receipt'], 'STALE')
+        record_execution_error(self.session, {**first, 'status': 'RECOVERED', 'handling': '同一版本已重读'})
+        with self.assertRaisesRegex(ValueError, 'different occurrence'):
+            record_execution_error(self.session, {**first, 'problem': '另一事件'})
+        self.assertTrue(seal_return(self.session, self.input)['can_close'])
+        body = response_body(self.session)
+        self.assertLess(body.index('## 参数'), body.index('## 执行报错'))
+        self.assertIn('| 1 | 来源 | 资料读取失败 &lt;first&gt; | 暂缺原件 | 已恢复 | 同一版本已重读 |', body)
+        self.assertIn('| 2 | 验证 | 交叉核对失败 | 影响 A &#124; B | 受阻 | 等待证据 |', body)
+        record_execution_error(self.session, second)
+        self.assertEqual(return_status(self.session)['current_receipt'], 'READY_UNCLOSED')
+        self.assertEqual(close_return(self.session, reason='fixture records preserved')['current_receipt'], 'CLOSED')
 
     def test_unrelated_run_and_duplicate_replay_do_not_stale_selected_body(self):
         begin = self.visit('BEGIN', category='SOURCE')

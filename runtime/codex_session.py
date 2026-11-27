@@ -402,7 +402,8 @@ def create_session(root: Path, *, request: Path, p_run: str,
         metadata['format'] = VISIT_FORMAT
         metadata['visit_clock'] = {'path': str(Path(visits_path).absolute()),
                                    'run_id': require_nonempty_text('visit run id', run_id or uuid.uuid4().hex)}
-        metadata['return_schema'] = 2
+        from .codex_response import ERROR_REPORT_SCHEMA, ordered_error_policy
+        metadata['return_schema'] = ERROR_REPORT_SCHEMA if ordered_error_policy(p_run) else 2
     root.mkdir(parents=True, exist_ok=False)
     (root / 'lines').mkdir()
     (root / 'common').mkdir()
