@@ -134,7 +134,10 @@ def require_claude_permission(p_run: str, model: str, lifecycle: Mapping[str, An
         elif participation_role != 'consult_guidance' or lifecycle.get('claude_policy', {}).get('mode') != 'ALLOW':
             raise ValueError('Formal content participation requires the current two-layer DIGR:: choice')
         if standing_claude_budget_policy(p_run) and not authorized_model(p_run, model):
-            raise ValueError('Standing layer authority covers only the profile’s supported external models')
+            supported = 'configured Anthropic Claude models'
+            if parallel_external_policy(p_run):
+                supported += ' and Gemini 4 Carbon'
+            raise ValueError(f'Standing layer authority covers {supported}')
     elif delimiter_policy(p_run) and CLAUDE_MODEL.search(model):
         if lifecycle.get('claude_policy', {}).get('mode') != 'ALLOW':
             raise ValueError('Claude is disabled by the current task choice; DIGR:: permits Claude, DIGR: does not')
