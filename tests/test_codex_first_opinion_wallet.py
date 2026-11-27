@@ -31,6 +31,9 @@ class FirstOpinionQuoteTests(unittest.TestCase):
         self.make_opener = opener.start()
         self.addCleanup(config.stop)
         self.addCleanup(opener.stop)
+        coverage = patch.object(wallet, 'confirmed_coverage', return_value={})
+        coverage.start()
+        self.addCleanup(coverage.stop)
         self.request = {'model': consult.DEFAULT_MODEL, 'messages': [{'role': 'system', 'content': 'Research independently.'},
                         {'role': 'user', 'content': '请核对代价与可行性。'}], 'provider': {'require_parameters': True},
                         'reasoning': {'effort': 'high', 'exclude': True}, 'max_tokens': 16_000}
@@ -108,12 +111,13 @@ class FirstOpinionWalletTests(unittest.TestCase):
         return path
 
     def reserve(self, exchange, *, root=None, wallet_id='wallet-one', ceiling=.2,
-                wallet_remaining=1, session=None, purpose=None):
+                wallet_remaining=1, session=None, purpose=None, snapshot=None):
+        budget = {'budget_total_usd': None, 'outside_spent_usd': 0, 'outside_reserved_usd': 0,
+                  'wallet_remaining_usd': wallet_remaining, 'ceiling_usd': ceiling}
+        if snapshot is not None:
+            budget['wallet_snapshot'] = snapshot
         return wallet.reserve(root or self.root, session or self.session, exchange_id=exchange,
-                              request_sha256='c' * 64, wallet_id=wallet_id,
-                              budget={'budget_total_usd': None, 'outside_spent_usd': 0,
-                                      'outside_reserved_usd': 0, 'wallet_remaining_usd': wallet_remaining,
-                                      'ceiling_usd': ceiling}, purpose=purpose)
+                              request_sha256='c' * 64, wallet_id=wallet_id, budget=budget, purpose=purpose)
 
     def reserve_first(self, exchange, **kwargs):
         return self.reserve(exchange, purpose=collaboration.FIRST_OPINION_PURPOSE, **kwargs)
@@ -144,6 +148,32 @@ class FirstOpinionWalletTests(unittest.TestCase):
             self.reserve_first('first', wallet_remaining=.19)
         self.assertIsNone(wallet.inspect_task(self.root, self.session).get('first_opinion_claim'))
         self.reserve_first('first', wallet_remaining=.2)
+
+    def test_auto_quote_reuses_confirmed_cost_but_counts_later_revision_and_pending_hold(self):
+        billed = self.reserve('settled')
+        initial = wallet.update(billed, state='KNOWN', cost=.16, cost_observed_at='2026-01-01T00:00:00+00:00')
+        snapshot = {'snapshot_id': 'verified-provider-balance', 'wallet_id': 'wallet-one',
+                    'covered_claims': {billed['claim_id']: {'cost_revision': initial['cost_revision'],
+                                                          'covered_cost_usd': .16}}}
+        self.reserve('pending', ceiling=.025, wallet_remaining=.35, snapshot=snapshot)
+        wallet.update(billed, state='KNOWN', cost=.18, cost_observed_at='2026-01-02T00:00:00+00:00')
+
+        model = consult.DEFAULT_MODEL
+        request = {'model': model, 'messages': [{'role': 'user', 'content': 'Review the claim.'}],
+                   'provider': {'require_parameters': True}, 'max_tokens': 3200}
+        config = {'endpoint': consult.DEFAULT_ENDPOINT, 'wallet_id': 'wallet-one', 'timeout_seconds': 8}
+        catalog = [{'id': model, 'pricing': {'prompt': '0.000002', 'completion': '0.00001'}}]
+        with patch.object(consult, '_config', return_value=(config, 'mock-credential-only')), \
+                patch.object(authority, '_quote_data', side_effect=[catalog, {'total_credits': 1.0, 'total_usage': .89}]):
+            quote = authority.first_opinion_quote(request)
+        facts = quote['facts']
+        self.assertEqual(facts['wallet_snapshot']['covered_claims'], snapshot['covered_claims'])
+        args = {'ceiling': quote['ceiling_usd'], 'wallet_remaining': facts['wallet_remaining_usd']}
+        with self.assertRaisesRegex(ValueError, 'Shared wallet reservation exceeds'):
+            self.reserve_first('first-opinion', **args)
+        receipt = self.reserve_first('first-opinion', snapshot=facts['wallet_snapshot'], **args)
+        self.assertAlmostEqual(receipt['known_uncovered_usd'], .02)
+        self.assertAlmostEqual(receipt['wallet_available_before_usd'], .11 - .02 - .025)
 
     def test_proven_unsent_release_frees_the_slot_and_committed_or_zero_cost_does_not(self):
         unsent = self.reserve_first('unsent')

@@ -1,4 +1,4 @@
-# DIGR 同源 Chat 按需深层 Stable 1.6.0
+# DIGR 同源 Chat 按需深层 Stable 1.6.1
 
 这是 Codex 研究语义的 Chat 宿主移植。根 Stable 与 Codex 分别选择和取得。用户选用本移植时加载本文件及CHAT_LIGHT；不得仅因聊天提及DIGR而自行覆盖已有路由。工作深度由用户要求与任务决定。
 

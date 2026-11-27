@@ -1,6 +1,6 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "protocol": "digr-codex-native-v24",
   "status": "stable",
   "language": "zh-CN",
@@ -177,7 +177,7 @@
     "court_cli": "COMPACT_DEFAULT_NEW_PIN_FULL_ON_DEMAND"
   },
   "file_sha256": {
-    "codex/VERSION": "cb1d9a30bc4ab8a397f39b7d786bb82aca0b816077eefc35d7c822017d75f6a5",
+    "codex/VERSION": "6430a242e9486093ef6f71d9086d48f61ba102f0d2fb0f5b95334c6007a46db3",
     "codex/AGENTS.light.md": "5abd877bc2f684ce54e34bbefcc9da17a0c00e1c8bbdadfa5a7f1aadcb700abd",
     "codex/ROUTER.experimental.txt": "45b6e2a6f06c9c7ee11845b7873f7ddb526ea1609bc6951f897eaebde85bd290",
     "codex/STARTUP.md": "d1f2bd4ab07455d59ec96f615cb3a41fc074d80766cc84d8077778a0facf0289",
@@ -195,13 +195,13 @@
     "codex/PERMISSIONS.md": "a6f47e953c57b97c5e0a930823d41f87c238c7394efa87fc1a1b79412005d71b",
     "codex/DELIVERY.md": "c19bbaa9080f9a4e2919c67964085bac9c0b4e8c897cf0cf126cce46271d5cf2",
     "codex/RETURN.md": "c5b227fdb0ce63096f6bcb1e89ad8ea088c6b4d76cb1eab0ed24907c900ac767",
-    "codex/EXECUTION_PROTOCOL.json": "a0971bbcfc5ef823807a3c284d0fb2d6662b0c05cdc7226137ae77068684b516",
-    "codex/COUNCIL.md": "cf0c6e07fb6916c3b2974dd609d8a8d248808387d1278ed925e3cfcaedb6465d",
+    "codex/EXECUTION_PROTOCOL.json": "dc7d0bf5bc1425ad7fe15e5b0aa3d9f7ba9414551fd31aae738fc6fef540768d",
+    "codex/COUNCIL.md": "dfb53248320455175ffa48e6c8ca9dd02b4f02db4eea764cd4e9ace123a9d91e",
     "codex/COURT.md": "66463392984284d853a0e692110d4f8a4e22a29f540fef5ed8e58a678c5c2678",
     "codex/USAGE.md": "7a8cc30aedab48f15988d607ecb1b608727b3f1a2867aab0788f8964a3fc27ee",
     "codex/CHAT.md": "78ac198a70adf5cfb15107d51137b882b1cbb99b2cec13695679bccd074cb41b",
-    "codex/CHAT_LIGHT.md": "0cdd6cb20526b0672cd040daec45bbb81a7ecdd26f944f8b429899eaef0baf8b",
-    "codex/CHAT_DEEP.md": "85584cd36bd075dbc4bdab3c1984673e0ecf272e0729071245724b0394794a0c",
+    "codex/CHAT_LIGHT.md": "ce77bb503231c820ff3a8a5f119b90f082df04b507c5882c9681d2de47958956",
+    "codex/CHAT_DEEP.md": "a3bc0532744f64c2b8ac68038ddfb578ae8613572d22bca91b01882fcdc2ec35",
     "codex/LIVE.md": "ed87b8d0ec6839abb65e36da5d5326a0e1e3bfc7b1928531ba9fa218658b1eaa"
   },
   "workbench_guide": "codex/WORKBENCH.md",

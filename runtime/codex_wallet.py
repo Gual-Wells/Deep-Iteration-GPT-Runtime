@@ -19,6 +19,7 @@ from typing import Any, Mapping
 from . import codex_collaboration
 
 FORMAT = 'digr-shared-wallet-1'
+OPENROUTER_QUOTE_SNAPSHOT_PREFIX = 'openrouter-quote:'
 
 
 def _now() -> str:
@@ -110,6 +111,28 @@ def _totals(rows) -> dict:
 def _has_table(db, name: str) -> bool:
     return db is not None and db.execute(
         "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone() is not None
+
+
+def confirmed_coverage(wallet_id: str) -> dict:
+    """Read the last explicit provider-balance confirmation for each claim."""
+    path = ledger_path()
+    if not path.is_file():
+        return {}
+    try:
+        with closing(sqlite3.connect(path.as_uri() + '?mode=ro', uri=True, timeout=15)) as db:
+            if not _has_table(db, 'snapshots'):
+                return {}
+            # An automatic quote carries evidence forward. It cannot confirm a
+            # charge or supersede a later explicit correction to its coverage.
+            snapshots = db.execute('''SELECT body FROM snapshots
+                WHERE wallet_id=? AND snapshot_id NOT LIKE ?
+                ORDER BY first_recorded_at, rowid''', (wallet_id, OPENROUTER_QUOTE_SNAPSHOT_PREFIX + '%'))
+            covered = {}
+            for (body,) in snapshots:
+                covered.update(json.loads(body)['covered_claims'])
+            return covered
+    except sqlite3.Error as error:
+        raise ValueError('Shared wallet read failed: ' + type(error).__name__ + '; no local budget fallback') from None
 
 
 def _availability(db, task_rows, wallet_rows, wallet_id: str, budget: Mapping[str, Any], *,

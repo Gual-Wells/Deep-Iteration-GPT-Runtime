@@ -74,7 +74,7 @@ python -B tools/codex.py council packet --root TASK --council-id c-first --actor
 python -B tools/codex.py council prepare-round --root TASK --council-id c-first --kind INDEPENDENT
 ```
 
-把初议包交给真实原生 actor。按 [SPLIT](SPLIT.md) 给已准备的首发 exchange 绑定实际本机分工。已准备的纯文本首发使用 OpenRouter 官方接口、且同一配置能查询模型价格与账户真实余额时，可直接用已绑定的 Split 文件运行。程序通过 `/credits` 核对共享钱包，按完整请求估算并核对用户限额和 0.20 美元上限后提交单次请求。`/key` 返回的密钥用量和额度属于另一项数据。需要指定私有配置时带 `--config CONFIG.json`。
+把初议包交给真实原生 actor。按 [SPLIT](SPLIT.md) 给已准备的首发 exchange 绑定实际本机分工。已准备的纯文本首发使用 OpenRouter 官方接口、且同一配置能查询模型价格与账户真实余额时，可直接用已绑定的 Split 文件运行。程序通过 `/credits` 核对共享钱包，沿用同一钱包已明确核实的历史费用覆盖，并扣除其后未覆盖的费用和未结预留。按完整请求估算并核对用户限额和 0.20 美元上限后提交单次请求。`/key` 返回的密钥用量和额度属于另一项数据。需要指定私有配置时带 `--config CONFIG.json`。
 
 ```text
 python -B tools/codex.py council run-round --root TASK --council-id c-first --round-id 1 --split-plan SPLIT.json

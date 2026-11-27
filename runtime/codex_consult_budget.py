@@ -91,18 +91,24 @@ def first_opinion_quote(request: Mapping[str, Any], *, config_path: Path | None 
         raise ValueError(f'The prepared first opinion exceeds its USD 0.20 ceiling at current prices. {_QUOTE_PLAN}')
     precision = Decimal('0.000001')
     ceiling = float(max(precision, cost_bound.quantize(precision, rounding=ROUND_CEILING)))
+    covered_claims = codex_wallet.confirmed_coverage(wallet_id)
     credits = _quote_data(opener, 'credits', timeout=timeout, credential=credential)
     try:
         remaining = max(Decimal(0), _quote_amount(credits['total_credits']) - _quote_amount(credits['total_usage']))
         wallet_remaining = consult._number('remaining OpenRouter credits', float(remaining))
     except (KeyError, DecimalException, TypeError, ValueError):
         raise ValueError(f'OpenRouter did not supply a usable current credit balance. {_QUOTE_PLAN}') from None
-    return {'facts': {'model': model, 'checked_at': checked_at, 'pricing_ref': 'OpenRouter GET /api/v1/models',
-                      'input_bound_basis': 'Complete text-only UTF-8 request bytes with provider framing allowance',
-                      'wallet_id': wallet_id, 'wallet_remaining_usd': wallet_remaining, 'outside_spent_usd': 0,
-                      'prompt_usd_per_million': prices['prompt'], 'completion_usd_per_million': prices['completion'],
-                      'request_usd': prices['request'], 'input_tokens_upper_bound': input_tokens},
-            'ceiling_usd': ceiling}
+    facts = {'model': model, 'checked_at': checked_at, 'pricing_ref': 'OpenRouter GET /api/v1/models',
+             'input_bound_basis': 'Complete text-only UTF-8 request bytes with provider framing allowance',
+             'wallet_id': wallet_id, 'wallet_remaining_usd': wallet_remaining, 'outside_spent_usd': 0,
+             'prompt_usd_per_million': prices['prompt'], 'completion_usd_per_million': prices['completion'],
+             'request_usd': prices['request'], 'input_tokens_upper_bound': input_tokens}
+    if covered_claims:
+        snapshot = {'wallet_id': wallet_id, 'covered_claims': covered_claims}
+        identity = consult._hash(consult._json_bytes({**snapshot, 'wallet_remaining_usd': wallet_remaining}))
+        facts['wallet_snapshot'] = {'snapshot_id': codex_wallet.OPENROUTER_QUOTE_SNAPSHOT_PREFIX + identity,
+                                    **snapshot}
+    return {'facts': facts, 'ceiling_usd': ceiling}
 
 
 def _task_binding(session: Mapping[str, Any]) -> dict:
