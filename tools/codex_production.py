@@ -28,6 +28,8 @@ def main(argv=None):
     submit.add_argument('--return-ref', required=True, help='actual native host return event reference')
     applied = commands.add_parser('record-applied', help='bind actual Claude arbitration to the final artifact')
     applied.add_argument('--arbitration-exchange', required=True)
+    applied.add_argument('--peer-arbitration-exchange',
+                         help='the other complete, coequal Sonnet or Carbon arbitration for the same assignment')
     applied.add_argument('--output', type=Path, required=True)
     applied.add_argument('--effect', required=True, help='what the actual verdict changed in the artifact')
     release = commands.add_parser('release', help='record an actual later user fallback or scope replacement')
@@ -50,7 +52,8 @@ def main(argv=None):
                                               output_path=args.output, return_ref=args.return_ref)
         elif args.command == 'record-applied':
             result = production.record_applied(args.root, args.production_id,
-                arbitration_exchange=args.arbitration_exchange, output_path=args.output, effect=args.effect)
+                arbitration_exchange=args.arbitration_exchange, output_path=args.output,
+                effect=args.effect, peer_exchange=args.peer_arbitration_exchange)
         elif args.command == 'release':
             result = production.release(args.root, args.production_id, disposition=args.disposition,
                 source=args.source, quote=args.quote, effect=args.effect,

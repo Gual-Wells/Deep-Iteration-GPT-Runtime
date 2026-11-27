@@ -922,7 +922,7 @@ def _claude_costs(root: Path) -> dict:
             'participation_role': value.get('participation_role', 'consult_guidance'),
             'member_id': scope.get('member_id'), 'cycle_id': scope.get('cycle_id'),
             'round_id': scope.get('round_id'),
-            'model': value.get('response_model', contract.get('requested_model')),
+            'model': value.get('response_model') or contract.get('requested_model'),
             'transport_status': value.get('transport_status'), 'billing_status': status,
             'settled_usd': known if value.get('reconciled_at') else None,
             'observed_usd': known if not value.get('reconciled_at') else None,
@@ -1000,17 +1000,23 @@ def _claude_costs(root: Path) -> dict:
                 selection = _read(lifecycle_path)['claude_policy']['mode']
             except (OSError, ValueError, KeyError):
                 selection = None
-        if claim is not None:
-            reply = indexed[claim['exchange_id']]
-            report['first_opinion'] = {
-                'state': 'RESERVED' if claim['state'] == 'RESERVED' else 'CONSUMED',
-                'exchange_id': claim['exchange_id'], 'wallet_status': claim['state'],
+        def first_record(current):
+            if current is None:
+                return {'state': 'UNUSED' if wallet.get('status') in {'READ', 'ABSENT'} else 'UNCONFIRMED'}
+            reply = indexed[current['exchange_id']]
+            return {
+                'state': 'RESERVED' if current['state'] == 'RESERVED' else 'CONSUMED',
+                'exchange_id': current['exchange_id'], 'wallet_status': current['state'],
                 'transport_status': reply['transport_status'], 'public_status': reply.get('public_status'),
                 'billing_status': reply['billing_status'], 'settled_usd': reply['settled_usd'],
                 'observed_usd': reply['observed_usd'], 'unresolved_reserved_usd': reply['unresolved_reserved_usd']}
-        elif selection == codex_collaboration.COUNCIL_ONLY:
-            report['first_opinion'] = {
-                'state': 'UNUSED' if wallet.get('status') in {'READ', 'ABSENT'} else 'UNCONFIRMED'}
+        if codex_collaboration.parallel_external_policy(session['P_run']):
+            claims = wallet.get('first_opinion_claims', {})
+            if claims or selection == codex_collaboration.COUNCIL_ONLY:
+                report['first_opinions'] = {
+                    name: first_record(claims.get(name)) for name in codex_collaboration.EXTERNAL_MODELS}
+        elif claim is not None or selection == codex_collaboration.COUNCIL_ONLY:
+            report['first_opinion'] = first_record(claim)
     return report
 
 

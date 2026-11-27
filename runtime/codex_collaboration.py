@@ -7,8 +7,16 @@ FORMAT = 'digr-actual-collaboration-1'
 SONNET_MODEL = re.compile(r'anthropic/claude-(?:sonnet-[0-9]+(?:\.[0-9]+)*|[0-9]+(?:\.[0-9]+)*-sonnet)(?:-[0-9]{8})?')
 CLAUDE_MODEL = re.compile(r'(?:^|/)claude(?:[-/:]|$)', re.IGNORECASE)
 COUNCIL_ONLY = 'COUNCIL_ONLY'
+SONNET_5_5 = 'anthropic/claude-sonnet-5.5'
+GEMINI_CARBON = 'google/gemini-4-carbon'
+EXTERNAL_MODELS = {'sonnet': SONNET_5_5, 'carbon': GEMINI_CARBON}
+OPENROUTER_SNAPSHOTS = {
+    SONNET_5_5: 'anthropic/claude-sonnet-5.5-20260928',
+    GEMINI_CARBON: 'google/gemini-4-carbon-20261110',
+}
 CLAUDE_LAYER_BY_ROLE = {'council_member': 'COUNCIL', 'consult_guidance': 'CONTENT'}
 DOUBLE_COLON_LAYER_CEILINGS_USD = {'COUNCIL': 0.20, 'CONTENT': 1.00}
+SHARED_LAYER_CEILINGS_USD = {'COUNCIL': 0.25, 'CONTENT': 1.25}
 FOUNDATION_INTENT_PURPOSE = 'foundation_intent'
 FIRST_OPINION_PURPOSE = 'first_opinion'
 FIRST_OPINION_NATIVE_WORK_RETURN_PURPOSE = 'first_opinion_native_work_return'
@@ -54,6 +62,43 @@ def foundation_intent_policy(p_run: str) -> bool:
     return _since(p_run, (1, 7, 0))
 
 
+def parallel_external_policy(p_run: str) -> bool:
+    return _since(p_run, (1, 7, 0))
+
+
+def layer_ceilings(p_run: str) -> dict[str, float]:
+    return SHARED_LAYER_CEILINGS_USD if parallel_external_policy(p_run) else DOUBLE_COLON_LAYER_CEILINGS_USD
+
+
+def priority_collaborator(p_run: str, model: str) -> bool:
+    return bool(SONNET_MODEL.fullmatch(model)) or (
+        parallel_external_policy(p_run) and model == GEMINI_CARBON)
+
+
+def external_participant(model: str) -> str | None:
+    return next((name for name, exact in EXTERNAL_MODELS.items() if exact == model), None)
+
+
+def authorized_model(p_run: str, model: str) -> bool:
+    return bool(re.fullmatch(r'anthropic/claude-[a-z0-9][a-z0-9._:-]*', model)) or (
+        parallel_external_policy(p_run) and model == GEMINI_CARBON)
+
+
+def observed_model_matches(p_run: str, requested: str, observed: str | None) -> bool:
+    if not observed:
+        return False
+    return observed == requested or (
+        parallel_external_policy(p_run) and OPENROUTER_SNAPSHOTS.get(requested) == observed)
+
+
+def first_opinion_purpose(p_run: str, participant: str | None = None) -> str:
+    if not parallel_external_policy(p_run):
+        return FIRST_OPINION_PURPOSE
+    if participant not in EXTERNAL_MODELS:
+        raise ValueError('A first-opinion claim requires its assigned external collaborator')
+    return f'{FIRST_OPINION_PURPOSE}:{participant}'
+
+
 def require_first_opinion_permission(lifecycle: Mapping[str, Any]) -> None:
     if not first_opinion_policy(lifecycle['P_run']):
         raise ValueError('The first-opinion opportunity requires a frozen Codex 1.2.0+ task')
@@ -69,7 +114,7 @@ def require_council_permission(lifecycle: Mapping[str, Any]) -> None:
     mode = lifecycle.get('claude_policy', {}).get('mode')
     if mode == 'ALLOW' or (layered_policy(lifecycle['P_run']) and mode == COUNCIL_ONLY):
         return
-    raise ValueError('Claude council members are disabled by the current task choice; native council remains usable')
+    raise ValueError('External council members are disabled by the current task choice; native council remains usable')
 
 
 def require_claude_permission(p_run: str, model: str, lifecycle: Mapping[str, Any], *,
@@ -82,12 +127,14 @@ def require_claude_permission(p_run: str, model: str, lifecycle: Mapping[str, An
     if layered_policy(p_run):
         if participation_role == 'council_member':
             require_council_permission(lifecycle)
-            if lifecycle['claude_policy']['mode'] == COUNCIL_ONLY and not CLAUDE_MODEL.search(model):
-                raise ValueError('The council-only wallet grant covers Claude members')
+            if (lifecycle['claude_policy']['mode'] == COUNCIL_ONLY
+                    and not CLAUDE_MODEL.search(model)
+                    and not (parallel_external_policy(p_run) and model == GEMINI_CARBON)):
+                raise ValueError('The council-only wallet grant covers the task’s external members')
         elif participation_role != 'consult_guidance' or lifecycle.get('claude_policy', {}).get('mode') != 'ALLOW':
             raise ValueError('Formal content participation requires the current two-layer DIGR:: choice')
-        if standing_claude_budget_policy(p_run) and not re.fullmatch(r'anthropic/claude-[a-z0-9][a-z0-9._:-]*', model):
-            raise ValueError('Standing layer authority covers configured Anthropic Claude models')
+        if standing_claude_budget_policy(p_run) and not authorized_model(p_run, model):
+            raise ValueError('Standing layer authority covers only the profile’s supported external models')
     elif delimiter_policy(p_run) and CLAUDE_MODEL.search(model):
         if lifecycle.get('claude_policy', {}).get('mode') != 'ALLOW':
             raise ValueError('Claude is disabled by the current task choice; DIGR:: permits Claude, DIGR: does not')
@@ -110,17 +157,21 @@ def requirements(p_run: str, model: str, paper_scope: Mapping[str, Any] | None, 
     if not unified(p_run):
         return None
     sonnet = bool(SONNET_MODEL.fullmatch(model))
+    priority = priority_collaborator(p_run, model)
+    carbon = parallel_external_policy(p_run) and model == GEMINI_CARBON
     protocols = ['codex/CONSULT.md', 'codex/SPLIT.md', 'codex/PERMISSIONS.md']
     if participation_role == 'council_member':
         protocols = ['codex/COUNCIL.md', 'codex/COLLABORATION.md', 'codex/SPLIT.md', 'codex/PERMISSIONS.md']
     if paper_scope is not None:
-        if not sonnet:
-            raise ValueError('Selected paper content driving requires the actual canonical Sonnet model')
+        if not priority:
+            raise ValueError('Selected paper content driving requires a supported canonical authoring model')
         protocols += ['paper/PROTOCOL.md', 'paper/DATA.md', 'paper/PDF_DESIGN.md']
     result = {'format': FORMAT, 'entrypoint': 'DIGR', 'selection_basis': 'ACTUAL_REQUEST_MODEL_AND_SCOPE',
             'requested_model': model, 'sonnet_selected': sonnet,
             'content_relationship': ('COUNCIL_MEMBER_RESEARCH' if participation_role == 'council_member' else
+                                     'CARBON_NATIVE_PAPER' if carbon and paper_scope is not None else
                                      'SONNET_NATIVE_PAPER' if paper_scope is not None else
+                                     'CARBON_CONTENT_GUIDANCE' if carbon else
                                      'SONNET_CONTENT_GUIDANCE' if sonnet else 'ORDINARY_CONTENT_COLLABORATION'),
             'paper_scope': dict(paper_scope) if paper_scope is not None else None, 'protocols': protocols,
             'engineering': ['source_preparation', 'native_split', 'public_relay',
@@ -130,7 +181,9 @@ def requirements(p_run: str, model: str, paper_scope: Mapping[str, Any] | None, 
     if council_enabled(p_run):
         result['participation_role'] = participation_role
         result['council_scope'] = dict(council_scope) if council_scope is not None else None
-        result['subjective_guidance_priority'] = participation_role == 'consult_guidance' and sonnet
+        result['subjective_guidance_priority'] = participation_role == 'consult_guidance' and priority
+        if parallel_external_policy(p_run):
+            result['external_participant'] = 'carbon' if carbon else 'sonnet' if sonnet else None
     if layered_policy(p_run):
         result['claude_layer'] = CLAUDE_LAYER_BY_ROLE[participation_role]
     return result

@@ -1,10 +1,10 @@
 # DIGR for Codex · Stable 1.7.0
 
-`DIGR：任务` 主动寻找能影响成品的开放取舍，在定案前安排 Claude 作一次独立首发。Claude 可以自行选择议题，也可委托 Codex 取原件、复算或试作，再根据结果继续判断。单冒号直接开放第一层，双冒号直接开放两层。第一层每任务累计 0.20 美元，第二层累计 1.00 美元，受真实钱包和用户更窄限额约束。每次提交前完成本机 Split，Sonnet 保留适合实质判断的 `high`，Codex 完成所需的支持工作。详见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
+`DIGR：任务` 主动寻找能影响成品的开放取舍，在定案前安排 Sonnet 和 Carbon 作一次独立首发。两位成员都可以自行选择议题，也可委托 Codex 取原件、复算或试作，再根据结果继续判断。单冒号直接开放第一层，双冒号直接开放两层。两位共同占用第一层每任务 0.25 美元和第二层每任务 1.25 美元，受真实钱包和用户更窄限额约束。每次提交前完成本机 Split，Sonnet 保留适合实质判断的 `high`，Codex 完成所需的支持工作。详见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
 
 用 `DIGR(F=3)：任务` 要求先研究至少三个来自相关公开社区的高评价特色项目，再据此决定相关方案。项目按任务去重，每个项目要进入实际比较；达额后，已采用的具体内容继续参与生产、修订、分工和恢复。五档F参考为0、2、3、4、6，INIT前按实际任务推断并保存正式目标，详见 [F 的完整规则](codex/PARAMETERS.md#f-公开社区项目先研)。
 
-[原语宪法](codex/CONSTITUTION.md)适用于整个当前 Codex 协议。正式内容委托按 [CONSULT](codex/CONSULT.md) 发起同题双边产出、Claude 裁决及 Main 落实。既有任务按原 pin 接续，适用关系见[兼容范围](docs/CODEX_STABLE_COMPATIBILITY.md)。
+[原语宪法](codex/CONSTITUTION.md)适用于整个当前 Codex 协议。正式内容委托按 [CONSULT](codex/CONSULT.md) 发起同题独立产出、所选外部协作者裁决及 Main 落实。既有任务按原 pin 接续，适用关系见[兼容范围](docs/CODEX_STABLE_COMPATIBILITY.md)。
 
 Codex 按当前模型和推理设置工作。五档提供任务强度推断的偏好基准。Main 主动寻找有价值的深入工作，若额外投入能承担实质推进、整体重开或独立研究，就提高相应参数。预见超巨量批任务时，可依据材料、分批收益和验收条件设计多档协作。明确的任务更新用 `DO：` 接入现有任务，费用答复只取得相应费用许可。冻结旧任务按完整原 pin 与工具恢复。历史变更见 [CHANGELOG](CHANGELOG.md)。
 
@@ -16,7 +16,7 @@ N/T/R/B/S(n,t,r,b)/D/V/L/M/X/F/C的完整调用已在[HELP](codex/HELP.md#完整
 
 0.9.0把[X文件交付](codex/DELIVERY.md)接入DIGR、DIGRP：无`X`在当前聊天返回文件；`DIGR(X):…`、`DIGRP(X):…`和`(X=Gmail)`均发送到本机配置的本人Gmail。常规投入参数后可另接一个X栏，例如`DIGRP(N=16,R=4)(X=Gmail):…`。X只控制任务约定的最终文件；没有文件时保留文字答复，不额外造文件。本版仅实现Gmail，个人目标在私有本机配置中，任务建立时解析并保存。
 
-[DIGR 论文0.6.2](paper/PROTOCOL.md)以同一论文和用户用途组织原生与 Sonnet 两份候选，Sonnet 裁决后由 Codex 落实。每篇有完整 M 和一份[标准页桌面 PDF](paper/PDF_DESIGN.md)。无 X 在聊天交付，有 X 时逐篇发送本人 Gmail 并读回。确切来源、发送意图与旧 pin 均按原契约保存。[交付操作](.agents/skills/digr-delivery/SKILL.md)随同一不可变 pin 提供。
+[DIGR 论文0.6.2](paper/PROTOCOL.md)以同一论文和用户用途组织原生与所选 Sonnet、Carbon 独立候选，外部作者给出裁决后由 Codex 落实。每篇有完整 M 和一份[标准页桌面 PDF](paper/PDF_DESIGN.md)。无 X 在聊天交付，有 X 时逐篇发送本人 Gmail 并读回。确切来源、发送意图与旧 pin 均按原契约保存。[交付操作](.agents/skills/digr-delivery/SKILL.md)随同一不可变 pin 提供。
 
 0.8.3接入社区 Anti-Defensive Writing：有据主张先行，删除重复辩护、叠加保留和自我贬低，必要限定准确落在相关主张。核心规则进入必读PROTOCOL、RETURN及普通任务轻量约定；中英双语完整技能连同不可变来源和MIT许可随分发提供。[来源与接入说明](docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md)。
 
@@ -148,12 +148,12 @@ python -B tools/codex.py acquire --stage execution --continue-from D:/task/acqui
 | `python -B tools/codex.py experience --help` | 保存明确选入的经验片段及出处；后续查看来源位置是否变化。不会自动写入全局 Memory。 |
 | `python -B tools/codex.py permissions --help` | 根据实际供给的任务授权、能力与费用事实给行动建议；不执行操作或改变宿主权限。 |
 
-统一 CLI 支持材料准备、事实记录，以及通过显式 `consult call` 或 `council run-round` 发送已授权的 Claude 请求。宿主负责启动原生代理、判断研究责任与验收作品。原有 `tools/codex_profile.py`、`tools/codex_workbench.py` 和 `tools/codex_experience.py` 仍可用。
+统一 CLI 支持材料准备、事实记录，以及通过显式 `consult call` 或 `council run-round` 发送已授权的外部协作请求。宿主负责启动原生代理、判断研究责任与验收作品。原有 `tools/codex_profile.py`、`tools/codex_workbench.py` 和 `tools/codex_experience.py` 仍可用。
 
-已为纯文本首发完成本机 Split，且同一 OpenRouter 官方接口配置可查询价格和账户实际余额时，可直接使用下面的运行命令。也可用 `--plan` 提供实际费用事实。完整流程见 [议会操作](codex/COUNCIL.md#本机可运行路径)。
+已为纯文本首发完成本机 Split，且同一 OpenRouter 官方接口配置可查询价格和账户实际余额时，可用下面的命令和成员到 Split 文件的 JSON 映射。也可用 `--plan` 提供实际费用事实。完整流程见 [议会操作](codex/COUNCIL.md#本机可运行路径)。
 
 ```text
-python -B tools/codex.py council run-round --root TASK --council-id ID --round-id 1 --split-plan SPLIT.json
+python -B tools/codex.py council run-round --root TASK --council-id ID --round-id 1 --member-splits SPLITS.json
 ```
 
 ## 协议原文与仓库维护

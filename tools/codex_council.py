@@ -69,7 +69,9 @@ def main(argv=None):
     plan_options.add_argument('--plan', type=Path,
         help='JSON members object: each member has facts (object or file), ceiling_usd, split_path, optional config_path')
     plan_options.add_argument('--split-plan', type=Path,
-        help='first opinion, its native work returns, and parallel U0: quote current OpenRouter cost')
+        help='one prepared member: use actual Split and quote current OpenRouter cost')
+    plan_options.add_argument('--member-splits', type=Path,
+        help='JSON member-ID-to-Split-path map for paired U0 and first-opinion quotes')
     run.add_argument('--config', type=Path, help='private billing configuration for --split-plan')
     seal = command('seal-member', 'seal actual existing member work without a further paid synthesis')
     seal.add_argument('--member', required=True)
@@ -114,15 +116,22 @@ def main(argv=None):
             result = council.prepare_round(args.root, args.council_id, kind=args.kind,
                 members=args.member, model=args.model, effort=args.effort, max_tokens=args.max_tokens)
         elif args.command == 'run-round':
-            if args.split_plan is not None:
+            if args.split_plan is not None or args.member_splits is not None:
+                member_splits = None
+                if args.member_splits is not None:
+                    supplied = read(args.member_splits)
+                    if not isinstance(supplied, dict):
+                        raise ValueError('The member Split file must map member IDs to paths')
+                    base = args.member_splits.resolve().parent
+                    member_splits = {key: base / Path(path) for key, path in supplied.items()}
                 event_name, jobs = council.automatic_round_plan(args.root, args.council_id, round_id=args.round_id,
-                    split_path=args.split_plan, config_path=args.config)
-                quote = next(iter(jobs.values()))
-                print(json.dumps({'event': event_name, 'ceiling_usd': quote['ceiling_usd'],
-                                  'model': quote['facts']['model']}, allow_nan=False), flush=True)
+                    split_path=args.split_plan, split_paths=member_splits, config_path=args.config)
+                for quote in jobs.values():
+                    print(json.dumps({'event': event_name, 'ceiling_usd': quote['ceiling_usd'],
+                                      'model': quote['facts']['model']}, allow_nan=False), flush=True)
             else:
                 if args.config is not None:
-                    raise ValueError('--config applies to --split-plan; put config_path in an explicit plan')
+                    raise ValueError('--config applies to automatic quotes; use config_path in an explicit plan')
                 jobs = read(args.plan)['members']
                 base = args.plan.resolve().parent
                 for job in jobs.values():

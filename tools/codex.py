@@ -62,6 +62,8 @@ def main(argv: list[str] | None = None) -> int:
     acquire.add_argument('--out', type=Path, help='new directory for acquired bytes and observations')
     acquire.add_argument('--continue-from', type=Path,
                          help='continue this already-acquired pin; never substitutes for live routing a new message')
+    acquire.add_argument('--stream-quotes', action='store_true',
+                         help='after verified execution acquisition, emit public paired prices as JSON lines')
     task = sub.add_parser('task', help='prepare an independently resumable task')
     ts = task.add_subparsers(dest='action', required=True)
     create = ts.add_parser('create')
@@ -197,6 +199,12 @@ def main(argv: list[str] | None = None) -> int:
             result = acquired.summary()
             if args.out is not None:
                 result['receipt'] = acquired.export(args.out).as_posix()
+            if args.stream_quotes and args.stage == 'execution':
+                from runtime.codex_collaboration import parallel_external_policy
+                if parallel_external_policy(f'{acquired.version}@{acquired.sha}'):
+                    from runtime.codex_consult_budget import startup_collaboration_quotes
+                    for quote in startup_collaboration_quotes():
+                        print(json.dumps(quote, ensure_ascii=False, allow_nan=False), flush=True)
         elif args.command == 'permissions':
             supplied = read_object(args.input)
             if 'restriction' in supplied:

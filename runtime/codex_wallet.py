@@ -136,7 +136,7 @@ def confirmed_coverage(wallet_id: str) -> dict:
 
 
 def _availability(db, task_rows, wallet_rows, wallet_id: str, budget: Mapping[str, Any], *,
-                  save_snapshot: bool, layer_limits: bool) -> dict:
+                  save_snapshot: bool, layer_limits: Mapping[str, float] | None) -> dict:
     task_totals, wallet_totals = _totals(task_rows), _totals(wallet_rows)
     total = budget['budget_total_usd']
     task_available = (None if total is None else total - budget['outside_spent_usd']
@@ -191,7 +191,7 @@ def _availability(db, task_rows, wallet_rows, wallet_id: str, budget: Mapping[st
               'coverage_basis': 'explicit confirmed cost revisions' if snapshot is not None else 'no confirmed coverage; covered amount zero'}
     if layer_limits:
         remaining = {}
-        for layer, ceiling in codex_collaboration.DOUBLE_COLON_LAYER_CEILINGS_USD.items():
+        for layer, ceiling in layer_limits.items():
             # A task on this pin records the layer for every new claim. If an
             # older writer left an unlabeled claim, count it conservatively.
             totals = _totals(row for row in task_rows if dict(row).get('claude_layer') in (None, layer))
@@ -204,7 +204,8 @@ def review_capacity(root: Path, session: Mapping[str, Any], *, wallet_id: str,
                     budgets: list[Mapping[str, Any]]) -> list[dict]:
     """Price preview reads one consistent ledger view without creating claims or schema."""
     path, task = ledger_path(), task_id(root, session)
-    layer_limits = codex_collaboration.double_colon_layer_budget_policy(session['P_run'])
+    layer_limits = (codex_collaboration.layer_ceilings(session['P_run'])
+                    if codex_collaboration.double_colon_layer_budget_policy(session['P_run']) else None)
     if not path.is_file():
         return [_availability(None, [], [], wallet_id, budget, save_snapshot=False, layer_limits=layer_limits)
                 for budget in budgets]
@@ -228,14 +229,15 @@ def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request
         raise ValueError('New DIGR submissions require an explicit shared wallet_id in the private config')
     if budget['budget_total_usd'] is None and not codex_collaboration.layered_policy(session['P_run']):
         raise ValueError('Wallet-only accounting requires the Stable task policy')
-    layer, layer_limits = None, False
+    layer, layer_limits = None, None
     standing = codex_collaboration.standing_claude_budget_policy(session['P_run'])
     if codex_collaboration.double_colon_layer_budget_policy(session['P_run']):
         # These values are derived from the actual role and selected user
         # decision by resolve(), which overwrites caller-supplied evidence.
         authority = budget['authorization_evidence']
         layer = codex_collaboration.CLAUDE_LAYER_BY_ROLE[authority['role']]
-        layer_limits = standing or authority['kind'] != 'SINGLE_COLON_WALLET_ONLY'
+        if standing or authority['kind'] != 'SINGLE_COLON_WALLET_ONLY':
+            layer_limits = codex_collaboration.layer_ceilings(session['P_run'])
         if standing:
             if (authority['kind'] != 'STANDING_CLAUDE_LAYER_LIMIT' or authority['layer'] != layer
                     or authority['wallet_id'] != wallet_id):
@@ -249,20 +251,26 @@ def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request
     first_return = standing and purpose == codex_collaboration.FIRST_OPINION_NATIVE_WORK_RETURN_PURPOSE
     if purpose is not None and (not (first_opinion or first_return) or (standing and layer != 'COUNCIL')):
         raise ValueError('Unknown shared wallet reservation purpose for this task profile')
+    first_purpose = None
+    if first_opinion or first_return:
+        first_purpose = codex_collaboration.first_opinion_purpose(
+            session['P_run'], authority.get('first_opinion_participant') if standing else None)
     if first_opinion:
-        if type(ceiling) not in (int, float) or not 0 < ceiling <= codex_collaboration.FIRST_OPINION_CEILING_USD:
-            raise ValueError('First-opinion reservation exceeds its USD 0.20 ceiling or lacks a positive bound')
+        cap = codex_collaboration.layer_ceilings(session['P_run'])['COUNCIL']
+        if type(ceiling) not in (int, float) or not 0 < ceiling <= cap:
+            raise ValueError(f'First-opinion reservation exceeds its USD {cap:.2f} ceiling or lacks a positive bound')
     path, task = ledger_path(), task_id(root, session)
     identity = claim_id(root, session, exchange_id)
     with _transaction(path) as db:
         if db.execute('SELECT 1 FROM claims WHERE claim_id=?', (identity,)).fetchone():
             raise ValueError('Shared wallet already claimed this exchange; inspect/recover without repeating inference')
         task_rows = list(db.execute('SELECT * FROM claims WHERE task_id=?', (task,)))
-        if first_opinion and any(row['purpose'] == purpose and row['state'] != 'ABORTED' for row in task_rows):
-            raise ValueError('This task already claimed its first Claude opinion; inspect its existing reservation')
+        if first_opinion and any(row['purpose'] == first_purpose and row['state'] != 'ABORTED' for row in task_rows):
+            raise ValueError('This task already claimed its first Claude opinion or its paired collaborator slot; '
+                             'inspect its existing reservation')
         if first_return and not any(
             row['exchange_id'] == authority['first_opinion_exchange_id']
-            and row['purpose'] == codex_collaboration.FIRST_OPINION_PURPOSE
+            and row['purpose'] == first_purpose
             and row['state'] in {'COMMITTED', 'KNOWN'}
             for row in task_rows
         ):
@@ -271,7 +279,7 @@ def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request
         availability = _availability(db, task_rows, wallet_rows, wallet_id, budget,
                                      save_snapshot=True, layer_limits=layer_limits)
         if layer_limits and ceiling > availability['layer_available_before_usd'][layer] + 1e-12:
-            amount = codex_collaboration.DOUBLE_COLON_LAYER_CEILINGS_USD[layer]
+            amount = layer_limits[layer]
             raise ValueError(f'Shared wallet reservation exceeds the {layer} layer budget (USD {amount:.2f} per task)')
         account_ref = budget.get('account_authorization_ref')
         limits = [availability[key] for key in ('task_available_before_usd', 'wallet_available_before_usd',
@@ -282,7 +290,8 @@ def reserve(root: Path, session: Mapping[str, Any], *, exchange_id: str, request
             (claim_id,task_id,wallet_id,exchange_id,request_sha256,state,ceiling_usd,reserved_at,
              account_authorization_ref,purpose,claude_layer)
             VALUES (?,?,?,?,?,'RESERVED',?,?,?,?,?)''',
-            (identity, task, wallet_id, exchange_id, request_sha256, ceiling, _now(), account_ref, purpose, layer))
+            (identity, task, wallet_id, exchange_id, request_sha256, ceiling, _now(), account_ref,
+             first_purpose if first_opinion else purpose, layer))
     return {'format': FORMAT, 'claim_id': identity, 'ledger_path': path.as_posix(),
             'wallet_id': wallet_id, 'request_sha256': request_sha256,
             **availability,
@@ -374,4 +383,11 @@ def inspect_task(root: Path, session: Mapping[str, Any]) -> dict:
                           and claim['state'] != 'ABORTED'), None)
     if first_opinion is not None:
         result['first_opinion_claim'] = first_opinion
+    if codex_collaboration.parallel_external_policy(session['P_run']):
+        purposes = {codex_collaboration.first_opinion_purpose(session['P_run'], name): name
+                    for name in codex_collaboration.EXTERNAL_MODELS}
+        result['first_opinion_claims'] = {
+            purposes[claim['purpose']]: claim for claim in claims
+            if claim.get('purpose') in purposes and claim['state'] != 'ABORTED'
+        }
     return result

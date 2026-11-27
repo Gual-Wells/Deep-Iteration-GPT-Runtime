@@ -27,7 +27,7 @@ from . import codex_split, codex_collaboration, codex_wallet, codex_io, codex_pa
 from .codex_lifecycle import content_message
 
 FORMAT = 'digr-codex-consult-1'
-DEFAULT_MODEL = 'anthropic/claude-sonnet-5.5'
+DEFAULT_MODEL = codex_collaboration.SONNET_5_5
 DEFAULT_EFFORT = 'high'
 DEFAULT_MAX_TOKENS = 128000
 DEFAULT_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
@@ -141,16 +141,20 @@ def _model_system(p_run: str, model: str, participation_role: str = 'consult_gui
             return _FOUNDATION_INTENT_PROMPT
         if codex_collaboration.native_work_policy(p_run):
             from .codex_council_work import MEMBER_INSTRUCTION
-            return _COUNCIL_MEMBER_SYSTEM + '\n\n' + MEMBER_INSTRUCTION
+            council_system = _COUNCIL_MEMBER_SYSTEM
+            if codex_collaboration.parallel_external_policy(p_run):
+                council_system = council_system.replace('Claude subcouncil', 'external council group', 1)
+            return council_system + '\n\n' + MEMBER_INSTRUCTION
         return _COUNCIL_MEMBER_SYSTEM
-    if codex_collaboration.unified(p_run) and not _SONNET_MODEL.fullmatch(model):
+    if codex_collaboration.unified(p_run) and not codex_collaboration.priority_collaborator(p_run, model):
         return _ORDINARY_COLLAB_SYSTEM
     return _generic_system(p_run)
 
 
-def _paper_system(addon_version: str) -> str:
-    return (_LOGICAL_PAPER_SYSTEM if codex_paper.CORE_MINIMUMS.get(addon_version, ()) >= (0, 12, 0)
-            else _PAPER_SYSTEM)
+def _paper_system(addon_version: str, model: str = DEFAULT_MODEL) -> str:
+    system = (_LOGICAL_PAPER_SYSTEM if codex_paper.CORE_MINIMUMS.get(addon_version, ()) >= (0, 12, 0)
+              else _PAPER_SYSTEM)
+    return system.replace('You are Sonnet,', 'You are Gemini 4 Carbon,', 1) if model == codex_collaboration.GEMINI_CARBON else system
 
 
 def streams_public(p_run: str) -> bool:
@@ -232,10 +236,17 @@ def _text(name: str, value: Any) -> str:
     return value
 
 
-def paper_model_identity(requested_model: Any, response_model: Any) -> dict:
+def paper_model_identity(requested_model: Any, response_model: Any, p_run: str = '') -> dict:
     """Report an exact observed Sonnet ID, not aliases or provider authenticity."""
     requested = requested_model if isinstance(requested_model, str) else None
     observed = response_model if isinstance(response_model, str) else None
+    if (codex_collaboration.parallel_external_policy(p_run)
+            and requested in codex_collaboration.EXTERNAL_MODELS.values()):
+        matched = codex_collaboration.observed_model_matches(p_run, requested, observed)
+        return {'status': 'CONFIRMED' if matched else 'UNCONFIRMED',
+                'requested_model': requested, 'response_model': observed,
+                'basis': ('Observed identifier matches the selected model or its explicit OpenRouter snapshot'
+                          if matched else 'Observed identifier does not identify the requested collaborator')}
     if not requested or not _SONNET_MODEL.fullmatch(requested):
         basis = 'Requested model is not a supported canonical Anthropic Sonnet identifier'
     elif not observed:
@@ -465,9 +476,10 @@ def _exchange_writer(root: Path, exchange_id: str):
 
 
 def _member_scope(root: Path, scope: Mapping[str, Any] | None, *, active: bool, exchange_id: str,
-                  dispatch: bool = False) -> dict:
+                  dispatch: bool = False, model: str | None = None) -> dict:
     from .codex_council import require_member_scope
-    return require_member_scope(root, scope, active=active, exchange_id=exchange_id, dispatch=dispatch)
+    return require_member_scope(root, scope, active=active, exchange_id=exchange_id,
+                                dispatch=dispatch, model=model)
 
 
 def _load(root: Path, exchange_id: str, *, verify_public: bool = True) -> tuple[Path, dict, dict]:
@@ -759,7 +771,7 @@ def prepare_request(
             raise ValueError('Council member work is distinct from formal paper authoring')
         if exchange_id is None:
             raise ValueError('Council members require their registered job exchange_id; no untracked random exchange')
-        council_scope = _member_scope(root, council_scope, active=True, exchange_id=exchange_id)
+        council_scope = _member_scope(root, council_scope, active=True, exchange_id=exchange_id, model=model)
         if codex_collaboration.native_work_policy(session['P_run']):
             from .codex_council_work import RESEARCH_EFFORTS, ROUND_KIND
             if effort not in RESEARCH_EFFORTS:
@@ -787,8 +799,8 @@ def prepare_request(
             old = parent['council_scope']
             if any(old.get(key) != council_scope.get(key) for key in ('council_id', 'member_id', 'line_id')):
                 raise ValueError('Cannot continue another council member research history')
-            if work_return and previous['model'] != model:
-                raise ValueError('Native work return must use the requesting Claude member’s model')
+            if previous['model'] != model and (work_return or codex_collaboration.parallel_external_policy(session['P_run'])):
+                raise ValueError('Council continuation must use the same requesting member’s model')
         prior_production = parent.get('production')
         if prior_production is not None and (
             production is None or prior_production['production_id'] != production['production_id']
@@ -810,7 +822,7 @@ def prepare_request(
             raise ValueError('Cannot continue generic Consult as paper authoring; start a separate exchange')
     elif paper_root is not None:
         authoring_scope, paper_value, paper_batch = _selected_paper(root, session, paper_root)
-        messages = [{'role': 'system', 'content': _paper_system(authoring_scope['addon_version'])}]
+        messages = [{'role': 'system', 'content': _paper_system(authoring_scope['addon_version'], model)}]
     else:
         initial = session.get('initial_invocation', {})
         pin = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)@[0-9a-f]{40}', session['P_run'])
@@ -836,8 +848,12 @@ def prepare_request(
     current = raw.decode('utf-8-sig')
     _text('current input', current)
     if authoring_scope is not None:
-        if not _SONNET_MODEL.fullmatch(model):
-            raise ValueError('Paper authoring requires a supported canonical Anthropic Sonnet model identifier')
+        if not codex_collaboration.priority_collaborator(session['P_run'], model):
+            raise ValueError('Paper authoring requires a supported canonical Anthropic Sonnet model identifier '
+                             'or, on the paired profile, Gemini 4 Carbon')
+        if (codex_collaboration.parallel_external_policy(session['P_run'])
+                and continue_from is not None and previous['model'] != model):
+            raise ValueError('Each paper collaborator keeps its own prior authoring history')
         sources, parts = _paper_context(root, lifecycle, authoring_scope, paper_value, paper_batch,
             previous_sources if codex_split.required(session['P_run']) else ())
         info['kind'] = 'HOST_WORKING_INPUT'
@@ -866,9 +882,9 @@ def prepare_request(
                          'The native candidate will be supplied separately at arbitration.')
         else:
             parts.append('Arbitrate the two actual candidates under the same user requirements and evidence. '
-                         'Your preceding public answer is the Claude candidate. The material labeled as the '
+                         'Your preceding public answer is your own candidate. The material labeled as the '
                          'native candidate is the independent Codex result. Consider both on equal terms. '
-                         'Select the native candidate, select the Claude candidate, or produce a synthesis. '
+                         'Select one of the actual candidates or produce a synthesis. '
                          'Give the actual final content or precise decisions that Main must apply. '
                          'If a decisive requirement cannot be settled, explain the remaining issue rather than declaring it complete.')
     if work_return:
@@ -1026,7 +1042,11 @@ def inspect_exchange(root: Path, exchange_id: str | None = None) -> dict:
             contract['sonnet_observed'] = bool(_SONNET_MODEL.fullmatch(attempt.get('response_model') or ''))
             result['collaboration'] = contract
             if contract['sonnet_selected'] or contract['sonnet_observed']:
-                result['sonnet_model_identity'] = paper_model_identity(request.get('model'), attempt.get('response_model'))
+                result['sonnet_model_identity'] = paper_model_identity(
+                    request.get('model'), attempt.get('response_model'), session['P_run'])
+            if contract.get('external_participant') == 'carbon':
+                result['carbon_model_identity'] = paper_model_identity(
+                    request.get('model'), attempt.get('response_model'), session['P_run'])
         split = attempt.get('split')
         if split is not None:
             path = directory / 'split.json'
@@ -1035,7 +1055,8 @@ def inspect_exchange(root: Path, exchange_id: str | None = None) -> dict:
                                'path': path.as_posix(), 'receipt': _read(path) if matches else None,
                                'semantic_approval': False}
         if attempt.get('authoring_scope') is not None:
-            result['paper_model_identity'] = paper_model_identity(request.get('model'), attempt.get('response_model'))
+            result['paper_model_identity'] = paper_model_identity(
+                request.get('model'), attempt.get('response_model'), session['P_run'])
     return result
 
 
@@ -1351,7 +1372,8 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
             if production is not None:
                 codex_production.require_current(root, production, request=request)
             if role == 'council_member':
-                _member_scope(root, attempt['council_scope'], active=True, exchange_id=exchange_id, dispatch=layered)
+                _member_scope(root, attempt['council_scope'], active=True, exchange_id=exchange_id,
+                              dispatch=layered, model=request['model'])
                 from .codex_council_work import ROUND_KIND
                 if attempt['council_scope']['round_kind'] == ROUND_KIND:
                     from .codex_council import native_work_context

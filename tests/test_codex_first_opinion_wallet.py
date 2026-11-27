@@ -43,6 +43,21 @@ class FirstOpinionQuoteTests(unittest.TestCase):
                          {'id': self.request['model'], 'pricing': prices}]}
         return BytesIO(json.dumps(data).encode('utf-8'))
 
+    def test_startup_prices_use_no_credential_wallet_or_prepared_request(self):
+        data = [{'id': collaboration.SONNET_5_5, 'pricing': {'prompt': '0.000002', 'completion': '0.00001'}},
+                {'id': collaboration.GEMINI_CARBON, 'pricing': {'prompt': '0.000004', 'completion': '0.00002'}}]
+        self.opener.open.return_value = BytesIO(json.dumps({'data': data}).encode('utf-8'))
+        with patch.object(authority, 'build_opener', return_value=self.opener), \
+                patch.object(wallet, 'ledger_path', side_effect=AssertionError('price display read the ledger')):
+            quotes = list(authority.startup_collaboration_quotes())
+        self.opener.open.assert_called_once()
+        request = self.opener.open.call_args.args[0]
+        self.assertEqual((request.full_url, request.get_method(), request.data, request.get_header('Authorization')),
+                         ('https://openrouter.ai/api/v1/models', 'GET', None, None))
+        self.assertEqual({q['participant']: float(q['output_usd_per_million']) for q in quotes},
+                         {'sonnet': 10, 'carbon': 20})
+        self.assertTrue(all(q['scope'] == 'DISPLAY_ONLY' and q['status'] == 'QUOTED' for q in quotes))
+
     def test_auto_quote_reads_official_sources_and_bounds_the_full_priced_request(self):
         prices = {'prompt': '0.000002', 'completion': '0.00001', 'request': '0.002'}
         self.opener.open.side_effect = [self.catalog(**prices), BytesIO(b'{"data":{"total_credits":9.9,"total_usage":7.8}}')]
@@ -121,6 +136,36 @@ class FirstOpinionWalletTests(unittest.TestCase):
 
     def reserve_first(self, exchange, **kwargs):
         return self.reserve(exchange, purpose=collaboration.FIRST_OPINION_PURPOSE, **kwargs)
+
+    def test_two_external_models_share_layers_and_each_has_one_first_opinion(self):
+        root = self.folder / 'paired'
+        session = create_session(root, request=self.write('paired.txt', 'DIGR:: A shared task.'),
+                                 p_run='1.7.0@' + 'e' * 40)
+
+        def reserve(name, *, role, amount, participant=None):
+            current_purpose = collaboration.FIRST_OPINION_PURPOSE if participant else None
+            label = 'wallet-' + name
+            layer = collaboration.CLAUDE_LAYER_BY_ROLE[role]
+            evidence = {'kind': 'STANDING_CLAUDE_LAYER_LIMIT', 'role': role, 'layer': layer,
+                        'wallet_id': label, 'purpose': current_purpose, 'first_opinion_participant': participant}
+            return wallet.reserve(root, session, exchange_id=name, request_sha256='d' * 64, wallet_id=label,
+                                  budget={'budget_total_usd': None, 'ceiling_usd': amount, 'wallet_remaining_usd': 20,
+                                          'outside_spent_usd': 0, 'outside_reserved_usd': 0,
+                                          'authorization_evidence': evidence})
+
+        reserve('first-sonnet', role='council_member', amount=.13, participant='sonnet')
+        with self.assertRaisesRegex(ValueError, 'COUNCIL layer budget.*0.25'):
+            reserve('large-carbon', role='council_member', amount=.13, participant='carbon')
+        reserve('first-carbon', role='council_member', amount=.12, participant='carbon')
+        with self.assertRaisesRegex(ValueError, 'already claimed'):
+            reserve('repeat-carbon', role='council_member', amount=.01, participant='carbon')
+        reserve('content-sonnet', role='consult_guidance', amount=.7)
+        with self.assertRaisesRegex(ValueError, 'CONTENT layer budget.*1.25'):
+            reserve('large-content-carbon', role='consult_guidance', amount=.56)
+        reserve('content-carbon', role='consult_guidance', amount=.55)
+        paired = wallet.inspect_task(root, session)
+        self.assertEqual(set(paired['first_opinion_claims']), {'carbon', 'sonnet'})
+        self.assertAlmostEqual(paired['totals']['unresolved_reserved_usd'], 1.5)
 
     def test_first_opinion_claim_is_atomic_across_wallets_exchanges_and_restored_roots(self):
         gate = Barrier(2, timeout=5)

@@ -1,4 +1,4 @@
-# DIGR Codex Stable 1.5 — 启动与恢复
+# DIGR Codex — 启动与恢复
 
 本 profile 面向已选 Codex 通道。实际获取当前 `codex/codex-host-adaptation` 的完整 Git SHA，从同一 SHA 取得并核对 `codex/manifest.json`、`codex/VERSION`、startup_slice 及散列。根目录 DIGR 另有入口。薄路由仅宽捕获精确 DIGR 或深度迭代，仓库决定语义；不得从引文、历史、工具输出或界面状态重造调用。
 
@@ -14,6 +14,8 @@
 ## 执行与呈现
 
 `EXECUTING` 以同 SHA 读取 entrypoint 与全部 core，按 manifest 核对声明的 execution_bundle、成员和散列。[原语宪法](CONSTITUTION.md) 适用于本 pin 的所有执行。失败按薄路由报告，旧缓存不用于本条必需的获取。WORKBENCH、Chat 导出及增量按实际用途读取。获知本机 `toolchain.json` 只提供工具定位。
+
+本次 `EXECUTING` 的同 SHA 核心验证成功后，即查询 OpenRouter 公共模型目录中的 `anthropic/claude-sonnet-5.5` 与 `google/gemini-4-carbon`。逐条在 commentary 流式显示模型、每百万 token 输入与输出美元价、来源和查询时间。使用 `acquire --stage execution --stream-quotes` 时转播该入口刷出的各条事件；已用 GitHub 连接器验证 pin 时可用 `profile quotes` 或直接只读同一公共端点。查询成功和失败均独立于发送权限、费用预留、钱包、U0 与任务接续。缺价时显示对应模型暂缺当前报价，继续任务。单独查看普通状态或恢复已对接的同一调用不自动再查。
 
 恢复先处理最新用户来源、实际活动、当前角色和待转播点。真实纠正进入 [FOUNDATION](FOUNDATION.md)，暂停或停止立即作用于相应活动。生命周期既不能由旧标志恢复，也不能由普通回复结束。只有实际返回并收口或明确终止才结束。
 

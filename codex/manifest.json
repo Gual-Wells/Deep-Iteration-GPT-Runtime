@@ -129,23 +129,28 @@
       "since": "1.2.1",
       "scope": "CUMULATIVE_PER_TASK_PER_LAYER",
       "ceilings_usd": {
-        "COUNCIL": 0.2,
-        "CONTENT": 1.0
-      }
+        "COUNCIL": 0.25,
+        "CONTENT": 1.25
+      },
+      "shared_models_since": "1.7.0"
     },
     "first_opinion": {
       "since": "1.2.0",
       "selection": "COUNCIL_ONLY",
       "trigger": "BEFORE_AN_OPEN_MATERIAL_DECISION",
       "purpose": "first_opinion",
-      "task_scoped_single_use": true,
-      "ceiling_usd": 0.2,
-      "default_model": "anthropic/claude-sonnet-5.5",
+      "task_scoped_single_use": false,
+      "ceiling_usd": 0.25,
       "default_effort": "high",
-      "default_max_output_tokens": 16000,
+      "default_max_output_tokens": 6000,
       "additional_user_approval": false,
       "automatic_resend": false,
-      "native_work_return_since": "1.3.0"
+      "native_work_return_since": "1.3.0",
+      "one_initial_per_model": true,
+      "models": [
+        "anthropic/claude-sonnet-5.5",
+        "google/gemini-4-carbon"
+      ]
     },
     "native_model_selection": "ACTIVE_CODEX_SETTINGS",
     "analysis_method": "REASONED_ARGUMENT_WITHOUT_DEFAULT_EXPERIMENT_GATE",
@@ -179,37 +184,66 @@
       "since": "1.7.0",
       "role": "COUNCIL",
       "independent_on": "CURRENT_CONTENT_INPUT",
-      "synthesis": "CLAUDE_INTENT_PRIMARY_UNDER_USER_FACTS_AND_AUTHORITY",
-      "additional_budget": false
+      "synthesis": "COEQUAL_EXTERNAL_INTENT_PRIORITY_UNDER_USER_FACTS_AND_AUTHORITY",
+      "additional_budget": false,
+      "external_roles": [
+        "sonnet",
+        "carbon"
+      ]
+    },
+    "external_collaboration": {
+      "since": "1.7.0",
+      "models": {
+        "sonnet": "anthropic/claude-sonnet-5.5",
+        "carbon": "google/gemini-4-carbon"
+      },
+      "shared_ceiling_usd": {
+        "COUNCIL": 0.25,
+        "CONTENT": 1.25
+      },
+      "role_equivalence": [
+        "foundation_intent",
+        "council_member",
+        "consult_guidance",
+        "candidate",
+        "arbitration",
+        "paper_authoring"
+      ],
+      "after_verified_execution_acquisition": {
+        "source": "https://openrouter.ai/api/v1/models",
+        "relay": "FLUSH_EACH_MODEL_TO_COMMENTARY",
+        "scope": "DISPLAY_ONLY",
+        "failure": "REPORT_UNAVAILABLE_AND_CONTINUE"
+      }
     }
   },
   "file_sha256": {
     "codex/VERSION": "bb7320d831e7a151aa901c35e7326c752fa2ef5024f30768c42319b8bed171ed",
     "codex/AGENTS.light.md": "5abd877bc2f684ce54e34bbefcc9da17a0c00e1c8bbdadfa5a7f1aadcb700abd",
     "codex/ROUTER.experimental.txt": "45b6e2a6f06c9c7ee11845b7873f7ddb526ea1609bc6951f897eaebde85bd290",
-    "codex/STARTUP.md": "d1f2bd4ab07455d59ec96f615cb3a41fc074d80766cc84d8077778a0facf0289",
-    "codex/PROTOCOL.md": "7c573816b7b1831b67036da856616e86be4b69e0e0862cc23f97b5159cb25f8b",
+    "codex/STARTUP.md": "3828cafb2d5d9247d67b6b40b0ae94684f054205e6511d1eac34f158feb89218",
+    "codex/PROTOCOL.md": "3fce468ecdf46fdca6e1bb85f28d96f13a0f0e6444550e131ae6bcf75cae5c4f",
     "codex/CONSTITUTION.md": "2ca796187af0e08cb1c267f6abee54e5a91d55e9639644b09df6e93ccc134ab0",
-    "codex/FOUNDATION.md": "092639b20bdebf4255e476453d7d68dccbe87dd5998f2b1edcf013abcda27a8a",
+    "codex/FOUNDATION.md": "0754dce685f404b39dbded5ec8e21b1adca63aa9fc9e78d2337107f5022cd6e9",
     "codex/METHOD.md": "ad1f7d9571c6d36d35dcf0c85440436472ac6450da53c4d03b8b52249534c996",
-    "codex/HELP.md": "76ba89a7de17aa2645fef74ecfb0809a0de22526e45cd9d43cfb8712ac8bb31b",
+    "codex/HELP.md": "c835bb62ec2a25f5b390b3572b69ca912729eb7dbc3c8752d4dfc5545be7a42b",
     "codex/PARAMETERS.md": "cd415319277052f555484b61a9a9b7238d22117a7e44d97734a02caa1613f90a",
-    "codex/WORKBENCH.md": "89237ddc7dfda2fdb51d76e4a0b8b3bb9966ff84ef01b71fa10ca6dda9971d72",
+    "codex/WORKBENCH.md": "7e31ccf9d8436ca478d91219174873da6ed67bc53f467ca7e0af2dc415fbb3e2",
     "codex/CHARACTER.md": "5d016d30092633e45ba3450be82f9dc5af11859faf73f9f41d49e8bd563afbfa",
     "codex/COLLABORATION.md": "cfc4b57c4a85fb7494b5b470995b53e5fedcb2d0ec0a4da3880e3b668847c333",
-    "codex/CONSULT.md": "ebcc8fc7c0f8ecd31ab4e4f1744638c90b4959f1cb19a88c36ca5db39a4e2fce",
-    "codex/SPLIT.md": "1d9d78c895a67b1fae2b3862e402b73f70923c63f2c1a1c349ebdd7706ba70b9",
+    "codex/CONSULT.md": "c8af82aaf3c7574c5876076f88bcdbe94d93affe62ff8787a6355a4631b1480c",
+    "codex/SPLIT.md": "8b76ffdb0bfa2c1921f95c160b4d48cca553f228b53c9d3947f181b6d8a00471",
     "codex/PERMISSIONS.md": "a6f47e953c57b97c5e0a930823d41f87c238c7394efa87fc1a1b79412005d71b",
     "codex/DELIVERY.md": "c19bbaa9080f9a4e2919c67964085bac9c0b4e8c897cf0cf126cce46271d5cf2",
     "codex/RETURN.md": "c5b227fdb0ce63096f6bcb1e89ad8ea088c6b4d76cb1eab0ed24907c900ac767",
-    "codex/EXECUTION_PROTOCOL.json": "dc982466a7d0fc045501af839a18aab228d691f4c6ab858dd0f7cb02604599b1",
-    "codex/COUNCIL.md": "dc1d50a0f92076db7cfb3b809a253316ba27ed61cf19374d8981bc1c227fff71",
+    "codex/EXECUTION_PROTOCOL.json": "f8c8c8d7eaf2da6408e03368e7f02e05775efb668d88ba77b6e2d03958cbf5d4",
+    "codex/COUNCIL.md": "cb6240966911b7bda11c8c64a172c66e68088ce0e53a962369fb68971e3c603f",
     "codex/COURT.md": "66463392984284d853a0e692110d4f8a4e22a29f540fef5ed8e58a678c5c2678",
-    "codex/USAGE.md": "7a8cc30aedab48f15988d607ecb1b608727b3f1a2867aab0788f8964a3fc27ee",
+    "codex/USAGE.md": "a711ab14b8d51e58498bbf809fe4f0843240a4310d65b7a4f8ffa02cc0b34df6",
     "codex/CHAT.md": "78ac198a70adf5cfb15107d51137b882b1cbb99b2cec13695679bccd074cb41b",
     "codex/CHAT_LIGHT.md": "ce77bb503231c820ff3a8a5f119b90f082df04b507c5882c9681d2de47958956",
-    "codex/CHAT_DEEP.md": "a3bc0532744f64c2b8ac68038ddfb578ae8613572d22bca91b01882fcdc2ec35",
-    "codex/LIVE.md": "631590bbae2ad9fcb558b3f599958a4e51501bb88e7cd2fbdcbeaca67cc45959"
+    "codex/CHAT_DEEP.md": "de5b5ac835ef0ead50d1d71fe8735c4443805e0e252b405a88fc7562dd6a88fe",
+    "codex/LIVE.md": "d08281fa2b928ff8f35955effb2b4482e7284167021f4d0f1535a8a242aa9e4b"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {

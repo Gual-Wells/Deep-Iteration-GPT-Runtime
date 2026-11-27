@@ -1,6 +1,6 @@
 # 本任务用量与费用返回
 
-Claude美元与Codex额度都返回，但保留真实分母与账目状态。百分比不由模型正文自报，不由消息次数或effort名称换算。
+外部模型费用与 Codex 额度都返回，但保留真实分母与账目状态。百分比不由模型正文自报，不由消息次数或effort名称换算。
 
 ## 原生聚合事件
 
@@ -32,9 +32,9 @@ python tools/codex.py usage body --root TASK
 
 内置代理依据[官方定价](https://learn.chatgpt.com/docs/pricing)，读取日期2026-11-18。官方明确credits价格本身不能确定套餐内消耗。实际计量字段依据[App Server](https://learn.chatgpt.com/docs/app-server)。未来费率变化需更新或用task内`usage/config.json`显式校准及来源。不能用代理费率宣称额度换算已精确测得。
 
-## Claude账目
+## 外部模型账目
 
-逐exchange读取实际attempt聚合，不同时加父汇总。保留`consult_guidance`或`council_member`及member/cycle/round身份。`reconciled_at`且KNOWN为已核对；服务usage已报但未metadata核对为服务已报；有依据的estimated独列；UNKNOWN未决预留独列。未决预留不是已发生账单，不与已知费用合称账单总额。尚未尝试与费用未知分开。
+逐 exchange 读取实际 attempt 并按当前任务汇总。保留 Sonnet、Carbon 的实际身份和各层共用费用。保留`consult_guidance`或`council_member`及member/cycle/round身份。`reconciled_at`且KNOWN为已核对；服务usage已报但未metadata核对为服务已报；有依据的estimated独列；UNKNOWN未决预留独列。未决预留不是已发生账单，不与已知费用合称账单总额。尚未尝试与费用未知分开。
 
 返回快照注明观测截止与覆盖actor。Main、D/V、重试按真实导入纳入；未导入者保持覆盖缺口，不能报未调用。真正未调用的档位才写“未调用”。当前最终回复、迟到usage与未知费用可能在快照之外；不能声称测到了尚未发生的完整尾部。
 

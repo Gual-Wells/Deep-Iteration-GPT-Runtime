@@ -14,7 +14,7 @@ from unittest.mock import patch
 from contextlib import redirect_stdout
 import io
 
-from runtime import codex_consult as consult, codex_council as council, codex_io
+from runtime import codex_collaboration as collaboration, codex_consult as consult, codex_council as council, codex_io
 from runtime.codex_lifecycle import handle_message, ingest_message
 from runtime.codex_session import create_session
 from tools.codex_council import main as council_cli
@@ -39,7 +39,7 @@ class CouncilHandler(BaseHTTPRequestHandler):
                 self.server.overlapped.set()
             self.server.entered.set()
         try:
-            self.server.release.wait(4)
+            self.server.release.wait(7)
             if self.server.delay:
                 time.sleep(self.server.delay)
             generation = 'gen-council-' + str(index)
@@ -49,10 +49,10 @@ class CouncilHandler(BaseHTTPRequestHandler):
             self.send_header('X-Generation-Id', generation)
             self.end_headers()
             frame = lambda value: ('data: ' + json.dumps(value, ensure_ascii=False) + '\n\n').encode('utf-8')
-            self.wfile.write(frame({'id': generation, 'model': consult.DEFAULT_MODEL,
+            self.wfile.write(frame({'id': generation, 'model': request['model'],
                 'choices': [{'index': 0, 'delta': {'content': body, 'reasoning': HIDDEN}}]}))
             self.wfile.flush()
-            if self.server.truncated:
+            if self.server.truncated or request['model'] in self.server.truncated_models:
                 return
             self.wfile.write(frame({'choices': [{'index': 0, 'delta': {}, 'finish_reason': 'stop'}],
                 'usage': {'cost': .002, 'prompt_tokens': 30, 'completion_tokens': 20}}))
@@ -90,6 +90,7 @@ class CouncilRuntimeTests(unittest.TestCase):
         self.server.release.set()
         self.server.delay = 0
         self.server.truncated = False
+        self.server.truncated_models = set()
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         self.addCleanup(self.stop_server)
@@ -145,7 +146,9 @@ class CouncilRuntimeTests(unittest.TestCase):
             plan = self.folder / (job['exchange_id'] + '-split.json')
             consult.bind_split_decision(self.root, job['exchange_id'], input_path=note, output=plan)
             self.assertEqual(brief['binding']['request_sha256'], consult.inspect_exchange(self.root, job['exchange_id'])['exchange']['request_sha256'])
-            result[member_id] = {'facts': self.facts(), 'ceiling_usd': .2,
+            facts = {**self.facts(), 'model': job.get('model', consult.DEFAULT_MODEL)}
+            cap = .1 if collaboration.parallel_external_policy(prepared['P_run']) else .2
+            result[member_id] = {'facts': facts, 'ceiling_usd': cap,
                                  'split_path': plan, 'config_path': self.config}
         return result
 
@@ -189,30 +192,39 @@ class CouncilRuntimeTests(unittest.TestCase):
                 self.assertFalse((self.root / 'foundation.json').exists())
                 prepared = council.prepare_round(self.root, identity, kind='INDEPENDENT', max_tokens=100)
                 jobs = self.jobs(prepared)
-                scope = jobs['member-1']
-                with patch('runtime.codex_consult_budget.claude_council_quote',
-                           return_value={'facts': scope['facts'], 'ceiling_usd': scope['ceiling_usd']}) as quote:
+                by_model = {job['facts']['model']: job for job in jobs.values()}
+                def quoted(request, **options):
+                    self.assertEqual(options['layer_ceiling'], .25)
+                    job = by_model[request['model']]
+                    return {'facts': job['facts'], 'ceiling_usd': job['ceiling_usd']}
+                with patch('runtime.codex_consult_budget.claude_council_quote', side_effect=quoted) as quote:
                     kind, jobs = council.automatic_round_plan(
-                        self.root, identity, round_id=1, split_path=scope['split_path'],
-                        config_path=scope['config_path'])
+                        self.root, identity, round_id=1,
+                        split_paths={key: job['split_path'] for key, job in jobs.items()},
+                        config_path=self.config)
                 self.assertEqual(kind, 'foundation_intent_quote')
-                quote.assert_called_once()
+                self.assertEqual(quote.call_count, 2)
                 self.server.entered.clear()
+                self.server.overlapped.clear()
                 self.server.release.clear()
                 events = []
                 with ThreadPoolExecutor(max_workers=1) as pool:
                     sender = pool.submit(council.run_round, self.root, identity, round_id=1,
                                          jobs=jobs, on_public_event=events.append)
                     try:
-                        self.assertTrue(self.server.entered.wait(4))
+                        self.assertTrue(self.server.overlapped.wait(5))
                         self.assertEqual(council.read_packet(self.root, identity, actor='native-1')['public_work'], [])
-                        body = json.dumps(self.server.requests[-1], ensure_ascii=False)
-                        self.assertIn('Independently extract the user intent', body)
-                        self.assertIn('Follow the specified scope', body)
-                        self.assertIn('Return one complete public U0 draft',
-                                      self.server.requests[-1]['messages'][0]['content'])
-                        self.assertNotIn('[[CODEX NATIVE WORK]]', body)
-                        self.assertNotIn('NATIVE INITIAL OPINION', body)
+                        sent = self.server.requests[-2:]
+                        self.assertEqual({r['model'] for r in sent}, set(collaboration.EXTERNAL_MODELS.values()))
+                        self.assertEqual(sent[0]['messages'], sent[1]['messages'])
+                        for request in sent:
+                            body = json.dumps(request, ensure_ascii=False)
+                            self.assertIn('Independently extract the user intent', body)
+                            self.assertIn('Follow the specified scope', body)
+                            self.assertIn('Return one complete public U0 draft', request['messages'][0]['content'])
+                            self.assertNotIn('[[CODEX NATIVE WORK]]', body)
+                            self.assertNotIn('NATIVE INITIAL OPINION', body)
+                            self.assertNotIn('PUBLIC MEMBER WORK', body)
                         council.submit_native_initial(self.root, identity, actor='native-1',
                                                       output_path=self.native, input_version=1)
                     finally:
@@ -221,12 +233,14 @@ class CouncilRuntimeTests(unittest.TestCase):
                 self.assert_complete_round(result)
                 packet = council.read_packet(self.root, identity, actor='native-1', stage='REDELIBERATION')
                 self.assertEqual({x['source'] for x in packet['public_work']},
-                                 {'native_initial', 'claude_subcouncil'})
-                self.assertTrue(any(e.get('event') == 'public_delta' for e in events))
+                                 {'native_initial', 'claude_sonnet', 'gemini_carbon'})
+                self.assertEqual({e['source'] for e in events if e.get('event') == 'public_delta'},
+                                 {'claude_sonnet', 'gemini_carbon'})
                 council.submit_redeliberation(self.root, identity, actor='native-1',
                                               output_path=self.redeliberation, input_version=1)
                 proposal = propose_foundation(self.root, self.foundation_intent_proposal(), reason='Compare actual U0 drafts.')
-                self.assertEqual(proposal['intent_review']['basis'], 'CLAUDE_INTENT_PRIORITY')
+                self.assertEqual(proposal['intent_review']['basis'], 'EXTERNAL_INTENT_PRIORITY')
+                self.assertEqual(set(proposal['intent_review']['completed_collaborators']), {'sonnet', 'carbon'})
                 self.assertEqual(proposal['status'], 'AWAITING_USER')
                 self.assertEqual(proposal['intent_review']['input_ref']['message_id'], 0)
                 self.assertTrue(council.completion_status(self.root)['complete'])
@@ -250,7 +264,7 @@ class CouncilRuntimeTests(unittest.TestCase):
                                       output_path=self.redeliberation, input_version=1)
         fallback = propose_foundation(self.root, self.foundation_intent_proposal(), reason='Actual fallback.')
         self.assertEqual(fallback['intent_review']['basis'], 'NATIVE_FALLBACK')
-        self.assertEqual(fallback['intent_review']['claude']['status'], 'PARTIAL')
+        self.assertEqual({d['status'] for d in fallback['intent_review']['external_drafts'].values()}, {'PARTIAL'})
 
         revision = self.file('u0-change.txt', 'DO: Replace the task scope with a new output.')
         message = ingest_message(self.root, source=revision, source_ref=revision.as_posix())
@@ -264,6 +278,37 @@ class CouncilRuntimeTests(unittest.TestCase):
         packet = council.read_packet(self.root, 'u0-1', actor='native-1')
         self.assertEqual(packet['public_work'], [])
         self.assertIn('Replace the task scope', json.dumps(packet['common_input']))
+
+    def test_parallel_first_opinion_dispatch_claims_both_member_slots(self):
+        from runtime import codex_wallet
+
+        self.foundation_intent_task('paired-first-opinion')
+        identity = 'paired-first'
+        council.create_council(self.root, council_id=identity, native_actors=['native-1'],
+                               first_opinion='Which design choice is still open?')
+        prepared = council.prepare_round(self.root, identity, max_tokens=100)
+        council.submit_native_initial(self.root, identity, actor='native-1', output_path=self.native, input_version=1)
+        result = council.run_round(self.root, identity, round_id=1, jobs=self.jobs(prepared))
+        self.assert_complete_round(result)
+        _, session, _ = consult._task(self.root, active=False)
+        wallet = codex_wallet.inspect_task(self.root, session)
+        self.assertEqual(set(wallet['first_opinion_claims']), {'sonnet', 'carbon'})
+        self.assertAlmostEqual(wallet['totals']['known_cost_usd'], .004)
+
+    def test_carbon_complete_u0_has_priority_when_sonnet_is_partial(self):
+        from runtime.codex_foundation import propose_foundation
+
+        self.foundation_intent_task('u0-carbon-complete')
+        self.server.truncated_models.add(collaboration.SONNET_5_5)
+        council.create_council(self.root, council_id='u0-0', native_actors=['native-1'], foundation_intent=True)
+        prepared = council.prepare_round(self.root, 'u0-0', max_tokens=100)
+        council.submit_native_initial(self.root, 'u0-0', actor='native-1', output_path=self.native, input_version=1)
+        council.run_round(self.root, 'u0-0', round_id=1, jobs=self.jobs(prepared))
+        council.submit_redeliberation(self.root, 'u0-0', actor='native-1',
+                                      output_path=self.redeliberation, input_version=1)
+        review = propose_foundation(self.root, self.foundation_intent_proposal(), reason='Use complete U0.')
+        self.assertEqual(review['intent_review']['basis'], 'EXTERNAL_INTENT_PRIORITY')
+        self.assertEqual(review['intent_review']['completed_collaborators'], ['carbon'])
 
     def test_foundation_intent_only_runs_for_initial_or_material_input(self):
         self.foundation_intent_task('u0-ordinary')
@@ -314,9 +359,10 @@ class CouncilRuntimeTests(unittest.TestCase):
                                foundation_intent=True)
         prepared = council.prepare_round(self.root, 'u0-0', kind='INDEPENDENT', max_tokens=100)
         jobs = self.jobs(prepared)
-        jobs['member-1']['facts']['wallet_remaining_usd'] = 0
+        for job in jobs.values():
+            job['facts']['wallet_remaining_usd'] = 0
         result = council.run_round(self.root, 'u0-0', round_id=1, jobs=jobs)
-        self.assertEqual(result['rounds'][0]['jobs']['member-1']['status'], 'FAILED')
+        self.assertEqual({j['status'] for j in result['rounds'][0]['jobs'].values()}, {'FAILED'})
         self.assertEqual(self.server.requests, [])
 
 

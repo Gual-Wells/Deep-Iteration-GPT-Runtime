@@ -356,7 +356,7 @@ def _authoring_scope(root, value):
 def _native_consultation(root, value, supplied):
     """Bind this paper's observed public authoring, independent of billing updates."""
     if not isinstance(supplied, dict):
-        raise ValueError('native paper candidate needs an actual scoped Sonnet exchange')
+        raise ValueError('native paper candidate needs an actual scoped paper collaborator exchange')
     exchange_id = _text(supplied.get('exchange_id'), 'actual Sonnet exchange_id')
     from .codex_consult import inspect_exchange
     observed = inspect_exchange(Path(value['task_root']), exchange_id)
@@ -365,7 +365,7 @@ def _native_consultation(root, value, supplied):
         raise ValueError('paper authoring needs the actual COMPLETE, unchanged public output')
     model_identity = observed.get('paper_model_identity')
     if not isinstance(model_identity, dict) or model_identity.get('status') != 'CONFIRMED':
-        raise ValueError('paper authoring model identity is unconfirmed; actual Sonnet request and response needed')
+        raise ValueError('paper authoring model identity is unconfirmed; actual request and response needed')
     expected = _authoring_scope(root, value)
     scope = attempt.get('authoring_scope')
     if not isinstance(scope, dict) or any(scope.get(key) != item for key, item in expected.items()):

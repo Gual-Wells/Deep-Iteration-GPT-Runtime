@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from runtime import codex_consult as consult, codex_production as production
+from runtime import codex_collaboration as collaboration, codex_consult as consult, codex_production as production
 from runtime.codex_lifecycle import handle_message, ingest_message
 from runtime.codex_session import create_session
 
@@ -98,6 +98,30 @@ class ProductionRecordTests(unittest.TestCase):
         self.assertNotEqual(reapplied['applied']['output']['sha256'], original['sha256'])
         self.assertEqual(reapplied['applied']['previous_outputs'][0]['output'], original)
         self.assertEqual(Path(original['snapshot_path']).read_bytes(), b'Final artifact adopts the native structure.')
+        self.assertTrue(production.completion_status(self.root)['complete'])
+
+    def test_one_formal_scope_binds_two_coequal_external_arbitrations(self):
+        self.root = self.work / 'paired'
+        create_session(self.root, request=self.file('paired.txt', 'DIGR:: Produce the shared result.'),
+                       p_run='1.7.0@' + 'b' * 40)
+        self.start()
+        for name, model in collaboration.EXTERNAL_MODELS.items():
+            self.prepare(name + '-candidate', model=model)
+            _, attempt, _ = consult._load(self.root, name + '-candidate')
+            self.assertTrue(attempt['collaboration_contract']['subjective_guidance_priority'])
+            self.fixture_return(name + '-candidate', name + ' public candidate.\n',
+                                model=collaboration.OPENROUTER_SNAPSHOTS[model])
+        production.submit_native(self.root, 'explanation', actor='D01',
+                                 output_path=self.file('native.md', 'Native public candidate.'), return_ref='return-2')
+        for name, model in collaboration.EXTERNAL_MODELS.items():
+            self.prepare(name + '-ruling', model=model, production_stage='arbitration',
+                         candidate_exchange=name + '-candidate')
+            self.fixture_return(name + '-ruling', name + ' public ruling.', model=collaboration.OPENROUTER_SNAPSHOTS[model])
+        final = self.file('joint.md', 'An artifact applying both complete rulings.')
+        recorded = production.record_applied(self.root, 'explanation', arbitration_exchange='carbon-ruling',
+            peer_exchange='sonnet-ruling', output_path=final, effect='Adopted compatible supported decisions.')
+        self.assertEqual(recorded['applied']['peer']['arbitration']['exchange_id'], 'sonnet-ruling')
+        self.assertTrue(production.require_applied(self.root, 'explanation', arbitration_exchange='sonnet-ruling'))
         self.assertTrue(production.completion_status(self.root)['complete'])
 
     def test_user_revision_invalidates_prepared_stage_and_explicitly_releases_old_assignment(self):

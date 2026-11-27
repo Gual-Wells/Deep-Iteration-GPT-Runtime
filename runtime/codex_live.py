@@ -79,7 +79,7 @@ def _external_label(item, *, member=None, model_label='', production_stage=None)
     member = item.get('member_id') or member
     identity = ' / '.join(dict.fromkeys(name for name in (member, exchange) if name)) or 'Consult'
     if production_stage in ('candidate', 'arbitration'):
-        label = 'Claude 候选' if production_stage == 'candidate' else 'Claude 终裁'
+        label = '正式候选' if production_stage == 'candidate' else '正式裁决'
         identity = label + ' / ' + identity
     if item['event'] in {'public_delta', 'public_text'}:
         return '**外部协作者 / ' + identity + model_label + '｜公开正文片段**'

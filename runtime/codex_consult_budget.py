@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 from urllib.error import HTTPError
 from urllib.parse import urlsplit
-from urllib.request import Request
+from urllib.request import Request, build_opener
 
 from . import codex_collaboration, codex_wallet
 
@@ -41,7 +41,39 @@ def _quote_data(opener, resource: str, *, timeout: float, credential: str | None
     return result.get('data') if isinstance(result, Mapping) else None
 
 
-def claude_council_quote(request: Mapping[str, Any], *, config_path: Path | None = None) -> dict:
+def startup_collaboration_quotes():
+    """Yield only current public model list prices. No task, auth or wallet is read."""
+    from datetime import datetime, timezone
+
+    source = 'https://openrouter.ai/api/v1/models'
+    failure = None
+    try:
+        catalog = _quote_data(build_opener(), 'models', timeout=8)
+    except ValueError as error:
+        catalog = None
+        failure = str(error).removesuffix(' ' + _QUOTE_PLAN)
+    checked_at = datetime.now(timezone.utc).isoformat()
+    models = catalog if isinstance(catalog, list) else ()
+    for participant, model in codex_collaboration.EXTERNAL_MODELS.items():
+        facts = {'event': 'collaboration_display_quote', 'model': model, 'participant': participant,
+                 'source': source, 'checked_at': checked_at, 'scope': 'DISPLAY_ONLY',
+                 'unit': 'USD_PER_1M_TOKENS'}
+        prices = [item.get('pricing') for item in models
+                  if isinstance(item, Mapping) and item.get('id') == model]
+        try:
+            if len(prices) != 1:
+                raise ValueError('One exact model entry is required')
+            prompt = _quote_amount(prices[0]['prompt'])
+            completion = _quote_amount(prices[0]['completion'])
+            facts.update(status='QUOTED', input_usd_per_million=str(prompt * 1_000_000),
+                         output_usd_per_million=str(completion * 1_000_000))
+        except (DecimalException, ValueError, TypeError, KeyError):
+            facts.update(status='UNAVAILABLE', reason=failure or 'No usable price for that exact model')
+        yield facts
+
+
+def claude_council_quote(request: Mapping[str, Any], *, config_path: Path | None = None,
+                         layer_ceiling: float = codex_collaboration.FIRST_OPINION_CEILING_USD) -> dict:
     """Quote a prepared text-only exchange in a validated first-opinion line.
 
     The existing send path checks current authority and reserves against the quoted facts.
@@ -87,8 +119,8 @@ def claude_council_quote(request: Mapping[str, Any], *, config_path: Path | None
         cost_bound = prompt * input_tokens + completion * max_tokens + request_fee
     except (KeyError, DecimalException, TypeError, ValueError):
         raise ValueError(f'OpenRouter did not supply usable pricing for the prepared request. {_QUOTE_PLAN}') from None
-    if cost_bound > Decimal(str(codex_collaboration.FIRST_OPINION_CEILING_USD)):
-        raise ValueError(f'The prepared first opinion exceeds its USD 0.20 ceiling at current prices. {_QUOTE_PLAN}')
+    if cost_bound > Decimal(str(layer_ceiling)):
+        raise ValueError(f'The prepared request exceeds its USD {layer_ceiling:.2f} ceiling at current prices. {_QUOTE_PLAN}')
     precision = Decimal('0.000001')
     ceiling = float(max(precision, cost_bound.quantize(precision, rounding=ROUND_CEILING)))
     covered_claims = codex_wallet.confirmed_coverage(wallet_id)
@@ -162,8 +194,8 @@ def _production_stage(root: Path, session: Mapping[str, Any], input_ref: Mapping
         raise ValueError('Formal production quotes require Stable 1.1 or later')
     if stage not in ('candidate', 'arbitration'):
         raise ValueError('A formal production quote needs the candidate or arbitration stage')
-    if not codex_production.claude_model(model):
-        raise ValueError('A formal production quote needs a canonical Anthropic Claude model')
+    if not codex_production.production_model(session['P_run'], model):
+        raise ValueError('A formal production quote needs a supported canonical collaborator')
     production_id = _text('production_id', production_id)
     record = codex_production.inspect(root, production_id)
     if (record.get('current') is not True or record.get('resolved') is not False
@@ -306,7 +338,7 @@ def preview(root: Path, *, jobs: Sequence[Mapping[str, Any]], task_ceiling_usd: 
         layer_budgets = {}
         # Layer availability comes from the same task rows for the whole preview.
         remaining_by_layer = positions[0]['layer_available_before_usd']
-        for layer, ceiling in codex_collaboration.DOUBLE_COLON_LAYER_CEILINGS_USD.items():
+        for layer, ceiling in codex_collaboration.layer_ceilings(session['P_run']).items():
             if standing and mode == codex_collaboration.COUNCIL_ONLY and layer != 'COUNCIL':
                 continue
             proposed = sum(row['reservation_ceiling_usd'] for row in rows
@@ -449,12 +481,17 @@ def resolve(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any]
         authority = {'kind': 'STANDING_CLAUDE_LAYER_LIMIT', 'mode': mode, 'message_id': policy['message_id'],
                      'source_ref': policy['source']['source_ref'], 'source_sha256': policy['source']['sha256'],
                      'input_ref': input_ref, 'layer': layer,
-                     'layer_ceiling_usd': codex_collaboration.DOUBLE_COLON_LAYER_CEILINGS_USD[layer]}
+                     'layer_ceiling_usd': codex_collaboration.layer_ceilings(session['P_run'])[layer]}
         production = _attempt_production(root, session, lifecycle, attempt, model)
         if production is not None:
             authority['production'] = production
         if first_opinion or first_return:
             authority['purpose'] = purpose
+            if codex_collaboration.parallel_external_policy(session['P_run']):
+                participant = codex_collaboration.external_participant(model)
+                if participant is None:
+                    raise ValueError('A paired first-opinion exchange requires its registered Sonnet or Carbon model')
+                authority['first_opinion_participant'] = participant
         if first_return:
             authority['first_opinion_exchange_id'] = _text('the original first-opinion exchange',
                                                            scope.get('first_opinion_exchange_id'))

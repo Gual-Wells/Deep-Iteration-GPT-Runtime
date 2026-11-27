@@ -246,11 +246,14 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
         raise ValueError('Supply distinct actual native actor IDs')
     for actor in actors:
         _id('native actor', actor)
+    external_models = tuple(codex_collaboration.EXTERNAL_MODELS.values())
+    paired = codex_collaboration.parallel_external_policy(session['P_run'])
+    intake_count = len(external_models) if paired else 1
     if foundation_intent:
         if not codex_collaboration.foundation_intent_policy(session['P_run']):
             raise ValueError('Parallel U0 requires a frozen Codex 1.7.0+ task')
-        if first_opinion is not None or len(actors) != 1 or member_count not in (None, 1):
-            raise ValueError('Parallel U0 uses one native extractor and one Claude member')
+        if first_opinion is not None or len(actors) != 1 or member_count not in (None, intake_count):
+            raise ValueError('Parallel U0 uses one native extractor and the configured external pair')
         input_ref = _input_ref(lifecycle)
         message_id = input_ref['message_id']
         if council_id != f'u0-{message_id}':
@@ -262,14 +265,14 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
                     prior.get('latest_change', {}).get('intent_input') != input_ref):
                 raise ValueError('Parallel U0 requires the initial commission or a recorded material change')
         enable_claude = True
-        member_count = 1
+        member_count = intake_count
     if first_opinion is not None:
         codex_collaboration.require_first_opinion_permission(lifecycle)
         first_opinion = _text('still-open first-opinion decision', first_opinion)
-        if member_count is not None and (type(member_count) is not int or member_count != 1):
-            raise ValueError('The first-opinion opportunity has exactly one Claude member')
+        if member_count is not None and (type(member_count) is not int or member_count != intake_count):
+            raise ValueError('The first-opinion opportunity uses the configured member count')
         enable_claude = True
-        member_count = 1
+        member_count = intake_count
     elif member_count is None:
         member_count = 2
     if type(member_count) is not int or member_count < 1 or member_count > 16:
@@ -290,6 +293,9 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
         members = {f'member-{index + 1}': {'line_id': council_id + '/member-' + str(index + 1),
             'exchanges': [], 'research_state': None, 'last_researched_input_version': None}
             for index in range(member_count)} if enable_claude else {}
+        if paired:
+            for index, member in enumerate(members.values()):
+                member['model'] = external_models[index % len(external_models)]
         state = {'format': FORMAT, 'council_id': council_id, 'P_run': session['P_run'],
             'task_request_sha256': session['request_sha256'], 'created_at': _now(),
             'isolation': 'HOST_LEVEL', 'actor_authority': 'HOST_ASSERTED_NOT_OS_AUTHENTICATED',
@@ -317,6 +323,7 @@ def inspect_council(root: Path, council_id: str) -> dict:
             'actor_authority': state['actor_authority'], 'native_actors': state['native_actors'],
             'members': {key: {'line_id': value['line_id'], 'exchanges': value['exchanges'],
                              'last_researched_input_version': value['last_researched_input_version']}
+                             | ({'model': value['model']} if 'model' in value else {})
                         for key, value in state['members'].items()},
             'cycle': _cycle(state), 'rounds': state['rounds'],
             'cycle_history': [{'cycle_id': cycle['cycle_id'], 'input_version': cycle['input_version'],
@@ -388,7 +395,8 @@ def submit_native_initial(root: Path, council_id: str, *, actor: str, output_pat
 
 
 def require_member_scope(root: Path, scope: Mapping[str, Any], *, active: bool = True,
-                         exchange_id: str | None = None, dispatch: bool = False) -> dict:
+                         exchange_id: str | None = None, dispatch: bool = False,
+                         model: str | None = None) -> dict:
     """Validate an exact member/line/cycle/packet/round binding for Consult."""
     if not isinstance(scope, Mapping) or not _SCOPE_KEYS <= set(scope):
         raise ValueError('Council member scope has an invalid schema')
@@ -431,11 +439,12 @@ def require_member_scope(root: Path, scope: Mapping[str, Any], *, active: bool =
             or scope['member_id'] not in round_record['jobs']
             or scope['packet_sha256'] != state['packets'][scope['input_version'] - 1]['sha256']):
         raise ValueError('Council member scope differs from its frozen round')
-    if (exchange_id is not None
-            and round_record['jobs'][scope['member_id']]['exchange_id'] != exchange_id):
+    job = round_record['jobs'][scope['member_id']]
+    if exchange_id is not None and job['exchange_id'] != exchange_id:
         raise ValueError('Council member exchange is not the one registered for this round')
+    if model is not None and job.get('model', model) != model:
+        raise ValueError('Council request model differs from the registered round member')
     if work_return:
-        job = round_record['jobs'][scope['member_id']]
         if job['scope'] != scope:
             raise ValueError('Native work return scope differs from the registered member job')
         if first_opinion and (state['rounds'][0]['kind'] != 'INDEPENDENT' or scope['cycle_id'] != 1
@@ -628,6 +637,10 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
         foundation_intent = bool(state.get('foundation_intent'))
         if foundation_intent and (state['rounds'] or kind != 'INDEPENDENT'):
             raise ValueError('Parallel U0 prepares one independent round per content input')
+        paired = codex_collaboration.parallel_external_policy(state['P_run'])
+        if (paired and (foundation_intent or first_opinion) and model is not None
+                and kind != codex_council_work.ROUND_KIND):
+            raise ValueError('Parallel U0 and first opinion use the registered Sonnet and Carbon models')
         if foundation_intent:
             effort = 'high' if effort is None else effort
             max_tokens = 4096 if max_tokens is None else max_tokens
@@ -644,7 +657,7 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
             if effort is None and not work_return:
                 effort = 'high'
             if max_tokens is None and not work_return:
-                max_tokens = codex_collaboration.FIRST_OPINION_OUTPUT_TOKENS
+                max_tokens = 6_000 if paired else codex_collaboration.FIRST_OPINION_OUTPUT_TOKENS
         if not state['claude_enabled'] or state['phase'] != 'INITIAL':
             raise ValueError('This council has no active Claude member work')
         if state['packets'][-1]['input_ref'] != _input_ref(lifecycle):
@@ -684,7 +697,7 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
                 body = (parent_dir / 'public.md').read_bytes().decode('utf-8')
                 codex_council_work.verify_origin(entries, parent, body)
                 if model is not None and model != parent_request['model']:
-                    raise ValueError('Native work returns use the requesting Claude member’s model')
+                    raise ValueError('Native work returns use the requesting member’s model')
                 for item in entries.values():
                     _artifact_text(directory, item['result'])
             elif entries:
@@ -703,7 +716,12 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
                     scope.update(purpose=codex_collaboration.FIRST_OPINION_NATIVE_WORK_RETURN_PURPOSE,
                         first_opinion_exchange_id=state['rounds'][0]['jobs'][member_id]['exchange_id'])
             exchange_id = 'c-' + _hash(_bytes(scope))[:32]
+            member_model = model or state['members'][member_id].get('model')
+            if work_return:
+                member_model = parent_request['model']
             jobs[member_id] = {'scope': scope, 'exchange_id': exchange_id, 'status': 'PREPARING'}
+            if member_model is not None:
+                jobs[member_id]['model'] = member_model
             if work_return:
                 for item in entries.values():
                     item['return_exchange_id'] = exchange_id
@@ -712,6 +730,7 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
         state['rounds'].append(record)
         _write(directory / 'council.json', state)
     failures = {}
+    common_intent_path = None
     for member_id, job in jobs.items():
         try:
             _, current, _ = _load(root, council_id, active=True)
@@ -735,9 +754,15 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
             if kind == 'FINAL':
                 parts.append('\nProduce your own public synthesis. Preserve the decisive reasons, '
                     'strong alternatives, domain, unresolved objections and specific reentry triggers.')
-            input_path = directory / f'round-{round_id}-{member_id}-input.txt'
-            with input_path.open('x', encoding='utf-8', newline='') as stream:
-                stream.write('\n'.join(parts))
+            input_path = common_intent_path
+            if input_path is None:
+                name = (f'round-{round_id}-common-input.txt' if foundation_intent
+                        else f'round-{round_id}-{member_id}-input.txt')
+                input_path = directory / name
+                with input_path.open('x', encoding='utf-8', newline='') as stream:
+                    stream.write('\n'.join(parts))
+                if foundation_intent:
+                    common_intent_path = input_path
             previous_exchange = current['members'][member_id]['exchanges'][-1:] or [None]
             kwargs = {'participation_role': 'council_member', 'council_scope': job['scope'],
                       'continue_from': previous_exchange[0], 'exchange_id': job['exchange_id']}
@@ -746,8 +771,8 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
                 kwargs['model'] = parent_request['model']
                 kwargs['effort'] = parent_request['reasoning']['effort']
                 kwargs['max_tokens'] = parent_request['max_tokens']
-            elif model is not None:
-                kwargs['model'] = model
+            elif 'model' in job:
+                kwargs['model'] = job['model']
             if effort is not None:
                 kwargs['effort'] = effort
             if max_tokens is not None:
@@ -820,9 +845,11 @@ def run_round(root: Path, council_id: str, *, round_id: int,
 
     def invoke(member_id: str) -> tuple[str, dict]:
         job = jobs[member_id]
-        exchange_id = record['jobs'][member_id]['exchange_id']
-        emit = ((lambda event: on_public_event({'source': 'claude_subcouncil', 'member_id': member_id,
-                    'council_id': council_id, 'round_id': round_id, **event})) if on_public_event else None)
+        member_job = record['jobs'][member_id]
+        exchange_id = member_job['exchange_id']
+        public_source = {'source': _public_member_source(member_job.get('model'), state['P_run']),
+                         'member_id': member_id, 'council_id': council_id, 'round_id': round_id}
+        emit = (lambda event: on_public_event({**public_source, **event})) if on_public_event else None
         try:
             consult.call_once(root, exchange_id, facts=job['facts'], ceiling_usd=job['ceiling_usd'],
                 split_path=Path(job['split_path']),
@@ -989,6 +1016,13 @@ def advance_barrier(root: Path, council_id: str, *, now: datetime | None = None)
     return inspect_council(root, council_id)
 
 
+def _public_member_source(model: str | None, p_run: str) -> str:
+    if not codex_collaboration.parallel_external_policy(p_run):
+        return 'claude_subcouncil'
+    return {'sonnet': 'claude_sonnet', 'carbon': 'gemini_carbon'}.get(
+        codex_collaboration.external_participant(model), 'external_council')
+
+
 def first_opinion_plan(root: Path, council_id: str, *, round_id: int,
                        split_path: Path, config_path: Path | None = None) -> dict:
     """Read a provider quote for one prepared first opinion; never send inference."""
@@ -1024,26 +1058,53 @@ def first_opinion_plan(root: Path, council_id: str, *, round_id: int,
 
 
 def automatic_round_plan(root: Path, council_id: str, *, round_id: int,
-                         split_path: Path, config_path: Path | None = None) -> tuple[str, dict]:
-    """Use the real current-wallet quote for a first opinion or foundation-intent exchange."""
+                         split_path: Path | None = None, split_paths: Mapping[str, Path] | None = None,
+                         config_path: Path | None = None) -> tuple[str, dict]:
+    """Quote actual prepared requests for paid admission, independently of startup display."""
+    from . import codex_consult, codex_consult_budget, codex_wallet
+
     _, state, lifecycle = _load(root, council_id, active=True)
-    if not state.get('foundation_intent'):
+    intent = bool(state.get('foundation_intent'))
+    paired = codex_collaboration.parallel_external_policy(state['P_run'])
+    if not paired and not intent:
+        if split_path is None or split_paths is not None:
+            raise ValueError('Historical first opinion uses one Split plan')
         return 'first_opinion_quote', first_opinion_plan(
             root, council_id, round_id=round_id, split_path=split_path, config_path=config_path)
-    codex_collaboration.require_council_permission(lifecycle)
-    if round_id != 1 or len(state['rounds']) != 1:
-        raise ValueError('Automatic U0 quote requires the prepared independent round')
-    record = state['rounds'][0]
-    member_id, job = next(iter(record['jobs'].items()))
-    if record['status'] != 'PREPARED' or job['status'] != 'PREPARED':
-        raise ValueError('Automatic U0 quote requires the prepared independent round')
-    exchange_id = job['exchange_id']
-    require_member_scope(root, job['scope'], exchange_id=exchange_id)
-    from . import codex_consult, codex_consult_budget
-    _, _, request = codex_consult._load(root, exchange_id)
-    quote = codex_consult_budget.claude_council_quote(request, config_path=config_path)
-    return 'foundation_intent_quote', {member_id: {
-        **quote, 'split_path': split_path, 'config_path': config_path}}
+    if intent:
+        codex_collaboration.require_council_permission(lifecycle)
+    elif 'first_opinion_decision' in state:
+        codex_collaboration.require_first_opinion_permission(lifecycle)
+    else:
+        raise ValueError('Automatic price and wallet facts require an intent or first-opinion round')
+    if type(round_id) is not int or not 1 <= round_id <= len(state['rounds']):
+        raise ValueError('Automatic quotes require an actual prepared round')
+    record = state['rounds'][round_id - 1]
+    returning = record['kind'] == codex_council_work.ROUND_KIND
+    if record['status'] != 'PREPARED' or (round_id != 1 and (intent or not returning)):
+        raise ValueError('Automatic quotes require the prepared independent round or its native work return')
+    jobs = {mid: job for mid, job in record['jobs'].items() if job['status'] == 'PREPARED'}
+    if split_paths is None and split_path is not None and len(jobs) == 1:
+        split_paths = {next(iter(jobs)): split_path}
+    if not jobs or split_paths is None or set(split_paths) != set(jobs):
+        raise ValueError('Supply one current Split plan for each prepared member')
+    _, session, _ = _task(root, active=True)
+    claims = {} if intent else codex_wallet.inspect_task(root, session).get('first_opinion_claims', {})
+    cap = codex_collaboration.layer_ceilings(state['P_run'])['COUNCIL']
+    plan = {}
+    for mid, job in jobs.items():
+        exchange = job['exchange_id']
+        require_member_scope(root, job['scope'], exchange_id=exchange)
+        _, _, request = codex_consult._load(root, exchange)
+        previous = claims.get(codex_collaboration.external_participant(request['model']))
+        if previous and not returning:
+            raise ValueError('A collaborator already holds its first opinion; inspect the existing exchange')
+        if returning and (not previous or previous['exchange_id'] != job['scope']['first_opinion_exchange_id']):
+            raise ValueError('A native work return needs the requesting collaborator’s original wallet claim')
+        quote = codex_consult_budget.claude_council_quote(
+            request, config_path=config_path, layer_ceiling=cap)
+        plan[mid] = {**quote, 'split_path': split_paths[mid], 'config_path': config_path}
+    return ('foundation_intent_quote' if intent else 'first_opinion_quote'), plan
 
 
 def foundation_intent_receipt(root: Path, council_id: str) -> dict:
@@ -1062,24 +1123,33 @@ def foundation_intent_receipt(root: Path, council_id: str) -> dict:
     comparison = cycle['redeliberation'][actor]['output']
     _artifact_text(directory, native)
     _artifact_text(directory, comparison)
-    member = cycle['members']['member-1']
-    claude = None
-    if member['exchange_id']:
-        attempt, body = _exchange_public(root, member['exchange_id'])
-        scope = attempt['council_scope']
-        if scope.get('purpose') != codex_collaboration.FOUNDATION_INTENT_PURPOSE:
-            raise ValueError('Parallel U0 requires its recorded Claude draft exchange')
-        if body is not None:
-            claude = {'exchange_id': member['exchange_id'], 'sha256': attempt['public_sha256'],
-                      'status': attempt['public_status']}
-    full = member['status'] == 'COMPLETE' and claude is not None and claude['status'] == 'COMPLETE'
+    drafts = {}
+    full = []
+    for member_id, side in cycle['members'].items():
+        member = state['members'][member_id]
+        model = member['model']
+        label = codex_collaboration.external_participant(model)
+        draft = {'model': model, 'status': side['status'], 'evidence': None}
+        if side['exchange_id']:
+            attempt, body = _exchange_public(root, side['exchange_id'])
+            if attempt['council_scope'].get('purpose') != codex_collaboration.FOUNDATION_INTENT_PURPOSE:
+                raise ValueError('Parallel U0 needs its recorded same-scope external draft')
+            if body is not None:
+                draft['evidence'] = {'exchange_id': side['exchange_id'], 'sha256': attempt['public_sha256'],
+                                     'public_status': attempt['public_status'],
+                                     'response_model': attempt.get('response_model')}
+                if (side['status'] == attempt['public_status'] == 'COMPLETE'
+                        and codex_collaboration.observed_model_matches(
+                            state['P_run'], model, attempt.get('response_model'))):
+                    full.append(label)
+        drafts[label] = draft
     if full:
         codex_collaboration.require_council_permission(lifecycle)
     return {'council_id': council_id, 'input_ref': packet['input_ref'],
-            'native': {'actor': actor, 'sha256': native['sha256']},
-            'claude': claude, 'comparison_sha256': comparison['sha256'],
-            'basis': 'CLAUDE_INTENT_PRIORITY' if full else 'NATIVE_FALLBACK',
-            'scope': 'recorded comparison, not certification of interpretation or user consent'}
+            'native': {'actor': actor, 'sha256': native['sha256']}, 'external_drafts': drafts,
+            'completed_collaborators': full, 'comparison_sha256': comparison['sha256'],
+            'basis': 'EXTERNAL_INTENT_PRIORITY' if full else 'NATIVE_FALLBACK',
+            'scope': 'actual combined comparison, independent input evidence and current user commission'}
 
 
 def _chunks(text: str, size: int) -> list[dict]:
@@ -1121,16 +1191,18 @@ def read_packet(root: Path, council_id: str, *, actor: str, stage: str = 'INITIA
             for exchange_id in exchanges:
                 attempt, body = _exchange_public(root, exchange_id)
                 if body is not None:
-                    result['public_work'].append({'source': 'claude_subcouncil', 'actor': member_id,
-                        'exchange_id': exchange_id, 'public_status': attempt['public_status'],
+                    model = attempt.get('collaboration_contract', {}).get('requested_model')
+                    result['public_work'].append({'source': _public_member_source(model, state['P_run']),
+                        'actor': member_id, 'exchange_id': exchange_id, 'public_status': attempt['public_status'],
                         'transport_status': attempt['transport_status'], 'billing_status': attempt['billing_status'],
                         'known_cost_usd': attempt.get('known_cost_usd'), 'reserved_usd': attempt.get('reserved_usd'),
                         'sha256': attempt['public_sha256'], 'chunks': _chunks(body, chunk_chars)})
         if state.get('foundation_intent'):
-            result['native_duty'] = ('Compare the independent U0 drafts on this input. Use the complete Claude '
-                'draft as the primary interpretation of user intent; preserve explicit user decisions, verified '
-                'facts, constraints, authority and feasibility. Identify substantive differences and the proposed '
-                'reorganization. Record missing or partial results and use the native draft when necessary.')
+            result['native_duty'] = ('Compare independent drafts on the same input. Give each complete '
+                'identified external draft equal priority over native preferences. If the two disagree, '
+                'resolve against explicit user words, verified facts, feasibility and actual authority or '
+                'surface the consequential choice. Identify material differences and the resulting U0. '
+                'Use a uniquely complete external draft if its peer is incomplete; use native U0 if neither completes.')
             return result
         result['native_duty'] = ('Independently reconsider domains and conclusions from the actual complete '
             'public work. Address substantive and strong alternative claims with reasons. '

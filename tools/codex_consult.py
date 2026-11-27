@@ -123,7 +123,7 @@ def main(argv=None):
                     print(json.dumps({'event': 'result', 'exchange_id': args.exchange_id,
                         'public_path': result.get('public_path'), 'public_status': attempt.get('public_status'),
                         'billing_status': attempt.get('billing_status'), 'known_cost_usd': attempt.get('known_cost_usd'),
-                        'identity': result.get('sonnet_model_identity'),
+                        'identity': result.get('sonnet_model_identity') or result.get('carbon_model_identity'),
                         'recovery': 'live read --reader commentary --exchange-id ' + args.exchange_id
                                     + (' --format commentary' if stable else ''),
                         'visibility': 'stdout is not user-visible commentary; host must relay actual text'},

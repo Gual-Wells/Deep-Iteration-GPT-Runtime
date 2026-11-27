@@ -49,13 +49,13 @@ CLI默认使用直接HTTPS：同次读取Git ref和Branches，SHA必须一致。
 
 ### 两层 Claude 的费用依据
 
-在本版新单冒号任务中，用 `council create --first-opinion "仍然开放的具体取舍" --facts FACTS.md` 加所用任务根、议会 ID 和真实原生 actor，进入 [COUNCIL](COUNCIL.md#单冒号的独立首发) 的单成员首发。宿主判断真实决定窗口，按需以 `--deadline-seconds` 调整默认 300 秒。用 `prepare-round` 准备 exchange，为该 exchange 实际完成 Split。默认 Sonnet 5.5／high／16,000 总输出 token。有预期回传时，在第一层累计上限内为首轮及必要续答估算余量。
+在本版新单冒号任务中，用 `council create --first-opinion "仍然开放的具体取舍" --facts FACTS.md` 加所用任务根、议会 ID 和真实原生 actor，进入 [COUNCIL](COUNCIL.md#单冒号的独立首发) 的双成员首发。宿主判断真实决定窗口，按需以 `--deadline-seconds` 调整默认 300 秒。用 `prepare-round` 准备 exchange，为每个成员的 exchange 完成实际 Split。Sonnet 5.5 与 Carbon 默认各用 high，分别有 6,000 总输出 token 起步。有预期回传时，在第一层累计上限内为首轮及必要续答估算余量。
 
 首发的问题可以是希望 Claude 帮忙发现选项的真实用途或构形选择。把它可能改变的决定和已具备的材料落在当前 Split 和公开阶段。后续按实际所得选择有新贡献的议会研究或正式指导，沿对应角色及费用入口准备。
 
-纯文本首发走 OpenRouter 官方接口，且同一配置能查询模型价格及账户实际余额时，用 `council run-round --root TASK --council-id ID --round-id 1 --split-plan SPLIT.json`。价格与余额取该配置实际响应，预留受分层上限、共享钱包和用户限额约束。密钥用量或密钥额度单列。采用其他提供商或无账户余额查询权限时，用 `--plan PLAN.json` 提供同一实际账户的费用事实。已提交的首发含空答均沿原 exchange 读回和对账，有实际 Codex 工作回传才按该请求另作同线续答。
+纯文本首发走 OpenRouter 官方接口，且同一配置能查询模型价格及账户实际余额时，用 `council run-round --root TASK --council-id ID --round-id 1 --member-splits SPLITS.json`。SPLITS.json 将每个实际成员 ID 映射到该成员的 Split 文件。价格与余额取该配置实际响应，预留受分层上限、共享钱包和用户限额约束。密钥用量或密钥额度单列。采用其他提供商或无账户余额查询权限时，用 `--plan PLAN.json` 提供同一实际账户的费用事实。已提交的首发含空答均沿原 exchange 读回和对账，有实际 Codex 工作回传才按该请求另作同线续答。
 
-1.3 起，当前实际用户选择直接提供对应层的额度内费用许可。单冒号和双冒号的第一层每任务累计 0.20 美元，双冒号第二层累计 1.00 美元。发送时提供当前价格、完整请求输入量上界、真实钱包余额与保守费用上界。共享钱包在同一事务中核对本层已知费用、未结预留和本次预留，沿用用户实际任务限额。
+当前实际用户选择直接提供对应层的额度内费用许可。1.7 起，Sonnet 和 Carbon 按实际费用及预留共同占用各层额度。单冒号和双冒号的第一层每任务累计 0.25 美元，双冒号第二层累计 1.25 美元。发送时提供当前价格、完整请求输入量上界、真实钱包余额与保守费用上界。共享钱包在同一事务中核对本层已知费用、未结预留和本次预留，沿用用户实际任务限额。 成功对接时的公开目录展示见 [STARTUP](STARTUP.md)，可用 `profile quotes` 流式读取两个型号。
 
 两种入口均可用 `consult budget-preview --root TASK --input INPUT.json --out PREVIEW.json` 提前估算。输入 `wallet_id`、`task_ceiling_usd`、`scope` 和 `jobs`。每项给当前费用 `facts`、`ceiling_usd` 及已准备的 `exchange_id`。为在议会开始前估算，也可用 `planned_council_member` 代替 `exchange_id`，写明实际用途 `purpose`、型号 `model` 和合计输出上限 `max_tokens`。预览的 `layer_budgets` 给出适用层的实际余量和拟预留额度。发送按当前入口授权、钱包和 Split 执行。
 
@@ -83,7 +83,7 @@ python -B tools/codex.py consult split --root TASK --exchange-id NEXT --input NA
 python -B tools/codex.py council run-round --root TASK --council-id ID --round-id ROUND --plan ROUND.json
 ```
 
-当前成员的委托结果齐备后再准备回传。轮次使用实际返回的编号和 exchange ID，沿原成员及同一公开历史传入对应的结果。适用的纯文本 OpenRouter 首发同线续答可沿 `run-round --split-plan SPLIT.json` 自动取价和核对余额。常规 `--plan` 每项指明本次费率、保守上界和 Split。续答仍占用第一层余额，沿原决定窗口和 `high` 或更高配置运行。
+当前成员的委托结果齐备后再准备回传。轮次使用实际返回的编号和 exchange ID，沿原成员及同一公开历史传入对应的结果。适用的纯文本 OpenRouter 首发同线续答可沿成员对应的 `--split-plan` 或多成员 `--member-splits` 自动取价和核对余额。常规 `--plan` 每项指明本次费率、保守上界和 Split。续答仍占用第一层余额，沿原决定窗口和 `high` 或更高配置运行。
 
 ### 第二层准备、两份成品与实际落实
 
@@ -152,15 +152,16 @@ answer不自动确认整体。模型理解真实答复：用户已看完整说�
 python -B tools/codex.py council create --root TASK --council-id u0-0 --foundation-intent --native-actor U0Native --facts FACTS.md
 python -B tools/codex.py council packet --root TASK --council-id u0-0 --actor U0Native
 python -B tools/codex.py council prepare-round --root TASK --council-id u0-0 --kind INDEPENDENT
-python -B tools/codex.py consult split --root TASK --exchange-id ID --input DECISION.json --out SPLIT.json
-python -B tools/codex.py council run-round --root TASK --council-id u0-0 --round-id 1 --split-plan SPLIT.json
+python -B tools/codex.py consult split --root TASK --exchange-id SONNET_ID --input SONNET_DECISION.json --out SONNET_SPLIT.json
+python -B tools/codex.py consult split --root TASK --exchange-id CARBON_ID --input CARBON_DECISION.json --out CARBON_SPLIT.json
+python -B tools/codex.py council run-round --root TASK --council-id u0-0 --round-id 1 --member-splits SPLITS.json
 python -B tools/codex.py council native-return --root TASK --council-id u0-0 --actor U0Native --input NATIVE-U0.md --input-version 1
 python -B tools/codex.py council barrier --root TASK --council-id u0-0
 python -B tools/codex.py council packet --root TASK --council-id u0-0 --actor U0Native --stage REDELIBERATION
 python -B tools/codex.py council redeliberation-return --root TASK --council-id u0-0 --actor U0Native --input REORGANIZED-U0.md --input-version 1
 ```
 
-Main 启动成员网络调用和独立原生提取后持续按 LIVE 转播。命令的返回顺序取实际发生。最后在重组的 `proposal.json` 顶层附 `"intent_council":"u0-0"`，走本章已有 `foundation propose` 与实际委托或用户决定。工具将实际两份稿、当前输入和比较稿的来源身份写入 `intent_review`，语义取舍由 Main 落实。没有两侧完整结果时保留实际退回或异常终态，可沿原生前置继续，避免用未完成记录冒充双侧完成。因输入变更而无关的旧前置轮，按真实原因关闭；新版输入使用自己的轮和证据。
+Main 启动成员网络调用和独立原生提取后持续按 LIVE 转播。命令的返回顺序取实际发生。最后在重组的 `proposal.json` 顶层附 `"intent_council":"u0-0"`，走本章已有 `foundation propose` 与实际委托或用户决定。SPLITS.json 记录两位准备就绪成员的 Split 路径。工具将实际初稿、当前输入和比较稿的来源身份写入 `intent_review`，语义取舍由 Main 落实。只取得一位完整外部稿时采用其有据理解。两位均未完成时采用原生前置，保留各方已取得的证据与真实终态。因输入变更而无关的旧前置轮，按真实原因关闭；新版输入使用自己的轮和证据。
 
 ### 当前输入、真实续做与结束
 

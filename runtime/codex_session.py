@@ -353,7 +353,7 @@ def create_session(root: Path, *, request: Path, p_run: str,
                 if codex_collaboration.standing_claude_budget_policy(p_run):
                     metadata['execution_profile']['initial_fee_basis'] = 'STANDING_CLAUDE_LAYER_LIMITS'
                     metadata['execution_profile']['initial_claude_layer_ceilings_usd'] = {
-                        layer: ceiling for layer, ceiling in codex_collaboration.DOUBLE_COLON_LAYER_CEILINGS_USD.items()
+                        layer: ceiling for layer, ceiling in codex_collaboration.layer_ceilings(p_run).items()
                         if invocation['claude_selection'] == 'ALLOW' or layer == 'COUNCIL'
                     }
                 else:
@@ -365,8 +365,10 @@ def create_session(root: Path, *, request: Path, p_run: str,
                     metadata['execution_profile']['first_opinion'] = {
                         'when': 'BEFORE_AN_OPEN_MATERIAL_DECISION',
                         'purpose': codex_collaboration.FIRST_OPINION_PURPOSE,
-                        'max_reservations_in_use_per_task': 1,
-                        'ceiling_usd': codex_collaboration.FIRST_OPINION_CEILING_USD,
+                        'max_reservations_in_use_per_task': (
+                            len(codex_collaboration.EXTERNAL_MODELS)
+                            if codex_collaboration.parallel_external_policy(p_run) else 1),
+                        'ceiling_usd': codex_collaboration.layer_ceilings(p_run)['COUNCIL'],
                         'scope': 'host evaluates the opportunity; current lifecycle and wallet govern sending',
                     }
     if profile_uses_delivery:
