@@ -165,6 +165,161 @@ class CouncilRuntimeTests(unittest.TestCase):
         return council.submit_native_initial(self.root, 'one', actor='native-1',
                                              output_path=self.native, input_version=version)
 
+    def foundation_intent_task(self, name, delimiter=':', *, version='1.7.0'):
+        request = self.file(name + '-input.txt', 'DIGR' + delimiter + ' Follow the specified scope.')
+        self.root = self.folder / name
+        create_session(self.root, request=request, p_run=version + '@' + 'e' * 40)
+        return request
+
+    def foundation_intent_proposal(self, identity='u0-0'):
+        from runtime.codex_foundation import BRIEF_FIELDS
+        return {'brief': {key: 'Source-bound actual ' + key for key in BRIEF_FIELDS},
+                'intent_council': identity}
+
+    def test_parallel_foundation_uses_first_layer_before_confirmation_under_both_delimiters(self):
+        from runtime.codex_foundation import propose_foundation
+
+        for i, delimiter in enumerate((':', '::')):
+            with self.subTest(delimiter=delimiter):
+                self.foundation_intent_task('u0-input-' + str(i), delimiter)
+                identity = 'u0-0'
+                with redirect_stdout(io.StringIO()):
+                    self.assertEqual(council_cli(['create', '--root', str(self.root),
+                        '--council-id', identity, '--foundation-intent', '--native-actor', 'native-1']), 0)
+                self.assertFalse((self.root / 'foundation.json').exists())
+                prepared = council.prepare_round(self.root, identity, kind='INDEPENDENT', max_tokens=100)
+                jobs = self.jobs(prepared)
+                scope = jobs['member-1']
+                with patch('runtime.codex_consult_budget.claude_council_quote',
+                           return_value={'facts': scope['facts'], 'ceiling_usd': scope['ceiling_usd']}) as quote:
+                    kind, jobs = council.automatic_round_plan(
+                        self.root, identity, round_id=1, split_path=scope['split_path'],
+                        config_path=scope['config_path'])
+                self.assertEqual(kind, 'foundation_intent_quote')
+                quote.assert_called_once()
+                self.server.entered.clear()
+                self.server.release.clear()
+                events = []
+                with ThreadPoolExecutor(max_workers=1) as pool:
+                    sender = pool.submit(council.run_round, self.root, identity, round_id=1,
+                                         jobs=jobs, on_public_event=events.append)
+                    try:
+                        self.assertTrue(self.server.entered.wait(4))
+                        self.assertEqual(council.read_packet(self.root, identity, actor='native-1')['public_work'], [])
+                        body = json.dumps(self.server.requests[-1], ensure_ascii=False)
+                        self.assertIn('Independently extract the user intent', body)
+                        self.assertIn('Follow the specified scope', body)
+                        self.assertIn('Return one complete public U0 draft',
+                                      self.server.requests[-1]['messages'][0]['content'])
+                        self.assertNotIn('[[CODEX NATIVE WORK]]', body)
+                        self.assertNotIn('NATIVE INITIAL OPINION', body)
+                        council.submit_native_initial(self.root, identity, actor='native-1',
+                                                      output_path=self.native, input_version=1)
+                    finally:
+                        self.server.release.set()
+                    result = sender.result(timeout=8)
+                self.assert_complete_round(result)
+                packet = council.read_packet(self.root, identity, actor='native-1', stage='REDELIBERATION')
+                self.assertEqual({x['source'] for x in packet['public_work']},
+                                 {'native_initial', 'claude_subcouncil'})
+                self.assertTrue(any(e.get('event') == 'public_delta' for e in events))
+                council.submit_redeliberation(self.root, identity, actor='native-1',
+                                              output_path=self.redeliberation, input_version=1)
+                proposal = propose_foundation(self.root, self.foundation_intent_proposal(), reason='Compare actual U0 drafts.')
+                self.assertEqual(proposal['intent_review']['basis'], 'CLAUDE_INTENT_PRIORITY')
+                self.assertEqual(proposal['status'], 'AWAITING_USER')
+                self.assertEqual(proposal['intent_review']['input_ref']['message_id'], 0)
+                self.assertTrue(council.completion_status(self.root)['complete'])
+                with self.assertRaisesRegex(ValueError, 'already exists'):
+                    council.create_council(self.root, council_id=identity, native_actors=['native-1'],
+                                           foundation_intent=True)
+
+    def test_foundation_intent_partial_and_new_input_keep_separate_evidence(self):
+        from runtime.codex_foundation import propose_foundation
+
+        self.foundation_intent_task('u0-partial')
+        self.server.truncated = True
+        council.create_council(self.root, council_id='u0-0', native_actors=['native-1'],
+                               foundation_intent=True)
+        prepared = council.prepare_round(self.root, 'u0-0', kind='INDEPENDENT', max_tokens=100)
+        council.submit_native_initial(self.root, 'u0-0', actor='native-1',
+                                      output_path=self.native, input_version=1)
+        result = council.run_round(self.root, 'u0-0', round_id=1, jobs=self.jobs(prepared))
+        self.assertEqual(result['phase'], 'REDELIBERATION')
+        council.submit_redeliberation(self.root, 'u0-0', actor='native-1',
+                                      output_path=self.redeliberation, input_version=1)
+        fallback = propose_foundation(self.root, self.foundation_intent_proposal(), reason='Actual fallback.')
+        self.assertEqual(fallback['intent_review']['basis'], 'NATIVE_FALLBACK')
+        self.assertEqual(fallback['intent_review']['claude']['status'], 'PARTIAL')
+
+        revision = self.file('u0-change.txt', 'DO: Replace the task scope with a new output.')
+        message = ingest_message(self.root, source=revision, source_ref=revision.as_posix())
+        handle_message(self.root, message_id=message['message_id'], action='revise', reason='Material scope changed.')
+        with self.assertRaisesRegex(ValueError, 'earlier user input'):
+            propose_foundation(self.root, self.foundation_intent_proposal(), reason='Stale scope.')
+        with self.assertRaisesRegex(ValueError, 'fresh independent council'):
+            council.publish_event(self.root, 'u0-0', input_path=revision, kind='USER_CORRECTION')
+        council.create_council(self.root, council_id='u0-1', native_actors=['native-1'],
+                               foundation_intent=True)
+        packet = council.read_packet(self.root, 'u0-1', actor='native-1')
+        self.assertEqual(packet['public_work'], [])
+        self.assertIn('Replace the task scope', json.dumps(packet['common_input']))
+
+    def test_foundation_intent_only_runs_for_initial_or_material_input(self):
+        self.foundation_intent_task('u0-ordinary')
+        reply = self.file('same-scope.txt', 'DO: Continue the same scope.')
+        message = ingest_message(self.root, source=reply, source_ref=reply.as_posix())
+        handle_message(self.root, message_id=message['message_id'], action='continue',
+                       reason='The currently commissioned scope still applies.')
+        with self.assertRaisesRegex(ValueError, 'material change'):
+            council.create_council(self.root, council_id='u0-1', native_actors=['native-1'],
+                                   foundation_intent=True)
+        self.assertEqual(self.server.requests, [])
+
+    def test_late_foundation_intent_does_not_reopen_or_block_fallback(self):
+        from runtime.codex_foundation import propose_foundation
+
+        self.foundation_intent_task('u0-late')
+        council.create_council(self.root, council_id='u0-0', native_actors=['native-1'],
+                               foundation_intent=True)
+        prepared = council.prepare_round(self.root, 'u0-0', kind='INDEPENDENT', max_tokens=100)
+        council.submit_native_initial(self.root, 'u0-0', actor='native-1',
+                                      output_path=self.native, input_version=1)
+        jobs = self.jobs(prepared)
+        self.server.release.clear()
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            sender = pool.submit(council.run_round, self.root, 'u0-0', round_id=1, jobs=jobs)
+            try:
+                self.assertTrue(self.server.entered.wait(4))
+                deadline = datetime.fromisoformat(prepared['cycle']['deadline_at'])
+                barrier = council.advance_barrier(self.root, 'u0-0', now=deadline + timedelta(seconds=1))
+                self.assertEqual(barrier['phase'], 'REDELIBERATION')
+                council.submit_redeliberation(self.root, 'u0-0', actor='native-1',
+                                              output_path=self.redeliberation, input_version=1)
+            finally:
+                self.server.release.set()
+            result = sender.result(timeout=8)
+        self.assertEqual(result['late_results'][0]['status'], 'RETAINED')
+        self.assertTrue(council.completion_status(self.root)['complete'])
+        fallback = propose_foundation(self.root, self.foundation_intent_proposal(), reason='Actual deadline fallback.')
+        self.assertEqual(fallback['intent_review']['basis'], 'NATIVE_FALLBACK')
+
+    def test_foundation_intent_refuses_old_pin_and_zero_wallet(self):
+        self.foundation_intent_task('u0-legacy', version='1.6.1')
+        with self.assertRaisesRegex(ValueError, '1.7.0'):
+            council.create_council(self.root, council_id='u0-0', native_actors=['native-1'],
+                                   foundation_intent=True)
+        self.foundation_intent_task('u0-zero')
+        council.create_council(self.root, council_id='u0-0', native_actors=['native-1'],
+                               foundation_intent=True)
+        prepared = council.prepare_round(self.root, 'u0-0', kind='INDEPENDENT', max_tokens=100)
+        jobs = self.jobs(prepared)
+        jobs['member-1']['facts']['wallet_remaining_usd'] = 0
+        result = council.run_round(self.root, 'u0-0', round_id=1, jobs=jobs)
+        self.assertEqual(result['rounds'][0]['jobs']['member-1']['status'], 'FAILED')
+        self.assertEqual(self.server.requests, [])
+
+
     def test_native_only_single_colon_context_gate_and_complete_chunks(self):
         self.root = self.task('denied', allow=False)
         self.create(enable=False)

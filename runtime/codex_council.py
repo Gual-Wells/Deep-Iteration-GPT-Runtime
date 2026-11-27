@@ -29,6 +29,16 @@ _ID = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,63}')
 _SCOPE_KEYS = frozenset({'council_id', 'member_id', 'line_id', 'cycle_id',
                           'input_version', 'packet_sha256', 'round_id', 'round_kind'})
 _FIRST_OPINION_SCOPE_KEYS = _SCOPE_KEYS | {'purpose'}
+_FOUNDATION_INTENT_PROMPT = (
+    'Independently extract the user intent and draft U0 from the exact common packet. '
+    'State the actual goal, deliverable, scope, granularity, established facts and decisions, '
+    'dependencies, proposed approach, resources, completion, and only consequential open choices. '
+    'Attribute explicit user words, inferred intent, and your suggestions separately. '
+    'Preserve the user’s instructions and factual boundaries. Your views cannot grant permission, '
+    'change budgets or protocol parameters, confirm the brief, or start execution. '
+    'Return one complete public U0 draft in this response. Do not request delegated work or look '
+    'for the native draft. The native extraction happens independently on the same packet.'
+)
 
 
 def _now() -> str:
@@ -143,6 +153,8 @@ def _load(root: Path, council_id: str, *, active: bool = False) -> tuple[Path, d
             or state.get('P_run') != session['P_run']
             or state.get('task_request_sha256') != session['request_sha256']):
         raise ValueError('Council identity differs from the frozen task')
+    if state.get('foundation_intent') and state['foundation_intent']['task_uuid'] != session['task_uuid']:
+        raise ValueError('Foundation intent work belongs to a different task')
     if active and state['phase'] == 'CLOSED':
         raise ValueError('Council is closed')
     _packet(directory, state, state['input_version'])
@@ -224,7 +236,8 @@ def _new_cycle(state: dict, *, native_actors: Sequence[str], members: Sequence[s
 def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
                    facts_path: Path | None = None, materials: Sequence[Path] = (),
                    enable_claude: bool = False, member_count: int | None = None,
-                   deadline_seconds: int = 300, first_opinion: str | None = None) -> dict:
+                   deadline_seconds: int = 300, first_opinion: str | None = None,
+                   foundation_intent: bool = False) -> dict:
     """Create a native work object with only the channels allowed by its pin."""
     root, session, lifecycle = _task(root, active=True)
     _id('council_id', council_id)
@@ -233,6 +246,23 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
         raise ValueError('Supply distinct actual native actor IDs')
     for actor in actors:
         _id('native actor', actor)
+    if foundation_intent:
+        if not codex_collaboration.foundation_intent_policy(session['P_run']):
+            raise ValueError('Parallel U0 requires a frozen Codex 1.7.0+ task')
+        if first_opinion is not None or len(actors) != 1 or member_count not in (None, 1):
+            raise ValueError('Parallel U0 uses one native extractor and one Claude member')
+        input_ref = _input_ref(lifecycle)
+        message_id = input_ref['message_id']
+        if council_id != f'u0-{message_id}':
+            raise ValueError('Parallel U0 must use u0-<current content message id>')
+        if message_id != 0 and lifecycle.get('latest_revision_message_id') != message_id:
+            from .codex_foundation import load_foundation
+            prior = load_foundation(root) if (root / 'foundation.json').is_file() else {}
+            if (prior.get('status') != 'REVISION_REQUIRED' or
+                    prior.get('latest_change', {}).get('intent_input') != input_ref):
+                raise ValueError('Parallel U0 requires the initial commission or a recorded material change')
+        enable_claude = True
+        member_count = 1
     if first_opinion is not None:
         codex_collaboration.require_first_opinion_permission(lifecycle)
         first_opinion = _text('still-open first-opinion decision', first_opinion)
@@ -268,7 +298,9 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
             'events': [], 'late_results': [], 'native_responsibility_credit': False}
         if first_opinion is not None:
             state['first_opinion_decision'] = first_opinion
-        if codex_collaboration.native_work_policy(session['P_run']):
+        if foundation_intent:
+            state['foundation_intent'] = {'task_uuid': session['task_uuid']}
+        if codex_collaboration.native_work_policy(session['P_run']) and not foundation_intent:
             state['native_work'] = {}
         _save_packet(directory, state, sources, lifecycle)
         _new_cycle(state, native_actors=actors, members=list(members), deadline_seconds=deadline_seconds)
@@ -294,6 +326,8 @@ def inspect_council(root: Path, council_id: str) -> dict:
             'late_results': state['late_results'],
             'current_input_changed': state['packets'][-1]['input_ref'] != _input_ref(lifecycle),
             'local_path': directory.as_posix(), 'native_responsibility_credit': False}
+    if state.get('foundation_intent'):
+        summary['foundation_intent'] = True
     if 'first_opinion_decision' in state:
         summary['first_opinion_decision'] = state['first_opinion_decision']
     if 'native_work' in state:
@@ -361,7 +395,10 @@ def require_member_scope(root: Path, scope: Mapping[str, Any], *, active: bool =
     directory, state, lifecycle = _load(root, scope['council_id'], active=active)
     first_opinion = 'first_opinion_decision' in state
     work_return = scope['round_kind'] == codex_council_work.ROUND_KIND
-    expected = _FIRST_OPINION_SCOPE_KEYS if first_opinion else _SCOPE_KEYS
+    foundation_intent = bool(state.get('foundation_intent'))
+    expected = _FIRST_OPINION_SCOPE_KEYS if first_opinion or foundation_intent else _SCOPE_KEYS
+    if foundation_intent and scope.get('purpose') != codex_collaboration.FOUNDATION_INTENT_PURPOSE:
+        raise ValueError('Parallel U0 requires its registered scope purpose')
     if work_return:
         if not codex_collaboration.native_work_policy(state['P_run']):
             raise ValueError('Native work return requires the current DIGR profile')
@@ -588,6 +625,12 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
         codex_collaboration.require_council_permission(lifecycle)
         cycle = _cycle(state)
         first_opinion = 'first_opinion_decision' in state
+        foundation_intent = bool(state.get('foundation_intent'))
+        if foundation_intent and (state['rounds'] or kind != 'INDEPENDENT'):
+            raise ValueError('Parallel U0 prepares one independent round per content input')
+        if foundation_intent:
+            effort = 'high' if effort is None else effort
+            max_tokens = 4096 if max_tokens is None else max_tokens
         native_work = codex_collaboration.native_work_policy(state['P_run'])
         work_return = kind == codex_council_work.ROUND_KIND
         if work_return and not native_work:
@@ -650,7 +693,9 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
                 'line_id': state['members'][member_id]['line_id'], 'cycle_id': state['cycle_id'],
                 'input_version': state['input_version'], 'packet_sha256': state['packets'][-1]['sha256'],
                 'round_id': round_id, 'round_kind': kind}
-            if first_opinion:
+            if foundation_intent:
+                scope['purpose'] = codex_collaboration.FOUNDATION_INTENT_PURPOSE
+            elif first_opinion:
                 scope['purpose'] = codex_collaboration.FIRST_OPINION_PURPOSE
             if work_return:
                 scope.update(native_work_return_of=parent_id, native_work_ids=sorted(entries))
@@ -671,7 +716,8 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
         try:
             _, current, _ = _load(root, council_id, active=True)
             packet = _packet(directory, current, job['scope']['input_version'])
-            prompt = _FIRST_OPINION_PROMPT if first_opinion else _MEMBER_PROMPT
+            prompt = ('Return your independent U0 for this exact input.' if foundation_intent else
+                      _FIRST_OPINION_PROMPT if first_opinion else _MEMBER_PROMPT)
             if work_return:
                 prompt = ('Continue your own research using the returned Codex work. Revisit the concrete '
                           'judgment the request was meant to inform and develop the relevant consequence.')
@@ -827,10 +873,10 @@ def run_round(root: Path, council_id: str, *, round_id: int,
                                                                      'return_exchange_id': None})
                 if requests:
                     side['status'] = 'AWAITING_NATIVE_WORK'
-                elif ('first_opinion_decision' in current or round_record['kind'] == 'FINAL'
-                        or outcome['status'] != 'COMPLETE'):
+                elif ('first_opinion_decision' in current or current.get('foundation_intent')
+                      or round_record['kind'] == 'FINAL' or outcome['status'] != 'COMPLETE'):
                     side['status'] = outcome['status']
-                    if 'first_opinion_decision' in current:
+                    if 'first_opinion_decision' in current or current.get('foundation_intent'):
                         side['sealed_at'] = _now()
                 elif round_record['kind'] == codex_council_work.ROUND_KIND:
                     side['status'] = 'PENDING'
@@ -843,8 +889,11 @@ def run_round(root: Path, council_id: str, *, round_id: int,
             elif body is not None:
                 current['late_results'].append({'member_id': member_id, 'exchange_id': outcome['exchange_id'],
                     'cycle_id': round_record['cycle_id'], 'input_version': round_record['input_version'],
-                    'at': _now(), 'status': 'PENDING_REENTRY',
-                    'scope': 'late public work; old barrier and redeliberation unchanged'})
+                    'at': _now(),
+                    'status': ('RETAINED' if current.get('foundation_intent') else 'PENDING_REENTRY'),
+                    'scope': ('late U0 draft retained as evidence for its original input'
+                              if current.get('foundation_intent') else
+                              'late public work; old barrier and redeliberation unchanged')})
             if all(job['status'] not in {'PREPARING', 'PREPARED'} for job in round_record['jobs'].values()):
                 round_record['status'] = 'FINISHED'
                 round_record['finished_at'] = _now()
@@ -974,6 +1023,65 @@ def first_opinion_plan(root: Path, council_id: str, *, round_id: int,
     return {member_id: {**quote, 'split_path': split_path, 'config_path': config_path}}
 
 
+def automatic_round_plan(root: Path, council_id: str, *, round_id: int,
+                         split_path: Path, config_path: Path | None = None) -> tuple[str, dict]:
+    """Use the real current-wallet quote for a first opinion or foundation-intent exchange."""
+    _, state, lifecycle = _load(root, council_id, active=True)
+    if not state.get('foundation_intent'):
+        return 'first_opinion_quote', first_opinion_plan(
+            root, council_id, round_id=round_id, split_path=split_path, config_path=config_path)
+    codex_collaboration.require_council_permission(lifecycle)
+    if round_id != 1 or len(state['rounds']) != 1:
+        raise ValueError('Automatic U0 quote requires the prepared independent round')
+    record = state['rounds'][0]
+    member_id, job = next(iter(record['jobs'].items()))
+    if record['status'] != 'PREPARED' or job['status'] != 'PREPARED':
+        raise ValueError('Automatic U0 quote requires the prepared independent round')
+    exchange_id = job['exchange_id']
+    require_member_scope(root, job['scope'], exchange_id=exchange_id)
+    from . import codex_consult, codex_consult_budget
+    _, _, request = codex_consult._load(root, exchange_id)
+    quote = codex_consult_budget.claude_council_quote(request, config_path=config_path)
+    return 'foundation_intent_quote', {member_id: {
+        **quote, 'split_path': split_path, 'config_path': config_path}}
+
+
+def foundation_intent_receipt(root: Path, council_id: str) -> dict:
+    """Bind the current actual drafts and comparison to a proposed U0."""
+    directory, state, lifecycle = _load(root, council_id, active=True)
+    if not state.get('foundation_intent') or state['phase'] != 'COMPLETE':
+        raise ValueError('Link a completed parallel U0 comparison')
+    packet = state['packets'][-1]
+    if packet['input_ref'] != _input_ref(lifecycle):
+        raise ValueError('Parallel U0 comparison belongs to an earlier user input')
+    cycle = _cycle(state)
+    actor = state['native_actors'][0]
+    native = cycle['native'][actor]['output']
+    if not native or cycle['native'][actor]['status'] != 'COMPLETE':
+        raise ValueError('Parallel U0 needs its actual native draft')
+    comparison = cycle['redeliberation'][actor]['output']
+    _artifact_text(directory, native)
+    _artifact_text(directory, comparison)
+    member = cycle['members']['member-1']
+    claude = None
+    if member['exchange_id']:
+        attempt, body = _exchange_public(root, member['exchange_id'])
+        scope = attempt['council_scope']
+        if scope.get('purpose') != codex_collaboration.FOUNDATION_INTENT_PURPOSE:
+            raise ValueError('Parallel U0 requires its recorded Claude draft exchange')
+        if body is not None:
+            claude = {'exchange_id': member['exchange_id'], 'sha256': attempt['public_sha256'],
+                      'status': attempt['public_status']}
+    full = member['status'] == 'COMPLETE' and claude is not None and claude['status'] == 'COMPLETE'
+    if full:
+        codex_collaboration.require_council_permission(lifecycle)
+    return {'council_id': council_id, 'input_ref': packet['input_ref'],
+            'native': {'actor': actor, 'sha256': native['sha256']},
+            'claude': claude, 'comparison_sha256': comparison['sha256'],
+            'basis': 'CLAUDE_INTENT_PRIORITY' if full else 'NATIVE_FALLBACK',
+            'scope': 'recorded comparison, not certification of interpretation or user consent'}
+
+
 def _chunks(text: str, size: int) -> list[dict]:
     if type(size) is not int or size < 1:
         raise ValueError('chunk_chars must be a positive integer')
@@ -1018,6 +1126,12 @@ def read_packet(root: Path, council_id: str, *, actor: str, stage: str = 'INITIA
                         'transport_status': attempt['transport_status'], 'billing_status': attempt['billing_status'],
                         'known_cost_usd': attempt.get('known_cost_usd'), 'reserved_usd': attempt.get('reserved_usd'),
                         'sha256': attempt['public_sha256'], 'chunks': _chunks(body, chunk_chars)})
+        if state.get('foundation_intent'):
+            result['native_duty'] = ('Compare the independent U0 drafts on this input. Use the complete Claude '
+                'draft as the primary interpretation of user intent; preserve explicit user decisions, verified '
+                'facts, constraints, authority and feasibility. Identify substantive differences and the proposed '
+                'reorganization. Record missing or partial results and use the native draft when necessary.')
+            return result
         result['native_duty'] = ('Independently reconsider domains and conclusions from the actual complete '
             'public work. Address substantive and strong alternative claims with reasons. '
             'Do not treat missing or partial work as support/opposition. Main relays, not selects positions.')
@@ -1082,6 +1196,8 @@ def publish_event(root: Path, council_id: str, *, input_path: Path, kind: str,
     send a request. Old results and redeliberations keep their old identities.
     """
     directory, current, _ = _load(root, council_id, active=True)
+    if current.get('foundation_intent'):
+        raise ValueError('A changed U0 uses a fresh independent council for the new content input')
     _text('event kind', kind)
     encoding = 'utf-8' if (kind == 'LATE_MEMBER_RESULT'
                             and codex_collaboration.first_opinion_policy(current['P_run'])) else 'utf-8-sig'

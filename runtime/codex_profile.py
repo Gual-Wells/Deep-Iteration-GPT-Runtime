@@ -19,7 +19,7 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v24'
+PROFILE_PROTOCOL = 'digr-codex-native-v25'
 PROFILE_CORE = (
     'codex/CONSTITUTION.md',
     'codex/FOUNDATION.md',

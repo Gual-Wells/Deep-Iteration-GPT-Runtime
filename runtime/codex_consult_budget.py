@@ -41,7 +41,7 @@ def _quote_data(opener, resource: str, *, timeout: float, credential: str | None
     return result.get('data') if isinstance(result, Mapping) else None
 
 
-def first_opinion_quote(request: Mapping[str, Any], *, config_path: Path | None = None) -> dict:
+def claude_council_quote(request: Mapping[str, Any], *, config_path: Path | None = None) -> dict:
     """Quote a prepared text-only exchange in a validated first-opinion line.
 
     The existing send path checks current authority and reserves against the quoted facts.
@@ -109,6 +109,10 @@ def first_opinion_quote(request: Mapping[str, Any], *, config_path: Path | None 
         facts['wallet_snapshot'] = {'snapshot_id': codex_wallet.OPENROUTER_QUOTE_SNAPSHOT_PREFIX + identity,
                                     **snapshot}
     return {'facts': facts, 'ceiling_usd': ceiling}
+
+
+def first_opinion_quote(request: Mapping[str, Any], *, config_path: Path | None = None) -> dict:
+    return claude_council_quote(request, config_path=config_path)
 
 
 def _task_binding(session: Mapping[str, Any]) -> dict:

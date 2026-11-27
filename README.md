@@ -1,4 +1,4 @@
-# DIGR for Codex · Stable 1.6.1
+# DIGR for Codex · Stable 1.7.0
 
 `DIGR：任务` 主动寻找能影响成品的开放取舍，在定案前安排 Claude 作一次独立首发。Claude 可以自行选择议题，也可委托 Codex 取原件、复算或试作，再根据结果继续判断。单冒号直接开放第一层，双冒号直接开放两层。第一层每任务累计 0.20 美元，第二层累计 1.00 美元，受真实钱包和用户更窄限额约束。每次提交前完成本机 Split，Sonnet 保留适合实质判断的 `high`，Codex 完成所需的支持工作。详见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
 

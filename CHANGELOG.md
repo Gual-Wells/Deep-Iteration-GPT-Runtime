@@ -1,5 +1,11 @@
 # Changelog
 
+## Codex Stable 1.7.0
+
+- 在现有方法入口加入批量论文证据、版本归并、并行研究交接与选题比较，沿现有 S、D、V、F 与工作笔记执行。
+- 新 pin 允许在初次 U0 或真实改向时，按同一用户输入并行形成独立 Codex 和 Claude 草稿。两份返回后以 Claude 意图解释为主重组，经既有前置决定进入执行。复用第一层权限和费用，保留原件、局部返回及原生处置。
+- 双 U0 的真实比较可随正式前置绑定当前输入和输出身份。既有任务以原 (P_{\mathrm{run}}) 恢复。
+
 ## Codex Stable 1.6.1
 
 - Reuse confirmed charge revisions for the same wallet when pricing a Claude first opinion from OpenRouter's current credits. Deduct uncovered cost changes and unresolved reservations from that balance before sending.

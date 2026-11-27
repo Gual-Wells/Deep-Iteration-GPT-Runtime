@@ -9,6 +9,7 @@ CLAUDE_MODEL = re.compile(r'(?:^|/)claude(?:[-/:]|$)', re.IGNORECASE)
 COUNCIL_ONLY = 'COUNCIL_ONLY'
 CLAUDE_LAYER_BY_ROLE = {'council_member': 'COUNCIL', 'consult_guidance': 'CONTENT'}
 DOUBLE_COLON_LAYER_CEILINGS_USD = {'COUNCIL': 0.20, 'CONTENT': 1.00}
+FOUNDATION_INTENT_PURPOSE = 'foundation_intent'
 FIRST_OPINION_PURPOSE = 'first_opinion'
 FIRST_OPINION_NATIVE_WORK_RETURN_PURPOSE = 'first_opinion_native_work_return'
 FIRST_OPINION_CEILING_USD = 0.20
@@ -47,6 +48,10 @@ def standing_claude_budget_policy(p_run: str) -> bool:
 
 def native_work_policy(p_run: str) -> bool:
     return _since(p_run, (1, 3, 0))
+
+
+def foundation_intent_policy(p_run: str) -> bool:
+    return _since(p_run, (1, 7, 0))
 
 
 def require_first_opinion_permission(lifecycle: Mapping[str, Any]) -> None:

@@ -130,10 +130,15 @@ def _generic_system(p_run: str) -> str:
     return _LOGICAL_SYSTEM if current else _SYSTEM
 
 
-def _model_system(p_run: str, model: str, participation_role: str = 'consult_guidance') -> str:
+def _model_system(p_run: str, model: str, participation_role: str = 'consult_guidance',
+                  *, council_scope: Mapping[str, Any] | None = None) -> str:
     if participation_role == 'council_member':
         if not codex_collaboration.council_enabled(p_run):
             raise ValueError('Council membership requires the current council profile')
+        if (codex_collaboration.foundation_intent_policy(p_run)
+                and (council_scope or {}).get('purpose') == codex_collaboration.FOUNDATION_INTENT_PURPOSE):
+            from .codex_council import _FOUNDATION_INTENT_PROMPT
+            return _FOUNDATION_INTENT_PROMPT
         if codex_collaboration.native_work_policy(p_run):
             from .codex_council_work import MEMBER_INSTRUCTION
             return _COUNCIL_MEMBER_SYSTEM + '\n\n' + MEMBER_INSTRUCTION
@@ -556,7 +561,8 @@ def _load(root: Path, exchange_id: str, *, verify_public: bool = True) -> tuple[
         if attempt.get('collaboration_contract') != expected:
             raise ValueError('Actual collaboration model/scope contract changed; prepare a current DIGR request')
         if attempt.get('authoring_scope') is None and request['messages'][0] != {
-                'role': 'system', 'content': _model_system(session['P_run'], request['model'], role)}:
+                'role': 'system', 'content': _model_system(
+                    session['P_run'], request['model'], role, council_scope=scope)}:
             raise ValueError('Actual collaborator prompt identity changed')
     if verify_public and attempt.get('public_sha256'):
         if _hash(public_raw if public_raw is not None else codex_io.read_bytes(directory / 'public.md')) != attempt['public_sha256']:
@@ -767,7 +773,8 @@ def prepare_request(
         raise ValueError('max_tokens must be a positive integer including hidden and public output')
     exchange_id = exchange_id or ('exchange-' + uuid.uuid4().hex)
     directory = _directory(root, exchange_id)
-    messages: list[dict] = [{'role': 'system', 'content': _model_system(session['P_run'], model, participation_role)}]
+    messages: list[dict] = [{'role': 'system', 'content': _model_system(
+        session['P_run'], model, participation_role, council_scope=council_scope)}]
     system_transition = None
     parent_request_sha256 = None
     previous_sources = []
@@ -818,7 +825,8 @@ def prepare_request(
     if production is not None and production.get('authoring_scope') != authoring_scope:
         raise ValueError('Production must retain the registered paper or generic authoring scope')
     if codex_collaboration.unified(session['P_run']) and authoring_scope is None:
-        actual_system = {'role': 'system', 'content': _model_system(session['P_run'], model, participation_role)}
+        actual_system = {'role': 'system', 'content': _model_system(
+            session['P_run'], model, participation_role, council_scope=council_scope)}
         if messages[0] != actual_system:
             system_transition = {'from_sha256': _hash(_json_bytes(messages[0])),
                                  'to_sha256': _hash(_json_bytes(actual_system)),
