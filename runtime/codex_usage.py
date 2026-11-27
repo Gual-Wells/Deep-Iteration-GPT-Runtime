@@ -1014,7 +1014,7 @@ def _claude_costs(root: Path) -> dict:
             claims = wallet.get('first_opinion_claims', {})
             if claims or selection == codex_collaboration.COUNCIL_ONLY:
                 report['first_opinions'] = {
-                    name: first_record(claims.get(name)) for name in codex_collaboration.EXTERNAL_MODELS}
+                    name: first_record(claims.get(name)) for name in codex_collaboration.external_models(session['P_run'])}
         elif claim is not None or selection == codex_collaboration.COUNCIL_ONLY:
             report['first_opinion'] = first_record(claim)
     return report

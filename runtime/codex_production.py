@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import re
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from . import codex_collaboration, codex_consult as consult, codex_io
 from .codex_lifecycle import content_message, load_lifecycle, require_active, _validate_snapshot
@@ -293,8 +293,31 @@ def _arbitration(root: Path, directory: Path, state: Mapping[str, Any], exchange
     return _receipt(returned, attempt, request, binding, paths), binding
 
 
+def _peer_arbitrations(root: Path, directory: Path, state: Mapping[str, Any],
+                       model: str, exchanges: Sequence[str]) -> list[dict]:
+    if not exchanges:
+        return []
+    p_run = state['P_run']
+    if not codex_collaboration.parallel_external_policy(p_run):
+        raise ValueError('Paired production requires Codex 1.7.0+')
+    peers = []
+    models = {model}
+    roster = set(codex_collaboration.external_models(p_run).values())
+    if len(exchanges) >= len(roster):
+        raise ValueError('Each collaborator can contribute at most one arbitration')
+    for exchange in exchanges:
+        receipt, binding = _arbitration(root, directory, state, exchange)
+        if binding['model'] in models:
+            raise ValueError('Peer arbitrations must come from distinct external collaborators')
+        models.add(binding['model'])
+        peers.append({'arbitration': receipt, 'binding': binding})
+    if not models <= roster:
+        raise ValueError('Peer arbitrations must use the collaborators of the frozen task pin')
+    return peers
+
+
 def record_applied(root: Path, production_id: str, *, arbitration_exchange: str,
-                   output_path: Path, effect: str, peer_exchange: str | None = None) -> dict:
+                   output_path: Path, effect: str, peer_exchange: str | Sequence[str] | None = None) -> dict:
     """Record how the actual Claude arbitration was implemented in the final bytes."""
     root, session, _ = _task(root, active=True)
     effect = consult._text('actual effect of arbitration on the final output', effect)
@@ -310,17 +333,10 @@ def record_applied(root: Path, production_id: str, *, arbitration_exchange: str,
         else:
             _require_current_state(state, lifecycle)
         receipt, binding = _arbitration(root, directory, state, arbitration_exchange)
-        peer = None
-        if peer_exchange is not None:
-            if not codex_collaboration.parallel_external_policy(session['P_run']):
-                raise ValueError('Paired production requires Codex 1.7.0+')
-            peer_receipt, peer_binding = _arbitration(root, directory, state, peer_exchange)
-            selected = {binding['model'], peer_binding['model']}
-            if selected != set(codex_collaboration.EXTERNAL_MODELS.values()):
-                raise ValueError('Paired arbitration needs one Sonnet and one Carbon response')
-            peer = {'arbitration': peer_receipt, 'binding': peer_binding}
+        peer_ids = [peer_exchange] if isinstance(peer_exchange, str) else list(peer_exchange or ())
+        peers = _peer_arbitrations(root, directory, state, binding['model'], peer_ids)
         if previous is not None and (receipt != previous['arbitration'] or binding != previous['binding']
-                                     or peer != previous.get('peer')):
+                                     or peers != _saved_peers(previous)):
             raise ValueError('Applied production arbitration provenance changed')
         output = _seal(directory, output_path, 'final', text=False)
         history = list(previous['previous_outputs']) if previous is not None else []
@@ -329,8 +345,11 @@ def record_applied(root: Path, production_id: str, *, arbitration_exchange: str,
         state.update(status='APPLIED', applied={'arbitration': receipt, 'binding': binding,
             'output': output, 'effect': effect, 'applied_at': consult._now(),
             'message_id': lifecycle['handled_message_id'], 'previous_outputs': history})
-        if peer is not None:
-            state['applied']['peer'] = peer
+        if peers:
+            if codex_collaboration.flex_collaboration_policy(session['P_run']):
+                state['applied']['peers'] = peers
+            else:
+                state['applied']['peer'] = peers[0]
         consult._write(directory / 'production.json', state)
     return inspect(root, production_id)
 
@@ -378,6 +397,10 @@ def release(root: Path, production_id: str, *, disposition: str, source: str, qu
     return inspect(root, production_id)
 
 
+def _saved_peers(applied: Mapping[str, Any]) -> list[dict]:
+    return [applied['peer']] if applied.get('peer') is not None else applied.get('peers', [])
+
+
 def _original_matches(output: Mapping[str, Any]) -> bool:
     try:
         raw = codex_io.read_bytes(Path(output['path']))
@@ -400,12 +423,10 @@ def _inspect(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any
         receipt, binding = _arbitration(root, directory, state, applied['arbitration']['exchange_id'])
         if receipt != applied['arbitration'] or binding != applied['binding']:
             raise ValueError('Applied production arbitration provenance changed')
-        peer = applied.get('peer')
-        if peer is not None:
-            peer_receipt, peer_binding = _arbitration(root, directory, state, peer['arbitration']['exchange_id'])
-            if (peer != {'arbitration': peer_receipt, 'binding': peer_binding}
-                    or {binding['model'], peer_binding['model']} != set(codex_collaboration.EXTERNAL_MODELS.values())):
-                raise ValueError('Applied paired arbitration provenance changed')
+        peers = _saved_peers(applied)
+        peer_ids = [peer['arbitration']['exchange_id'] for peer in peers]
+        if _peer_arbitrations(root, directory, state, binding['model'], peer_ids) != peers:
+            raise ValueError('Applied peer arbitration provenance changed')
         if state['status'] == 'APPLIED' and state['input_ref'] == consult._input_ref(lifecycle):
             output_matches = _original_matches(output)
     view = {**state, 'input_source': {key: value for key, value in state['input_source'].items() if key != 'text'}}
@@ -445,8 +466,7 @@ def require_applied(root: Path, production_id: str, *, arbitration_exchange: str
     if item['status'] != 'APPLIED' or item['input_ref'] != consult._input_ref(lifecycle):
         raise ValueError('Delivery requires a current applied production arbitration')
     exchanges = {applied['arbitration']['exchange_id']}
-    if applied.get('peer') is not None:
-        exchanges.add(applied['peer']['arbitration']['exchange_id'])
+    exchanges.update(peer['arbitration']['exchange_id'] for peer in _saved_peers(applied))
     if arbitration_exchange is not None and arbitration_exchange not in exchanges:
         raise ValueError('Delivery requires a current applied production arbitration')
     if item['current_output_matches'] is not True:

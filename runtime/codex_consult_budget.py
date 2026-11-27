@@ -41,34 +41,57 @@ def _quote_data(opener, resource: str, *, timeout: float, credential: str | None
     return result.get('data') if isinstance(result, Mapping) else None
 
 
-def startup_collaboration_quotes():
-    """Yield only current public model list prices. No task, auth or wallet is read."""
+def _endpoint_pricing(opener, model: str, endpoint: str, *, timeout: float) -> Mapping[str, Any]:
+    data = _quote_data(opener, f'models/{model}/endpoints', timeout=timeout)
+    if not isinstance(data, Mapping) or data.get('id') != model or not isinstance(data.get('endpoints'), list):
+        raise ValueError('OpenRouter returned an unexpected endpoint catalog')
+    matches = [item.get('pricing') for item in data['endpoints']
+               if isinstance(item, Mapping) and item.get('tag') == endpoint]
+    if len(matches) != 1 or not isinstance(matches[0], Mapping):
+        raise ValueError('OpenRouter did not list a current quote for the required Flex endpoint')
+    return matches[0]
+
+
+def startup_collaboration_quotes(p_run: str = ''):
+    """Yield only current public model or Flex endpoint prices."""
     from datetime import datetime, timezone
 
     source = 'https://openrouter.ai/api/v1/models'
+    opener = build_opener()
     failure = None
     try:
-        catalog = _quote_data(build_opener(), 'models', timeout=8)
+        catalog = _quote_data(opener, 'models', timeout=8)
     except ValueError as error:
         catalog = None
         failure = str(error).removesuffix(' ' + _QUOTE_PLAN)
     checked_at = datetime.now(timezone.utc).isoformat()
     models = catalog if isinstance(catalog, list) else ()
-    for participant, model in codex_collaboration.EXTERNAL_MODELS.items():
+    for participant, model in codex_collaboration.external_models(p_run).items():
         facts = {'event': 'collaboration_display_quote', 'model': model, 'participant': participant,
                  'source': source, 'checked_at': checked_at, 'scope': 'DISPLAY_ONLY',
                  'unit': 'USD_PER_1M_TOKENS'}
         prices = [item.get('pricing') for item in models
                   if isinstance(item, Mapping) and item.get('id') == model]
+        flex_endpoint = codex_collaboration.consult_flex_endpoint(p_run, model)
+        quote_failure = failure
         try:
-            if len(prices) != 1:
+            if flex_endpoint:
+                facts.update(source=f'{source}/{model}/endpoints', service_tier='flex', endpoint=flex_endpoint)
+                quote_failure = None
+                pricing = _endpoint_pricing(opener, model, flex_endpoint, timeout=8)
+                facts['checked_at'] = datetime.now(timezone.utc).isoformat()
+            elif len(prices) == 1:
+                pricing = prices[0]
+            else:
                 raise ValueError('One exact model entry is required')
-            prompt = _quote_amount(prices[0]['prompt'])
-            completion = _quote_amount(prices[0]['completion'])
+            prompt = _quote_amount(pricing['prompt'])
+            completion = _quote_amount(pricing['completion'])
             facts.update(status='QUOTED', input_usd_per_million=str(prompt * 1_000_000),
                          output_usd_per_million=str(completion * 1_000_000))
-        except (DecimalException, ValueError, TypeError, KeyError):
-            facts.update(status='UNAVAILABLE', reason=failure or 'No usable price for that exact model')
+        except (DecimalException, ValueError, TypeError, KeyError) as error:
+            if flex_endpoint and isinstance(error, ValueError):
+                quote_failure = str(error).removesuffix(' ' + _QUOTE_PLAN)
+            facts.update(status='UNAVAILABLE', reason=quote_failure or 'No usable price for that exact model')
         yield facts
 
 
@@ -99,17 +122,25 @@ def claude_council_quote(request: Mapping[str, Any], *, config_path: Path | None
     opener = consult._opener(config)
     timeout = min(config['timeout_seconds'], 15)
     checked_at = consult._now()
-    models = _quote_data(opener, 'models', timeout=timeout)
-    catalog = models if isinstance(models, list) else []
-    matches = [item.get('pricing') for item in catalog if isinstance(item, Mapping) and item.get('id') == model]
-    if len(matches) != 1 or not isinstance(matches[0], Mapping):
-        raise ValueError(f'OpenRouter did not list one current price for the prepared model. {_QUOTE_PLAN}')
-    pricing = matches[0]
+    pricing_ref = 'OpenRouter GET /api/v1/models'
+    if request.get('service_tier') == 'flex':
+        if (model != codex_collaboration.GEMINI_HYDROGEN or
+                request['provider'].get('only') != [codex_collaboration.HYDROGEN_FLEX_ENDPOINT]):
+            raise ValueError('Flex quote requires the prepared Hydrogen Flex endpoint')
+        pricing = _endpoint_pricing(opener, model, codex_collaboration.HYDROGEN_FLEX_ENDPOINT, timeout=timeout)
+        pricing_ref += f'/{model}/endpoints ({codex_collaboration.HYDROGEN_FLEX_ENDPOINT})'
+    else:
+        models = _quote_data(opener, 'models', timeout=timeout)
+        catalog = models if isinstance(models, list) else []
+        matches = [item.get('pricing') for item in catalog if isinstance(item, Mapping) and item.get('id') == model]
+        if len(matches) != 1 or not isinstance(matches[0], Mapping):
+            raise ValueError(f'OpenRouter did not list one current price for the prepared model. {_QUOTE_PLAN}')
+        pricing = matches[0]
     try:
         prompt = _quote_amount(pricing['prompt'])
-        completion = max(_quote_amount(pricing['completion']), _quote_amount(pricing.get('internal_reasoning', 0)))
+        completion = max(_quote_amount(pricing['completion']), _quote_amount(pricing.get('internal_reasoning') or 0))
         # The public model listing omits the optional fee when it is absent.
-        request_fee = _quote_amount(pricing.get('request', 0))
+        request_fee = _quote_amount(pricing.get('request') or 0)
         prices = {'prompt': float(prompt * 1_000_000), 'completion': float(completion * 1_000_000),
                   'request': float(request_fee)}
         sized_request = {**request, 'provider': {**request['provider'], 'max_price': prices}}
@@ -130,7 +161,7 @@ def claude_council_quote(request: Mapping[str, Any], *, config_path: Path | None
         wallet_remaining = consult._number('remaining OpenRouter credits', float(remaining))
     except (KeyError, DecimalException, TypeError, ValueError):
         raise ValueError(f'OpenRouter did not supply a usable current credit balance. {_QUOTE_PLAN}') from None
-    facts = {'model': model, 'checked_at': checked_at, 'pricing_ref': 'OpenRouter GET /api/v1/models',
+    facts = {'model': model, 'checked_at': checked_at, 'pricing_ref': pricing_ref,
              'input_bound_basis': 'Complete text-only UTF-8 request bytes with provider framing allowance',
              'wallet_id': wallet_id, 'wallet_remaining_usd': wallet_remaining, 'outside_spent_usd': 0,
              'prompt_usd_per_million': prices['prompt'], 'completion_usd_per_million': prices['completion'],
@@ -488,7 +519,7 @@ def resolve(root: Path, session: Mapping[str, Any], lifecycle: Mapping[str, Any]
         if first_opinion or first_return:
             authority['purpose'] = purpose
             if codex_collaboration.parallel_external_policy(session['P_run']):
-                participant = codex_collaboration.external_participant(model)
+                participant = codex_collaboration.external_participant(session['P_run'], model)
                 if participant is None:
                     raise ValueError('A paired first-opinion exchange requires its registered Sonnet or Carbon model')
                 authority['first_opinion_participant'] = participant

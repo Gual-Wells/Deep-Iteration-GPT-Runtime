@@ -42,7 +42,10 @@ def _efficient_hearing(hearing: dict) -> bool:
 
 
 def _parameter_names(root: Path) -> tuple[str, ...]:
-    return (*PARAMETERS, 'C') if _efficient(root) else PARAMETERS
+    from .codex_collaboration import u0_council_parameter
+    p_run = _session(root)[1]['P_run']
+    names = (*PARAMETERS, 'C') if court_mode_parameter(p_run) else PARAMETERS
+    return (*names, 'U') if u0_council_parameter(p_run) else names
 
 
 def enabled(p_run: str) -> bool:
@@ -765,6 +768,10 @@ def _configuration(root: Path, state: dict, supplied: Mapping[str, Any]) -> dict
         parameters['C'] = require_binary('C', supplied['C'])
         if parameters['C'] != task['C']:
             raise ValueError('remand cannot grant/change C; use the actual current court choice')
+    if 'U' in names:
+        parameters['U'] = require_binary('U', supplied['U'])
+        if parameters['U'] != task['U']:
+            raise ValueError('remand cannot grant/change U; use the actual current U0 choice')
     return parameters
 
 

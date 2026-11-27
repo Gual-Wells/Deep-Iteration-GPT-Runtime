@@ -14,6 +14,7 @@ import re
 import time
 from typing import Any, Mapping
 
+from .codex_collaboration import u0_council_parameter
 from .validation import require_binary, require_nonempty_text
 
 FORMAT = 'digr-codex-lifecycle-1'
@@ -184,6 +185,7 @@ def initialize_lifecycle(root: Path, metadata: Mapping[str, Any]) -> dict[str, A
         elif (surface.get('depth_preferences') or {}).get('preset') == 'Max':
             value['max_court_required'] = True
             value['max_court_source'] = _input_ref(value['current_message'])
+    _apply_u0_selection(value, metadata, value['current_message'])
     _write_json(root / 'lifecycle.json', value, new=True)
     return value
 
@@ -229,6 +231,39 @@ def _apply_court_selection(value: dict, metadata: Mapping[str, Any],
     value['court_required'] = bool(selection)
 
 
+def _apply_u0_selection(value: dict, metadata: Mapping[str, Any],
+                        message: Mapping[str, Any], selection: int | None = None) -> None:
+    if not u0_council_parameter(metadata['P_run']):
+        if selection is not None:
+            raise ValueError('U requires a frozen Codex 1.8.0+ task')
+        return
+    from .codex_profile import classify_invocation
+    surface = classify_invocation(message['source']['text'], p_run=metadata['P_run'])
+    if surface['classification'] in {'HELP', 'INVALID', 'ROUTE_PENDING'}:
+        if selection is not None:
+            raise ValueError('help/malformed/unresolved source cannot change U')
+        return
+    depth = surface.get('depth_preferences') or {}
+    header = depth.get('explicit_overrides', {}).get('U')
+    if selection is not None:
+        require_binary('U', selection)
+        if header is not None and selection != header:
+            raise ValueError('U choice conflicts with the current user header')
+    if header is not None:
+        selection = header
+    previous = value.get('u0_parameter_source')
+    if selection is None and previous is not None:
+        return
+    source = {'value': 0 if selection is None else selection, 'input_explicit': selection is not None,
+              'message_id': message['id'], 'source_ref': message['source']['source_ref'],
+              'source_sha256': message['source']['sha256'],
+              'basis': ('INVOCATION_HEADER' if header is not None else
+                        'CURRENT_USER_DECISION' if selection is not None else 'NEW_TASK_DEFAULT')}
+    if previous is not None and previous != source:
+        value.setdefault('u0_selection_history', []).append(previous)
+    value['u0_parameter_source'] = source
+
+
 def load_lifecycle(root: Path) -> dict[str, Any]:
     """Read finite current source/state. Legacy absence is explicitly unmanaged."""
     from .codex_session import _read_json, _session
@@ -260,6 +295,13 @@ def load_lifecycle(root: Path) -> dict[str, Any]:
         if (type(choice.get('message_id')) is not int or choice['message_id'] > value['handled_message_id']
                 or observed != {'sha256': choice.get('source_sha256'), 'message_id': choice['message_id']}):
             raise ValueError('C is not bound to a handled actual user source')
+    if u0_council_parameter(metadata['P_run']):
+        choice = value.get('u0_parameter_source', {})
+        require_binary('U', choice.get('value'))
+        observed = value['seen_source_refs'].get(choice.get('source_ref'))
+        if (type(choice.get('message_id')) is not int or choice['message_id'] > value['handled_message_id']
+                or observed != {'sha256': choice.get('source_sha256'), 'message_id': choice['message_id']}):
+            raise ValueError('U is not bound to a handled actual user source')
     _validate_snapshot(current['source'])
     _pin_reference(current.get('upstream_route_pin_ref'))
     from .codex_profile import parse_do_supplement
@@ -520,7 +562,8 @@ def _revoke_if_present(root: Path, message: Mapping[str, Any], reason: str) -> N
 
 def handle_message(root: Path, *, message_id: int, action: str, reason: str,
                    delivery_selection: dict | None = None, destinations: Path | None = None,
-                   claude_selection: str | None = None, court_mode: int | None = None) -> dict[str, Any]:
+                   claude_selection: str | None = None, court_mode: int | None = None,
+                   u0_council: int | None = None) -> dict[str, Any]:
     """Serialize a real policy change with pre-send reservation, not STOP.
 
     The message itself is already pending before this call; an external host
@@ -540,15 +583,16 @@ def handle_message(root: Path, *, message_id: int, action: str, reason: str,
         with policy_lock(Path(root).resolve()):
             return _handle_message(root,message_id=message_id,action=action,reason=reason,
                 delivery_selection=delivery_selection,destinations=destinations,claude_selection=claude_selection,
-                court_mode=court_mode)
+                court_mode=court_mode, u0_council=u0_council)
     return _handle_message(root,message_id=message_id,action=action,reason=reason,
         delivery_selection=delivery_selection,destinations=destinations,claude_selection=claude_selection,
-        court_mode=court_mode)
+        court_mode=court_mode, u0_council=u0_council)
 
 
 def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
                     delivery_selection: dict | None = None, destinations: Path | None = None,
-                    claude_selection: str | None = None, court_mode: int | None = None) -> dict[str, Any]:
+                    claude_selection: str | None = None, court_mode: int | None = None,
+                   u0_council: int | None = None) -> dict[str, Any]:
     """Apply a model-owned interpretation; this does not judge free-text intent.
 
     Message disposition is not task termination. Ordinary input to ACTIVE is
@@ -590,7 +634,7 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
         if (not layered or value['status'] != 'ACTIVE'
                 or message['surface'] != 'NATIVE' or message['route_required']
                 or claude_selection is not None or delivery_selection is not None or destinations is not None
-                or court_mode is not None):
+                or court_mode is not None or u0_council is not None):
             raise ValueError('Budget handling is for a standalone fee-only reply on an active Stable task')
         value['latest_budget_message_id'] = message_id
     if action not in {'stop', 'cancel'} and value['status'] not in TERMINAL:
@@ -599,6 +643,9 @@ def _handle_message(root: Path, *, message_id: int, action: str, reason: str,
         raise ValueError('a terminal task/source cannot change Claude selection')
     if action not in {'stop', 'cancel'} and value['status'] not in TERMINAL:
         _apply_court_selection(value, metadata, message, court_mode)
+        _apply_u0_selection(value, metadata, message, u0_council)
+    elif u0_council is not None:
+        raise ValueError('a terminal task/source cannot change U')
     elif court_mode is not None:
         raise ValueError('a terminal task/source cannot change C')
     if metadata.get('delivery_contract') == 'x-files-v1' and action not in {'stop','cancel','pause'}:

@@ -1,6 +1,6 @@
 {
   "name": "DIGR Codex Native Profile",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "protocol": "digr-codex-native-v25",
   "status": "stable",
   "language": "zh-CN",
@@ -106,7 +106,7 @@
     "consult_concurrency": "PER_EXCHANGE_NETWORK_LOCK_AND_SHARED_WALLET_TRANSACTIONS",
     "usage_return": "AUTOMATIC_TASK_SCOPED_USD_AND_NATIVE_QUOTA_OBSERVATIONS",
     "chat_port": "VERSIONED_LIGHT_AND_ON_DEMAND_DEEP",
-    "council_default_members": 2,
+    "council_default_members": 3,
     "council_default_deadline_seconds": 300,
     "council_native_work": {
       "since": "1.3.0",
@@ -149,7 +149,8 @@
       "one_initial_per_model": true,
       "models": [
         "anthropic/claude-sonnet-5.5",
-        "google/gemini-4-carbon"
+        "google/gemini-4-hydrogen",
+        "x-ai/grok-4.7"
       ]
     },
     "native_model_selection": "ACTIVE_CODEX_SETTINGS",
@@ -166,7 +167,8 @@
     "formal_task_parameters": [
       "X",
       "F",
-      "C"
+      "C",
+      "U"
     ],
     "x_parameter": "BINARY_EXPLICIT_FILE_DELIVERY",
     "court_since": "1.5.0",
@@ -188,14 +190,17 @@
       "additional_budget": false,
       "external_roles": [
         "sonnet",
-        "carbon"
-      ]
+        "hydrogen",
+        "grok"
+      ],
+      "activation": "CURRENT_TASK_U_1"
     },
     "external_collaboration": {
       "since": "1.7.0",
       "models": {
         "sonnet": "anthropic/claude-sonnet-5.5",
-        "carbon": "google/gemini-4-carbon"
+        "hydrogen": "google/gemini-4-hydrogen",
+        "grok": "x-ai/grok-4.7"
       },
       "shared_ceiling_usd": {
         "COUNCIL": 0.25,
@@ -213,37 +218,49 @@
         "source": "https://openrouter.ai/api/v1/models",
         "relay": "FLUSH_EACH_MODEL_TO_COMMENTARY",
         "scope": "DISPLAY_ONLY",
-        "failure": "REPORT_UNAVAILABLE_AND_CONTINUE"
+        "failure": "REPORT_UNAVAILABLE_AND_CONTINUE",
+        "flex_source": "https://openrouter.ai/api/v1/models/google/gemini-4-hydrogen/endpoints"
+      },
+      "roster_since": "1.8.0",
+      "flex_routes": {
+        "hydrogen": "google-ai-studio/flex"
       }
+    },
+    "u0_council_parameter": {
+      "since": "1.8.0",
+      "default": 0,
+      "enabled": 1,
+      "task_scoped": true,
+      "fee_authority": false
     }
   },
   "file_sha256": {
-    "codex/VERSION": "bb7320d831e7a151aa901c35e7326c752fa2ef5024f30768c42319b8bed171ed",
+    "codex/VERSION": "3eb1ef94b5890ca727158b106142685c8733b0ace5bcb4cf3f0ac14f9f0643f4",
     "codex/AGENTS.light.md": "5abd877bc2f684ce54e34bbefcc9da17a0c00e1c8bbdadfa5a7f1aadcb700abd",
     "codex/ROUTER.experimental.txt": "45b6e2a6f06c9c7ee11845b7873f7ddb526ea1609bc6951f897eaebde85bd290",
-    "codex/STARTUP.md": "3828cafb2d5d9247d67b6b40b0ae94684f054205e6511d1eac34f158feb89218",
-    "codex/PROTOCOL.md": "3fce468ecdf46fdca6e1bb85f28d96f13a0f0e6444550e131ae6bcf75cae5c4f",
+    "codex/STARTUP.md": "c309dbb1d8508d4932e9077c85a0f71943e113962cd5e2739ce6c8dc14bc8e7b",
+    "codex/PROTOCOL.md": "659afb2bae235d2c11b230915171f21ccc93d355b6f8071c59c647694924059b",
     "codex/CONSTITUTION.md": "2ca796187af0e08cb1c267f6abee54e5a91d55e9639644b09df6e93ccc134ab0",
-    "codex/FOUNDATION.md": "0754dce685f404b39dbded5ec8e21b1adca63aa9fc9e78d2337107f5022cd6e9",
+    "codex/FOUNDATION.md": "770f6b5e322b963bb2b743bfdd6d6bef92d73957380d8a9bb6a0be5c99f900e1",
     "codex/METHOD.md": "ad1f7d9571c6d36d35dcf0c85440436472ac6450da53c4d03b8b52249534c996",
-    "codex/HELP.md": "c835bb62ec2a25f5b390b3572b69ca912729eb7dbc3c8752d4dfc5545be7a42b",
-    "codex/PARAMETERS.md": "cd415319277052f555484b61a9a9b7238d22117a7e44d97734a02caa1613f90a",
-    "codex/WORKBENCH.md": "7e31ccf9d8436ca478d91219174873da6ed67bc53f467ca7e0af2dc415fbb3e2",
+    "codex/HELP.md": "360f9c4c85851fd02b065e517b64c87ec711966d87448af74c13a59a35bd9d7a",
+    "codex/PARAMETERS.md": "6f7b33b637efa21f9fa4693d0eb862c6833a59f0ca80542892851770e667da3d",
+    "codex/WORKBENCH.md": "1112f9d1583e030a352dc5475deaaa55e446c037f042818917934de206cfd3d4",
     "codex/CHARACTER.md": "5d016d30092633e45ba3450be82f9dc5af11859faf73f9f41d49e8bd563afbfa",
     "codex/COLLABORATION.md": "cfc4b57c4a85fb7494b5b470995b53e5fedcb2d0ec0a4da3880e3b668847c333",
-    "codex/CONSULT.md": "c8af82aaf3c7574c5876076f88bcdbe94d93affe62ff8787a6355a4631b1480c",
-    "codex/SPLIT.md": "8b76ffdb0bfa2c1921f95c160b4d48cca553f228b53c9d3947f181b6d8a00471",
+    "codex/CONSULT.md": "98f82aaa96d92fba5fd5a3b0521a46345cc4c83583ec14dd17c2f31b97297785",
+    "codex/SPLIT.md": "9535aca6e963336e557358f69dd972405073c0310e7214ae30762a935c3bc5be",
     "codex/PERMISSIONS.md": "a6f47e953c57b97c5e0a930823d41f87c238c7394efa87fc1a1b79412005d71b",
     "codex/DELIVERY.md": "c19bbaa9080f9a4e2919c67964085bac9c0b4e8c897cf0cf126cce46271d5cf2",
     "codex/RETURN.md": "c5b227fdb0ce63096f6bcb1e89ad8ea088c6b4d76cb1eab0ed24907c900ac767",
-    "codex/EXECUTION_PROTOCOL.json": "f8c8c8d7eaf2da6408e03368e7f02e05775efb668d88ba77b6e2d03958cbf5d4",
-    "codex/COUNCIL.md": "cb6240966911b7bda11c8c64a172c66e68088ce0e53a962369fb68971e3c603f",
+    "codex/EXECUTION_PROTOCOL.json": "f27cc9fca2220858675dbcce0f42a30654c03c55a74d89499a13fcf2cae916bc",
+    "codex/COUNCIL.md": "871f7d20ddd511161b54a78826f091094616e9171bae63fb92840b48529d5d93",
     "codex/COURT.md": "66463392984284d853a0e692110d4f8a4e22a29f540fef5ed8e58a678c5c2678",
-    "codex/USAGE.md": "a711ab14b8d51e58498bbf809fe4f0843240a4310d65b7a4f8ffa02cc0b34df6",
+    "codex/USAGE.md": "3d5eaaddab86370cead04b2c66f3f260db47e97eedbb91fae6b3aaefe3b654d6",
     "codex/CHAT.md": "78ac198a70adf5cfb15107d51137b882b1cbb99b2cec13695679bccd074cb41b",
     "codex/CHAT_LIGHT.md": "ce77bb503231c820ff3a8a5f119b90f082df04b507c5882c9681d2de47958956",
-    "codex/CHAT_DEEP.md": "de5b5ac835ef0ead50d1d71fe8735c4443805e0e252b405a88fc7562dd6a88fe",
-    "codex/LIVE.md": "d08281fa2b928ff8f35955effb2b4482e7284167021f4d0f1535a8a242aa9e4b"
+    "codex/CHAT_DEEP.md": "c7a13b05308dd9bd8201f5837474207cab296c96d0f874cd0d9400cca20c92b1",
+    "codex/LIVE.md": "542c39d5bf9c984eb724003dd4f0d49f683fe107d4dc5ee4b845148caa13a9ca"
   },
   "workbench_guide": "codex/WORKBENCH.md",
   "depth_preferences": {
@@ -256,7 +273,8 @@
       "M": 1,
       "X": 0,
       "F": 3,
-      "C": 0
+      "C": 0,
+      "U": 0
     },
     "complex_tasks_raise_investment": true,
     "unit_semantics": "codex/PARAMETERS.md",
@@ -281,7 +299,8 @@
         "M": 1,
         "X": 0,
         "F": 0,
-        "C": 0
+        "C": 0,
+        "U": 0
       },
       "Less": {
         "N": 6,
@@ -292,7 +311,8 @@
         "M": 1,
         "X": 0,
         "F": 2,
-        "C": 0
+        "C": 0,
+        "U": 0
       },
       "Default": {
         "N": 12,
@@ -303,7 +323,8 @@
         "M": 1,
         "X": 0,
         "F": 3,
-        "C": 0
+        "C": 0,
+        "U": 0
       },
       "More": {
         "N": 18,
@@ -314,7 +335,8 @@
         "M": 1,
         "X": 0,
         "F": 4,
-        "C": 0
+        "C": 0,
+        "U": 0
       },
       "Max": {
         "N": 24,
@@ -325,7 +347,8 @@
         "M": 1,
         "X": 0,
         "F": 6,
-        "C": 1
+        "C": 1,
+        "U": 0
       }
     },
     "preset_aliases": {
@@ -335,14 +358,16 @@
     "task_defaults": {
       "X": 0,
       "F": 3,
-      "C": 0
+      "C": 0,
+      "U": 0
     },
     "task_parameters": [
       "X",
       "F",
-      "C"
+      "C",
+      "U"
     ],
-    "task_defaults_scope": "Main infers F; X is explicit file delivery; C is binary court mode, Max defaults to 1 and other tiers to 0, explicit C wins"
+    "task_defaults_scope": "Main infers F; X is explicit file delivery; C is binary court mode, Max defaults to 1 and other tiers to 0, explicit C wins; U independently enables the U0 council only when 1"
   },
   "execution_bundle": {
     "path": "codex/EXECUTION_PROTOCOL.json",

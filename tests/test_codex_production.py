@@ -124,6 +124,26 @@ class ProductionRecordTests(unittest.TestCase):
         self.assertTrue(production.require_applied(self.root, 'explanation', arbitration_exchange='sonnet-ruling'))
         self.assertTrue(production.completion_status(self.root)['complete'])
 
+    def test_three_coequal_arbitrations_share_one_assignment(self):
+        self.root = self.work / 'three-models'
+        p_run = '1.8.0@' + 'b' * 40
+        create_session(self.root, request=self.file('three.txt', 'DIGR:: Produce the shared result.'), p_run=p_run)
+        self.start()
+        production.submit_native(self.root, 'explanation', actor='D01',
+                                 output_path=self.file('native.md', 'Native candidate.'), return_ref='return-3')
+        for name, model in collaboration.external_models(p_run).items():
+            self.prepare(name + '-candidate', model=model)
+            self.fixture_return(name + '-candidate', name + ' candidate.')
+            self.prepare(name + '-ruling', model=model, production_stage='arbitration',
+                         candidate_exchange=name + '-candidate')
+            self.fixture_return(name + '-ruling', name + ' ruling.', model=collaboration.OPENROUTER_SNAPSHOTS[model])
+        final = self.file('joint.md', 'An artifact applying all three rulings.')
+        recorded = production.record_applied(self.root, 'explanation', arbitration_exchange='sonnet-ruling',
+            peer_exchange=['hydrogen-ruling', 'grok-ruling'], output_path=final, effect='Applied the supported rulings.')
+        self.assertEqual([peer['arbitration']['exchange_id'] for peer in recorded['applied']['peers']],
+                         ['hydrogen-ruling', 'grok-ruling'])
+        self.assertTrue(production.require_applied(self.root, 'explanation', arbitration_exchange='grok-ruling'))
+
     def test_user_revision_invalidates_prepared_stage_and_explicitly_releases_old_assignment(self):
         self.start()
         binding, _ = production.bind_exchange(self.root, 'explanation', stage='candidate')

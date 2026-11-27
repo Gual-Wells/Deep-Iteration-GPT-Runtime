@@ -28,8 +28,8 @@ def main(argv=None):
     submit.add_argument('--return-ref', required=True, help='actual native host return event reference')
     applied = commands.add_parser('record-applied', help='bind actual Claude arbitration to the final artifact')
     applied.add_argument('--arbitration-exchange', required=True)
-    applied.add_argument('--peer-arbitration-exchange',
-                         help='the other complete, coequal Sonnet or Carbon arbitration for the same assignment')
+    applied.add_argument('--peer-arbitration-exchange', action='append',
+                         help='a complete coequal arbitration for the same assignment; repeat for multiple peers')
     applied.add_argument('--output', type=Path, required=True)
     applied.add_argument('--effect', required=True, help='what the actual verdict changed in the artifact')
     release = commands.add_parser('release', help='record an actual later user fallback or scope replacement')

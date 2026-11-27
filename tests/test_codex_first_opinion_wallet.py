@@ -43,6 +43,31 @@ class FirstOpinionQuoteTests(unittest.TestCase):
                          {'id': self.request['model'], 'pricing': prices}]}
         return BytesIO(json.dumps(data).encode('utf-8'))
 
+    def test_flex_quote_is_bound_to_the_exact_endpoint(self):
+        model = collaboration.GEMINI_HYDROGEN
+        tag = collaboration.HYDROGEN_FLEX_ENDPOINT
+        self.request.update(model=model, service_tier='flex')
+        self.request['provider'].update(only=[tag], allow_fallbacks=False)
+        endpoints = {'id': model, 'endpoints': [
+            {'tag': 'google-ai-studio', 'pricing': {'prompt': '0.0000015', 'completion': '0.0000075'}},
+            {'tag': tag, 'pricing': {'prompt': '0.00000075', 'completion': '0.00000375',
+                                     'internal_reasoning': '0.00000375', 'request': None}},
+        ]}
+        self.opener.open.side_effect = [
+            BytesIO(json.dumps({'data': endpoints}).encode()),
+            BytesIO(b'{"data":{"total_credits":1,"total_usage":0}}'),
+        ]
+        quote = authority.claude_council_quote(self.request)
+        facts = quote['facts']
+        self.assertEqual((facts['prompt_usd_per_million'], facts['completion_usd_per_million']), (.75, 3.75))
+        self.assertIn(tag, facts['pricing_ref'])
+        self.assertEqual(self.opener.open.call_args_list[0].args[0].full_url,
+                         f'https://openrouter.ai/api/v1/models/{model}/endpoints')
+        endpoints['endpoints'].pop()
+        self.opener.open.side_effect = [BytesIO(json.dumps({'data': endpoints}).encode())]
+        with self.assertRaisesRegex(ValueError, 'required Flex endpoint'):
+            authority.claude_council_quote(self.request)
+
     def test_startup_prices_use_no_credential_wallet_or_prepared_request(self):
         data = [{'id': collaboration.SONNET_5_5, 'pricing': {'prompt': '0.000002', 'completion': '0.00001'}},
                 {'id': collaboration.GEMINI_CARBON, 'pricing': {'prompt': '0.000004', 'completion': '0.00002'}}]

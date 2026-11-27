@@ -154,7 +154,10 @@ def _model_system(p_run: str, model: str, participation_role: str = 'consult_gui
 def _paper_system(addon_version: str, model: str = DEFAULT_MODEL) -> str:
     system = (_LOGICAL_PAPER_SYSTEM if codex_paper.CORE_MINIMUMS.get(addon_version, ()) >= (0, 12, 0)
               else _PAPER_SYSTEM)
-    return system.replace('You are Sonnet,', 'You are Gemini 4 Carbon,', 1) if model == codex_collaboration.GEMINI_CARBON else system
+    author = {codex_collaboration.GEMINI_CARBON: 'Gemini 4 Carbon',
+              codex_collaboration.GEMINI_HYDROGEN: 'Gemini 4 Hydrogen',
+              codex_collaboration.GROK_4_7: 'Grok 4.7'}.get(model)
+    return system.replace('You are Sonnet,', f'You are {author},', 1) if author else system
 
 
 def streams_public(p_run: str) -> bool:
@@ -241,7 +244,7 @@ def paper_model_identity(requested_model: Any, response_model: Any, p_run: str =
     requested = requested_model if isinstance(requested_model, str) else None
     observed = response_model if isinstance(response_model, str) else None
     if (codex_collaboration.parallel_external_policy(p_run)
-            and requested in codex_collaboration.EXTERNAL_MODELS.values()):
+            and requested in codex_collaboration.external_models(p_run).values()):
         matched = codex_collaboration.observed_model_matches(p_run, requested, observed)
         return {'status': 'CONFIRMED' if matched else 'UNCONFIRMED',
                 'requested_model': requested, 'response_model': observed,
@@ -850,7 +853,7 @@ def prepare_request(
     if authoring_scope is not None:
         if not codex_collaboration.priority_collaborator(session['P_run'], model):
             raise ValueError('Paper authoring requires a supported canonical Anthropic Sonnet model identifier '
-                             'or, on the paired profile, Gemini 4 Carbon')
+                             'or a registered native paper collaborator')
         if (codex_collaboration.parallel_external_policy(session['P_run'])
                 and continue_from is not None and previous['model'] != model):
             raise ValueError('Each paper collaborator keeps its own prior authoring history')
@@ -908,6 +911,13 @@ def prepare_request(
     request = {'model': model, 'messages': messages, 'reasoning': {'effort': effort, 'exclude': True},
                'max_tokens': max_tokens, 'stream': streams_public(session['P_run']), 'usage': {'include': True},
                'provider': {'require_parameters': True}}
+    flex_endpoint = codex_collaboration.consult_flex_endpoint(session['P_run'], model)
+    if flex_endpoint:
+        request['service_tier'] = 'flex'
+        request['provider'].update(only=[flex_endpoint], allow_fallbacks=False)
+    elif (codex_collaboration.flex_collaboration_policy(session['P_run']) and
+          model in codex_collaboration.external_models(session['P_run']).values()):
+        request['service_tier'] = 'default'
     if request['stream']:
         request['stream_options'] = {'include_usage': True}
     if authoring_scope is not None:
@@ -1489,6 +1499,9 @@ def call_once(root: Path, exchange_id: str, *, facts: Mapping[str, Any], ceiling
                 attempt['body_generation_id'] = body_id
             attempt['response_model'] = _safe_text(data.get('model'), secret)
             attempt['response_provider'] = _safe_text(data.get('provider'), secret)
+            if 'service_tier' in request:
+                attempt['requested_service_tier'] = request['service_tier']
+                attempt['response_service_tier'] = _safe_text(data.get('service_tier'), secret)
             choices = data.get('choices')
             choice = choices[0] if isinstance(choices, list) and choices and isinstance(choices[0], Mapping) else {}
             finish = _safe_text(choice.get('finish_reason'), secret)

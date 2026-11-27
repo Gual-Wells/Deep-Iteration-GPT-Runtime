@@ -34,7 +34,7 @@ python tools/codex.py usage body --root TASK
 
 ## 外部模型账目
 
-逐 exchange 读取实际 attempt 并按当前任务汇总。保留 Sonnet、Carbon 的实际身份和各层共用费用。保留`consult_guidance`或`council_member`及member/cycle/round身份。`reconciled_at`且KNOWN为已核对；服务usage已报但未metadata核对为服务已报；有依据的estimated独列；UNKNOWN未决预留独列。未决预留不是已发生账单，不与已知费用合称账单总额。尚未尝试与费用未知分开。
+逐 exchange 读取实际 attempt 并按当前任务汇总。保留 Sonnet、Hydrogen、Grok 的实际身份和各层共用费用。请求服务等级与供应商已报告等级各自读取。保留`consult_guidance`或`council_member`及member/cycle/round身份。`reconciled_at`且KNOWN为已核对；服务usage已报但未metadata核对为服务已报；有依据的estimated独列；UNKNOWN未决预留独列。未决预留不是已发生账单，不与已知费用合称账单总额。尚未尝试与费用未知分开。
 
 返回快照注明观测截止与覆盖actor。Main、D/V、重试按真实导入纳入；未导入者保持覆盖缺口，不能报未调用。真正未调用的档位才写“未调用”。当前最终回复、迟到usage与未知费用可能在快照之外；不能声称测到了尚未发生的完整尾部。
 

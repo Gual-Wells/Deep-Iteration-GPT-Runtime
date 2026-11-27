@@ -6,7 +6,7 @@
 
 论文辅学另有可选的[知识池技能](../.agents/skills/digr-paper-knowledge/SKILL.md)与 `python -B tools/codex.py knowledge --help`。原生 Codex 读论文、分层批量问询和教学，工具保存冻结问项、论文局部用法、真实选择、有范围证据及接续位置。个人数据与原件放在独立私有项目，不进入本公共库；可从私有项目的相对路径入口接续，本机定位缓存仅用于发现。它不替代本轮在线 DIGR 协议获取，也不需要阅读器或付费模型接口。普通读取只用标准库，摄入 PDF 另需所选 Python 环境中的 `pypdf`。具体数据与命令见技能的按需引用。
 
-统一 DIGR 第二层实际委托 Sonnet 制作整篇解构、导读或完整读物时，应用同 SHA 声明的[论文协议](../paper/PROTOCOL.md)、[技能](../.agents/skills/digr-paper/SKILL.md)与 `python -B tools/codex.py paper --help`。它保存每篇的来源/导读映射、候选和Gmail读回事实；不替知识池写学习证据，单篇返回也不关闭当前DIGR任务。
+统一 DIGR 第二层实际委托外部作者制作整篇解构、导读或完整读物时，应用同 SHA 声明的[论文协议](../paper/PROTOCOL.md)、[技能](../.agents/skills/digr-paper/SKILL.md)与 `python -B tools/codex.py paper --help`。它保存每篇的来源/导读映射、候选和Gmail读回事实；不替知识池写学习证据，单篇返回也不关闭当前DIGR任务。
 
 必读[RETURN](RETURN.md)要求最终response正文固定五段：结果、关键变化、工作过程、论证与适用范围、参数。过程用正文时间／工作表，不能由文件、内嵌页或截图替代；真实任务产物仍可链接。`return seal/status/body/close`保存选定正文并收口；body输出待发送Markdown，不证明宿主已发送。历史timeline是按需工具，不再是默认报告。
 
@@ -316,7 +316,7 @@ python -B tools/codex.py visits repair --root D:/task/session --actor D01 --begi
 
 ## C模式法庭与同任务返工
 
-按 COURT 在原生产与研究责任完成后组织实际法庭，并为当前案卷保留真实角色的派发出处、原需求与前文条件、过程材料和最终候选。法院工具的读写入口为 `python -B tools/codex.py court --help`。正式X/F/C的任务级记录通过 `task parameters --root TASK --input task-parameters.json` 保存，读取时省略input。每条M的初始化仍走line create。输入对象为 `{"parameters":{"X":0,"F":0,"C":1},"reasons":{"F":"本任务以现有原件完成，不另设社区项目下限"}}`；X/C只核对当前实际选择。改变X/C须先按真实用户来源走task message/handle；自然语言C选择用`task handle --court-mode 0|1`绑定当前原话，显式头部C自动应用，HELP/损坏/终止输入不能授权改变。
+按 COURT 在原生产与研究责任完成后组织实际法庭，并为当前案卷保留真实角色的派发出处、原需求与前文条件、过程材料和最终候选。法院工具的读写入口为 `python -B tools/codex.py court --help`。正式X/F/C/U的任务级记录通过 `task parameters --root TASK --input task-parameters.json` 保存，读取时省略input。每条M的初始化仍走line create。输入对象为 `{"parameters":{"X":0,"F":0,"C":1},"reasons":{"F":"本任务以现有原件完成，不另设社区项目下限"}}`；X/C/U 核对当前实际选择。显式 U 写在调用头部。同任务明确变更可用 `task handle --u0-council 0|1` 绑定当前原话。改变X/C须先按真实用户来源走task message/handle；自然语言C选择用`task handle --court-mode 0|1`绑定当前原话，显式头部C自动应用，HELP/损坏/终止输入不能授权改变。
 
 `court open` 固定待返回result、key_changes、argument_scope三段实质正文及artifacts/delivery_files实际字节和过程/需求来源，七个角色包括双方各一位律师和实际书记员；`submit`保存公诉意图级审查、控辩论证及全体同等暴力威慑，`verdict`保存法官逐项裁判。`record`保存实际书记员的证据索引、一致性核对、检索来源与长程公开审判记录，当前裁判须纳入记录后才能关闭或发送。须再执行时`remand`保存有理由的完整自定义配置，实际执行后`review`核对完成来源并建立复审。`status`与正常return检查使用同一当前案卷，旧判决不覆盖新产品或另一个结果。完整JSON对象及实际来源示例见[法院操作示例](examples/COURT_WORKFLOW.md)。示例字段须换成真实材料，不能代替实际角色与执行。
 

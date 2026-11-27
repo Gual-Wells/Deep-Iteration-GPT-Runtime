@@ -106,6 +106,8 @@ def main(argv: list[str] | None = None) -> int:
                         help='actual current prose user choice; complete one/two-colon headers apply directly')
     handle.add_argument('--court-mode', type=int, choices=(0, 1),
                         help='actual current prose user C choice; headers apply directly, 1.6+ only')
+    handle.add_argument('--u0-council', type=int, choices=(0, 1),
+                        help='actual current prose user U choice; headers apply directly, 1.8.0+ only')
     lifecycle = ts.add_parser('lifecycle', help='read managed continuation state or explicit legacy status')
     lifecycle.add_argument('--root', required=True, type=Path)
     stop = ts.add_parser('terminate', help='stop/cancel a task; completed delivery uses return close')
@@ -203,7 +205,7 @@ def main(argv: list[str] | None = None) -> int:
                 from runtime.codex_collaboration import parallel_external_policy
                 if parallel_external_policy(f'{acquired.version}@{acquired.sha}'):
                     from runtime.codex_consult_budget import startup_collaboration_quotes
-                    for quote in startup_collaboration_quotes():
+                    for quote in startup_collaboration_quotes(f'{acquired.version}@{acquired.sha}'):
                         print(json.dumps(quote, ensure_ascii=False, allow_nan=False), flush=True)
         elif args.command == 'permissions':
             supplied = read_object(args.input)
@@ -234,7 +236,7 @@ def main(argv: list[str] | None = None) -> int:
                     action=args.message_action, reason=args.reason,
                     delivery_selection=read_object(args.delivery_selection) if args.delivery_selection else None,
                     destinations=args.destinations, claude_selection=args.claude_selection,
-                    court_mode=args.court_mode)
+                    court_mode=args.court_mode, u0_council=args.u0_council)
             elif args.action == 'lifecycle':
                 result = load_lifecycle(args.root)
             elif args.action == 'terminate':

@@ -228,6 +228,7 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
     project_research = p_run is None or version >= (1, 4, 0)
     formal_task_parameters = p_run is None or version >= (1, 5, 0)
     court_mode = p_run is None or version >= (1, 6, 0)
+    u0_council = p_run is None or version >= (1, 8, 0)
     depth_key = 'depth_preferences' if preference_only else 'depth_defaults'
     base = {'classification': 'NATIVE', 'route_key': key, 'task': None,
             'invocation_key': invocation_key, 'addon_hint': addon_hint,
@@ -284,7 +285,8 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
             execution_parameters, delivery = _invocation_parameters(prelude)
         depth = resolve_defaults(execution_parameters, preference_only=preference_only,
                                  project_research=project_research,
-                                 formal_task_parameters=formal_task_parameters, court_mode=court_mode)
+                                 formal_task_parameters=formal_task_parameters, court_mode=court_mode,
+                                 u0_council=u0_council)
         if formal_task_parameters:
             declared = depth['explicit_overrides']
             if standalone_x is not None:
@@ -465,7 +467,8 @@ def refresh_distribution(root: Path) -> dict[str, Any]:
     version = (root / 'codex/VERSION').read_text(encoding='utf-8').strip()
     if manifest.get('protocol') != PROFILE_PROTOCOL or manifest.get('version') != version:
         raise ValueError('Codex manifest/VERSION identity mismatch')
-    catalog = preset_catalog()
+    from .codex_collaboration import u0_council_parameter
+    catalog = preset_catalog(u0_council=u0_council_parameter(version + "@" + "0" * 40))
     manifest['depth_preferences']['presets'] = catalog['presets']
     manifest['depth_preferences']['task_defaults'] = catalog['task_defaults']
     manifest['depth_preferences']['task_parameters'] = catalog['task_parameters']

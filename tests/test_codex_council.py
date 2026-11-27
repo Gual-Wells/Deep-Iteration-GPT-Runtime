@@ -16,7 +16,8 @@ import io
 
 from runtime import codex_collaboration as collaboration, codex_consult as consult, codex_council as council, codex_io
 from runtime.codex_lifecycle import handle_message, ingest_message
-from runtime.codex_session import create_session
+from runtime.codex_profile import classify_invocation
+from runtime.codex_session import create_session, task_parameters
 from tools.codex_council import main as council_cli
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,6 +51,7 @@ class CouncilHandler(BaseHTTPRequestHandler):
             self.end_headers()
             frame = lambda value: ('data: ' + json.dumps(value, ensure_ascii=False) + '\n\n').encode('utf-8')
             self.wfile.write(frame({'id': generation, 'model': request['model'],
+                'service_tier': request.get('service_tier'),
                 'choices': [{'index': 0, 'delta': {'content': body, 'reasoning': HIDDEN}}]}))
             self.wfile.flush()
             if self.server.truncated or request['model'] in self.server.truncated_models:
@@ -178,6 +180,66 @@ class CouncilRuntimeTests(unittest.TestCase):
         from runtime.codex_foundation import BRIEF_FIELDS
         return {'brief': {key: 'Source-bound actual ' + key for key in BRIEF_FIELDS},
                 'intent_council': identity}
+
+    def test_binary_u_preserves_default_and_existing_non_u0_council(self):
+        pin = '1.8.0@' + 'e' * 40
+        for malformed in ('U=2', 'U', 'U=1,U=0', 'S(U=1)'):
+            with self.subTest(malformed=malformed):
+                self.assertEqual(classify_invocation(f'DIGR({malformed}): Test.', p_run=pin)['classification'],
+                                 'INVALID')
+        self.foundation_intent_task('u0-default-closed', version='1.8.0')
+        self.assertEqual(task_parameters(self.root)['parameters']['U'], 0)
+        with self.assertRaisesRegex(ValueError, 'requires U=1'):
+            council.create_council(self.root, council_id='u0-0', native_actors=['native-1'],
+                                   foundation_intent=True)
+        first = council.create_council(self.root, council_id='opinion', native_actors=['native-1'],
+                                       first_opinion='Find a better way to meet this goal.')
+        self.assertEqual({member['model'] for member in first['members'].values()},
+                         set(collaboration.external_models(pin).values()))
+
+    def test_new_u0_dispatches_three_models_with_hydrogen_flex_only(self):
+        self.foundation_intent_task('u0-flex', '(U=1):', version='1.8.0')
+        self.assertEqual(task_parameters(self.root)['parameters']['U'], 1)
+        council.create_council(self.root, council_id='u0-0', native_actors=['native-1'],
+                               foundation_intent=True)
+        prepared = council.prepare_round(self.root, 'u0-0', kind='INDEPENDENT', max_tokens=100)
+        jobs = self.jobs(prepared)
+        for job in jobs.values():
+            job['ceiling_usd'] = 0.05  # Covers this 100-token request, within the shared layer cap.
+        completed = council.run_round(self.root, 'u0-0', round_id=1, jobs=jobs)
+        self.assert_complete_round(completed)
+        requests = {request['model']: request for request in self.server.requests}
+        self.assertEqual(set(requests), {collaboration.SONNET_5_5, collaboration.GEMINI_HYDROGEN,
+                                         collaboration.GROK_4_7})
+        hydrogen = requests[collaboration.GEMINI_HYDROGEN]
+        self.assertEqual(hydrogen['service_tier'], 'flex')
+        self.assertEqual(hydrogen['provider']['only'], ['google-ai-studio/flex'])
+        self.assertIs(hydrogen['provider']['allow_fallbacks'], False)
+        self.assertEqual(requests[collaboration.SONNET_5_5]['service_tier'], 'default')
+        self.assertEqual(requests[collaboration.GROK_4_7]['service_tier'], 'default')
+        for job in completed['rounds'][-1]['jobs'].values():
+            _, attempt, request = consult._load(self.root, job['exchange_id'])
+            self.assertEqual(attempt['response_service_tier'], request['service_tier'])
+
+    def test_u0_revocation_blocks_existing_prepared_round(self):
+        self.foundation_intent_task('u0-revoked', '(U=1):', version='1.8.0')
+        council.create_council(self.root, council_id='u0-0', native_actors=['native-1'],
+                               foundation_intent=True)
+        prepared = council.prepare_round(self.root, 'u0-0', max_tokens=100)
+        jobs = self.jobs(prepared)
+        message = self.file('u0-turn-off.txt', 'DO: Turn off the U0 model council.')
+        pending = ingest_message(self.root, source=message, source_ref='latest-u0-decision')
+        handle_message(self.root, message_id=pending['message_id'], action='ordinary',
+                       reason='The user revoked U0 council use', u0_council=0)
+        self.assertEqual(task_parameters(self.root)['U_source']['source_ref'], 'latest-u0-decision')
+        with self.assertRaisesRegex(ValueError, 'requires U=1'):
+            council.run_round(self.root, 'u0-0', round_id=1, jobs=jobs)
+        self.assertFalse(self.server.requests)
+        followup = self.file('u0-inherit.txt', 'DO: Continue the task as agreed.')
+        pending = ingest_message(self.root, source=followup, source_ref='continue-without-u0')
+        handle_message(self.root, message_id=pending['message_id'], action='ordinary',
+                       reason='Continue with the saved choice')
+        self.assertEqual(task_parameters(self.root)['parameters']['U'], 0)
 
     def test_parallel_foundation_uses_first_layer_before_confirmation_under_both_delimiters(self):
         from runtime.codex_foundation import propose_foundation

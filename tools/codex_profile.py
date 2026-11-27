@@ -22,12 +22,12 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     sub = ap.add_subparsers(dest='command', required=True)
     sub.add_parser('check', help='verify local instruction identity and bytes')
-    sub.add_parser('quotes', help='stream both public model quotes after verified protocol acquisition')
+    sub.add_parser('quotes', help='stream current public collaborator quotes after verified protocol acquisition')
     sub.add_parser('refresh', help='explicitly regenerate local bundle and profile hashes')
     sub.add_parser('depth', help='show depth preferences and unit-responsibility references')
     sub.add_parser('presets', help='list five preference baselines; no execution or budget')
     parameters = sub.add_parser('parameters', help='show the preference baseline and explicit overrides')
-    parameters.add_argument('--text', default='', help='N/T/R/B/S(n,t,r,b)/D/V/L/M/X/F/C named parameter group')
+    parameters.add_argument('--text', default='', help='N/T/R/B/S(n,t,r,b)/D/V/L/M/X/F/C/U named parameter group')
     parameters.add_argument('--overrides', type=Path, help='explicit structured overrides JSON')
     ins = sub.add_parser('instructions', help='print a layer; never install it')
     ins.add_argument('layer', choices=('light', 'experimental-router', 'codex-agents', 'chat-light', 'chat-deep'))
@@ -50,8 +50,8 @@ def main(argv: list[str] | None = None) -> int:
             from runtime.codex_consult_budget import startup_collaboration_quotes
             version = verify_distribution(ROOT)['version']
             if not parallel_external_policy(version + '@' + '0' * 40):
-                raise ValueError('The installed profile does not define paired price display')
-            for quote in startup_collaboration_quotes():
+                raise ValueError('The installed profile does not define collaborator price display')
+            for quote in startup_collaboration_quotes(version + '@' + '0' * 40):
                 print(json.dumps(quote, ensure_ascii=False, allow_nan=False), flush=True)
             return 0
         elif args.command == 'refresh':
@@ -59,11 +59,11 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == 'depth':
             result = depth_preferences(ROOT)
         elif args.command == 'presets':
-            result = preset_catalog()
+            result = preset_catalog(u0_council=True)
         elif args.command == 'parameters':
             result = resolve_defaults(args.text,
                 json.loads(args.overrides.read_text(encoding='utf-8-sig')) if args.overrides else None,
-                preference_only=True)
+                preference_only=True, u0_council=True)
         elif args.command == 'classify':
             result = classify_invocation(args.message_file.read_bytes().decode('utf-8-sig'), p_run=args.pin)
         elif args.command == 'instructions':

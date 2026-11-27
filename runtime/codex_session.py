@@ -134,7 +134,10 @@ def _line_explicit_parameters(session: Mapping[str, Any]) -> Mapping[str, Any]:
     explicit = session['explicit_parameters']
     baseline = (session.get('parameter_selection') or {}).get('preference_baseline', {})
     if formal_task_parameters(session['P_run']):
+        from .codex_collaboration import u0_council_parameter
         task_keys = {'X', 'F', 'C'} if court_mode_parameter(session['P_run']) else {'X', 'F'}
+        if u0_council_parameter(session['P_run']):
+            task_keys.add('U')
         return {key: value for key, value in explicit.items() if key not in task_keys}
     if 'F' in baseline:
         return {key: value for key, value in explicit.items() if key != 'F'}
@@ -260,6 +263,9 @@ def create_session(root: Path, *, request: Path, p_run: str,
         if preferences is not None:
             if formal_task_parameters(p_run) and 'X' in explicit and 'X' not in preferences['explicit_overrides']:
                 raise ValueError('X selection must come from the original user header, not an added parameter record')
+            from .codex_collaboration import u0_council_parameter
+            if u0_council_parameter(p_run) and 'U' in explicit and 'U' not in preferences['explicit_overrides']:
+                raise ValueError('U must come from the actual user invocation header')
             if court_mode_parameter(p_run) and 'C' in explicit and 'C' not in preferences['explicit_overrides']:
                 raise ValueError('C selection must come from the original user header, not an added parameter record')
             explicit = merge_explicit_parameters(preferences['explicit_overrides'], explicit)
@@ -269,6 +275,8 @@ def create_session(root: Path, *, request: Path, p_run: str,
                 require_binary('X', explicit['X'])
             if court_mode_parameter(p_run) and 'C' in explicit:
                 require_binary('C', explicit['C'])
+            if u0_council_parameter(p_run) and 'U' in explicit:
+                require_binary('U', explicit['U'])
         else:
             # Historical pins recorded an explicitly named tier as declarations.
             chosen = dict(parameter_selection['parameters']) if parameter_selection['preset_explicit'] else {}
@@ -366,7 +374,7 @@ def create_session(root: Path, *, request: Path, p_run: str,
                         'when': 'BEFORE_AN_OPEN_MATERIAL_DECISION',
                         'purpose': codex_collaboration.FIRST_OPINION_PURPOSE,
                         'max_reservations_in_use_per_task': (
-                            len(codex_collaboration.EXTERNAL_MODELS)
+                            len(codex_collaboration.external_models(p_run))
                             if codex_collaboration.parallel_external_policy(p_run) else 1),
                         'ceiling_usd': codex_collaboration.layer_ceilings(p_run)['COUNCIL'],
                         'scope': 'host evaluates the opportunity; current lifecycle and wallet govern sending',
@@ -405,8 +413,12 @@ def create_session(root: Path, *, request: Path, p_run: str,
         initialize_lifecycle(root, metadata)
     if formal_task_parameters(p_run):
         reference = parameter_selection['preference_baseline']
+        from .codex_collaboration import u0_council_parameter
+        keys = ('X', 'F', 'C') if court_mode_parameter(p_run) else ('X', 'F')
+        if u0_council_parameter(p_run):
+            keys += ('U',)
         initial = {'format': TASK_PARAMETERS_FORMAT, 'P_run': p_run,
-                   'reference': {key: reference[key] for key in (('X', 'F', 'C') if court_mode_parameter(p_run) else ('X', 'F'))},
+                   'reference': {key: reference[key] for key in keys},
                    'parameters': {'F': explicit.get('F')},
                    'input_explicit': {'F': 'F' in explicit},
                    'explicit_parameters': {key: explicit[key] for key in ('F',) if key in explicit},
@@ -505,18 +517,27 @@ def task_parameters(root: Path) -> dict[str, Any] | None:
         result['parameters']['C'] = c_source['value']
         result['input_explicit']['C'] = bool(c_source.get('input_explicit'))
         result['C_source'] = json.loads(json.dumps(c_source))
+    from .codex_collaboration import u0_council_parameter
+    if u0_council_parameter(metadata['P_run']):
+        u_source = lifecycle['u0_parameter_source']
+        result['parameters']['U'] = u_source['value']
+        result['input_explicit']['U'] = u_source['input_explicit']
+        result['U_source'] = json.loads(json.dumps(u_source))
     return result
 
 
 def set_task_parameters(root: Path, *, parameters: Mapping[str, Any],
                         reasons: Mapping[str, str], user_revision: str | None = None) -> dict[str, Any]:
-    """Record Main's F inference; X/C choices retain their user-source path."""
+    """Record Main's F inference; X/C/U choices retain their user-source path."""
     root, metadata = _session(root)
     if not formal_task_parameters(metadata['P_run']):
         raise ValueError('task X/F parameters require 1.5+; keep older pins unchanged')
+    from .codex_collaboration import u0_council_parameter
     allowed = {'X', 'F', 'C'} if court_mode_parameter(metadata['P_run']) else {'X', 'F'}
+    if u0_council_parameter(metadata['P_run']):
+        allowed.add('U')
     if not isinstance(parameters, Mapping) or 'F' not in parameters or set(parameters) - allowed:
-        raise ValueError('task parameters require F and optionally the current X/C values supported by this pin')
+        raise ValueError('task parameters require F and optionally the current X/C/U values supported by this pin')
     require_nonnegative_int('F', parameters['F'])
     if not isinstance(reasons, Mapping):
         raise TypeError('task parameter reasons must be a mapping')
@@ -534,6 +555,10 @@ def set_task_parameters(root: Path, *, parameters: Mapping[str, Any],
         require_binary('C', parameters['C'])
         if parameters['C'] != current['parameters']['C']:
             raise ValueError('C changes require the actual selected user input and lifecycle court choice')
+    if 'U' in parameters:
+        require_binary('U', parameters['U'])
+        if parameters['U'] != current['parameters']['U']:
+            raise ValueError('U changes require the actual selected user input and lifecycle U0 choice')
     previous, target = current['parameters']['F'], parameters['F']
     revision_input = None
     if user_revision is not None:

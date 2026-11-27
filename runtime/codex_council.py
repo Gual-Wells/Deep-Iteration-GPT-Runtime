@@ -246,14 +246,15 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
         raise ValueError('Supply distinct actual native actor IDs')
     for actor in actors:
         _id('native actor', actor)
-    external_models = tuple(codex_collaboration.EXTERNAL_MODELS.values())
+    external_models = tuple(codex_collaboration.external_models(session['P_run']).values())
     paired = codex_collaboration.parallel_external_policy(session['P_run'])
     intake_count = len(external_models) if paired else 1
     if foundation_intent:
+        codex_collaboration.require_foundation_intent_enabled(lifecycle)
         if not codex_collaboration.foundation_intent_policy(session['P_run']):
             raise ValueError('Parallel U0 requires a frozen Codex 1.7.0+ task')
         if first_opinion is not None or len(actors) != 1 or member_count not in (None, intake_count):
-            raise ValueError('Parallel U0 uses one native extractor and the configured external pair')
+            raise ValueError('Parallel U0 uses one native extractor and the configured external collaborators')
         input_ref = _input_ref(lifecycle)
         message_id = input_ref['message_id']
         if council_id != f'u0-{message_id}':
@@ -274,7 +275,7 @@ def create_council(root: Path, *, council_id: str, native_actors: Sequence[str],
         enable_claude = True
         member_count = intake_count
     elif member_count is None:
-        member_count = 2
+        member_count = intake_count if codex_collaboration.flex_collaboration_policy(session['P_run']) else 2
     if type(member_count) is not int or member_count < 1 or member_count > 16:
         raise ValueError('member_count must be 1 to 16; this is a resource bound, not a native V count')
     if type(deadline_seconds) is not int or deadline_seconds < 1:
@@ -405,6 +406,8 @@ def require_member_scope(root: Path, scope: Mapping[str, Any], *, active: bool =
     work_return = scope['round_kind'] == codex_council_work.ROUND_KIND
     foundation_intent = bool(state.get('foundation_intent'))
     expected = _FIRST_OPINION_SCOPE_KEYS if first_opinion or foundation_intent else _SCOPE_KEYS
+    if foundation_intent and active:
+        codex_collaboration.require_foundation_intent_enabled(lifecycle)
     if foundation_intent and scope.get('purpose') != codex_collaboration.FOUNDATION_INTENT_PURPOSE:
         raise ValueError('Parallel U0 requires its registered scope purpose')
     if work_return:
@@ -635,12 +638,14 @@ def prepare_round(root: Path, council_id: str, *, kind: str = 'INDEPENDENT',
         cycle = _cycle(state)
         first_opinion = 'first_opinion_decision' in state
         foundation_intent = bool(state.get('foundation_intent'))
+        if foundation_intent:
+            codex_collaboration.require_foundation_intent_enabled(lifecycle)
         if foundation_intent and (state['rounds'] or kind != 'INDEPENDENT'):
             raise ValueError('Parallel U0 prepares one independent round per content input')
         paired = codex_collaboration.parallel_external_policy(state['P_run'])
         if (paired and (foundation_intent or first_opinion) and model is not None
                 and kind != codex_council_work.ROUND_KIND):
-            raise ValueError('Parallel U0 and first opinion use the registered Sonnet and Carbon models')
+            raise ValueError('Parallel U0 and first opinion use the registered external models')
         if foundation_intent:
             effort = 'high' if effort is None else effort
             max_tokens = 4096 if max_tokens is None else max_tokens
@@ -1020,8 +1025,9 @@ def advance_barrier(root: Path, council_id: str, *, now: datetime | None = None)
 def _public_member_source(model: str | None, p_run: str) -> str:
     if not codex_collaboration.parallel_external_policy(p_run):
         return 'claude_subcouncil'
-    return {'sonnet': 'claude_sonnet', 'carbon': 'gemini_carbon'}.get(
-        codex_collaboration.external_participant(model), 'external_council')
+    return {'sonnet': 'claude_sonnet', 'carbon': 'gemini_carbon',
+            'hydrogen': 'gemini_hydrogen', 'grok': 'grok_4_7'}.get(
+        codex_collaboration.external_participant(p_run, model), 'external_council')
 
 
 def first_opinion_plan(root: Path, council_id: str, *, round_id: int,
@@ -1097,7 +1103,7 @@ def automatic_round_plan(root: Path, council_id: str, *, round_id: int,
         exchange = job['exchange_id']
         require_member_scope(root, job['scope'], exchange_id=exchange)
         _, _, request = codex_consult._load(root, exchange)
-        previous = claims.get(codex_collaboration.external_participant(request['model']))
+        previous = claims.get(codex_collaboration.external_participant(state['P_run'], request['model']))
         if previous and not returning:
             raise ValueError('A collaborator already holds its first opinion; inspect the existing exchange')
         if returning and (not previous or previous['exchange_id'] != job['scope']['first_opinion_exchange_id']):
@@ -1129,7 +1135,7 @@ def foundation_intent_receipt(root: Path, council_id: str) -> dict:
     for member_id, side in cycle['members'].items():
         member = state['members'][member_id]
         model = member['model']
-        label = codex_collaboration.external_participant(model)
+        label = codex_collaboration.external_participant(state['P_run'], model)
         draft = {'model': model, 'status': side['status'], 'evidence': None}
         if side['exchange_id']:
             attempt, body = _exchange_public(root, side['exchange_id'])

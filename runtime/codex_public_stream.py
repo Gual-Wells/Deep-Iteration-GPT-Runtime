@@ -126,7 +126,7 @@ def read_public_response(response, *, secret: str, on_delta: Callable[[str], Non
     def consume(data):
         if not isinstance(data, Mapping):
             raise ValueError('nonobject public response')
-        for field in ('id', 'model', 'provider'):
+        for field in ('id', 'model', 'provider', 'service_tier'):
             if isinstance(data.get(field), str):
                 result[field] = data[field].replace(secret, '[REDACTED]') if secret else data[field]
         if isinstance(data.get('usage'), Mapping):

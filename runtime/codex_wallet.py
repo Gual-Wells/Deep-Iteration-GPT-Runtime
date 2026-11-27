@@ -385,7 +385,7 @@ def inspect_task(root: Path, session: Mapping[str, Any]) -> dict:
         result['first_opinion_claim'] = first_opinion
     if codex_collaboration.parallel_external_policy(session['P_run']):
         purposes = {codex_collaboration.first_opinion_purpose(session['P_run'], name): name
-                    for name in codex_collaboration.EXTERNAL_MODELS}
+                    for name in codex_collaboration.external_models(session['P_run'])}
         result['first_opinion_claims'] = {
             purposes[claim['purpose']]: claim for claim in claims
             if claim.get('purpose') in purposes and claim['state'] != 'ABORTED'
