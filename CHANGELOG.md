@@ -1,5 +1,9 @@
 # Changelog
 
+## Codex Stable 1.6.1
+
+- Reuse confirmed charge revisions for the same wallet when pricing a Claude first opinion from OpenRouter's current credits. Deduct uncovered cost changes and unresolved reservations from that balance before sending.
+
 ## Codex Stable 1.6.0
 
 - Align HELP with every named N/T/R/B/S(n,t,r,b)/D/V/L/M/X/F/C call. Add task-scoped binary C: new Max tasks default to 1, others to 0; explicit C wins and later omitted C inherits. Bind changes to actual user sources, preserve history, and retain old-pin semantics.
