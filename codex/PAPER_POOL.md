@@ -1,6 +1,6 @@
 # Paper Pool 与学术任务识别
 
-本章随 DIGR Codex 2.0.0 起的执行协议取得。Paper Pool（PP）是论文、学术和科研任务的正式路由目标。它保存并使用原有同批 5,000 篇的作者摘要、逐篇机制证据及九维亲本，承担当前委托中一块有分量、能验收的工作。
+本章随 DIGR Codex 2.0.0 起的执行协议取得。Paper Pool（PP）是论文、学术和科研任务的正式路由目标。首批语料包含原有同批 5,000 篇的作者摘要、逐篇机制证据及九维亲本。PP 可分批扩充语料，承担当前委托中一块有分量、能验收的工作。
 
 ## 识别当前任务
 
@@ -43,10 +43,13 @@ PP 负责一个完整问题、关键章节、一项核心比较或质量责任�
 
 ## 证据接入与工具
 
-私有绑定默认是 `CODEX_HOME/digr-codex/paper-pool.json`。用 `paper-pool bind` 指定已存在的作者摘要、九维亲本、逐篇提取三个 JSONL 和绑定输出。三层都绑定 P0001–P5000、外部论文身份和作者摘要来源。检索分别呈现来源和派生资料，可由 P 编号回查原文、摘要指纹与位置。绑定和源文件留在原有私有存储位置。库指纹区分数据版本；原件实质改变后重新核对再绑定。
+2.1 起优先使用本机私有索引 `CODEX_HOME/digr-codex/paper-pool.sqlite3`。`paper-pool migrate` 从已有 JSONL 绑定生成索引，保留首批库指纹。`paper-pool append --abstracts NEW_ABSTRACTS.jsonl` 验证并原子追加一批新论文。可同时给出 `--parents` 和 `--extractions`，也可先录入真实作者摘要。每个提供的资料层与该批论文编号一致，原始身份和锚点须能核对。重复投递同一批会返回已有状态，冲突批次整批回滚。
+
+默认查询索引中的当前快照，进行中的 PP 工作沿第一次成功查询的库指纹继续。普通检索只读索引候选，单篇回读按 P 编号查找。`paper-pool check` 查看快照和规模，`paper-pool audit` 核验索引及归档原件哈希。每条证据保留批次、来源文件哈希、行号和句段位置。已有 JSONL 绑定仍可由原精确 pin 恢复。
 
 ```text
 python -B tools/codex.py paper-pool check
+python -B tools/codex.py paper-pool append --abstracts NEW_ABSTRACTS.jsonl
 python -B tools/codex.py paper-pool route --root TASK
 python -B tools/codex.py paper-pool dispatch --root TASK --actor ACTUAL --source ACTUAL_HANDOFF
 python -B tools/codex.py paper-pool search --root TASK --term "edge inference" --term offloading

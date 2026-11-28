@@ -207,6 +207,13 @@ def query_context(root: Path) -> dict:
     return context
 
 
+def query_snapshot(root: Path, context: Mapping[str, Any]) -> str | None:
+    """Use the first successful query's snapshot throughout this assignment."""
+    root = Path(root).resolve()
+    queries = _read_record(_record_path(root, context), context)['queries']
+    return next((receipt['catalog'] for receipt in queries.values()), None)
+
+
 def baseline_result(root: Path, *, kind: str, target: str, disposition: str, reason: str,
                     attempt: str, evidence_anchor: str, artifact: Path) -> dict:
     """Keep an original route result or an evidenced attempt and its disposition."""

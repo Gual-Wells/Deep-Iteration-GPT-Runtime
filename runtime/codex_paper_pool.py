@@ -109,12 +109,13 @@ def _check_file(path: Path, role: str, *, missing_ok: bool = False) -> bool:
 
 
 def _source_paths(binding: Path, sources: dict[str, Path]) -> dict[str, Path]:
-    paths = {role: _absolute_local(sources[role]) for role in SOURCES}
+    _require('abstracts' in sources and set(sources) <= set(SOURCES), 'invalid Paper Pool source roles')
+    paths = {role: _absolute_local(source) for role, source in sources.items()}
     if os.name == 'nt':
         _require(all(path.drive.casefold() == binding.drive.casefold() for path in paths.values()),
                  'Paper Pool sources and binding must use the same local Windows volume')
     identities = {os.path.normcase(str(path)) for path in (binding, *paths.values())}
-    _require(len(identities) == len(SOURCES) + 1, 'Paper Pool paths must be distinct')
+    _require(len(identities) == len(paths) + 1, 'Paper Pool paths must be distinct')
     return paths
 
 
@@ -240,6 +241,8 @@ def _check_extraction(extraction: dict, chunks: dict, where: str) -> None:
 def _join(rows: dict) -> dict[str, _Paper]:
     primary = rows['abstracts']
     for role in ('parents', 'extractions'):
+        if role not in rows:
+            continue
         missing = sorted(primary.keys() - rows[role].keys())
         extra = sorted(rows[role].keys() - primary.keys())
         _require(not missing and not extra,
@@ -269,12 +272,14 @@ def _join(rows: dict) -> dict[str, _Paper]:
             _require(existing is None, f'{where}: duplicate {label} shared with {existing}')
             indexes[label][key] = identity
 
-        parent_line, parent = rows['parents'][identity]
-        extraction_line, extraction = rows['extractions'][identity]
+        parent_line, parent = rows.get('parents', {}).get(identity, (None, None))
+        extraction_line, extraction = rows.get('extractions', {}).get(identity, (None, None))
         for role, record_line, record, hash_field in (
             ('parents', parent_line, parent, 'author_abstract_sha256'),
             ('extractions', extraction_line, extraction, 'abstract_sha256'),
         ):
+            if record is None:
+                continue
             mismatches = [key for key in JOINED_FIELDS
                           if type(record.get(key)) is not type(row[key]) or record[key] != row[key]]
             if record.get(hash_field) != source_sha:
@@ -283,9 +288,11 @@ def _join(rows: dict) -> dict[str, _Paper]:
                      f'{identity} at {role} line {record_line}: disagrees on {", ".join(mismatches)}')
 
         chunks = _source_chunks(row, where)
-        _check_dimensions(parent.get('genotype'), chunks, f'{identity} at parents line {parent_line}')
-        _check_extraction(extraction, chunks, f'{identity} at extractions line {extraction_line}')
-        papers[identity] = _Paper(line, row, parent['genotype'], extraction)
+        if parent is not None:
+            _check_dimensions(parent.get('genotype'), chunks, f'{identity} at parents line {parent_line}')
+        if extraction is not None:
+            _check_extraction(extraction, chunks, f'{identity} at extractions line {extraction_line}')
+        papers[identity] = _Paper(line, row, parent['genotype'] if parent else {}, extraction or {})
     return papers
 
 
@@ -418,18 +425,22 @@ def _matches(text: str, queries: list[_Term]) -> dict[str, set[str]]:
     return matches
 
 
-def _matching_fields(paper: _Paper, queries: list[_Term]) -> dict[str, dict[str, set[str]]]:
+def _search_fields(paper: _Paper) -> dict[str, list[str]]:
     fields = {
         'title': [paper.author['title']],
         'author_abstract': [paper.author['abstract']],
         'topic': [paper.author['topic']],
-        **{f'extraction.{key}': [paper.extraction[key]] for key in EXTRACTION_FIELDS},
+        **{f'extraction.{key}': [paper.extraction[key]] for key in EXTRACTION_FIELDS if key in paper.extraction},
     }
     for name in DIMENSIONS:
-        statements = [component['statement'] for component in paper.dimensions[name]['components']]
+        statements = [component['statement'] for component in paper.dimensions.get(name, {}).get('components', ())]
         if statements:
             # A query phrase must occur in a real component, not across two independently derived notes.
             fields[f'nine_dimensions.{name}'] = statements
+    return fields
+
+
+def _match_fields(fields: dict[str, list[str]], queries: list[_Term]) -> dict[str, dict[str, set[str]]]:
     matched = {query.text: {} for query in queries}
     for field, values in fields.items():
         for value in values:
@@ -522,7 +533,7 @@ def _search_result(identity: str, paper: _Paper, queries: list[_Term],
                                                             'author_sentence_ids', 'offsets')}
                     components.append({'dimension': name, 'matched_terms': list(terms), **item})
     extraction = {key: paper.extraction[key] for key in EXTRACTION_FIELDS if f'extraction.{key}' in fields}
-    extracted_sentences = {anchor['n'] for anchor in paper.extraction['anchors']}
+    extracted_sentences = {anchor['n'] for anchor in paper.extraction.get('anchors', ())}
     if extraction:
         extraction['anchor_sentence_ids'] = sorted(extracted_sentences)
         anchored_sentences.update(extracted_sentences)
@@ -543,7 +554,7 @@ def search_catalog(binding: Path, terms: list[str], limit: int = 12) -> dict:
     papers, hashes = _open_catalog(binding)
     ranked = []
     for identity, paper in papers.items():
-        matched = _matching_fields(paper, queries)
+        matched = _match_fields(_search_fields(paper), queries)
         if all(matched.values()):
             source_terms, score = _ranking(matched)
             ranked.append((-source_terms, -score, identity, matched))
@@ -567,19 +578,24 @@ def show_paper(binding: Path, paper_id: str) -> dict:
     identity = paper_id.strip().upper()
     papers, hashes = _open_catalog(binding)
     _require(identity in papers, f'Paper Pool contains no record for {identity}')
-    paper = papers[identity]
+    return {**_summary(papers, hashes), 'paper': _paper_details(identity, papers[identity])}
+
+
+def _paper_details(identity: str, paper: _Paper) -> dict:
     result = _entry(identity, paper)
     result['evidence'].update(
         abstract=paper.author['abstract'],
         chunks=[_quoted(chunk) for chunk in paper.author['chunks']],
-        excerpts=[_quoted(anchor) for anchor in paper.extraction['anchors']],
+        excerpts=[_quoted(anchor) for anchor in paper.extraction.get('anchors', ())],
     )
     result['derived'] = {
         'topic': paper.author['topic'],
         'nine_dimensions': paper.dimensions,
-        'extraction': {key: paper.extraction[key] for key in ('type', *EXTRACTION_FIELDS)},
+        'extraction': {key: paper.extraction[key] for key in ('type', *EXTRACTION_FIELDS)
+                       if key in paper.extraction},
     }
-    result['derived']['extraction']['anchor_sentence_ids'] = [
-        anchor['n'] for anchor in paper.extraction['anchors']
-    ]
-    return {**_summary(papers, hashes), 'paper': result}
+    if paper.extraction:
+        result['derived']['extraction']['anchor_sentence_ids'] = [
+            anchor['n'] for anchor in paper.extraction['anchors']
+        ]
+    return result

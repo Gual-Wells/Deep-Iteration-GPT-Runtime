@@ -1,4 +1,4 @@
-# DIGR for Codex · Stable 2.0.0
+# DIGR for Codex · Stable 2.1.0
 
 `DIGR：任务` 开放第一层研究议会，`DIGR：：任务` 同时开放第二层内容协作。原生 Codex 与 Sonnet 5.5、Gemini 4 Hydrogen Flex、Grok 4.7 的意见和候选按同一标准比较。各外部模型共用第一层每任务 0.25 美元和第二层每任务 1.25 美元，受真实钱包和用户更窄限额约束。实际提交依现有 Split、权限与对账流程。见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
 

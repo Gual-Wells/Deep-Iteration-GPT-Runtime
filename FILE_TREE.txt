@@ -465,6 +465,7 @@ runtime/codex_lifecycle.py
 runtime/codex_live.py
 runtime/codex_paper.py
 runtime/codex_paper_pool.py
+runtime/codex_paper_pool_index.py
 runtime/codex_paper_pool_route.py
 runtime/codex_permissions.py
 runtime/codex_personal.py
@@ -932,6 +933,7 @@ tests/test_codex_native_paper_return.py
 tests/test_codex_paper.py
 tests/test_codex_paper_native.py
 tests/test_codex_paper_pool_catalog.py
+tests/test_codex_paper_pool_index.py
 tests/test_codex_paper_pool_routing.py
 tests/test_codex_permissions.py
 tests/test_codex_personal.py

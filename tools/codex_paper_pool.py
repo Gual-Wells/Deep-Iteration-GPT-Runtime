@@ -9,16 +9,40 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from runtime import codex_paper_pool as catalog, codex_paper_pool_route as work
+from runtime import codex_paper_pool as catalog
+from runtime import codex_paper_pool_index as indexed
+from runtime import codex_paper_pool_route as work
+
+
+def _private_directory() -> Path:
+    location = os.environ.get('CODEX_HOME')
+    if not location:
+        raise ValueError('select the private corpus binding explicitly or use the existing CODEX_HOME')
+    return Path(location) / 'digr-codex'
 
 
 def _binding(value: Path | None) -> Path:
     if value is not None:
         return value
-    location = os.environ.get('CODEX_HOME')
-    if not location:
-        raise ValueError('select the private corpus binding with --binding or the existing CODEX_HOME')
-    return Path(location) / 'digr-codex' / 'paper-pool.json'
+    directory = _private_directory()
+    index = directory / indexed.INDEX_NAME
+    try:
+        index.lstat()
+    except FileNotFoundError:
+        return directory / 'paper-pool.json'
+    return index
+
+
+def _is_index(path: Path) -> bool:
+    return path.suffix.lower() in ('.sqlite3', '.db')
+
+
+def _legacy_snapshot(binding: Path, requested: str | None) -> None:
+    if requested is None:
+        return
+    _, hashes = catalog._read_binding(catalog._absolute_local(binding))
+    if requested != catalog._fingerprint(hashes):
+        raise ValueError('selected snapshot is unavailable in this legacy binding')
 
 
 def main(argv=None) -> int:
@@ -27,11 +51,22 @@ def main(argv=None) -> int:
             stream.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='action', required=True)
-    bind = commands.add_parser('bind', help='verify and register the fixed corpus on this machine')
+    bind = commands.add_parser('bind', help='verify and register a legacy JSONL corpus binding')
     for field in ('out', 'abstracts', 'parents', 'extractions'):
         bind.add_argument('--' + field, type=Path, required=True)
-    check = commands.add_parser('check', help='verify the private binding')
+    migrate = commands.add_parser('migrate', help='build the local append-only index from a verified legacy binding')
+    migrate.add_argument('--from-binding', type=Path)
+    migrate.add_argument('--out', type=Path)
+    append = commands.add_parser('append', help='validate and append one new paper batch atomically')
+    append.add_argument('--binding', type=Path)
+    append.add_argument('--abstracts', type=Path, required=True)
+    for role in ('parents', 'extractions'):
+        append.add_argument('--' + role, type=Path)
+    check = commands.add_parser('check', help='read an indexed snapshot or verify a legacy binding')
     check.add_argument('--binding', type=Path)
+    check.add_argument('--snapshot')
+    audit = commands.add_parser('audit', help='verify the index and the archived source bytes')
+    audit.add_argument('--binding', type=Path)
     search = commands.add_parser('search', help='search source records and their clearly marked derived views')
     search.add_argument('--term', action='append', required=True)
     search.add_argument('--limit', type=int, default=12)
@@ -39,6 +74,7 @@ def main(argv=None) -> int:
     show.add_argument('paper_id')
     for action in (search, show):
         action.add_argument('--binding', type=Path)
+        action.add_argument('--snapshot')
         action.add_argument('--root', type=Path, help='bind this retrieval to the current Paper Pool assignment')
     task_commands = {}
     for name, description in (
@@ -76,20 +112,48 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     try:
         if args.action == 'bind':
+            if _is_index(args.out):
+                raise ValueError('use migrate to create a Paper Pool index')
             value = catalog.bind_catalog(args.out, abstracts=args.abstracts, parents=args.parents,
                                          extractions=args.extractions)
-        elif args.action == 'check':
-            value = catalog.check_catalog(_binding(args.binding))
+        elif args.action == 'migrate':
+            source = args.from_binding if args.from_binding is not None else _private_directory() / 'paper-pool.json'
+            output = args.out if args.out is not None else _private_directory() / indexed.INDEX_NAME
+            if not _is_index(output):
+                raise ValueError('choose a .sqlite3 or .db file for the Paper Pool index')
+            value = indexed.migrate(output, source)
+        elif args.action == 'append':
+            output = args.binding if args.binding is not None else _private_directory() / indexed.INDEX_NAME
+            if not _is_index(output):
+                raise ValueError('migrate the legacy binding before appending a batch')
+            value = indexed.append(output, abstracts=args.abstracts, parents=args.parents, extractions=args.extractions)
+        elif args.action in ('check', 'audit'):
+            target = _binding(args.binding)
+            if _is_index(target):
+                value = indexed.audit(target) if args.action == 'audit' else indexed.check(target, args.snapshot)
+            else:
+                if args.action == 'check':
+                    _legacy_snapshot(target, args.snapshot)
+                value = catalog.check_catalog(target)
         elif args.action in ('search', 'show'):
             context = work.query_context(args.root) if args.root is not None else None
             terms = args.term if args.action == 'search' else [args.paper_id]
             try:
+                current = work.query_snapshot(args.root, context) if context is not None else None
+                if current and args.snapshot is not None and args.snapshot != current:
+                    raise ValueError('this assignment already uses a different Paper Pool snapshot')
+                fingerprint = current or args.snapshot
                 binding = _binding(args.binding)
+                use_index = _is_index(binding)
+                if not use_index:
+                    _legacy_snapshot(binding, fingerprint)
                 if args.action == 'search':
-                    value = catalog.search_catalog(binding, terms=terms, limit=args.limit)
+                    value = (indexed.search(binding, terms, args.limit, fingerprint) if use_index
+                             else catalog.search_catalog(binding, terms=terms, limit=args.limit))
                     query = value
                 else:
-                    value = catalog.show_paper(binding, args.paper_id)
+                    value = (indexed.show(binding, args.paper_id, fingerprint) if use_index
+                             else catalog.show_paper(binding, args.paper_id))
                     query = {'corpus_fingerprint': value['corpus_fingerprint'], 'query': terms,
                              'results': [value['paper']]}
             except (OSError, ValueError) as exc:
