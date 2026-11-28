@@ -19,11 +19,13 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v27'
+PROFILE_PROTOCOL = 'digr-codex-native-v28'
 PROFILE_CORE = (
     'codex/CONSTITUTION.md',
     'codex/FOUNDATION.md',
     'codex/PAPER_POOL.md',
+    'codex/COMMUNITY_CRY.md',
+    'codex/COMMUNITY_CRY.json',
     'codex/METHOD.md', 'codex/CHARACTER.md', 'codex/PARAMETERS.md',
     'codex/COLLABORATION.md', 'codex/PERMISSIONS.md',
     'codex/CONSULT.md',
@@ -45,6 +47,8 @@ PROFILE_FILES = (
     'codex/CONSTITUTION.md',
     'codex/FOUNDATION.md',
     'codex/PAPER_POOL.md',
+    'codex/COMMUNITY_CRY.md',
+    'codex/COMMUNITY_CRY.json',
     'codex/METHOD.md',
     'codex/HELP.md',
     'codex/PARAMETERS.md',

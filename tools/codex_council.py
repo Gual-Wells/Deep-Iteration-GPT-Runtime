@@ -145,9 +145,11 @@ def main(argv=None):
             emit = lambda event: print(json.dumps(event, ensure_ascii=False, allow_nan=False), flush=True)
             relay = None
             if not args.raw_events:
+                from runtime.codex_cc import enabled as cc_enabled
                 from runtime.codex_live import ParagraphRelay, stable_live
-                stable = stable_live(read(args.root / 'session.json')['P_run'])
-                relay = ParagraphRelay(emit, stable=stable)
+                pin = read(args.root / 'session.json')['P_run']
+                stable = stable_live(pin)
+                relay = ParagraphRelay(emit, stable=stable, reminders=cc_enabled(pin))
                 def source_event(event):
                     exchange = event.get('exchange_id')
                     path = args.root / 'consult/exchanges' / str(exchange) / 'request.json'

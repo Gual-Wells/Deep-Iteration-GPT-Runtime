@@ -636,7 +636,7 @@ class CourtTests(CourtFixture, unittest.TestCase):
             record_verdict(self.root, proposed)
 
 
-class CorrectedCourtTests(CourtFixture, unittest.TestCase):
+class CorrectedCourtFixture(CourtFixture):
     pin = '1.5.1@' + 'c' * 40
     roles = CORRECTED_ROLES
     answer_roles = {'defendant', 'prosecution_lawyer', 'defence_lawyer'}
@@ -683,6 +683,7 @@ class CorrectedCourtTests(CourtFixture, unittest.TestCase):
         self.acquit(charges)
         return record_docket(self.root, self.docket())
 
+class CorrectedCourtTests(CorrectedCourtFixture, unittest.TestCase):
     def test_seven_actual_roles_and_two_distinct_lawyers_are_required(self):
         old = deepcopy(self.open_input)
         old['actors'] = {key: value for key, value in old['actors'].items() if key != 'clerk'}

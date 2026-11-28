@@ -31,7 +31,7 @@ from runtime.codex_lifecycle import (
 )
 
 TOOL_GROUPS = ('profile', 'workbench', 'experience', 'timeline', 'return', 'visits',
-               'paper-pool', 'delivery', 'consult', 'council', 'production', 'usage',
+               'paper-pool', 'cc', 'delivery', 'consult', 'council', 'production', 'usage',
                'allot', 'live', 'court')
 
 

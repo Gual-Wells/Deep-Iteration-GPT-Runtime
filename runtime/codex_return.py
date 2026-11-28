@@ -13,9 +13,11 @@ import json
 import os
 from pathlib import Path
 import re
+import time
 from typing import Any, Mapping
 import uuid
 
+from . import codex_cc
 from .codex_session import (
     _effective_main_target, _read_activity, _read_json, _session, _write_json, derive_activity, session_report,
 )
@@ -213,21 +215,36 @@ def _error_path(root: Path) -> Path:
     return path
 
 
-def execution_errors(root: Path) -> list[dict[str, str]]:
-    root, metadata = _session(root)
-    if not ordered_error_policy(metadata['P_run']):
-        raise ValueError('ordered execution error records require a frozen Codex 1.9+ task')
+def _ordinary_errors(root: Path, metadata: Mapping) -> tuple[list[dict], dict[str, int]]:
     path = _error_path(root)
     if not path.exists():
-        return []
+        return [], {}
     data = _read_json(path)
     if (data.get('schema_version') != 1 or data.get('task_uuid') != metadata['task_uuid']
             or data.get('P_run') != metadata['P_run'] or not isinstance(data.get('errors'), list)):
         raise ValueError('execution error record does not belong to this frozen task')
     errors = [execution_error(item) for item in data['errors']]
-    if len({item['id'] for item in errors}) != len(errors):
+    ids = {item['id'] for item in errors}
+    if len(ids) != len(errors):
         raise ValueError('duplicate execution error identity')
-    return errors
+    first_seen = data.get('first_seen_wall_ns', {})
+    if (not isinstance(first_seen, dict) or set(first_seen) - ids
+            or any(type(at) is not int or at < 0 for at in first_seen.values())):
+        raise ValueError('invalid execution error first-occurrence order')
+    return errors, first_seen
+
+
+def execution_errors(root: Path) -> list[dict[str, str]]:
+    root, metadata = _session(root)
+    if not ordered_error_policy(metadata['P_run']):
+        raise ValueError('ordered execution error records require a frozen Codex 1.9+ task')
+    errors, first_seen = _ordinary_errors(root, metadata)
+    if not codex_cc.enabled(metadata['P_run']):
+        return errors
+    from .codex_court import cc_execution_errors
+    observations = [(first_seen.get(item['id'], 0), item) for item in errors]
+    observations.extend(cc_execution_errors(root))
+    return [execution_error(item) for _, item in sorted(observations, key=lambda pair: pair[0])]
 
 
 def record_execution_error(root: Path, supplied: Mapping[str, Any]) -> dict[str, str]:
@@ -237,10 +254,13 @@ def record_execution_error(root: Path, supplied: Mapping[str, Any]) -> dict[str,
     if not ordered_error_policy(metadata['P_run']):
         raise ValueError('ordered execution error records require a frozen Codex 1.9+ task')
     item = execution_error(supplied)
+    modern = codex_cc.enabled(metadata['P_run'])
+    if modern and item['id'].startswith('cc-'):
+        raise ValueError('CC action errors come from the actual court record')
     path = _error_path(root)
     with _writer(path.parent):
         require_active(root)
-        errors = execution_errors(root)
+        errors, first_seen = _ordinary_errors(root, metadata)
         for index, prior in enumerate(errors):
             if prior['id'] != item['id']:
                 continue
@@ -252,8 +272,13 @@ def record_execution_error(root: Path, supplied: Mapping[str, Any]) -> dict[str,
             break
         else:
             errors.append(item)
-        _write_json(path, {'schema_version': 1, 'task_uuid': metadata['task_uuid'],
-                          'P_run': metadata['P_run'], 'errors': errors})
+            if modern:
+                first_seen[item['id']] = time.time_ns()
+        record = {'schema_version': 1, 'task_uuid': metadata['task_uuid'],
+                  'P_run': metadata['P_run'], 'errors': errors}
+        if modern:
+            record['first_seen_wall_ns'] = first_seen
+        _write_json(path, record)
     return item
 
 
@@ -598,6 +623,11 @@ def response_body(root: Path) -> str:
     status = return_status(root)
     if status['current_receipt'] not in {'READY_UNCLOSED', 'CLOSED'}:
         raise ValueError('a current sealed return is required before emitting the response body')
+    court = status['court_completion']
+    if court['required'] and (court.get('cc_blocked_products') or any(
+            item['outcome'] == 'SUSPENDED' or item['admission_due']
+            for item in court.get('cc_interventions', []))):
+        raise ValueError('the affected CC contribution must be resolved and filed before the final response body')
     schema = status.get('return_schema')
     if schema not in {2, ERROR_REPORT_SCHEMA}:
         raise ValueError('legacy return is a saved view, not a response body')

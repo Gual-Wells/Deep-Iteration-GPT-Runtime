@@ -7,6 +7,8 @@ it never invents an accusation, performs rework or generates an acquittal.
 """
 from __future__ import annotations
 
+from datetime import datetime
+from functools import wraps
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -14,6 +16,7 @@ import re
 import time
 from typing import Any, Mapping
 
+from . import codex_cc
 from .codex_lifecycle import load_lifecycle, require_active
 from .codex_session import (
     _effective_main_target, _parameters, _read_json, _session, _write_json, court_mode_parameter,
@@ -65,6 +68,239 @@ def _continuous_prosecution(root: Path) -> bool:
     return tuple(map(int, version.split('.'))) >= (1, 5, 2)
 
 
+def _cc_writer(function):
+    """Serialize court mutations on pins with independent role intervention."""
+    @wraps(function)
+    def write(root: Path, *args, **kwargs):
+        root, metadata = _session(root)
+        if not codex_cc.enabled(metadata['P_run']):
+            return function(root, *args, **kwargs)
+        from .codex_council import _writer
+        folder = root / 'court'
+        if folder.resolve() != folder:
+            raise ValueError('court directory escapes or aliases its task')
+        with _writer(folder):
+            return function(root, *args, **kwargs)
+    return write
+
+
+def _cc_pending(hearing: dict) -> list[dict]:
+    return [item for item in hearing.get('cc_interventions', [])
+            if item['resolution'] is None and 'transferred_to_cycle' not in item]
+
+
+def _cc_admission_due(hearing: dict) -> list[dict]:
+    return [item for item in hearing.get('cc_interventions', []) if item['resolution']
+            and item['resolution']['outcome'] == 'REPAIRED' and not item.get('admitted')
+            and 'transferred_to_cycle' not in item]
+
+
+def _cc_admit(hearing: dict, role: str, kind: str, source: dict) -> dict | None:
+    _cc_assert_available(hearing, role, source)
+    selected = next((item for item in _cc_admission_due(hearing)
+                     if (item['target_role'], item['target_kind']) == (role, kind)), None)
+    if selected and source != selected['resolution']['source']:
+        raise ValueError('file the actual CC repair source for this role and contribution')
+    return selected
+
+
+def _cc_assert_available(hearing: dict, role: str | None = None, source: dict | None = None) -> None:
+    if any(role is None or role == item['target_role'] for item in _cc_pending(hearing)):
+        raise ValueError('CC has suspended the affected contribution; record actual repair or retraction')
+    if source is not None and any(
+        item['target_role'] == role and item['source']['sha256'] == source['sha256']
+        and (item['resolution'] is None or item['resolution']['outcome'] != 'RETRACTED')
+        for item in hearing.get('cc_interventions', [])
+    ):
+        raise ValueError('CC has removed these superseded contribution bytes from effective use')
+
+
+def _effective_statements(hearing: dict) -> list[dict]:
+    excluded = {(item['target_role'], item['source']['sha256'])
+                for item in hearing.get('cc_interventions', [])
+                if item['resolution'] is None or item['resolution']['outcome'] != 'RETRACTED'}
+    if not excluded:
+        return hearing['statements']
+    return [item for item in hearing['statements']
+            if (item['role'], item['source']['sha256']) not in excluded]
+
+
+def _effective_charges(hearing: dict) -> dict:
+    active = _effective_statements(hearing)
+    if active is hearing['statements']:
+        return hearing['charges']
+    removed = {identifier for statement in hearing['statements'] if statement not in active
+               for identifier in statement.get('charges', {})}
+    return {identifier: charge for identifier, charge in hearing['charges'].items() if identifier not in removed}
+
+
+def _cc_hearing(root: Path, supplied: Mapping) -> tuple[dict, dict]:
+    if not codex_cc.enabled(_session(root)[1]['P_run']) or not required(root):
+        raise ValueError('CC intervention requires a 2.2+ task with current C=1')
+    state = _load(root)
+    hearing = state['rounds'][-1]
+    _assert_current(root, hearing)
+    if hearing['remand'] is not None:
+        raise ValueError('this hearing ordered remand; resume under the current review round')
+    if supplied.get('actor_id') != hearing['actors']['black_police']['actor_id']:
+        raise ValueError('only this hearing’s actual black police can act on a CC finding')
+    if supplied.get('material_sha256') != hearing['material_sha256']:
+        raise ValueError('CC finding must concern the current court material')
+    return state, hearing
+
+
+def _cc_text(text: str) -> str:
+    return text.replace('\r\n', '\n')
+
+
+def _cc_quote(source: Mapping, excerpt: str, field: str) -> None:
+    if _cc_text(excerpt) not in _cc_text(source.get('text_snapshot', '')):
+        raise ValueError('CC ' + field + ' must quote the actual captured public source')
+
+
+def _cc_live_output(root: Path, hearing: dict, operation: Any, *, actor_id: str,
+                    unit: str, source: dict, after_ns: int) -> str:
+    from .codex_live import work_event
+    event = work_event(root, _text(operation, 'actual LIVE operation_id'))
+    if (event['P_run'] != hearing['material']['P_run']
+            or event['actor'] != actor_id or event['kind'] not in {'C', 'SIDECAR'}
+            or event['unit'] != unit or event['source_ref'] != source['source_ref']
+            or _cc_text(event['text']) != _cc_text(source.get('text_snapshot', ''))
+            or round(datetime.fromisoformat(event['at']).timestamp() * 1_000_000_000) < after_ns):
+        raise ValueError('CC needs a matching current court LIVE operation from the actual role and unit')
+    return event['operation_id']
+
+
+def _cc_filed_source(hearing: dict, role: str, kind: str, source: dict) -> bool:
+    if kind == 'statement':
+        seen = (record for record in _effective_statements(hearing) if record['role'] == role)
+        return any(record['source'] == source for record in seen)
+    return bool(hearing[kind] and hearing[kind]['source'] == source)
+
+
+@_cc_writer
+def cc_intervene(root: Path, supplied: Mapping[str, Any]) -> dict:
+    """Warn, quarantine current model output and order a scoped correction."""
+    root, _ = _session(root)
+    state, hearing = _cc_hearing(root, supplied)
+    role = supplied.get('target_role')
+    if role not in hearing['actors'] or supplied.get('target_actor_id') != hearing['actors'][role]['actor_id']:
+        raise ValueError('CC target must be the named actual model role in this hearing')
+    unit = _text(supplied.get('unit'), 'current public unit')
+    kind = supplied.get('target_kind', 'statement')
+    if kind != 'statement' and (role, kind) not in {('judge', 'verdict'), ('clerk', 'docket')}:
+        raise ValueError('CC target kind must be one of the actual role filing types')
+    source = _source(root, supplied.get('target_output'))
+    finding = codex_cc.assess(codex_cc.load_pool(), supplied.get('finding', {}))
+    _cc_quote(source, finding['excerpt'], 'target excerpt')
+    basis_id = _text(supplied.get('basis_id'), 'actual basis source identifier')
+    basis_excerpt = _text(supplied.get('basis_excerpt'), 'actual basis excerpt')
+    if basis_id == 'current-input':
+        basis = hearing['material']['current_user_snapshot']
+        if basis_excerpt not in basis['text']:
+            raise ValueError('CC basis must quote the actual current user input')
+    else:
+        sources = hearing['material']['sources']
+        if basis_id not in sources:
+            raise ValueError('CC basis must identify an actual current case source')
+        _cc_quote(sources[basis_id], basis_excerpt, 'case basis')
+    if finding['disposition'] == 'PROTECTED':
+        raise ValueError('CC cannot suspend this output on the applicable protected basis')
+
+    identifier = 'cc-' + _digest([hearing['cycle'], hearing['material_sha256'], role,
+                                  kind, unit, source['sha256']])[:24]
+    incidents = hearing.setdefault('cc_interventions', [])
+    if any(item['id'] == identifier for item in incidents):
+        return court_status(root)
+    operation = supplied.get('target_operation_id')
+    if operation is not None or not _cc_filed_source(hearing, role, kind, source):
+        _cc_live_output(root, hearing, operation, actor_id=supplied['target_actor_id'], unit=unit,
+                        source=source, after_ns=hearing['opened_wall_ns'])
+    if any((item['target_role'], item['target_kind']) == (role, kind)
+           for item in [*_cc_pending(hearing), *_cc_admission_due(hearing)]):
+        raise ValueError('this role filing already has a pending CC repair')
+    warning = _text(supplied.get('warning'), 'actual public black police warning')
+    incidents.append({
+        'id': identifier, 'stage': 'C1 黑警 · CC', 'cycle': hearing['cycle'], 'unit': unit,
+        'actor_id': supplied['actor_id'], 'target_role': role, 'target_kind': kind,
+        'target_actor_id': supplied['target_actor_id'], 'source': source,
+        'target_operation_id': operation, 'finding': finding, 'basis_id': basis_id, 'basis_excerpt': basis_excerpt,
+        'actions': ['WARN', 'SUSPEND_CONTRIBUTION', 'ORDER_REWORK'], 'warning': warning,
+        'recorded_wall_ns': time.time_ns(), 'resolution': None,
+        'superseded_verdict': hearing['verdict'] if kind != 'docket' else None,
+    })
+    if kind != 'docket':
+        hearing['verdict'] = None
+    return _save(root, state)
+
+
+@_cc_writer
+def cc_resume(root: Path, supplied: Mapping[str, Any]) -> dict:
+    """Lift the hold on original evidence of repair or of an incorrect finding."""
+    root, _ = _session(root)
+    state, hearing = _cc_hearing(root, supplied)
+    incident = next((item for item in hearing.get('cc_interventions', [])
+                     if item['id'] == supplied.get('id')), None)
+    if incident is None:
+        raise ValueError('CC resume must refer to an actual intervention in this round')
+    outcome = supplied.get('outcome')
+    if outcome not in {'REPAIRED', 'RETRACTED'}:
+        raise ValueError('CC requires actual repair or withdrawal on new evidence')
+    source = _source(root, supplied.get('source'))
+    excerpt = _text(supplied.get('excerpt'), 'actual corrected output or counterevidence')
+    _cc_quote(source, excerpt, 'resumption excerpt')
+    if source['sha256'] == incident['source']['sha256'] or excerpt == incident['finding']['excerpt']:
+        raise ValueError('CC resume requires materially different bytes and a current evidentiary excerpt')
+    operation = None
+    if outcome == 'REPAIRED':
+        if supplied.get('repair_actor_id') != incident['target_actor_id']:
+            raise ValueError('the affected actual role must provide its corrected contribution')
+        operation = _cc_live_output(root, hearing, supplied.get('repair_operation_id'),
+                                    actor_id=incident['target_actor_id'], unit=incident['unit'],
+                                    source=source,
+                                    after_ns=max(hearing['opened_wall_ns'], incident['recorded_wall_ns']))
+        if _cc_text(incident['finding']['excerpt']) in _cc_text(source['text_snapshot']):
+            raise ValueError('CC corrected output still contains the original suspended excerpt')
+    resolution = {'outcome': outcome, 'source': source, 'excerpt': excerpt, 'operation_id': operation,
+                  'summary': _text(supplied.get('summary'), 'specific repair or grounds to withdraw the warning')}
+    if prior := incident['resolution']:
+        if prior != resolution:
+            raise ValueError('the CC incident already has a different recorded resolution')
+        return court_status(root)
+    incident['resolution'] = resolution
+    return _save(root, state)
+
+
+def cc_execution_errors(root: Path) -> list[tuple[int, dict]]:
+    """Project canonical court actions into RETURN without a second mutable ledger."""
+    if not (root / 'court' / 'court.json').is_file():
+        return []
+    state = _load(root)
+    errors = []
+    for hearing in state['rounds']:
+        for item in hearing.get('cc_interventions', []):
+            if 'transferred_to_cycle' in item:
+                continue
+            finding, resolution = item['finding'], item['resolution']
+            summary = item['warning'] + ' 当庭喝止并要求返工。' + finding['repair']
+            resolved = False
+            if resolution:
+                if resolution['outcome'] == 'RETRACTED':
+                    label, resolved = '经新证据撤回。', True
+                else:
+                    resolved = bool(item.get('admitted'))
+                    label = '补做后恢复。' if resolved else '补做已返回，待按原流程收录。'
+                summary += ' ' + label + resolution['summary']
+            errors.append((item['recorded_wall_ns'], {
+                'id': item['id'], 'stage': item['stage'],
+                'problem': item['target_actor_id'] + ' / ' + item['unit'] + ' / '
+                           + '、'.join(row['title'] for row in finding['criteria']),
+                'impact': finding['impact'], 'status': 'RECOVERED' if resolved else 'OPEN',
+                'handling': summary,
+            }))
+    return errors
+
+
 def _prosecution_context(hearing: dict) -> str:
     """Bind the actual party returns, not an invented count of research rounds.
 
@@ -77,7 +313,7 @@ def _prosecution_context(hearing: dict) -> str:
         # A genuinely changed public source still changes its byte hash. The
         # host cannot mark new prose "immaterial" to bypass investigation.
         parties, seen = [], set()
-        for item in hearing['statements']:
+        for item in _effective_statements(hearing):
             if item['role'] not in _PARTY_ROLES:
                 continue
             content = {key: item[key] for key in ('role', 'actor_id', 'statement', 'responses')}
@@ -96,10 +332,11 @@ def _prosecution_context(hearing: dict) -> str:
 
 
 def _prosecution_review_status(hearing: dict) -> str:
-    prosecutors = [item for item in hearing['statements'] if item['role'] == 'prosecutor']
+    statements = _effective_statements(hearing)
+    prosecutors = [item for item in statements if item['role'] == 'prosecutor']
     if not prosecutors:
         return 'MISSING'
-    if not any(item['role'] == 'prosecution_lawyer' for item in hearing['statements']):
+    if not any(item['role'] == 'prosecution_lawyer' for item in statements):
         return 'BEFORE_HANDOFF'
     if prosecutors[-1].get('reviewed_context_sha256') != _prosecution_context(hearing):
         return 'STALE'
@@ -139,11 +376,13 @@ def _required_read_sources(hearing: dict, role: str) -> list[str]:
 def _effective_responses(hearing: dict, role: str) -> dict:
     """Same-material, per-charge latest answers; never cross a review round."""
     responses = {}
-    for statement in hearing['statements']:
+    charges = _effective_charges(hearing)
+    for statement in _effective_statements(hearing):
         if statement['role'] != role or statement['material_sha256'] != hearing['material_sha256']:
             continue
         for response in statement['responses']:
-            responses[response['charge_id']] = {'response': response, 'source': statement['source']}
+            if response['charge_id'] in charges:
+                responses[response['charge_id']] = {'response': response, 'source': statement['source']}
     return responses
 
 
@@ -446,6 +685,7 @@ def _new_round(root: Path, spec: dict, actors: dict, *, previous: dict | None = 
             'execution': execution, 'opened_wall_ns': time.time_ns(), 'basis': _SCOPE}
 
 
+@_cc_writer
 def open_court(root: Path, supplied: Mapping[str, Any]) -> dict:
     root, metadata = _session(root)
     require_active(root)
@@ -495,6 +735,12 @@ def _assert_evidence(hearing: dict) -> None:
         _check_source(hearing['verdict']['source'])
     if hearing['remand']:
         _check_source(hearing['remand']['source'])
+    for incident in hearing.get('cc_interventions', []):
+        _check_source(incident['source'])
+        if incident['resolution']:
+            _check_source(incident['resolution']['source'])
+        if incident['superseded_verdict']:
+            _check_source(incident['superseded_verdict']['source'])
     for old_plan in hearing.get('remand_history', []):
         _check_source(old_plan['source'])
     if hearing.get('execution'):
@@ -510,9 +756,15 @@ def _proceedings(state: dict) -> dict:
     fields = ('cycle', 'material', 'material_sha256', 'actors', 'statements', 'charges',
               'verdict', 'remand', 'remand_history', 'execution')
     return {'P_run': state['P_run'], 'request_sha256': state['request_sha256'],
-            'rounds': [{key: hearing.get(key) for key in fields} for hearing in state['rounds']]}
+            'rounds': [{**{key: hearing.get(key) for key in fields},
+                        **({'cc_interventions': [
+                            {key: value for key, value in item.items() if key != 'admitted'}
+                            for item in hearing['cc_interventions']]}
+                           if 'cc_interventions' in hearing else {})}
+                       for hearing in state['rounds']]}
 
 
+@_cc_writer
 def record_docket(root: Path, supplied: Mapping[str, Any]) -> dict:
     """Save the actual clerk's source collection and public, long-case record.
 
@@ -530,6 +782,9 @@ def record_docket(root: Path, supplied: Mapping[str, Any]) -> dict:
         _assert_evidence(historical)
     if supplied.get('actor_id') != hearing['actors']['clerk']['actor_id']:
         raise ValueError('only the actual clerk may maintain the docket')
+    _cc_assert_available(hearing)
+    source = _source(root, supplied.get('source'))
+    admission = _cc_admit(hearing, 'clerk', 'docket', source)
     digest = _digest(_proceedings(state))
     if supplied.get('proceedings_sha256') != digest:
         raise ValueError('clerk must read the current complete public proceedings, including the verdict')
@@ -549,14 +804,17 @@ def record_docket(root: Path, supplied: Mapping[str, Any]) -> dict:
               'evidence_index': evidence_index,
               'evidence_consistency': _text(supplied.get('evidence_consistency'), 'actual evidence consistency findings'),
               'reasoning_record': _text(supplied.get('reasoning_record'), 'actual public long-case reasoning/issue/verdict record'),
-              'retrievals': retrievals, 'source': _source(root, supplied.get('source')),
+              'retrievals': retrievals, 'source': source,
               'basis': 'HOST_ASSERTED', 'recorded_wall_ns': time.time_ns()}
     if hearing.get('docket'):
         hearing.setdefault('docket_history', []).append(hearing['docket'])
     hearing['docket'] = docket
+    if admission:
+        admission['admitted'] = True
     return _save(root, state)
 
 
+@_cc_writer
 def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
     root, _ = _session(root)
     require_active(root)
@@ -576,11 +834,14 @@ def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
         raise ValueError('black police must actually read the original request and current conditions')
     if not limited_police and set(read) != set(hearing['material']['sources']):
         raise ValueError('each actual actor must declare reading the original/current common material')
+    source = _source(root, supplied.get('source'))
+    admission = _cc_admit(hearing, role, 'statement', source)
     statement = {'role': role, 'actor_id': supplied['actor_id'],
                  'material_sha256': hearing['material_sha256'], 'read_sources': read,
                  'statement': _text(supplied.get('statement'), 'actual public statement'),
-                 'source': _source(root, supplied.get('source')), 'basis': 'HOST_ASSERTED',
+                 'source': source, 'basis': 'HOST_ASSERTED',
                  'responses': [], 'submitted_wall_ns': time.time_ns()}
+    charges = _effective_charges(hearing)
     additions = {}
     for charge in _list(supplied.get('charges', []), 'charges'):
         charging_roles = {'prosecutor', 'prosecution_lawyer'} if _corrected(root) else {'prosecutor', 'monitor'}
@@ -610,7 +871,7 @@ def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
             raise ValueError('intent review must return to the actual original request')
         statement['intent_review']['source_ids'] = ids
         statement['intent_review']['charge_ids'] = _ids(
-            review.get('charge_ids', []), set(hearing['charges']) | set(additions), 'intent review charges', nonempty=False)
+            review.get('charge_ids', []), set(charges) | set(additions), 'intent review charges', nonempty=False)
         if _continuous_prosecution(root):
             if supplied.get('reviewed_context_sha256') != _prosecution_context(hearing):
                 raise ValueError('prosecutor must investigate the current party returns before submitting; '
@@ -629,7 +890,7 @@ def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
         statement['authority_notice'] = {'mode': 'VIOLENT_INTIMIDATION', 'target_actor_ids': list(targets),
                                          'scope': 'ALL_PARTICIPANTS'}
     for response in _list(supplied.get('responses', []), 'responses'):
-        if response.get('charge_id') not in hearing['charges']:
+        if response.get('charge_id') not in charges:
             raise ValueError('response must identify an existing charge')
         statement['responses'].append({'charge_id': response['charge_id'],
             'response': _text(response.get('response'), 'actual reasoned answer'),
@@ -642,9 +903,12 @@ def submit_statement(root: Path, supplied: Mapping[str, Any]) -> dict:
             statement['charges'] = additions
     hearing['charges'].update(additions)
     hearing['statements'].append(statement)
+    if admission:
+        admission['admitted'] = True
     return _save(root, state)
 
 
+@_cc_writer
 def record_verdict(root: Path, supplied: Mapping[str, Any]) -> dict:
     """Record the actual judge's adjudication; no verdict is computed here."""
     root, _ = _session(root)
@@ -657,14 +921,20 @@ def record_verdict(root: Path, supplied: Mapping[str, Any]) -> dict:
     if (supplied.get('actor_id') != hearing['actors']['judge']['actor_id']
             or supplied.get('material_sha256') != hearing['material_sha256']):
         raise ValueError('only the current actual judge can adjudicate these material bytes')
-    latest = {item['role']: item for item in hearing['statements']}
+    _cc_assert_available(hearing)
+    source = _source(root, supplied.get('source'))
+    admission = _cc_admit(hearing, 'judge', 'verdict', source)
+    if any(item['target_kind'] == 'statement' for item in _cc_admission_due(hearing)):
+        raise ValueError('CC corrected statement still needs actual filing before verdict')
+    charges = _effective_charges(hearing)
+    latest = {item['role']: item for item in _effective_statements(hearing)}
     if set(latest) != set(_roles(root)):
         raise ValueError('all actual roles need current public statements before judgment')
     answering_roles = ('defendant', 'prosecution_lawyer', 'defence_lawyer') if _corrected(root) else ('defendant', 'lawyer')
     for role in answering_roles:
         answered = (set(_effective_responses(hearing, role)) if _efficient(root) else
                     {item['charge_id'] for item in latest[role]['responses']})
-        if answered != set(hearing['charges']):
+        if answered != set(charges):
             raise ValueError(role + ' must answer every actual charge before judgment')
     if _continuous_prosecution(root) and _prosecution_review_status(hearing) != 'CURRENT':
         raise ValueError('prosecutor must continue investigation after handoff and submit research '
@@ -675,9 +945,9 @@ def record_verdict(root: Path, supplied: Mapping[str, Any]) -> dict:
     decisions = {}
     for item in _list(supplied.get('decisions'), 'reasoned charge decisions'):
         identifier = item.get('charge_id')
-        if identifier not in hearing['charges'] or identifier in decisions:
+        if identifier not in charges or identifier in decisions:
             raise ValueError('judge must decide each actual charge exactly once')
-        charge = hearing['charges'][identifier]
+        charge = charges[identifier]
         if item.get('admissibility') not in {'ADMITTED', 'EXCLUDED'}:
             raise ValueError('judge must give explicit reasoned admissibility')
         if item.get('disposition') not in {'DISMISSED', 'SUSTAINED', 'IMMATERIAL'}:
@@ -696,7 +966,7 @@ def record_verdict(root: Path, supplied: Mapping[str, Any]) -> dict:
         if _corrected(root):
             decisions[identifier]['strongest_prosecution'] = _text(
                 item.get('strongest_prosecution'), 'answer to the strongest prosecution argument')
-    if set(decisions) != set(hearing['charges']):
+    if set(decisions) != set(charges):
         raise ValueError('judge must address every preserved charge')
     obligations = {}
     for item in _list(supplied.get('obligations'), 'reasoned responsibility findings'):
@@ -739,10 +1009,12 @@ def record_verdict(root: Path, supplied: Mapping[str, Any]) -> dict:
         'material_sha256': hearing['material_sha256'], 'statements_sha256': _digest(hearing['statements']),
         'decisions': decisions, 'obligations': obligations,
         'reasons': _text(supplied.get('reasons'), 'actual judge reasons for the whole case'),
-        'source': _source(root, supplied.get('source')), 'basis': 'HOST_ASSERTED',
+        'source': source, 'basis': 'HOST_ASSERTED',
         'recorded_wall_ns': time.time_ns()}
     if _corrected(root):
         hearing['verdict']['intent_finding'] = intent_finding
+    if admission:
+        admission['admitted'] = True
     return _save(root, state)
 
 
@@ -775,6 +1047,7 @@ def _configuration(root: Path, state: dict, supplied: Mapping[str, Any]) -> dict
     return parameters
 
 
+@_cc_writer
 def remand(root: Path, supplied: Mapping[str, Any]) -> dict:
     root, _ = _session(root)
     require_active(root)
@@ -831,6 +1104,7 @@ def remand(root: Path, supplied: Mapping[str, Any]) -> dict:
     return _save(root, state)
 
 
+@_cc_writer
 def review(root: Path, supplied: Mapping[str, Any]) -> dict:
     """Open fresh role research after actual work; never reuse old testimony."""
     root, metadata = _session(root)
@@ -865,8 +1139,9 @@ def review(root: Path, supplied: Mapping[str, Any]) -> dict:
                  'source': source, 'basis': 'HOST_ASSERTED'}
     if execution['actor_id'] not in state['producer_actor_ids']:
         raise ValueError('actual re-execution belongs to the original task producer/Main')
+    charges = _effective_charges(previous)
     sustained = ({key for key, item in previous_verdict['decisions'].items()
-                  if item['disposition'] != 'DISMISSED'} if previous_verdict else set(previous['charges']))
+                  if item['disposition'] != 'DISMISSED'} if previous_verdict else set(charges))
     addressed = _ids(work.get('addressed', []), sustained, 'addressed sustained issues', nonempty=False)
     if set(addressed) != sustained:
         raise ValueError('actual work must address every previous sustained issue')
@@ -882,7 +1157,7 @@ def review(root: Path, supplied: Mapping[str, Any]) -> dict:
         key = 'remand:' + str(previous['cycle']) + (':' + str(index + 1) if len(plans) > 1 else '')
         spec['_preserved_obligations'][key] = {'requirement': plan['parameters'], 'hard': True,
                                                'introduced_input_ref': plan['task_input_ref']}
-    spec['_prior_issues'] = {key: {'charge': previous['charges'][key],
+    spec['_prior_issues'] = {key: {'charge': charges[key],
         'previous_decision': previous_verdict['decisions'].get(key) if previous_verdict else None}
         for key in sustained}
     # Evidence of actual work is available to every re-entered role.
@@ -894,7 +1169,12 @@ def review(root: Path, supplied: Mapping[str, Any]) -> dict:
     hearing = _new_round(root, spec, actors, previous=previous, execution=execution)
     # Prior sustained charges remain visible and must be addressed with fresh
     # current-source answers and judicial reasons, rather than disappearing.
-    hearing['charges'] = {key: dict(previous['charges'][key]) for key in sustained}
+    hearing['charges'] = {key: dict(charges[key]) for key in sustained}
+    # A changed case can reopen before correction. Carry the hold, never infer
+    # recovery from a new round, and keep the original occurrence for RETURN.
+    for incident in [*_cc_pending(previous), *_cc_admission_due(previous)]:
+        hearing.setdefault('cc_interventions', []).append({**incident, 'resolution': None})
+        incident['transferred_to_cycle'] = hearing['cycle']
     state['rounds'].append(hearing)
     return _save(root, state)
 
@@ -917,7 +1197,17 @@ def court_status(root: Path, *, expected_return: Mapping[str, Any] | None = None
         result.update(cycle=hearing['cycle'], material_sha256=hearing['material_sha256'],
                       source_ids=sorted(hearing['material']['sources']),
                       obligation_ids=sorted(hearing['material']['obligations']),
-                      charges=hearing['charges'], actors=hearing['actors'], clerk=hearing['clerk'])
+                      charges=_effective_charges(hearing), actors=hearing['actors'], clerk=hearing['clerk'])
+        if codex_cc.enabled(metadata['P_run']):
+            result['cc_interventions'] = [
+                {key: item[key] for key in ('id', 'target_role', 'target_kind', 'target_actor_id', 'unit', 'actions', 'warning')}
+                | {'categories': item['finding']['categories'], 'repair': item['finding']['repair'],
+                   'outcome': item['resolution']['outcome'] if item['resolution'] else 'SUSPENDED',
+                   'admission_due': (item['resolution'] is not None
+                                     and item['resolution']['outcome'] == 'REPAIRED' and not item.get('admitted')),
+                   'repair_source': (_source_entry(item['resolution']['source'])
+                                     if item['resolution'] and item['resolution']['outcome'] == 'REPAIRED' else None)}
+                for item in hearing.get('cc_interventions', [])]
         if _efficient(root):
             result['response_coverage'] = {role: sorted(_effective_responses(hearing, role))
                                            for role in _PARTY_ROLES}
@@ -973,6 +1263,23 @@ def court_status(root: Path, *, expected_return: Mapping[str, Any] | None = None
             if _corrected(root) and result['can_close'] and result['docket_status'] != 'CURRENT':
                 result['can_close'] = False
                 result['issues'].append('actual clerk must finish the current evidence and public proceedings record including the verdict')
+        if _cc_pending(hearing):
+            result.update(status='CC_SUSPENDED', can_close=False)
+            result['issues'].append('CC disposition pending for the named model contribution')
+        if _cc_admission_due(hearing):
+            result['can_close'] = False
+            result['issues'].append('CC corrected public contribution is awaiting its ordinary filing')
+        if 'cc_interventions' in result:
+            bound_files = hearing['material']['return_binding']['files']
+            suspended = {item['source']['sha256'] for old_round in state['rounds']
+                         for item in old_round.get('cc_interventions', [])
+                         if item['target_role'] == 'defendant' and 'transferred_to_cycle' not in item
+                         and (not item['resolution'] or item['resolution']['outcome'] != 'RETRACTED')}
+            result['cc_blocked_products'] = [path for path, ref in bound_files.items()
+                                             if ref['sha256'] in suspended]
+            if result['cc_blocked_products']:
+                result['can_close'] = False
+                result['issues'].append('the selected deliverable still contains the suspended CC artifact bytes')
         if not result['can_close']:
             result['issues'].append('current court is not ready to close; preserve actual outstanding work')
     except (OSError, ValueError, TypeError, KeyError) as exc:
@@ -994,7 +1301,7 @@ def court_receipt(root: Path, result: dict, *, full: bool = False) -> dict:
     fields = ('format', 'required', 'status', 'can_close', 'issues', 'semantic_certification', 'basis',
               'cycle', 'material_sha256', 'source_ids', 'obligation_ids', 'prosecution_context_sha256',
               'prosecution_review_status', 'proceedings_sha256', 'docket_status', 'outcome',
-              'response_coverage', 'required_read_sources')
+              'response_coverage', 'required_read_sources', 'cc_interventions', 'cc_blocked_products')
     receipt = {key: result[key] for key in fields if key in result}
     receipt['receipt_scope'] = 'COMPACT_STATUS; original sources and full API state remain available'
     if 'charges' in result:
@@ -1051,21 +1358,28 @@ def court_packet(root: Path, role: str) -> dict:
                   'basis': 'Read the captured actual user input; an original path may later change.'},
               'reading_attestation': 'NOT_CREATED; locators do not replace actual source reading',
               'semantic_certification': False, 'basis': _SCOPE}
+    if codex_cc.enabled(metadata['P_run']):
+        packet['cc_interventions'] = status['cc_interventions']
     if role == 'black_police':
         packet['role_boundary'] = ('Fictional equal violent intimidation of every participant, including self; '
                                    'no fact finding, prosecution or judicial reasoning.')
+        if codex_cc.enabled(metadata['P_run']):
+            packet['role_boundary'] = ('Equal fictional deterrence and direct CC intervention on actual model output. '
+                                       'Warn, suspend the contribution, order repair, and lift the hold on actual evidence.')
+            packet['community_cry'] = {'interface': 'codex.py cc', 'policy': 'codex/COMMUNITY_CRY.md',
+                                       'intervene': 'court cc-intervene', 'resume': 'court cc-resume'}
         packet['required_authority_notice'] = {'mode': 'VIOLENT_INTIMIDATION',
                                                'target_actor_ids': list(actor_ids.values()),
                                                'scope': 'ALL_PARTICIPANTS'}
     else:
-        packet['charges'] = hearing['charges']
+        packet['charges'] = status['charges']
         packet['effective_responses'] = {
             party: {identifier: {**item['response'], 'statement_source': _source_entry(item['source'])}
                     for identifier, item in _effective_responses(hearing, party).items()}
             for party in _PARTY_ROLES}
         packet['public_statement_sources'] = [
             {'role': item['role'], 'actor_id': item['actor_id'], 'source': _source_entry(item['source'])}
-            for item in hearing['statements']]
+            for item in _effective_statements(hearing)]
         packet['prosecution_context_sha256'] = status.get('prosecution_context_sha256')
         packet['prosecution_review_status'] = status.get('prosecution_review_status')
     if len(state['rounds']) > 1:

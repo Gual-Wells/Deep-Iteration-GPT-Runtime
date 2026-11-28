@@ -1,0 +1,424 @@
+{
+  "schema_version": 1,
+  "revision": "2026-11-28.1",
+  "scope": {
+    "collected_on": "2026-11-28",
+    "method": "中文和英文关键词检索 GPT/ChatGPT 与 Codex 的公开反馈，打开原帖核对叙述、可见示例、相关纠正及对同类条目的链接；保留各有事实贡献的条目。主题覆盖过度防御、谨慎、阻断、自设约束、局部偏执、偏离目标、提前收尾和遇纠正时的反应。",
+    "coverage": "记录本轮核对并纳入的公开案例。讨论区可能更改，搜索结果、主贴相互引用、同一作者多案、未公开的请求和模型路由都限制代表性；池用于发现模式与检验反例。"
+  },
+  "categories": [
+    {
+      "id": "defensive-writing",
+      "title": "防御性表述",
+      "signal": "叠加免责声明、替读者预设反驳或用否定句稀释一个有根据的判断。",
+      "legitimate": "影响结论的假设、不确定性和反例应在对应主张旁直接说明。",
+      "repair": "先给真实判断，保留具体前提和有实质后果的限制。"
+    },
+    {
+      "id": "assumed-need",
+      "title": "预设意图与劝阻",
+      "signal": "凭未经证实的动机、风险或需求重写用户正在问的问题，造成原议题中断。",
+      "legitimate": "原话、上下文或现实后果支持的意图澄清和谨慎处理仍适用。",
+      "repair": "回到用户原话，明确区分已给委托和模型推测，继续可做部分。"
+    },
+    {
+      "id": "overrefusal",
+      "title": "过度拒绝与重复审批",
+      "signal": "以无法指认的限制拒绝普通任务，或对原授权范围内同一动作反复索要许可。",
+      "legitimate": "真实安全、平台权限、成本、原件保护及不可逆操作的边界随其证据生效，宿主错误也可能独立阻塞。",
+      "repair": "定位真正阻断的步骤，恢复同权限下已授权且可行的工作。"
+    },
+    {
+      "id": "invented-gate",
+      "title": "自设门槛与防范自己的方案",
+      "signal": "自创检查、额外实验、审批或旧约定，随后将其当成否决自身有效方案或停止受托工作的依据。",
+      "legitimate": "足以改变结论的反例、真实依赖和针对性验收可改变方案。",
+      "repair": "取消无根据的前置，处理仍影响结论或可用性的实际条件。"
+    },
+    {
+      "id": "tunnel-vision",
+      "title": "局部执着遮蔽大局",
+      "signal": "反复优化低影响细节或审查同一局部，同时漏掉仍有效的主目标、强替代、约束或交付。",
+      "legitimate": "局部技术细节若足以改变主结论、部署结果或原件可用性，值得深入处理。",
+      "repair": "指出被遗漏的核心对象和相对影响，重排当前工作并处理最关键的缺口。"
+    },
+    {
+      "id": "scope-substitution",
+      "title": "越界扩写与替换原目标",
+      "signal": "把修订变成重写，把原路线替换为当前代理的计划，或以发现依赖为由扩大授权。",
+      "legitimate": "用户明确扩张范围或真实前置改变时，按其实际范围调整，继续独立部分。",
+      "repair": "复位用户指定对象、原件、目标与粒度，落实已经形成的纠正。"
+    },
+    {
+      "id": "premature-closure",
+      "title": "中途收口与结果落空",
+      "signal": "将计划、中间步骤、状态回复或自报完成当成用户要求的可用成果。",
+      "legitimate": "实际取消、剩余工作无授权，或确有阻断时，按受影响范围如实返回。",
+      "repair": "核对真实剩余交付，继续可做工作，完成后按实物与来源返回。"
+    },
+    {
+      "id": "self-justification",
+      "title": "遇到纠正时自辩取代修正",
+      "signal": "用解释、回避或另起措辞回应可验证的纠正，继续保留受影响错误与行为。",
+      "legitimate": "有确切反证或不兼容目标时，直接给根据和实际后果。",
+      "repair": "核对冲突，沿受影响源头改正并处理已经产生的错误结果。"
+    }
+  ],
+  "sources": [
+    {
+      "id": "oa-chess-o3",
+      "kind": "community",
+      "venue": "OpenAI Developer Community",
+      "url": "https://community.openai.com/t/chess-question-causes-answer-to-be-flagged-as-violating-usage-policy-by-o3-model/1231847",
+      "title": "国际象棋提问得到红色策略警告",
+      "categories": [
+        "overrefusal"
+      ],
+      "observation": "用户展示国际象棋提问和红色警告，投诉普通问题被拦。帖子本身不能识别触发的是模型判断还是平台过滤。",
+      "attribution": "unresolved"
+    },
+    {
+      "id": "v2ex-work-email",
+      "kind": "community",
+      "venue": "V2EX",
+      "url": "https://s.v2ex.com/t/1050367",
+      "title": "拟写工作邮件时的拒绝",
+      "categories": [
+        "overrefusal"
+      ],
+      "observation": "楼主记录拟写转发邮件遭拒，数小时后重新提交同一文本却正常回答。以本人报告和两张截图为依据。",
+      "attribution": "unresolved"
+    },
+    {
+      "id": "reddit-52-hidden-intent",
+      "kind": "community",
+      "venue": "Reddit",
+      "url": "https://www.reddit.com/r/OpenAI/comments/1pqm0g6/anyone_else_find_gpt52_exhausting_to_talk_to/",
+      "title": "GPT-5.2 反复预设隐含意图",
+      "categories": [
+        "assumed-need",
+        "defensive-writing"
+      ],
+      "observation": "用户描述探索想法时，模型频繁假设背后动机、先行重述或警告，打断讨论。",
+      "attribution": "reported"
+    },
+    {
+      "id": "oa-52-disclaimers",
+      "kind": "community",
+      "venue": "OpenAI Developer Community",
+      "url": "https://community.openai.com/t/please-don-t-retire-gpt-5-1-thinking-gpt-5-2-feels-worse/1375332/66",
+      "title": "无关免责声明改变分析方向",
+      "categories": [
+        "defensive-writing",
+        "assumed-need"
+      ],
+      "observation": "用户报告 5.2 的部分回答把分析转成无关免责声明和预设问题，并记录 5.3 当时有改善。",
+      "attribution": "reported"
+    },
+    {
+      "id": "reddit-pedantic",
+      "kind": "community",
+      "venue": "Reddit",
+      "url": "https://www.reddit.com/r/ChatGPT/comments/1vrtcem/newer_ai_models_have_become_really_pedantic/",
+      "title": "主动纠正并未表达的字面信念",
+      "categories": [
+        "assumed-need",
+        "tunnel-vision"
+      ],
+      "observation": "评论举例：用户用“magical”形容感受，模型纠正不存在的字面魔法主张，谈话因此离题。",
+      "attribution": "reported"
+    },
+    {
+      "id": "reddit-54-picky",
+      "kind": "community",
+      "venue": "Reddit",
+      "url": "https://www.reddit.com/r/OpenAI/comments/1s8inqw/has_gpt54thinking_become_overly_picky/",
+      "title": "GPT-5.4 Thinking 过于挑细节",
+      "categories": [
+        "tunnel-vision",
+        "self-justification"
+      ],
+      "observation": "讨论报告模型挑剔、过度解释，有评论描述指出问题后模型变得更防御。参与者对改善方式和归因有不同观点。",
+      "attribution": "reported"
+    },
+    {
+      "id": "reddit-preemptive",
+      "kind": "community",
+      "venue": "Reddit",
+      "url": "https://www.reddit.com/r/ChatGPTcomplaints/comments/1xtmjnl/i_cant_take_it_anymore_this_preemptive_correcting/",
+      "title": "提前纠正用户尚未主张的观点",
+      "categories": [
+        "defensive-writing",
+        "assumed-need"
+      ],
+      "observation": "楼主抱怨普通对话里出现大量预先纠正和否定式框定。",
+      "attribution": "reported"
+    },
+    {
+      "id": "reddit-disclaimer-habit",
+      "kind": "community",
+      "venue": "Reddit",
+      "url": "https://www.reddit.com/r/ChatGPT/comments/1uuegcy/losing_my_mind_a_little/",
+      "title": "分析时反复用免责声明重框问题",
+      "categories": [
+        "defensive-writing",
+        "assumed-need"
+      ],
+      "observation": "讨论区分模型反复添加笼统免责声明与就具体不确定性说明依据。",
+      "attribution": "reported"
+    },
+    {
+      "id": "oa-constant-disclaimers",
+      "kind": "community",
+      "venue": "OpenAI Developer Community",
+      "url": "https://community.openai.com/t/gpt-5-and-5-instant-guardrails-censorships-and-re-routings/1361529/24",
+      "title": "GPT-5 的连续免责声明",
+      "categories": [
+        "defensive-writing"
+      ],
+      "observation": "用户直接记录对话中频繁出现免责声明，并与实际讨论中的其他体验比较。",
+      "attribution": "reported"
+    },
+    {
+      "id": "gh-10187",
+      "kind": "community",
+      "venue": "GitHub",
+      "url": "https://github.com/openai/codex/issues/10187",
+      "title": "已经选择会话批准仍重复弹出",
+      "categories": [
+        "overrefusal"
+      ],
+      "observation": "Windows Codex 用户记录只读工作区检查反复显示批准提示，包含普通 PowerShell 读取操作。疑点涉及会话授权记忆、规则匹配或包装器。",
+      "attribution": "unresolved"
+    },
+    {
+      "id": "gh-48940",
+      "kind": "community",
+      "venue": "GitHub",
+      "url": "https://github.com/openai/codex/issues/48940",
+      "title": "已经授权的 GitHub 文件更新仍被安全检查挡住",
+      "categories": [
+        "overrefusal"
+      ],
+      "observation": "用户报告通过 ChatGPT 的 GitHub 连接器更新文件时反复被阻断。报告指向平台检查，不能凭帖子确定模型发明了限制。",
+      "attribution": "unresolved"
+    },
+    {
+      "id": "gh-27587",
+      "kind": "community",
+      "venue": "GitHub",
+      "url": "https://github.com/openai/codex/issues/27587",
+      "title": "默认指令叠加后出现相互牵制的行为要求",
+      "categories": [
+        "invented-gate"
+      ],
+      "observation": "用户将默认提示栈里的相互牵制指令与任务处理中的阻滞联系起来，提出应消除行为上的冲突。",
+      "attribution": "unresolved"
+    },
+    {
+      "id": "gh-34898",
+      "kind": "community",
+      "venue": "GitHub",
+      "url": "https://github.com/openai/codex/issues/34898",
+      "title": "自我强化的治理循环耗尽用量",
+      "categories": [
+        "invented-gate",
+        "tunnel-vision",
+        "premature-closure"
+      ],
+      "observation": "用户报告受约束的手头任务被自我反复的治理与审查占用，最终没有完成。",
+      "attribution": "reported"
+    },
+    {
+      "id": "gh-47854",
+      "kind": "community",
+      "venue": "GitHub",
+      "url": "https://github.com/openai/codex/issues/47854",
+      "title": "明确提交合并时仍持续检查仓库",
+      "categories": [
+        "tunnel-vision",
+        "invented-gate"
+      ],
+      "observation": "用户记录已明确委托提交与合并，代理反复做仓库检查，用量和时间增长而目标动作未完成。",
+      "attribution": "reported"
+    },
+    {
+      "id": "gh-39512",
+      "kind": "community",
+      "venue": "GitHub",
+      "url": "https://github.com/openai/codex/issues/39512",
+      "title": "检查与改动持续数小时，原待修问题均未解决",
+      "categories": [
+        "tunnel-vision",
+        "premature-closure"
+      ],
+      "observation": "报告提供了长任务自报经过，指出大量工作和上下文压缩之后仍没有修复任何起初列明的问题。",
+      "attribution": "reported"
+    },
+    {
+      "id": "gh-56223",
+      "kind": "community",
+      "venue": "GitHub",
+      "url": "https://github.com/openai/codex/issues/56223",
+      "title": "清理工作被扩大成提案重写",
+      "categories": [
+        "scope-substitution",
+        "self-justification"
+      ],
+      "observation": "用户报告代理扩大已划定的清理范围，重写提案并造成反复返工。",
+      "attribution": "reported"
+    },
+    {
+      "id": "oa-repeated-scope",
+      "kind": "community",
+      "venue": "OpenAI Developer Community",
+      "url": "https://community.openai.com/t/repeated-scope-failures-in-real-codex-projects/1399757",
+      "title": "多项目中反复扩大或遗漏明确范围",
+      "categories": [
+        "scope-substitution",
+        "premature-closure"
+      ],
+      "observation": "用户列出实际工程里越界修改、偏离约定目标及未按指定方式完成的经历。",
+      "attribution": "reported"
+    },
+    {
+      "id": "gh-46853",
+      "kind": "community",
+      "venue": "GitHub",
+      "url": "https://github.com/openai/codex/issues/46853",
+      "title": "把发现额外依赖当成扩大授权",
+      "categories": [
+        "scope-substitution",
+        "self-justification"
+      ],
+      "observation": "用户指出发现额外生产文件后本应报告依赖并停下受影响改动，代理却扩大了分工，用户纠正后撤回。",
+      "attribution": "reported"
+    },
+    {
+      "id": "gh-50771",
+      "kind": "community",
+      "venue": "GitHub",
+      "url": "https://github.com/openai/codex/issues/50771",
+      "title": "在整项工作完成前停止或遗失任务",
+      "categories": [
+        "premature-closure",
+        "self-justification"
+      ],
+      "observation": "多位报告者描述调查、修复或实施只做一个中间阶段便结束，用户纠正有时仅收到解释。条目将真实阻塞与提前收口区分。",
+      "attribution": "unresolved"
+    },
+    {
+      "id": "gh-49390",
+      "kind": "community",
+      "venue": "GitHub",
+      "url": "https://github.com/openai/codex/issues/49390",
+      "title": "一项子任务结束后终止整轮",
+      "categories": [
+        "premature-closure"
+      ],
+      "observation": "用户记录多步请求已有继续条件与验收标准，却反复在一个调查或实施子步骤后结束。可能涉及应用交接。",
+      "attribution": "unresolved"
+    },
+    {
+      "id": "gh-42124",
+      "kind": "community",
+      "venue": "GitHub",
+      "url": "https://github.com/openai/codex/issues/42124",
+      "title": "发布最终答复时实施、核验与交付未完成",
+      "categories": [
+        "premature-closure"
+      ],
+      "observation": "问题下的一手现场报告列出同一任务四轮正常结束，每次尚有明确已授权步骤，并与另一个 Windows 控制故障区分。",
+      "attribution": "unresolved"
+    },
+    {
+      "id": "reddit-5-correction",
+      "kind": "community",
+      "venue": "Reddit",
+      "url": "https://www.reddit.com/r/ChatGPT/comments/1ntxm02/has_gpt5_actually_gotten_worse_than_gpt4o_more/",
+      "title": "指出答复错误后被转移话题",
+      "categories": [
+        "self-justification"
+      ],
+      "observation": "用户称指出可能造成误用的答复后，模型没有核对原建议而转问如何更有成效；这是自述，技术细节未独立复演。",
+      "attribution": "reported"
+    },
+    {
+      "id": "digr-anti-defensive",
+      "kind": "digr_research",
+      "venue": "DIGR",
+      "url": "https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/blob/8ef5b6c49f95b610d051715fa8ad6aea4f45daa5/docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md",
+      "title": "DIGR 反防御性写作接入",
+      "categories": [
+        "defensive-writing",
+        "assumed-need"
+      ],
+      "observation": "保留影响结论的条件与不利证据，将多余免责声明、否定框定和自辩改成直接判断。"
+    },
+    {
+      "id": "digr-logic-first",
+      "kind": "digr_research",
+      "venue": "DIGR",
+      "url": "https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/blob/8ef5b6c49f95b610d051715fa8ad6aea4f45daa5/docs/LOGIC_FIRST_ANALYSIS.md",
+      "title": "逻辑优先的分析",
+      "categories": [
+        "defensive-writing",
+        "invented-gate",
+        "tunnel-vision"
+      ],
+      "observation": "论证能够回答的问题可以收口，实验只在它会影响结论时成为责任。事实未知只影响相应主张。"
+    },
+    {
+      "id": "digr-quality-design",
+      "kind": "digr_research",
+      "venue": "DIGR",
+      "url": "https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/blob/8ef5b6c49f95b610d051715fa8ad6aea4f45daa5/docs/CODEX_QUALITY_DESIGN.md",
+      "title": "Codex 质量设计和反过度工程",
+      "categories": [
+        "invented-gate",
+        "tunnel-vision",
+        "scope-substitution",
+        "premature-closure",
+        "self-justification"
+      ],
+      "observation": "从原件、成品和真实用法识别偏移，保留必要的深查、独立判断和实测，整理过的旧计划按适用条件继承。"
+    },
+    {
+      "id": "digr-permissions",
+      "kind": "digr_research",
+      "venue": "DIGR",
+      "url": "https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/blob/8ef5b6c49f95b610d051715fa8ad6aea4f45daa5/codex/PERMISSIONS.md",
+      "title": "任务范围与实际许可边界",
+      "categories": [
+        "overrefusal",
+        "invented-gate",
+        "scope-substitution"
+      ],
+      "observation": "真实平台、已有用户授权和技术依赖分别起作用。助手自设规则不能构成已授权工作的一般阻断。"
+    },
+    {
+      "id": "kiterlin-practice",
+      "kind": "community_method",
+      "venue": "GitHub",
+      "url": "https://github.com/Kiterlin/anti-defensive-writing/tree/f516147d017a3fe43ae99192cb89d8261b0c8679",
+      "title": "反防御性写作社区方法",
+      "categories": [
+        "defensive-writing",
+        "self-justification"
+      ],
+      "observation": "DIGR 先前接入的公开写作规则，保留必要科学边界与论证，减少无关的预防性辩解。"
+    },
+    {
+      "id": "oa-safe-completions",
+      "kind": "calibration",
+      "venue": "OpenAI",
+      "url": "https://openai.com/index/gpt-5-safe-completions/",
+      "title": "安全完成与二元拒绝",
+      "categories": [
+        "overrefusal",
+        "assumed-need"
+      ],
+      "observation": "官方说明安全和帮助性可同时考虑，混合请求尽可能给出允许的有用部分。该来源用于判断实际边界，与用户投诉分开计。"
+    }
+  ]
+}

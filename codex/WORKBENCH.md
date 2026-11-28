@@ -1,6 +1,6 @@
 # 工作工具：取回问题、继续制作、保留真实后果
 
-长任务从已有笔记开始，必要时再使用这些标准库工具。统一入口是 `python -B tools/codex.py`；Claude提交的原生分工及`consult split`／`call --split-plan`见必读[SPLIT](SPLIT.md)。工作台、版本和访时工具保存实际事实。外部推理仅从满足角色、费用与 Split 条件的调用入口提交。
+长任务从已有笔记开始，必要时再使用这些标准库工具。社区证据与现行纠偏规则走 `cc inspect/search/assess`，C1 直接介入与恢复走 `court cc-intervene/cc-resume`，见 [Community Cry](COMMUNITY_CRY.md)。统一入口是 `python -B tools/codex.py`；Claude提交的原生分工及`consult split`／`call --split-plan`见必读[SPLIT](SPLIT.md)。工作台、版本和访时工具保存实际事实。外部推理仅从满足角色、费用与 Split 条件的调用入口提交。
 
 按 [PROTOCOL](PROTOCOL.md) 解释任务冻结版本和用户当前选择。Stable 的 `task lifecycle/report` 给出当前 `claude_policy`。单冒号为 `COUNCIL_ONLY`，双冒号为 `ALLOW`。普通话明确更改时用 `task handle --claude-selection COUNCIL_ONLY|ALLOW|DENY` 绑定真实当前原话。已有任务按原 pin 的枚举及费用契约恢复。`profile classify --pin <版本@完整SHA>` 可离线预览对应语义，省略 pin 时预览当前分发，真实获取仍走 `acquire`。
 

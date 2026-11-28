@@ -104,9 +104,10 @@ def main(argv=None):
             compact = tuple(map(int, session['P_run'].split('@')[0].split('.'))) >= (0, 16, 0) and not args.raw_events
             relay = None
             if live and compact:
+                from runtime.codex_cc import enabled as cc_enabled
                 from runtime.codex_live import ParagraphRelay, stable_live
                 stable = stable_live(session['P_run'])
-                relay = ParagraphRelay(emit, stable=stable)
+                relay = ParagraphRelay(emit, stable=stable, reminders=cc_enabled(session['P_run']))
                 exchange = args.root / 'consult/exchanges' / args.exchange_id
                 requested_model = read(exchange / 'request.json')['model']
                 production_stage = (read(exchange / 'attempt.json').get('production') or {}).get('stage') if stable else None

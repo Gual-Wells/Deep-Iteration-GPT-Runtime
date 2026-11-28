@@ -14,7 +14,7 @@ import threading
 import time
 import uuid
 
-from . import codex_io
+from . import codex_cc, codex_io
 
 _ID = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,95}')
 STAGES = {'START': '▶ 开始', 'PROGRESS': '⋯ 进展', 'REENTER': '↻ 再入',
@@ -23,6 +23,28 @@ STAGES = {'START': '▶ 开始', 'PROGRESS': '⋯ 进展', 'REENTER': '↻ 再�
 KINDS = {'U0', 'N', 'R', 'D', 'V', 'S', 'M', 'SIDECAR'}
 ICONS = {'U0': '🟦', 'N': '🟦', 'R': '🟪', 'D': '🟧', 'V': '🟩', 'S': '🟨', 'M': '🟥', 'SIDECAR': '🟦'}
 STABLE_KINDS = {'INIT': '⚙️', 'ARBITRATION': '🟥'}
+_PARAMETER_KINDS = {'T': '🕒', 'B': '🟨', 'L': '🟧', 'F': '🟨',
+                    'C': '🟥', 'U': '🟦', 'X': '🟦'}
+_REMINDER_DUTIES = {
+    'U0': '核对当前范围、公开流、独立性、费用与接续',
+    'INIT': '核对已定投入、真实派发及当前交付',
+    'N': '沿当前对象落实可见产物',
+    'T': '按真实访时边界记录投入',
+    'R': '指出真实异议和改动后果',
+    'B': '按实质补点恢复受影响工作',
+    'S': '回到原件、用途与来源边界',
+    'D': '保持独立并处理真实返回',
+    'V': '按当前版本验证并处理缺陷',
+    'L': '核对真实隔离与公开交接',
+    'M': '处理真实回包和原目标',
+    'F': '追溯来源和实际转化',
+    'C': '核对当前案卷、角色、CC与续审',
+    'U': '同等处理独立稿和真实授权',
+    'X': '核对当前交付目标和实际回读',
+    'ARBITRATION': '比较真实同范围候选并落实取舍',
+    'SIDECAR': '核对本线义务及主线接续',
+}
+_EXTERNAL_REMINDER = '协议自提醒（外部返回）｜核对原文转播、费用、终态与原生再议。'
 _PUBLIC_EVENTS = {'public_delta', 'connected', 'finished'}
 _PUBLIC_FIELDS = ('event', 'exchange_id', 'member_id', 'sequence', 'at', 'text',
                   'transport_status', 'public_status', 'billing_status', 'known_cost_usd', 'http_status')
@@ -110,11 +132,12 @@ def _external_status(item):
 
 class ParagraphRelay:
     """Coalesce actual public deltas by exchange without rewriting their text."""
-    def __init__(self, emit, *, max_chars=1600, latency_seconds=.5, stable=False):
+    def __init__(self, emit, *, max_chars=1600, latency_seconds=.5, stable=False, reminders=False):
         if max_chars < 64 or latency_seconds <= 0:
             raise ValueError('relay bounds must be positive and readable')
         self.emit, self.max_chars, self.latency = emit, max_chars, latency_seconds
         self.stable = stable
+        self.reminders = reminders
         self.buffers = {}
         self.lock = threading.RLock()
 
@@ -187,6 +210,9 @@ class ParagraphRelay:
                         status, production_stage=event.get('production_stage')) + '\n\n' + _external_status(status)
                 else:
                     status['display_text'] = '**宿主状态｜' + str(event.get('event')) + '**\n\n' + json.dumps(status, ensure_ascii=False)
+                if self.reminders and status.get('event') == 'finished':
+                    status['protocol_reminder'] = _EXTERNAL_REMINDER
+                    status['display_text'] += '\n\n' + _EXTERNAL_REMINDER
                 self.emit(status)
 
     def flush(self):
@@ -203,13 +229,14 @@ def emit_work(root: Path, *, actor: str, kind: str, unit: str, stage: str,
     from .codex_visits import _locked
     root, session = _session(root)
     stable = stable_live(session['P_run'])
+    reminders = codex_cc.enabled(session['P_run'])
     if not stable:
         require_active(root)
         if line or return_mode:
             raise ValueError('line and return mode require a 1.x or later task pin')
     _id(actor); _id(unit); _id(operation_id)
-    if (kind not in KINDS and not (stable and kind in STABLE_KINDS)
-            or stage not in STAGES or not isinstance(text, str) or not text.strip()):
+    valid_kind = kind in KINDS or stable and kind in STABLE_KINDS or reminders and kind in _PARAMETER_KINDS
+    if (not valid_kind or stage not in STAGES or not isinstance(text, str) or not text.strip()):
         raise ValueError('actual work kind, stage and public summary text required')
     if stage in {'RETURN', 'HANDLED'} and (not isinstance(source_ref, str) or not source_ref.strip()):
         raise ValueError('returned contribution and actual handling require a source reference')
@@ -225,6 +252,8 @@ def emit_work(root: Path, *, actor: str, kind: str, unit: str, stage: str,
         if return_mode and (stage != 'RETURN' or return_mode not in {'quote', 'summary'}):
             raise ValueError('native return mode must be quote or summary on an actual return')
         record.update(line=line, return_mode=(return_mode or 'summary') if stage == 'RETURN' else '')
+    if reminders:
+        record['protocol_reminder'] = f"协议自提醒（{_unit_label(record)}）｜{_REMINDER_DUTIES[kind]}。"
     with _locked(path, create=True) as descriptor:
         os.lseek(descriptor, 0, os.SEEK_SET)
         saved = b''
@@ -262,6 +291,15 @@ def _items(root, exchange_id):
     events = _lines(root / 'consult/exchanges' / exchange_id / 'public.events.jsonl')
     return [{field: row[field] for field in _PUBLIC_FIELDS if field in row}
             for row in events if row.get('event') in _PUBLIC_EVENTS]
+
+
+def work_event(root: Path, operation_id: str) -> dict:
+    """Recover an actual recorded operation without inferring display or authorship."""
+    _id(operation_id)
+    for item in _items(root, None):
+        if item['operation_id'] == operation_id:
+            return item
+    raise ValueError('CC requires the actual recorded public work operation')
 
 
 def _public_text(item, stable):
@@ -308,7 +346,7 @@ def _work_label(item, stable):
         stage += '｜' + ('逐字引文' if item.get('return_mode') == 'quote' else '概括')
     if item.get('missing_start'):
         stage += '｜开始边界缺记录'
-    icon = ICONS.get(kind) or STABLE_KINDS[kind]
+    icon = ICONS.get(kind) or STABLE_KINDS.get(kind) or _PARAMETER_KINDS[kind]
     return f'{icon} **{role}{topic}**\n**{stage}**'
 
 
@@ -386,7 +424,12 @@ def pending(root: Path, *, reader: str, exchange_id: str | None = None,
                      + model_label + '**' if public_original else '**宿主状态**')
         label += '（续）' if offset else ''
         start_index, start_offset = index, offset
-        budget = left - len(label) - 8
+        reminder = item.get('protocol_reminder', '')
+        if item.get('event') == 'finished' and codex_cc.enabled(session['P_run']):
+            reminder = _EXTERNAL_REMINDER
+        # Reserve public space for the reminder even when this output needs multiple batches.
+        tail = ('\n\n' + reminder) if reminder else ''
+        budget = left - len(label) - 8 - len(tail)
         if stable and budget < (5 if quote else 1):
             if segments:
                 break
@@ -416,6 +459,9 @@ def pending(root: Path, *, reader: str, exchange_id: str | None = None,
                          'end_offset': offset, 'text': text, 'public_original': public_original,
                          'source_ref': item.get('source_ref'), 'actor': item.get('actor'), 'stage': item.get('stage')})
         body = '> ' + text.replace('\n', '\n> ') if quote else text
+        if tail and index > start_index:
+            body += tail
+            segments[-1]['protocol_reminder'] = reminder
         displays.append(label + '\n\n' + body)
         left -= len(label) + len(body) + 8
     to = {'index': index, 'offset': offset, 'prefix_sha256': sha256(_bytes(items[:index])).hexdigest(),

@@ -10,7 +10,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from runtime.codex_court import (
-    ROLES, court_packet, court_receipt, court_status, open_court, record_docket,
+    ROLES, cc_intervene, cc_resume, court_packet, court_receipt, court_status, open_court, record_docket,
     record_verdict, remand, review, submit_statement,
 )
 
@@ -20,7 +20,8 @@ def main(argv=None):
         if hasattr(stream, 'reconfigure'):
             stream.reconfigure(encoding='utf-8', newline='\n')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('open', 'submit', 'verdict', 'record', 'remand', 'review', 'status', 'packet'))
+    parser.add_argument('action', choices=('open', 'submit', 'verdict', 'record', 'remand', 'review', 'status', 'packet',
+                                           'cc-intervene', 'cc-resume'))
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--input', type=Path, help='actual source-bound public input JSON, required for writes')
     parser.add_argument('--role', choices=ROLES, help='actual role for the read-only packet action')
@@ -40,7 +41,8 @@ def main(argv=None):
             if not isinstance(supplied, dict):
                 raise ValueError('--input must contain a JSON object')
             functions = {'open': open_court, 'submit': submit_statement, 'verdict': record_verdict,
-                         'record': record_docket, 'remand': remand, 'review': review}
+                         'record': record_docket, 'remand': remand, 'review': review,
+                         'cc-intervene': cc_intervene, 'cc-resume': cc_resume}
             result = functions[args.action](args.root, supplied)
         if args.action != 'packet':
             result = court_receipt(args.root, result, full=args.full)

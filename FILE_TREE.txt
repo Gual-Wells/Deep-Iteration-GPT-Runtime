@@ -22,6 +22,8 @@ codex/CHAT.md
 codex/CHAT_DEEP.md
 codex/CHAT_LIGHT.md
 codex/COLLABORATION.md
+codex/COMMUNITY_CRY.json
+codex/COMMUNITY_CRY.md
 codex/CONSTITUTION.md
 codex/CONSULT.md
 codex/COUNCIL.md
@@ -449,6 +451,7 @@ runtime/clock_journal.py
 runtime/clock_probe.py
 runtime/codex_allot.py
 runtime/codex_allot_labor.py
+runtime/codex_cc.py
 runtime/codex_collaboration.py
 runtime/codex_consult.py
 runtime/codex_consult_budget.py
@@ -903,6 +906,7 @@ tests/test_codex_allot_policy.py
 tests/test_codex_allot_primary_model.py
 tests/test_codex_allot_recovery.py
 tests/test_codex_carrier.py
+tests/test_codex_cc.py
 tests/test_codex_claude_selection.py
 tests/test_codex_cli.py
 tests/test_codex_consult.py
@@ -1001,6 +1005,7 @@ tools/assemble_paper.py
 tools/build_release.py
 tools/codex.py
 tools/codex_allot.py
+tools/codex_cc.py
 tools/codex_consult.py
 tools/codex_council.py
 tools/codex_court.py
