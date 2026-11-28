@@ -28,7 +28,7 @@
 
 ## 使用与证据边界
 
-从[当前技能](../.agents/skills/digr-spoken-preprint/SKILL.md)进入，具体活动示例见[GENESIS](../spoken-preprint/GENESIS.md)。有明确私人绑定时读真实入口及其局限，不把某份历史书当默认合格样本。个人上下文是可选的所选资料提供者，虚构项目可在已选技术范围内自足；无需先建设全人画像。第二语言、论文知识池、Voice陪练继续各自独立。
+从[当前技能](https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/blob/7223b4722739a63b6cff37163a6ea6b0f2c04854/.agents/skills/digr-spoken-preprint/SKILL.md)进入，具体活动示例见[GENESIS](../spoken-preprint/GENESIS.md)。有明确私人绑定时读真实入口及其局限，不把某份历史书当默认合格样本。个人上下文是可选的所选资料提供者，虚构项目可在已选技术范围内自足；无需先建设全人画像。第二语言、论文知识池、Voice陪练继续各自独立。
 
 本次代表性人物生产、私人目标和消费记录留在私人项目；公开运行库不收个人学习记录。原生提交、编辑解释、文件验证、真实手机Voice、理解和后续复用是不同事实。没有以文本消费者代替手机实机，也没有观察长期学习收益。
 

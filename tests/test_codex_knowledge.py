@@ -12,6 +12,13 @@ from unittest.mock import patch
 from runtime import codex_knowledge as k
 
 
+ROOT = Path(__file__).resolve().parents[1]
+LEGACY_KNOWLEDGE_CLI = [
+    sys.executable, '-B', '-c',
+    'from tools.codex_knowledge import main\nraise SystemExit(main())',
+]
+
+
 class KnowledgePoolTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory()
@@ -247,9 +254,9 @@ class KnowledgePoolTests(unittest.TestCase):
                     'supporting_quotes':[{'page':1,'quote':'Tasks arrive at the beginning of a slot.'}]},
                     'reason':'Fixture source re-read','source_ref':'synthetic correction source'}
         inp=self.root/'use-correction.json';inp.write_text(json.dumps(correction),encoding='utf-8')
-        cli=Path(__file__).resolve().parents[1]/'tools/codex_knowledge.py'
-        r=subprocess.run([sys.executable,'-B',str(cli),'--pool',str(self.root),'revise-use','--input',str(inp),
-            '--expected-revision','3','--operation-id','correct-use'],capture_output=True,text=True,encoding='utf-8')
+        r=subprocess.run([*LEGACY_KNOWLEDGE_CLI,'--pool',str(self.root),'revise-use','--input',str(inp),
+            '--expected-revision','3','--operation-id','correct-use'],
+            cwd=ROOT,capture_output=True,text=True,encoding='utf-8')
         self.assertEqual(r.returncode,0,r.stderr)
         replacement=json.loads(r.stdout)['result']['replacement_id']
         self.assertEqual(k.load(self.root)['sessions']['paper-a-s1']['questionnaire'],frozen)
@@ -289,10 +296,9 @@ class KnowledgePoolTests(unittest.TestCase):
     def test_cli_utf8_is_independent_of_parent_encoding(self):
         self.analysis['questions'][1]['label']='剩余工作 −1² 与下一步'
         self.ingest()
-        cli=Path(__file__).resolve().parents[1]/'tools/codex.py'
         env={**os.environ,'PYTHONIOENCODING':'ascii','PYTHONUTF8':'0'}
-        result=subprocess.run([sys.executable,'-B',str(cli),'knowledge','--pool',str(self.root),'questionnaire'],
-            env=env,capture_output=True)
+        result=subprocess.run([*LEGACY_KNOWLEDGE_CLI,'--pool',str(self.root),'questionnaire'],
+            cwd=ROOT,env=env,capture_output=True)
         self.assertEqual(result.returncode,0,result.stderr.decode('utf-8'))
         self.assertIn('剩余工作 −1² 与下一步',result.stdout.decode('utf-8'))
 
@@ -304,9 +310,9 @@ class KnowledgePoolTests(unittest.TestCase):
         payload={'concept_id':'queue.work','expected_content_sha256':old['content_sha256'],
                  'replacement':replacement,'reason':'Fixture correction','source_ref':'fixture source'}
         inp=self.root/'correction.json';inp.write_text(json.dumps(payload),encoding='utf-8')
-        cli=Path(__file__).resolve().parents[1]/'tools/codex_knowledge.py'
-        result=subprocess.run([sys.executable,'-B',str(cli),'--pool',str(self.root),'revise-concept',
-            '--input',str(inp),'--expected-revision','1','--operation-id','cli-correction'],capture_output=True,text=True,encoding='utf-8')
+        result=subprocess.run([*LEGACY_KNOWLEDGE_CLI,'--pool',str(self.root),'revise-concept',
+            '--input',str(inp),'--expected-revision','1','--operation-id','cli-correction'],
+            cwd=ROOT,capture_output=True,text=True,encoding='utf-8')
         self.assertEqual(result.returncode,0,result.stderr)
         self.assertEqual(json.loads(result.stdout)['action'],'revise-concept')
         self.assertEqual(k.load(self.root)['revision'],2)

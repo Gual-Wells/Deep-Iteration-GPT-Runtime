@@ -44,9 +44,9 @@ python -B tools/codex.py voice export project --out D:/task/ChatGPT-Voice-Compan
 | [MOBILE.txt](MOBILE.txt) | 手机／网页自足配置；本用户选择直接替换旧stable，普通语音不另开正式DIGR通道。 |
 | [START.txt](START.txt) | 明确选用完整附件并开练的一次入口；不会以裸 DIGR 前缀误触正式执行。 |
 | [完整英文单文件](ChatGPT-Voice-Companion.md) | 供无本地读取端上传；由同一份源技能和参考装配。 |
-| [完整技能](../.agents/skills/digr-voice-companion/SKILL.md) | 当前交流、救场、创作、事实与话轮的具体行为；按需要读取例子。 |
-| [对话例子](../.agents/skills/digr-voice-companion/references/examples.md) | 通过真实英文往返展示行为，不是让用户背的答案。 |
-| [宿主说明](../.agents/skills/digr-voice-companion/references/hosts.md) | 区分ChatGPT账号指令、本机AGENTS、本地技能与Voice前台，给出对应装载方式。 |
+| [完整技能](https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/blob/7223b4722739a63b6cff37163a6ea6b0f2c04854/.agents/skills/digr-voice-companion/SKILL.md) | 当前交流、救场、创作、事实与话轮的具体行为；按需要读取例子。 |
+| [对话例子](https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/blob/7223b4722739a63b6cff37163a6ea6b0f2c04854/.agents/skills/digr-voice-companion/references/examples.md) | 通过真实英文往返展示行为，不是让用户背的答案。 |
+| [宿主说明](https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/blob/7223b4722739a63b6cff37163a6ea6b0f2c04854/.agents/skills/digr-voice-companion/references/hosts.md) | 区分ChatGPT账号指令、本机AGENTS、本地技能与Voice前台，给出对应装载方式。 |
 
 短核适合驻留，完整内容按需。可发现的技能不等于已用于当前语音；项目文件存在也不等于模型已经读过。安装与实际使用分别确认。
 

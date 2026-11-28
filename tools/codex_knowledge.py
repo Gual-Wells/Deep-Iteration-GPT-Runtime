@@ -4,6 +4,12 @@ from __future__ import annotations
 import argparse,json,os
 from pathlib import Path
 import sys
+
+if __name__ == '__main__':
+    print('Paper Knowledge retired in DIGR Codex 2.0. Use the original DIGR Codex 1.x distribution for the task.',
+          file=sys.stderr)
+    raise SystemExit(2)
+
 ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 from runtime import codex_knowledge as k
@@ -67,6 +73,3 @@ def main(argv=None):
     except (ValueError,KeyError,TypeError,OSError) as exc:
         print(json.dumps({'error':str(exc),'mutations_not_assumed':True},ensure_ascii=False),file=sys.stderr)
         return 2
-
-
-if __name__=='__main__':raise SystemExit(main())

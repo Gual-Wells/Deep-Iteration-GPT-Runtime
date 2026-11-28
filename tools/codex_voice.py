@@ -7,6 +7,11 @@ import json
 from pathlib import Path
 import sys
 
+if __name__ == '__main__':
+    print('Voice Companion retired in DIGR Codex 2.0. Use the original DIGR Codex 1.x distribution for the task.',
+          file=sys.stderr)
+    raise SystemExit(2)
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -77,9 +82,3 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError, KeyError) as exc:
         print(f'Voice companion error: {exc}', file=sys.stderr)
         return 2
-
-
-if __name__ == '__main__':
-    if hasattr(sys.stdout, 'reconfigure'):
-        sys.stdout.reconfigure(encoding='utf-8')
-    raise SystemExit(main())

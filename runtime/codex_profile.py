@@ -19,10 +19,11 @@ from .codex_transport import profile_layout
 from .execution_protocol import verify_execution_bundle
 from .codex_presets import resolve_defaults, preset_catalog
 
-PROFILE_PROTOCOL = 'digr-codex-native-v26'
+PROFILE_PROTOCOL = 'digr-codex-native-v27'
 PROFILE_CORE = (
     'codex/CONSTITUTION.md',
     'codex/FOUNDATION.md',
+    'codex/PAPER_POOL.md',
     'codex/METHOD.md', 'codex/CHARACTER.md', 'codex/PARAMETERS.md',
     'codex/COLLABORATION.md', 'codex/PERMISSIONS.md',
     'codex/CONSULT.md',
@@ -43,6 +44,7 @@ PROFILE_FILES = (
     'codex/PROTOCOL.md',
     'codex/CONSTITUTION.md',
     'codex/FOUNDATION.md',
+    'codex/PAPER_POOL.md',
     'codex/METHOD.md',
     'codex/HELP.md',
     'codex/PARAMETERS.md',
@@ -221,9 +223,10 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
     # The thin router stays broad. Only the acquired profile interprets aliases.
     invocation_key = next((alias for alias in ('DIGRC', 'DIGRP')
                            if text.startswith(alias)), key)
-    addon_hint = 'paper' if invocation_key == 'DIGRP' else None
     pin = _PROFILE_PIN.fullmatch(p_run) if p_run is not None else None
     version = tuple(map(int, pin.groups())) if pin else ()
+    retired_paper_entry = invocation_key == 'DIGRP' and (p_run is None or version >= (2, 0, 0))
+    addon_hint = 'paper' if invocation_key == 'DIGRP' and not retired_paper_entry else None
     preference_only = p_run is None or version >= (1, 1, 1)
     project_research = p_run is None or version >= (1, 4, 0)
     formal_task_parameters = p_run is None or version >= (1, 5, 0)
@@ -245,6 +248,9 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
         return {**base, 'reason': 'no exact leading candidate prefix'}
     tail = text[len(invocation_key):]
     if tail.strip() == '/help':
+        if retired_paper_entry:
+            return {**base, 'classification': 'INVALID',
+                    'reason': 'DIGRP is retired for new tasks; use DIGR/help or restore the original pin'}
         return {**base, 'classification': 'HELP', 'reason': 'exact help request'}
     if not tail.strip():
         return {**base, 'classification': 'INVALID', 'reason': 'empty invocation'}
@@ -273,6 +279,9 @@ def classify_invocation(message: str, *, p_run: str | None = None) -> dict[str, 
     prelude, task = tail[:separator], tail[separator + separator_length:]
     if prelude.strip() and not (prelude.strip().startswith(('(', '（')) and prelude.strip().endswith((')', '）'))):
         return {**base, 'reason': 'discussion text before the task separator'}
+    if retired_paper_entry:
+        return {**base, 'classification': 'INVALID',
+                'reason': 'DIGRP is retired for new tasks; use DIGR or restore the original pin'}
     if separator_length > 2:
         return {**base, 'classification': 'INVALID', 'reason': 'use one or two task-separator colons'}
     if not task.strip():

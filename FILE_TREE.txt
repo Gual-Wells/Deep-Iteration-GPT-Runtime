@@ -3,18 +3,6 @@
 .agents/skills/anti-defensive-writing/UPSTREAM.json
 .agents/skills/digr-delivery/SKILL.md
 .agents/skills/digr-delivery/agents/openai.yaml
-.agents/skills/digr-paper-knowledge/SKILL.md
-.agents/skills/digr-paper-knowledge/references/data-contract.md
-.agents/skills/digr-paper/SKILL.md
-.agents/skills/digr-paper/agents/openai.yaml
-.agents/skills/digr-personal-context/SKILL.md
-.agents/skills/digr-personal-context/agents/openai.yaml
-.agents/skills/digr-spoken-preprint/SKILL.md
-.agents/skills/digr-spoken-preprint/references/native-io.md
-.agents/skills/digr-voice-companion/SKILL.md
-.agents/skills/digr-voice-companion/references/examples.md
-.agents/skills/digr-voice-companion/references/hosts.md
-.agents/skills/digr-voice-companion/references/professional.md
 .gitattributes
 .gitignore
 CHANGELOG.md
@@ -47,6 +35,7 @@ codex/FOUNDATION.md
 codex/HELP.md
 codex/LIVE.md
 codex/METHOD.md
+codex/PAPER_POOL.md
 codex/PARAMETERS.md
 codex/PERMISSIONS.md
 codex/PROTOCOL.md
@@ -475,6 +464,8 @@ runtime/codex_knowledge.py
 runtime/codex_lifecycle.py
 runtime/codex_live.py
 runtime/codex_paper.py
+runtime/codex_paper_pool.py
+runtime/codex_paper_pool_route.py
 runtime/codex_permissions.py
 runtime/codex_personal.py
 runtime/codex_personal_sources.py
@@ -940,6 +931,8 @@ tests/test_codex_live_batching.py
 tests/test_codex_native_paper_return.py
 tests/test_codex_paper.py
 tests/test_codex_paper_native.py
+tests/test_codex_paper_pool_catalog.py
+tests/test_codex_paper_pool_routing.py
 tests/test_codex_permissions.py
 tests/test_codex_personal.py
 tests/test_codex_preprint.py
@@ -1014,6 +1007,7 @@ tools/codex_experience.py
 tools/codex_knowledge.py
 tools/codex_live.py
 tools/codex_paper.py
+tools/codex_paper_pool.py
 tools/codex_personal.py
 tools/codex_preprint.py
 tools/codex_production.py

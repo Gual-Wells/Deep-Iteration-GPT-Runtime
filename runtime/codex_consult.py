@@ -345,6 +345,9 @@ def _paper_scopes(root: Path, session: Mapping[str, Any]) -> list[dict]:
 
 def _selected_paper(root: Path, session: Mapping[str, Any], paper_root: Path) -> tuple[dict, dict, dict]:
     """Resolve one registered 0.5 paper; no other paper's state becomes context."""
+    from .codex_paper_pool_route import enabled as paper_pool_enabled
+    if paper_pool_enabled(session["P_run"]):
+        raise ValueError("DIGRP paper authoring is retired on 2.0+; use ordinary content scope and Paper Pool work")
     paper_root = Path(paper_root).resolve()
     for registered in _paper_scopes(root, session):
         if registered['version'] not in _NATIVE_PAPER_VERSIONS:

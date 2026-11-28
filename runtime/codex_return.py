@@ -188,6 +188,9 @@ def _native_state(root: Path) -> dict[str, Any]:
             state['delivery_ledger'] = _file_ref(ledger)
     if ordered_error_policy(metadata['P_run']):
         state['execution_errors'] = execution_errors(root)
+    from . import codex_paper_pool_route
+    if codex_paper_pool_route.enabled(metadata['P_run']):
+        state['paper_pool'] = _paper_pool_completion(root)
     if metadata.get('visit_clock'):
         from .codex_visits import run_projection
         clock = metadata['visit_clock']
@@ -261,7 +264,7 @@ def _strings(data: Mapping[str, Any], field: str) -> list[str]:
     return value
 
 
-def _input(root: Path, path: Path) -> tuple[dict[str, Any], set[Path], bytes]:
+def _input(root: Path, path: Path, *, verify_delivery: bool = True) -> tuple[dict[str, Any], set[Path], bytes]:
     raw = path.read_bytes()
     data = json.loads(raw.decode('utf-8-sig'))
     if not isinstance(data, dict) or data.get('schema_version') not in {1, 2, ERROR_REPORT_SCHEMA}:
@@ -313,11 +316,12 @@ def _input(root: Path, path: Path) -> tuple[dict[str, Any], set[Path], bytes]:
             if not {Path(item['path']) for item in normal}.issubset(set(final_paths)):
                 raise ValueError('X completion cannot omit declared final artifacts from delivery_files')
             paths.update(final_paths)
-            completion = completion_status(root, [item.as_posix() for item in final_paths], policy)
-            if not completion['ready']:
-                raise ValueError('selected X file delivery is incomplete: ' + json.dumps(completion, ensure_ascii=False))
             data['delivery_files'] = [item.as_posix() for item in final_paths]
-            data['delivery_completion'] = completion
+            if verify_delivery:
+                completion = completion_status(root, data['delivery_files'], policy)
+                if not completion['ready']:
+                    raise ValueError('selected X file delivery is incomplete: ' + json.dumps(completion, ensure_ascii=False))
+                data['delivery_completion'] = completion
         if _resources_enabled(metadata):
             from .codex_usage import build_usage_report, render_usage_markdown
             report = build_usage_report(root)
@@ -430,6 +434,14 @@ def _entry(root: Path, result: Mapping[str, Any]) -> None:
     temporary.replace(target)  # Replace the entry; never follow a repointed link.
 
 
+def _paper_pool_completion(root: Path) -> dict:
+    from .codex_paper_pool_route import completion
+    try:
+        return completion(root)
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        return {'state': 'UNAVAILABLE', 'can_close': False, 'problem': str(error)}
+
+
 def return_status(root: Path, *, refresh_entry: bool = False) -> dict[str, Any]:
     """Recheck current bytes and closure, without changing task lifecycle."""
     root, metadata = _session(root)
@@ -440,6 +452,7 @@ def return_status(root: Path, *, refresh_entry: bool = False) -> dict[str, Any]:
               'can_close': False, 'cannot_close': [],
               'scope': 'selected current bytes and declared return; not semantic completion'}
     selected_return = None
+    selected_pool_return = None
     if not (root / 'current-return.json').exists():
         result['issues'].append('no return snapshot has been sealed')
     else:
@@ -457,6 +470,7 @@ def return_status(root: Path, *, refresh_entry: bool = False) -> dict[str, Any]:
             result['return_schema'] = receipt.get('return_schema', 1)
             result['coverage'] = receipt['coverage']
             selected_return = receipt.get('court_return_binding')
+            selected_pool_return = receipt.get('paper_pool_return_selection')
             for name, ref in receipt['inputs'].items():
                 if _file_ref(Path(name)) != ref:
                     result['issues'].append('selected input changed or redirected: ' + name)
@@ -511,6 +525,14 @@ def return_status(root: Path, *, refresh_entry: bool = False) -> dict[str, Any]:
     result['court_completion'] = court
     if court['required'] and (not court['can_close'] or selected_return is None):
         result['cannot_close'].append('selected Max requires a current closing court verdict for the actual final answer and all products')
+    from .codex_paper_pool_route import enabled as paper_pool_enabled
+    if paper_pool_enabled(metadata['P_run']):
+        paper_pool = _paper_pool_completion(root)
+        result['paper_pool_completion'] = paper_pool
+        if not paper_pool['can_close']:
+            result['cannot_close'].append('Paper Pool work or an original-route result remains pending')
+        elif paper_pool.get('selection_sha256') and paper_pool['selection_sha256'] != selected_pool_return:
+            result['cannot_close'].append('Paper Pool consideration must cover the selected reply and final artifacts')
     if result['current_receipt'] not in {'READY_UNCLOSED', 'CLOSED'}:
         result['cannot_close'].append('a current sealed return is required before normal task closure')
     result['can_close'] = result['current_receipt'] == 'READY_UNCLOSED' and not result['cannot_close']
@@ -556,6 +578,9 @@ def seal_return(root: Path, input_path: Path) -> dict[str, Any]:
                'tool_state': tool_state,
                'outputs': outputs, 'semantic_certification': False,
                'collection_scope': 'explicit selected public facts; no automatic chat collection'}
+    if native.get('paper_pool', {}).get('state') == 'COMPLETE':
+        from .codex_paper_pool_route import selection_digest
+        receipt['paper_pool_return_selection'] = selection_digest(data)
     from .codex_court import required, return_binding
     if required(root):
         receipt['court_return_binding'] = return_binding(path.parent, data)

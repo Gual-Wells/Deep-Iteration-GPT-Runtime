@@ -6,7 +6,7 @@
 
 本机复算还可能发现原件自身的疑点。例如合成原文把服务变量定义为“实际完成工作”，附录又要求稳态严格负的到达减服务余量；不能默默改成“可提供的服务容量”后把修正讲法当原文定理。任务包应同时提供原段和标明本机身份的疑点、推导及其适用前提，让Claude据此自行发展或改变解释。最小充分材料在这种情境可以就是完整短论文；内容选择与讲法仍交给协作者。
 
-先根据本次原生研究准备 `claude-task.txt`、`original-excerpt.md`、必要图像；这些是实际发出的材料，不是本机索引。若本次实际对象为整篇论文导读，统一DIGR内部用真实`--paper-root`绑定，不需要另一种用户入口。
+先根据本次原生研究准备 `claude-task.txt`、`original-excerpt.md`、必要图像；这些是实际发出的材料，不是本机索引。2.0+ 按同一真实委托准备整篇导读，并按 [Paper Pool](../../PAPER_POOL.md) 履行学术任务工作。旧论文增量沿原 pin 绑定。
 
 ```text
 python -B tools/codex.py consult prepare --root D:/work/task --guidance --input D:/work/claude-task.txt --material D:/work/original-excerpt.md --exchange-id explain-stability

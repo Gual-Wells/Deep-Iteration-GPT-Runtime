@@ -6,6 +6,11 @@ import json
 from pathlib import Path
 import sys
 
+if __name__ == '__main__':
+    print('Personal Context retired in DIGR Codex 2.0. Use the original DIGR Codex 1.x distribution for the task.',
+          file=sys.stderr)
+    raise SystemExit(2)
+
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -78,10 +83,3 @@ def main(argv=None):
     except (ValueError, KeyError, IndexError, TypeError, OSError) as error:
         print('Personal Context: ' + str(error), file=sys.stderr)
         return 2
-
-
-if __name__ == '__main__':
-    for stream in (sys.stdout, sys.stderr):
-        if hasattr(stream, 'reconfigure'):
-            stream.reconfigure(encoding='utf-8')
-    raise SystemExit(main())

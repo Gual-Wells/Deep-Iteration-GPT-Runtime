@@ -55,7 +55,8 @@ class ClaudeSelectionTests(unittest.TestCase):
             for separator in (':', '：', '::', '：：', ':：', '：:'):
                 with self.subTest(alias=alias, separator=separator):
                     raw_task = '  原件：保持双冒号::与末尾换行\n'
-                    value = classify_invocation('  ' + alias + '(Less)(X)' + separator + raw_task)
+                    pin = '1.9.0@' + '1' * 40 if alias == 'DIGRP' else None
+                    value = classify_invocation('  ' + alias + '(Less)(X)' + separator + raw_task, p_run=pin)
                     self.assertEqual(value['classification'], 'EXECUTING')
                     self.assertEqual(value['task'], raw_task)
                     self.assertEqual(value['parameter_text'], '(Less)(X)')

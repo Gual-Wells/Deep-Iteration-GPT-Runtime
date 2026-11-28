@@ -132,6 +132,18 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
                            stable=layered)
     previous = load_foundation(root) if (root / 'foundation.json').exists() else None
     material = change_kind == 'material'
+    revision = previous['revision'] + 1 if previous else 1
+    from .codex_paper_pool_route import PLAN_FIELD, enabled as paper_pool_enabled, normalize_plan
+    if paper_pool_enabled(session['P_run']):
+        if previous is not None and not material:
+            original = previous['brief'][PLAN_FIELD]
+            if PLAN_FIELD in brief and normalize_plan(brief[PLAN_FIELD]) != original:
+                raise ValueError('a changed Paper Pool assignment or baseline needs a material revision')
+            brief[PLAN_FIELD] = deepcopy(original)
+            brief['paper_pool_revision'] = previous['brief']['paper_pool_revision']
+        else:
+            brief[PLAN_FIELD] = normalize_plan(brief.get(PLAN_FIELD))
+            brief['paper_pool_revision'] = revision
     intent_review = None
     intent_council = proposal.get('intent_council')
     if intent_council is not None:
@@ -165,7 +177,6 @@ def propose_foundation(root: Path, proposal: Mapping[str, Any], *, reason: str,
         changed = [key for key in DECISION_FIELDS if previous['brief'].get(key) != brief.get(key)]
         if changed:
             raise ValueError('decision fields changed; use material revision: ' + ', '.join(sorted(changed)))
-    revision = previous['revision'] + 1 if previous else 1
     # Answers survive only an unchanged decision question, not a recycled ID.
     old_questions = {q['id']: q for q in previous['questions']} if previous else {}
     for question in questions:

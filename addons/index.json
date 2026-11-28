@@ -1,27 +1,7 @@
 [
   {
-    "id": "digrp",
-    "name": "DIGRP Paper Reading",
-    "path": "paper/PROTOCOL.md"
-  },
-  {
-    "id": "voice-companion",
-    "name": "DIGR Voice Companion",
-    "path": "voice/README.md"
-  },
-  {
-    "id": "paper-knowledge",
-    "name": "DIGR Paper Knowledge",
-    "path": ".agents/skills/digr-paper-knowledge/SKILL.md"
-  },
-  {
-    "id": "english-spoken-preprint",
-    "name": "English-Spoken-Preprint",
-    "path": "spoken-preprint/README.md"
-  },
-  {
-    "id": "personal-context",
-    "name": "DIGR Personal Context",
-    "path": "personal-context/README.md"
+    "id": "paper-pool",
+    "name": "Paper Pool",
+    "path": "codex/PAPER_POOL.md"
   }
 ]

@@ -4,9 +4,7 @@
 
 按 [PROTOCOL](PROTOCOL.md) 解释任务冻结版本和用户当前选择。Stable 的 `task lifecycle/report` 给出当前 `claude_policy`。单冒号为 `COUNCIL_ONLY`，双冒号为 `ALLOW`。普通话明确更改时用 `task handle --claude-selection COUNCIL_ONLY|ALLOW|DENY` 绑定真实当前原话。已有任务按原 pin 的枚举及费用契约恢复。`profile classify --pin <版本@完整SHA>` 可离线预览对应语义，省略 pin 时预览当前分发，真实获取仍走 `acquire`。
 
-论文辅学另有可选的[知识池技能](../.agents/skills/digr-paper-knowledge/SKILL.md)与 `python -B tools/codex.py knowledge --help`。原生 Codex 读论文、分层批量问询和教学，工具保存冻结问项、论文局部用法、真实选择、有范围证据及接续位置。个人数据与原件放在独立私有项目，不进入本公共库；可从私有项目的相对路径入口接续，本机定位缓存仅用于发现。它不替代本轮在线 DIGR 协议获取，也不需要阅读器或付费模型接口。普通读取只用标准库，摄入 PDF 另需所选 Python 环境中的 `pypdf`。具体数据与命令见技能的按需引用。
-
-统一 DIGR 第二层实际委托外部作者制作整篇解构、导读或完整读物时，应用同 SHA 声明的[论文协议](../paper/PROTOCOL.md)、[技能](../.agents/skills/digr-paper/SKILL.md)与 `python -B tools/codex.py paper --help`。它保存每篇的来源/导读映射、候选和Gmail读回事实；不替知识池写学习证据，单篇返回也不关闭当前DIGR任务。
+学术任务用 [Paper Pool](PAPER_POOL.md) 识别当前委托、派发工作、检索可回指原件并记录实际结果。入口为 `python -B tools/codex.py paper-pool --help`。1.x 的五项附属用对应的原 P_run 分发和资料绑定恢复。
 
 必读[RETURN](RETURN.md)规定 1.9 的最终正文依次为结果、关键变化、工作过程、论证与适用范围、参数、执行报错。正文内使用时间／工作表，实际产物可以链接。`return seal/status/body/close`保存、读回与收口，`return record-error/errors`记录并读回执行异常。
 
@@ -87,7 +85,7 @@ python -B tools/codex.py council run-round --root TASK --council-id ID --round-i
 
 ### 第二层准备、两份成品与实际落实
 
-采用正式双边产出协议的任务按 [CONSULT](CONSULT.md) 判断实际目的。仅委托意见的请求用 `consult prepare --root TASK --input GUIDANCE.txt --exchange-id G --guidance`。委托实际成品时，把当前用户要求、交付范围和验收条件写入 UTF-8 的 `SCOPE.md`，向实际原生 L3 派发该工作。用真实代理身份和本次派发出处登记，再准备 Claude 候选请求。制作所选论文读物时，下列两条命令分别加上同一个 `--paper-root PAPER`。
+采用正式双边产出协议的任务按 [CONSULT](CONSULT.md) 判断实际目的。仅委托意见的请求用 `consult prepare --root TASK --input GUIDANCE.txt --exchange-id G --guidance`。委托实际成品时，把当前用户要求、交付范围和验收条件写入 UTF-8 的 `SCOPE.md`，向实际原生 L3 派发该工作。用真实代理身份和本次派发出处登记，再准备 Claude 候选请求。论文作为实际任务对象时，同时按 [Paper Pool](PAPER_POOL.md) 履行其独立工作。
 
 ```text
 python -B tools/codex.py production start --root TASK --production-id F --scope SCOPE.md --actor NATIVE_ACTOR --dispatch-ref ACTUAL_DISPATCH

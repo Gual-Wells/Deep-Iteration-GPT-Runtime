@@ -90,7 +90,7 @@ class CodexBoundaryTests(unittest.TestCase):
     def test_digrp_longest_alias_selects_paper_without_changing_the_thin_route(self):
         from runtime.routing import candidate_route_key
         raw = '\u3000 DIGRP（N（12），S（n（3）））：完整论文：保留原任务\n'
-        result = classify_invocation(raw)
+        result = classify_invocation(raw, p_run='1.9.0@' + '1' * 40)
         self.assertEqual(candidate_route_key(raw), 'DIGR')
         self.assertEqual(result['route_key'], 'DIGR')
         self.assertEqual(result['invocation_key'], 'DIGRP')
@@ -111,7 +111,7 @@ class CodexBoundaryTests(unittest.TestCase):
                  ('DIGRProblem：这里只是单词讨论', 'NATIVE')]
         for text, expected in cases:
             with self.subTest(text=text):
-                result = classify_invocation(text)
+                result = classify_invocation(text, p_run='1.9.0@' + '1' * 40)
                 self.assertEqual(result['classification'], expected)
                 self.assertEqual(result['addon_hint'], 'paper')
                 self.assertIsNone(result['addon_selection'])

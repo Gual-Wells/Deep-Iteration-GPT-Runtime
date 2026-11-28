@@ -16,7 +16,7 @@ ESP 是 DIGR Codex 的附属工作流，不是另一个 DIGR 执行协议。故�
 
 > 使用 English-Spoken-Preprint，生成一册英语生活场景。给人物各自真实独立的 M/D，上下文只包含本人的可知经历；世界议会从创世开始活动。编好后交手机仅跟听包和单独幕后版。
 
-执行细节见 [生成技能](../.agents/skills/digr-spoken-preprint/SKILL.md)。原生 Codex 负责研究、创作、调度与取舍；标准库工具只保存提交、投递视角、出版和核对来源，不会调用模型或自动造角色。
+执行细节见 [生成技能](https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/blob/7223b4722739a63b6cff37163a6ea6b0f2c04854/.agents/skills/digr-spoken-preprint/SKILL.md)。原生 Codex 负责研究、创作、调度与取舍；标准库工具只保存提交、投递视角、出版和核对来源，不会调用模型或自动造角色。
 
 ```text
 python -B tools/codex.py preprint --help

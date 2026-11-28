@@ -1,11 +1,11 @@
-# DIGR Codex 1.8 使用说明
+# DIGR Codex 2.0 使用说明
 
 | 调用 | 工作方式 |
 | --- | --- |
 | `DIGR：核对这组设计的机制并完成约定修改` | Codex 研究和交付。在能影响成品的取舍定案前，请 Sonnet、Hydrogen 和 Grok 作独立首发。第一层累计 0.25 美元内直接使用。 |
 | `DIGR：：请 Claude 就这份稿件的结构给建议` | 第二层指导。Main 落实有效建议。 |
 | `DIGR：：让 Claude 制作一份可用的解释` | 第二层正式产出。原生 L3 和 Claude 独立完成同范围候选，Main 按同一标准比较并交付。 |
-| `DIGR：：用 Sonnet 完整讲通这篇论文` | 为完整论文读物产出同范围独立候选并比较，接入同 pin 的[论文增量](../paper/PROTOCOL.md)。 |
+| `DIGR：用 Paper Pool 查找与这项结论有关的论文材料，并复核出处` | 用[论文池](PAPER_POOL.md)定位材料和来源，再按任务范围核对证据。 |
 | `DIGR(Less)(X)：任务` | 参考 Less 投入偏好推断各项参数，最终文件按配置交付至本人 Gmail。 |
 | `DIGR(More,N=20)：任务` | 参考 More 投入偏好，按显式 N 声明和实际任务推断完整配置。 |
 | `DIGR(Less,F=3)：设计离线阅读器的批注同步方案` | 先研究至少 3 个来自相关公开社区的高评价、有特色的项目，再将所得用于相关方案的取舍。 |
@@ -19,7 +19,7 @@
 
 Main 主动找 Claude 能影响的开放取舍。Claude 可选择或改划议题并先给出立场，原生议会读原文后再议，由 Main 落实。追加请教要有当前仍值得解决的具体问题。取舍已经确定、超过实际决定窗口或已有材料足够时，原生议会据实际所得推进。
 
-ASCII `:` / `::` 与全角等价。真实获取 Codex 分支、固定同 SHA 协议后解析，双冒号整体消费。三枚以上分隔冒号和空任务无效。完整只读/询问调用也可深执行，操作范围按实际委托。讨论和引用有原来的含义。DIGRC、DIGRP 兼容拼写沿相同角色和费用条件。
+ASCII `:` / `::` 与全角等价。真实获取 Codex 分支、固定同 SHA 协议后解析，双冒号整体消费。三枚以上分隔冒号和空任务无效。完整只读/询问调用也可深执行，操作范围按实际委托。讨论和引用有原来的含义。新任务以 `DIGR` 进入。
 
 Light、Less、Default、More、Max 是五档投入偏好基准，`standard` 兼容为 Light。裸调用以 Default 为参考（N12/R4/D3/V3/L3/M1）。Main 在正式 INIT 前主动考虑能改善交付的加深做法，按真实工作逐项推断。若一次更深入的整体重开可能改变方案，Less 也可以将 R 定得更高。推断值可以越过 Light 或 Max 的参考值，用户逐项声明的值按其适用范围生效。Codex 沿当前模型和推理设置工作。只有预见超巨量批任务才按实际收益考虑多档协作。两层 Claude 的研究与内容工作均另记来源，原生 N/R/D/V/L/M 仍由 Codex 承担。详见 [PARAMETERS](PARAMETERS.md)。
 
@@ -61,8 +61,10 @@ X 是正式二元参数，X0在当前聊天交付，显式X1选择本人Gmail；
 
 ## 本机工具
 
-`python -B tools/codex.py consult prepare` 组装实际任务包。第二层用 `--guidance` 或正式对象和阶段参数声明实际目的。`consult split --input native-decision.json --out split-plan.json` 绑定当前计划，`consult call --split-plan …` 通过本机 Split 核对后在真实预算内作一次提交。`consult inspect` 读公开事实，`reconcile-cost` 负责对账。`consult budget-preview` 用于估算，`consult budget-limit` 登记用户给出的更窄限额。`production` 记录实际派发、候选、实际选择及成品后果，论文请求用 `--paper-root` 绑定对应对象。
+`python -B tools/codex.py consult prepare` 组装实际任务包。第二层用 `--guidance` 或正式对象和阶段参数声明实际目的。`consult split --input native-decision.json --out split-plan.json` 绑定当前计划，`consult call --split-plan …` 通过本机 Split 核对后在真实预算内作一次提交。`consult inspect` 读公开事实，`reconcile-cost` 负责对账。`consult budget-preview` 用于估算，`consult budget-limit` 登记用户给出的更窄限额。`production` 记录实际派发、候选、实际选择及成品后果。
 
-`profile check`只检本地完整性，`acquire`真实联网取pin；`live work/read/ack` 保存真实阶段和无损公开流，宿主实际转播后再确认显示。 `usage` 返回真实 Claude 美元及 Codex 模型和档位的用量证据。 `paper`、`visits` 和 `return` 保存作用域、事实与接续。它们不代替模型的研究、内容判断或有效指导的落实。完整执行按[PROTOCOL](PROTOCOL.md)及manifest全部核心，操作细节见[WORKBENCH](WORKBENCH.md)。
+Main 为正式学术任务单列 [Paper Pool 工作](PAPER_POOL.md)，明确研究问题、交付物和验收条件。`python -B tools/codex.py paper-pool --help` 显示论文池的工具入口。需要池内材料时，先绑定实际使用的论文池，再按研究问题检索并回查证据。
 
-1.9 的最终正文在参数之后显示「执行报错」，按首次发生顺序附阶段、问题、影响、状态和处理。
+`profile check` 校验本地完整性，`acquire` 联网获取 pin。`live work/read/ack` 保存真实阶段和无损公开流，宿主实际转播后确认显示。`usage` 读取实际用量证据，`visits` 和 `return` 保存任务事实。完整执行按[PROTOCOL](PROTOCOL.md)及 manifest 的核心正文，操作细节见[WORKBENCH](WORKBENCH.md)。
+
+历史任务按原 `P_run` 接续。1.x 的 DIGRP、Voice Companion、Paper Knowledge、English-Spoken-Preprint 和 Personal Context 使用原 SHA 的对应分发和原数据绑定。参见[附属项目与历史恢复](../addons/README.md)。

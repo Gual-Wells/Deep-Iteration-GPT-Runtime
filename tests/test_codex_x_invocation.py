@@ -18,7 +18,8 @@ class CodexXInvocationTests(unittest.TestCase):
                 with self.subTest(alias=alias, group=group, separator=separator):
                     body = '  完整任务：保留标点\n(X=QQ)  '
                     raw = '\u3000 ' + alias + group + separator + body
-                    result = classify_invocation(raw)
+                    pin = '1.9.0@' + '1' * 40 if alias == 'DIGRP' else None
+                    result = classify_invocation(raw, p_run=pin)
                     self.assertEqual(result['classification'], 'EXECUTING')
                     self.assertEqual(result['task'], body)
                     self.assertEqual(result['parameter_text'], group)
@@ -124,7 +125,7 @@ class CodexXInvocationTests(unittest.TestCase):
 
     def test_mentions_quotes_help_and_discussion_never_select_delivery(self):
         for raw, classification in (
-            ('DIGR/help', 'HELP'), ('DIGRP/help', 'HELP'),
+            ('DIGR/help', 'HELP'), ('DIGRP/help', 'INVALID'),
             ('DIGR(X=QQ)', 'NATIVE'), ('DIGR(X)是什么？', 'NATIVE'),
             ('DIGRProblem(X=QQ):a word', 'NATIVE'),
             ('请解释DIGR(X=QQ):task', 'NATIVE'), ('“DIGR(X=QQ):task”是引文', 'NATIVE'),

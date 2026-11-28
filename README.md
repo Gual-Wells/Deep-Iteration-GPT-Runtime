@@ -1,4 +1,4 @@
-# DIGR for Codex · Stable 1.9.0
+# DIGR for Codex · Stable 2.0.0
 
 `DIGR：任务` 开放第一层研究议会，`DIGR：：任务` 同时开放第二层内容协作。原生 Codex 与 Sonnet 5.5、Gemini 4 Hydrogen Flex、Grok 4.7 的意见和候选按同一标准比较。各外部模型共用第一层每任务 0.25 美元和第二层每任务 1.25 美元，受真实钱包和用户更窄限额约束。实际提交依现有 Split、权限与对账流程。见[当前协议](codex/PROTOCOL.md)和[使用说明](codex/HELP.md)。
 
@@ -10,13 +10,11 @@ Codex 按当前模型和推理设置工作。五档提供任务强度推断的�
 
 概念、机制、协议和方案分析以逻辑论证完成。真实检验用于核对明确事实与实际工程，限制只约束实际受影响的决定或行动。已有明确委托和适用的局部工作继续处理。[共同分析方法](docs/LOGIC_FIRST_ANALYSIS.md)。
 
-共同核心承接当前理解关系、现稿纠正与历史案例证据，论文、知识接续、个人材料、ESP 和 Voice 按各自用途使用这些方法。[全族适用范围](docs/CODEX_FAMILY_UPGRADE_0_11_1.md)区分共同方法与 Consult 专属权限。未选档时以 Default 的 N12/R4/D3/V3/L3/M1 为参考。Main 根据实际任务确定生效配置。
+未选档时以 Default 的 N12/R4/D3/V3/L3/M1 为参考。Main 根据实际任务确定生效配置。
 
-N/T/R/B/S(n,t,r,b)/D/V/L/M/X/F/C的完整调用已在[HELP](codex/HELP.md#完整参数调用)对齐。X/F/C纳入正式任务级参数与五档、自定义配置。`X=0`选择本聊天，显式`X=1`选择本人Gmail，旧`(X)`和`(X=Gmail)`兼容。C独立控制庭审：新任务Max默认C1、其余档C0，显式选择优先，同任务省略继承。`DIGR(Less,C=1)：任务`与`DIGR(Max,C=0)：任务`均可正常调用。实际C1在原责任完成后按[COURT](codex/COURT.md)接受真实七角色庭审，控辩双方各一位律师，书记员主动维护原件与全程案卷，黑警平等暴力威慑全体，公诉覆盖意图理解与默认忽略，交给控方律师后仍持续研究全流程诉点并及时递交，成立问题重新估参、执行和复审，直到当前无罪或误差不致罪后完成交付。X1的最终候选先审，之后发送并读回。
+N/T/R/B/S(n,t,r,b)/D/V/L/M/X/F/C/U 的完整调用见[使用说明](codex/HELP.md#完整参数调用)。`X=0`选择当前聊天，显式`X=1`选择本人 Gmail，旧`(X)`和`(X=Gmail)`兼容。C独立控制庭审：新任务Max默认C1、其余档C0，显式选择优先，同任务省略继承。`DIGR(Less,C=1)：任务`与`DIGR(Max,C=0)：任务`均可正常调用。实际C1在原责任完成后按[COURT](codex/COURT.md)接受真实七角色庭审，控辩双方各一位律师，书记员主动维护原件与全程案卷，黑警平等暴力威慑全体，公诉覆盖意图理解与默认忽略，交给控方律师后仍持续研究全流程诉点并及时递交，成立问题重新估参、执行和复审，直到当前无罪或误差不致罪后完成交付。X1的最终候选先审，之后发送并读回。
 
-0.9.0把[X文件交付](codex/DELIVERY.md)接入DIGR、DIGRP：无`X`在当前聊天返回文件；`DIGR(X):…`、`DIGRP(X):…`和`(X=Gmail)`均发送到本机配置的本人Gmail。常规投入参数后可另接一个X栏，例如`DIGRP(N=16,R=4)(X=Gmail):…`。X只控制任务约定的最终文件；没有文件时保留文字答复，不额外造文件。本版仅实现Gmail，个人目标在私有本机配置中，任务建立时解析并保存。
-
-[DIGR 论文 0.6.3](paper/PROTOCOL.md)以同一论文原件和读者用途组织独立候选。Main 比较并落实为每篇一份[标准页桌面 PDF](paper/PDF_DESIGN.md)。无 X 在聊天交付，有 X 时逐篇发送本人 Gmail 并读回。
+[X 文件交付](codex/DELIVERY.md)作用于任务约定的最终文件。新任务可用 `DIGR(N=16,R=4,X=1)：…` 发送至本机配置的本人 Gmail 并读回。仅文字交付的任务沿当前聊天返回正文。
 
 0.8.3接入社区 Anti-Defensive Writing：有据主张先行，删除重复辩护、叠加保留和自我贬低，必要限定准确落在相关主张。核心规则进入必读PROTOCOL、RETURN及普通任务轻量约定；中英双语完整技能连同不可变来源和MIT许可随分发提供。[来源与接入说明](docs/CODEX_ANTI_DEFENSIVE_UPGRADE.md)。
 
@@ -24,7 +22,7 @@ N/T/R/B/S(n,t,r,b)/D/V/L/M/X/F/C的完整调用已在[HELP](codex/HELP.md#完整
 
 **让深入研究、竞争方案和实际制作共同推动任务结果。**
 
-[默认返回](codex/RETURN.md)在对话正文呈现结果、工作表和参数等内容，1.9 在末尾追加按发生顺序的「执行报错」。各参与者共用 Begin/End 记录，T/t 按同一任务的区间并集统计。消息、决定、产物和返回沿原 pin 接续。
+[默认返回](codex/RETURN.md)在对话正文呈现结果、工作表和参数等内容，并按发生顺序汇报「执行报错」。各参与者共用 Begin/End 记录，T/t 按同一任务的区间并集统计。消息、决定、产物和返回沿原 pin 接续。
 
 0.7新增[U0前置任务工程](codex/FOUNDATION.md)：先调查已有材料，把完整结果、处理粒度、依赖、竞争路线和资源去向说清，经问答纠偏与明确决定后再全面执行。前置与正式任务独立预算、独立计时；已确认续做只问重要变化。[本轮研究与实际工作](docs/research/codex-task-foundation-20261109/WORK.md)记录了取舍和验证范围。
 
@@ -34,7 +32,11 @@ DIGR 是一套由模型承担研究、判断与制作的工作协议。它鼓励
 
 本分支提供 Codex 候选通道与配套本地工具。模型选择问题和方法、调用宿主能力、处理返回并交付；Python 工具负责取得仓库原文、取回材料、保存接续位置和记录活动区间。
 
-[附属项目入口](addons/README.md)列出 Voice Companion、Paper Knowledge、[English-Spoken-Preprint](spoken-preprint/README.md) 与 [Personal Context](personal-context/README.md)。ESP 0.2 以目标领域中的困难处理为选材中心，提供原场景与独立双语学习听稿；个人资料附属可提供有来源的最小人物视图，保持可选关系。项目回原数据接续，不互相强绑；独立的[真人参与实训](research/codex-participation/README.md)目前只作设计探索。附属各自版本化，不改根 stable 语义。
+[Paper Pool](codex/PAPER_POOL.md)是 2.0 的唯一[附属项目](addons/README.md)。正式学术任务按研究问题安排独立的 Paper Pool 工作。工具提供论文池检索和可回查的证据，研究结果进入当前候选的取舍。
+
+1.x 的 DIGRP、Voice Companion、Paper Knowledge、English-Spoken-Preprint 和 Personal Context 已从当前入口退役，历史任务沿原 `P_run`、原版工具和原数据绑定接续。[1.9.0 附属目录归档](https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime/blob/7223b4722739a63b6cff37163a6ea6b0f2c04854/addons/README.md)
+
+[真人参与实训](research/codex-participation/README.md)是独立的设计探索。
 
 ## 从你的用途进入
 
@@ -43,7 +45,7 @@ DIGR 是一套由模型承担研究、判断与制作的工作协议。它鼓励
 | 在普通任务中采用这些交付偏好 | 将 [轻量工作约定](codex/AGENTS.light.md) 合并到适用的 AGENTS 指令；照常提问，不建立 DIGR 参数与计时。 |
 | 明确让 Codex 为一个任务投入深研究与独立协作 | 按下节启用 [Codex 路由](codex/ROUTER.experimental.txt)，再发送显式任务。当前协议入口为 [codex/manifest.json](codex/manifest.json)。 |
 | 只想取回材料、整理正在进行的工作或接续一个任务 | 使用下方的本地工具。工作台可直接用于普通任务。 |
-| 在英语语音里需要伙伴帮忙接话、构思或共同创作 | 使用独立的 [Voice Companion](voice/README.md)：短常驻核待命，完整技能按需；附可直接上传的自足文件，不启动 DIGR 参数。 |
+| 从论文池定位与当前问题有关的材料 | 见 [Paper Pool](codex/PAPER_POOL.md)。在仓库或同版分发目录运行 `python -B tools/codex.py paper-pool --help`。 |
 | 继续使用既有 stable 通道 | 使用根 [manifest.json](manifest.json)、[启动协议](entry/STARTUP.md) 与 [帮助](entry/HELP.md)。根版本保持 **5.0.0-alpha.5**。 |
 
 Codex 与根 stable 分别版本化。选择 Codex 时，按 `codex/` 解释参数、时钟前提和返回；stable 保留自己的执行器与证明语义。
@@ -65,7 +67,7 @@ DIGR：比较这个项目的两种发布方案，实际验证关键路径，给�
 | 调用 | 含义 |
 | --- | --- |
 | `DIGR：任务` | 在能改变结果的取舍定案前安排一次独立首发。参考 Default，根据实际任务推断初始投入。 |
-| `DIGR：：用 Sonnet 完整处理论文` | 按第二层内容制作和已批准的费用范围接入论文增量，一篇一份完整标准页 PDF。 |
+| `DIGR：：用 Sonnet 独立撰写这份技术说明` | 按第二层正式产出机制形成候选，由 Main 比较并交付。 |
 | `DIGR(M(2))：任务` | 两条完整独立 Main，各自初始化、研究制作、承担本线责任并收敛，然后比较。 |
 | `DIGR(target=60min)：任务` | 软时间目标，模型仍按结果决定是否继续。 |
 | `DIGR(min=60min)：任务` | 有效工作硬下限，需要真实时间证据。 |
@@ -91,7 +93,7 @@ DIGR：比较这个项目的两种发布方案，实际验证关键路径，给�
 
 ## 本地工具：从一份材料开始
 
-需要 **Python 3.10+**，核心运行时只用标准库；[论文增量](paper/DATA.md)的实际PDF几何核验和[论文知识池](.agents/skills/digr-paper-knowledge/SKILL.md)的PDF摄入另需 `pypdf`。桌面PDF排版还使用已定位的Node、浏览器、MathJax及本地字体，具体依赖与命令见论文文件契约。以下是 Windows PowerShell 示例，任务数据放在 D 盘；其它平台按实际任务目录调整路径。在现有本分支 checkout 根目录运行即可。尚无 checkout 时：
+核心运行时需要 **Python 3.10+**，使用标准库。以下 Windows PowerShell 示例使用 D 盘存放仓库与任务数据。已签出本分支时，从仓库根目录运行工具即可。首次签出可运行以下命令。
 
 ```powershell
 git clone --branch codex/codex-host-adaptation --single-branch https://github.com/Gual-Wells/Deep-Iteration-GPT-Runtime.git D:/CodexStorage/workspaces/digr-runtime
@@ -145,6 +147,7 @@ python -B tools/codex.py acquire --stage execution --continue-from D:/task/acqui
 | 命令 | 用途 |
 | --- | --- |
 | `python -B tools/codex.py profile instructions light` | 输出轻量指令文本，供人工合并；不安装。 |
+| `python -B tools/codex.py paper-pool --help` | 查看论文池绑定、检索和来源核对的命令。 |
 | `python -B tools/codex.py experience --help` | 保存明确选入的经验片段及出处；后续查看来源位置是否变化。不会自动写入全局 Memory。 |
 | `python -B tools/codex.py permissions --help` | 根据实际供给的任务授权、能力与费用事实给行动建议；不执行操作或改变宿主权限。 |
 
@@ -170,6 +173,6 @@ python -B -X utf8 tests/validate_repo.py
 
 源码发布工具 [tools/build_release.py](tools/build_release.py) 同时生成Codex聚合包/散列和根stable分发材料，排除本机私有.cache与Git入口。测试、版本与哈希核查验证相应代码和分发行为；实际发生的跨任务效果按所观察的范围陈述。
 
-Codex 0.12.1 默认流式读取并实时转播Claude公开正文；宿主先完成文本/Markdown、公式及必要图表裁取，避免以整页图批量转移前处理和视觉成本。旧pin维持旧传输；新论文增量为0.5.3。
+外部协作的公开正文由宿主流式读取并及时转播。宿主负责准备文本、公式和必要图表。
 
 1.6.0在每个真实层级U0后增加短协议自提醒，并优化庭审的增量回应、公诉内容失效、职责阅读、短回执和证据就绪调度。实际成本归因、匿名聚合与可证明的收益范围见[庭审效率研究](docs/CODEX_COURT_EFFICIENCY_1_6.md)。冻结旧任务继续原pin，不跨版本改旧案。

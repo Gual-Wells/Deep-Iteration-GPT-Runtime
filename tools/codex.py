@@ -30,9 +30,9 @@ from runtime.codex_lifecycle import (
     MESSAGE_ACTIONS, ingest_message, handle_message, load_lifecycle, close_session, recover_session, terminate_message,
 )
 
-TOOL_GROUPS = ('profile', 'workbench', 'experience', 'knowledge', 'timeline', 'voice',
-               'return', 'preprint', 'personal', 'visits', 'paper', 'delivery',
-               'consult', 'council', 'production', 'usage', 'allot', 'live', 'court')
+TOOL_GROUPS = ('profile', 'workbench', 'experience', 'timeline', 'return', 'visits',
+               'paper-pool', 'delivery', 'consult', 'council', 'production', 'usage',
+               'allot', 'live', 'court')
 
 
 def read_object(path: Path) -> dict:
@@ -52,7 +52,7 @@ def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else list(argv)
     # Pass through argument parsing rather than duplicate mature CLI surfaces.
     if argv and argv[0] in TOOL_GROUPS:
-        return import_module('tools.codex_' + argv[0]).main(argv[1:])
+        return import_module('tools.codex_' + argv[0].replace('-', '_')).main(argv[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
     for name in TOOL_GROUPS:
